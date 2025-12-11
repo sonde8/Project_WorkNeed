@@ -19,7 +19,7 @@ Clone 버튼을 클릭하여 프로젝트를 다운로드하고 IntelliJ로 엽�
 ⌨️ 터미널 명령어 사용 (대안)
 원하는 폴더로 이동하여 다음 명령을 실행합니다.
 
-Bash
+
 
 git clone https://github.com/sonde8/Project_WorkNeed.git
 2. 🌳 자신의 개발 브랜치로 전환 (Checkout)
@@ -37,7 +37,7 @@ Checkout 버튼을 눌러 해당 브랜치로 전환합니다.
 ⌨️ 터미널 명령어 사용 (대안)
 터미널에서 자신의 브랜치 이름으로 전환합니다.
 
-Bash
+
 
 # 예: 근태 관리를 맡은 팀원
 git checkout feature/Attendance
@@ -47,7 +47,7 @@ git checkout feature/Attendance
 A. 작업 시작 전: 최신 내용 가져오기 (Pull)
 매일 작업을 시작하기 전 또는 중요한 작업 시작 전에 main 브랜치에 다른 팀원들이 병합한 최신 내용이 있는지 확인하고 가져와야 합니다.
 
-Bash
+
 
 # 자신의 브랜치에 있는 상태에서 실행
 git pull origin main
@@ -60,14 +60,14 @@ B. 코드 작성 및 커밋 (Commit)
 
 커밋 메시지 작성: 정해진 규칙에 따라 커밋 메시지를 작성합니다. (예: feat:, fix:, refactor: 사용)
 
-Bash
+
 
 # 예시
 git commit -m "feat: Members 회원가입 API 컨트롤러 작성"
 C. 자신의 브랜치에 푸시 (Push)
 로컬에서 커밋한 내용을 GitHub의 자신의 브랜치에 반영합니다.
 
-Bash
+
 
 # [자신의_브랜치_이름]을 정확히 입력
 git push origin [자신의 브랜치 이름]
