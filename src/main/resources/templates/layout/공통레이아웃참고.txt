@@ -1,0 +1,9 @@
+
+<title th:text="${pageTitle}">WORKNEED</title>
+      -> 컨트롤러에서 model.addAttribute("pageTitle", "각자 페이지타이틀(브라우저 탭 제목)로 넣어주세요");
+
+content : 1340px를 max로 넣어주세요
+
+<main class="content" th:replace="${content}">
+      -> 컨트롤러에서  model.addAttribute("content", " 각자의 템플릿 상대 경로 :: content");
+      -> content에 들어갈 내용.html 파일에서 <div th:fragment=""> 로 작성해주세요
