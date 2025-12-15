@@ -1,0 +1,129 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: #ffffff;
+    font-family: Arial, sans-serif;
+}
+
+/* ===== 전체 ===== */
+.calendar-page {
+    width: 1200px;
+    height: 100vh;
+    margin: 0 auto;
+}
+
+/* ===== 레이아웃 ===== */
+.calendar-layout {
+    display: flex;
+    height: 100%;
+}
+
+/* ===== 사이드바 ===== */
+.calendar-sidebar {
+    width: 380px;
+    padding: 20px;
+    background: #f3f3f3;
+
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+/* ===== 가운데 여백 ===== */
+.calendar-gap {
+    width: 20px;
+    background: #ffffff;
+}
+
+/* ===== 메인 ===== */
+.calendar-main {
+    width: 800px;
+    padding: 20px;
+    background: #f3f3f3;
+
+    display: flex;
+    flex-direction: column;
+}
+
+/* ===== 미니 캘린더 ===== */
+.sidebar-mini-calendar {
+    height: 260px;
+    background: #ddd;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-weight: bold;
+}
+
+/* ===== 버튼 ===== */
+.sidebar-btn {
+    height: 50px;
+    padding: 0 14px;
+
+    background: #ffffff;
+    border: 1px solid #ccc;
+
+    text-align: left;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.sidebar-btn.active {
+    background: #e0ebff;
+    border-color: #3B82F6;
+    font-weight: bold;
+}
+
+/* ===== 공유 캘린더 ===== */
+.sidebar-box {
+    background: #ffffff;
+    border: 1px solid #ccc;
+    padding: 12px;
+}
+
+.sidebar-box-header {
+    display: flex;
+    justify-content: space-between;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.sidebar-box-toggle {
+    font-weight: bold;
+}
+
+/* 리스트 */
+.sidebar-calendar-list {
+    margin-top: 10px;
+    padding-left: 10px;
+    display: none;
+}
+
+.sidebar-calendar-list li {
+    margin: 8px 0;
+    cursor: pointer;
+}
+
+.sidebar-calendar-list li.active {
+    color: #3B82F6;
+    font-weight: bold;
+}
+
+/* ===== 타이틀 ===== */
+.calendar-title {
+    text-align: center;
+    margin-bottom: 10px;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+/* ===== FullCalendar ===== */
+#calendar {
+    flex: 1;
+    width: 100%;
+}

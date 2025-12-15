@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.Workneed.workneed.Calendar.mapper.ScheduleMapper">
+
+    <!-- 일정 전체 조회 -->
+    <select id="findAll"
+            resultType="com.Workneed.workneed.Calendar.dto.ScheduleDTO">
+        SELECT
+            schedule_id AS scheduleId,
+            calendar_id AS calendarId,
+            created_by AS createdBy,
+            invited_by AS invitedBy,
+            description,
+            title,
+            event_type AS eventType,
+            status,
+            start_at AS startAt,
+            end_at AS endAt,
+            is_all_day AS isAllDay,
+            location,
+            created_at AS createdAt,
+            type,
+            file_storage_url AS fileStorageUrl,
+            git_url AS gitUrl,
+            google_event_id AS googleEventId
+        FROM schedule
+        ORDER BY start_at ASC
+    </select>
+
+    <!-- 일정 상세 조회 -->
+    <select id="findById"
+            parameterType="long"
+            resultType="com.Workneed.workneed.Calendar.dto.ScheduleDTO">
+        SELECT
+            schedule_id AS scheduleId,
+            calendar_id AS calendarId,
+            created_by AS createdBy,
+            invited_by AS invitedBy,
+            description,
+            title,
+            event_type AS eventType,
+            status,
+            start_at AS startAt,
+            end_at AS endAt,
+            is_all_day AS isAllDay,
+            location,
+            created_at AS createdAt,
+            type,
+            file_storage_url AS fileStorageUrl,
+            git_url AS gitUrl,
+            google_event_id AS googleEventId
+        FROM schedule
+        WHERE schedule_id = #{id}
+    </select>
+
+    <!-- 일정 추가 -->
+    <insert id="insert"
+            parameterType="com.Workneed.workneed.Calendar.dto.ScheduleDTO">
+        INSERT INTO schedule (
+            calendar_id,
+            created_by,
+            invited_by,
+            description,
+            title,
+            event_type,
+            status,
+            start_at,
+            end_at,
+            is_all_day,
+            location,
+            type
+        )
+        VALUES (
+                   #{calendarId},
+                   #{createdBy},
+                   #{invitedBy},
+                   #{description},
+                   #{title},
+                   #{eventType},
+                   #{status},
+                   #{startAt},
+                   #{endAt},
+                   #{isAllDay},
+                   #{location},
+                   #{type}
+               )
+    </insert>
+
+</mapper>

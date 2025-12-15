@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>캘린더 메인</title>
+
+    <!-- FullCalendar CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" th:href="@{/css/calendar.css}">
+</head>
+
+<body>
+
+<div class="calendar-page">
+    <div class="calendar-layout">
+
+        <!-- ===============================
+             왼쪽 사이드바
+        =============================== -->
+        <aside class="calendar-sidebar">
+
+            <!-- 미니 캘린더 (추후 실제 구현) -->
+            <div class="sidebar-mini-calendar">
+                미니 캘린더
+            </div>
+
+            <!-- 액션 버튼 -->
+            <button class="sidebar-btn" id="addScheduleBtn">
+                일정 / 예약 등록
+            </button>
+
+            <button class="sidebar-btn" id="allCalendarBtn">
+                전체 캘린더 보기
+            </button>
+
+            <button class="sidebar-btn" id="personalBtn">
+                내 캘린더
+            </button>
+
+            <!-- 공유 캘린더 -->
+            <div class="sidebar-box">
+
+                <div class="sidebar-box-header" id="shareToggle">
+                    공유 캘린더
+                    <span class="sidebar-box-toggle">+</span>
+                </div>
+
+                <ul class="sidebar-calendar-list" id="shareList">
+                    <li data-type="TEAM">팀 일정</li>
+                    <li data-type="COMPANY">전사 일정</li>
+                </ul>
+
+            </div>
+
+            <!-- 회의실 -->
+            <button class="sidebar-btn" id="resourceBtn">
+                회의실 현황
+            </button>
+
+        </aside>
+
+        <!-- 가운데 여백 -->
+        <div class="calendar-gap"></div>
+
+        <!-- ===============================
+             오른쪽 메인 캘린더
+        =============================== -->
+        <main class="calendar-main">
+
+            <div class="calendar-title">
+                메인 캘린더
+            </div>
+
+            <div id="calendar"></div>
+
+        </main>
+
+    </div>
+</div>
+
+<!-- Custom JS -->
+<script th:src="@{/js/calendar.js}"></script>
+
+</body>
+</html>
