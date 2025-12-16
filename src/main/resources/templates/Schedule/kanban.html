@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="[http://www.thymeleaf.org](http://www.thymeleaf.org/)">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" th:href="@{/Schedule/kanban.css}">
+</head>
+
+<body>
+<div class="kanban">
+    <div class="kanban-todo">
+        <div class="kanban-header">TODO</div>
+        <div class="kanban-cards">
+            <div class="kanban-card"></div>
+        </div>
+        <button class="kanban-addTask">+ Add Task</button>
+    </div>
+    <div class="kanban-doing">
+        <div class="kanban-header">DOING</div>
+        <div class="kanban-cards">
+            <div class="kanban-card"></div>
+            <div class="kanban-card"></div>
+            <div class="kanban-card"></div>
+        </div>
+        <button class="kanban-addTask">+ Add Task</button>
+    </div>
+    <div class="kanban-done">
+        <div class="kanban-header">DONE</div>
+        <div class="kanban-cards">
+            <div class="kanban-card"></div>
+            <div class="kanban-card"></div>
+        </div>
+        <button class="kanban-addTask">+ Add Task</button>
+    </div>
+</div>
+</body>
+</html>
