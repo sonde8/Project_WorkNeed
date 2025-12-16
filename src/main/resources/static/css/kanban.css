@@ -1,0 +1,39 @@
+.kanban{
+    max-width: 1360px;
+    width: 100%;
+    border: 1px solid black;
+
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+
+}
+.kanban-todo, .kanban-doing, .kanban-done{
+    border: 1px solid red;
+    margin: 1rem;
+}
+.kanban-header{
+    padding: 1rem;
+    font-size: 1.3rem;
+    font-weight: 700;
+}
+.kanban-cards{
+    height: 40rem;
+    margin: 2rem 1.5rem;
+    border: 1px solid orange;
+    overflow: auto;
+}
+.kanban-card{
+    height: 13rem;
+    margin:1rem;
+    background-color: #aaaaaa;
+    border-radius: 0.5rem;
+}
+.kanban-addTask{
+    display: block;
+    margin: 3rem auto;
+    font-size: 1.1rem;
+    font-weight: 500;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+}
