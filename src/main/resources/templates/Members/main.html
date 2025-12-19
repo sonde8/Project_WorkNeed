@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Main</title>
+    <script src="/js/main.js"></script>
+</head>
+<body>
+
+
+<h1>임시 메인 화면</h1>
+
+<!-- 비로그인 상태 -->
+<div th:if="${isLogin}">
+    <p th:text="${loginUser.userName} + ' 님 환영합니다'"></p>
+
+    <form action="/logout" method="post">
+        <button type="submit">로그아웃</button>
+    </form>
+</div>
+
+<!-- 비로그인 상태 -->
+
+<button onclick="document.getElementById('pwModal').style.display='block'">
+    비밀번호 변경
+</button>
+
+<div th:unless="${isLogin}">
+    <a href="/login">로그인</a>
+    <a href="/register">회원가입</a>
+</div>
+
+<!--로그인된 비밀번호 변경 -->
+<div id="pwModal" style="display:none;">
+    <form method="post" action="/my/password/change">
+        <input type="password" name="currentPassword" placeholder="현재 비밀번호">
+        <input type="password" name="newPassword" placeholder="새 비밀번호">
+        <input type="password" name="confirmPassword" placeholder="새 비밀번호 확인">
+        <button type="submit">확인</button>
+    </form>
+
+    <p th:if="${passwordChangeError}" th:text="${passwordChangeError}"></p>
+</div>
+
+
+
+</body>
+</html>

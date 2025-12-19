@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>로그인</title>
+</head>
+<body>
+
+<h2>로그인</h2>
+
+<form th:action="@{/login/do}" method="post">
+    <div>
+        <input type="text" name="loginId" placeholder="아이디">
+    </div>
+    <div>
+        <input type="password" name="password" placeholder="비밀번호">
+    </div>
+    <button type="submit">로그인</button>
+</form>
+
+<!-- 실패 모달 (최소 버전) -->
+<div th:if="${errorMessage}" style="color:red">
+    <span th:text="${errorMessage}"></span>
+</div>
+
+<!--로그인된 사용자가 비밀번호 변경 성공시-->
+<div th:if="${passwordChangeSuccess}">
+    <p>비밀번호가 변경되었습니다. 다시 로그인해주세요.</p>
+</div>
+
+</body>
+</html>
