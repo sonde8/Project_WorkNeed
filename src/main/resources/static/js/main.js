@@ -1,32 +1,17 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-    const logoutBtn = document.getElementById("logoutBtn");
+    // 비밀번호 변경 버튼 → 모달 열기
+    const openBtn = document.getElementById("openPwModal");
+    const modal = document.getElementById("pwModal");
 
-    if (!logoutBtn) return;
-
-    logoutBtn.addEventListener("click", () => {
-        fetch("/logout", {
-            method: "POST"
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.success) {
-                alert("로그아웃 되었습니다.");
-                location.href = "/main";
-            }
-        })
-        .catch(() => {
-            alert("로그아웃 처리 중 오류가 발생했습니다.");
+    if (openBtn && modal) {
+        openBtn.addEventListener("click", () => {
+            modal.style.display = "block";
         });
-    });
-
-     // 비밀번호 못맞추면 모달창띄움
-    /*<![CDATA[*/
-    if ([[${passwordChangeError != null}]]) {
-        document.getElementById('pwModal').style.display = 'block';
     }
-    /*]]>*/
 
-
-
+    // 서버 에러 발생 시 모달 자동 오픈
+    if (window.passwordChangeError && modal) {
+        modal.style.display = "block";
+    }
 });

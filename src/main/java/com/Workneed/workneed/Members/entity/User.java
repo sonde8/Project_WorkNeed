@@ -22,6 +22,9 @@ public class User {
     private LocalDateTime userUpdatedAt;
     private LocalDate userBirthday;
 
+    private String rememberToken;
+    private LocalDateTime rememberTokenExpired;
+
     private Long rankId;
     private Long deptId;
 }
