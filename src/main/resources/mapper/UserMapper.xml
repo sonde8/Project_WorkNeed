@@ -133,7 +133,6 @@
     </select>
 
 
-
     <update id="updatePassword">
         UPDATE User
         SET user_password = #{userPassword}

@@ -23,13 +23,13 @@ public class LoginController {
 
     @GetMapping("login")
     public String loginForm(HttpSession session,
-                            @RequestParam(required = false)String passwordChanged,
+                            @RequestParam(required = false) String passwordChanged,
                             @RequestParam(required = false) String registerSuccess,
                             Model model) {
 
-            if (session.getAttribute("user") != null) {
-                return "redirect:/main";
-            }
+        if (session.getAttribute("user") != null) {
+            return "redirect:/main";
+        }
 
         if (passwordChanged != null) {
             model.addAttribute("infoMessage", "비밀번호가 변경되었습니다. 다시 로그인해주세요.");
@@ -50,9 +50,9 @@ public class LoginController {
             String autoLogin,  // 자동로그인
             HttpServletResponse response,
             Model model
-            ) {
-        if(session.getAttribute("user") != null){
-            return  "redirect:/main";
+    ) {
+        if (session.getAttribute("user") != null) {
+            return "redirect:/main";
         }
 
         //  아이디 미입력
@@ -76,20 +76,21 @@ public class LoginController {
             return "Members/login";
         }
 
-        //  로그인 성공
+        //  로그인 성공-세션사용
         session.setAttribute("user", user);
 
         // 자동저장 체크된 경우
         if ("on".equals(autoLogin)) {
-            String token = UUID.randomUUID().toString();
+            String token = UUID.randomUUID().toString();    //자동로그인 토큰생성
 
+            //토큰 db저장- service내 메서드가 내부 sql쿼리문 실행
             userService.saveRememberToken(user.getUserId(), token);
 
-            Cookie cookie = new Cookie("REMEMBER_ME", token);
-            cookie.setHttpOnly(true);
+            Cookie cookie = new Cookie("REMEMBER_ME", token);   //쿠키생성
+            cookie.setHttpOnly(true);        //httpOnly 설정 : js접근불가 , xss 차단
             cookie.setPath("/");
-            cookie.setMaxAge(60 * 60 * 24 * 7); // 7일
-            response.addCookie(cookie);
+            cookie.setMaxAge(60 * 60 * 24 * 365); // 1년
+            response.addCookie(cookie);     //쿠키를 응답시켜 보내면 브라우저에서 쿠키저장
         }
         return "redirect:/main";
     }

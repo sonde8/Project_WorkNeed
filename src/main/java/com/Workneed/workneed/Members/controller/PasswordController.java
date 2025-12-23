@@ -15,13 +15,7 @@ public class PasswordController {
     private final UserService userService;
 
     @PostMapping("/my/password/change")
-    public String changePassword(
-            HttpSession session,
-            String currentPassword,
-            String newPassword,
-            String confirmPassword,
-            Model model
-    ) {
+    public String changePassword(HttpSession session, String currentPassword, String newPassword, String confirmPassword, Model model) {
         User user = (User) session.getAttribute("user");
 
         if (user == null) {
@@ -29,12 +23,7 @@ public class PasswordController {
         }
 
         try {
-            userService.changePassword(
-                    user.getUserId(),
-                    currentPassword,
-                    newPassword,
-                    confirmPassword
-            );
+            userService.changePassword(user.getUserId(), currentPassword, newPassword, confirmPassword);
             session.invalidate(); //비밀번호 변경 선공 -> 세션 종료 => 재로그인
             return "redirect:/login?password=changed";
 

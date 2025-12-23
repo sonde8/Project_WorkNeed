@@ -22,7 +22,7 @@ public interface UserMapper {
     User findByRememberToken(String token); // 자동로그인 토큰저장
 
     void insertUser(User user);
-    
+
     void updateUser(User user);
 
     void deleteUser(Long userId);
@@ -42,7 +42,6 @@ public interface UserMapper {
             @Param("name") String name,
             @Param("email") String email
     );
-
 
 
     void clearRememberToken(Long userId); //토큰정보삭제-로그아웃시 같이됨

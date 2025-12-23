@@ -3,7 +3,6 @@ package com.Workneed.workneed.Members.service;
 import com.Workneed.workneed.Members.entity.User;
 import com.Workneed.workneed.Members.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +16,7 @@ public class UserService {
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
 
-      // 회원가입
+    // 회원가입
 
     public void register(User user) {
 
@@ -45,7 +44,7 @@ public class UserService {
     }
 
 
-      // 로그인
+    // 로그인
     public User login(String loginId, String rawPassword) {
 
         User user = userMapper.findByLoginId(loginId);
@@ -62,17 +61,16 @@ public class UserService {
     }
 
 
-
-
-       // 자동 로그인 (Remember Me)
+    // 자동 로그인 (Remember Me)
     public void saveRememberToken(Long userId, String token) {
         userMapper.updateRememberToken(
                 userId,
                 token,
-                LocalDateTime.now().plusDays(7)
+                LocalDateTime.now().plusDays(365)   // 토큰 저장기간설정
         );
     }
 
+    // 자동 로그인에 쓸 토큰 찾기
     public User findByRememberToken(String token) {
         return userMapper.findByRememberToken(token);
     }
@@ -81,7 +79,7 @@ public class UserService {
         userMapper.clearRememberToken(userId);
     }
 
-      // 로그인된 사용자 비밀번호 변경
+    // 로그인된 사용자 비밀번호 변경
 
     public void changePassword(
             Long userId,
@@ -124,13 +122,13 @@ public class UserService {
     }
 
 
-      // 아이디 찾기 (이름 + 이메일)
+    // 아이디 찾기 (이름 + 이메일)
     public User findByNameAndEmail(String name, String email) {
         return userMapper.findByNameAndEmail(name, email);
     }
 
 
-      // User CRUD (관리 / 공용)
+    // User CRUD (관리 / 공용)
     public List<User> getAllUsers() {
         return userMapper.findAll();
     }
