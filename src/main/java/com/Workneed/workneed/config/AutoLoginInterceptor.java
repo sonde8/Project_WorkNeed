@@ -7,8 +7,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.apache.el.parser.Token;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
+
+import java.util.UUID;
 
 //자동 로그인-세션 검증을 가장 빨리해서 db에 쿠키가 남아있다면 로그인-
 @Component
@@ -16,6 +19,9 @@ import org.springframework.web.servlet.HandlerInterceptor;
 public class AutoLoginInterceptor implements HandlerInterceptor {
 
     private final UserService userService;
+
+    private static final String COOKIE_NAME = "autoLoginToken";
+    private static final int COOKIE_AGE = 60 * 60 * 24 * 365;
 
     @Override
     public boolean preHandle(
@@ -36,22 +42,45 @@ public class AutoLoginInterceptor implements HandlerInterceptor {
         Cookie[] cookies = request.getCookies();
         if (cookies == null) return true;
 
+        String token = null;
         for (Cookie cookie : cookies) {
             if ("autoLoginToken".equals(cookie.getName())) {
-
-                String token = cookie.getValue();
-
-                // DB에서 토큰으로 사용자 조회
-                User user = userService.findByRememberToken(token);
-
-                if (user != null) {
-                    // 세션 복원
-                    HttpSession newSession = request.getSession(true);
-                    newSession.setAttribute("user", user);
-                }
+                token = cookie.getValue();
                 break;
             }
         }
+        if (token == null || token.isBlank())
+            return true;
+
+
+        User user = userService.findByRememberToken(token);
+
+        // db에 없거나 만료되면 쿠키삭제
+        if (user == null) {
+            Cookie deleteCookie = new Cookie(COOKIE_NAME, "");
+            deleteCookie.setPath("/");
+            deleteCookie.setMaxAge(0);
+            response.addCookie(deleteCookie);
+
+            return true;
+        }
+
+        // 세션 복원
+        HttpSession newSession = request.getSession(true);
+        newSession.setAttribute("user", user);
+
+        // 토큰 로테이트- 자동 로그인으로 들어와도 보안을 위해서 교체
+        userService.clearRememberToken(user.getUserId());
+
+        String newToken = UUID.randomUUID().toString();
+        userService.saveRememberToken(user.getUserId(), newToken);
+
+        Cookie newCookie = new Cookie(COOKIE_NAME, newToken);
+        newCookie.setHttpOnly(true);
+        newCookie.setPath("/");
+        newCookie.setMaxAge(COOKIE_AGE);
+        response.addCookie(newCookie);
+
 
         return true;
     }

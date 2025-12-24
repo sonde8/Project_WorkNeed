@@ -159,7 +159,7 @@
         WHERE user_id = #{userId}
     </update>
 
-    <update id="clearRememberToken">
+    <update id="clearRememberToken" parameterType="long">
         UPDATE User
         SET remember_token = NULL,
         remember_token_expired = NULL

@@ -44,7 +44,7 @@ public interface UserMapper {
     );
 
 
-    void clearRememberToken(Long userId); //토큰정보삭제-로그아웃시 같이됨
+    void clearRememberToken(@Param("userId") Long userId); //토큰정보삭제-로그아웃시 같이됨
 
 
 }

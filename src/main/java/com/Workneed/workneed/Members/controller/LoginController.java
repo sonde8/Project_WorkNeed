@@ -19,7 +19,11 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class LoginController {
 
+    public static final String AUTO_LOGIN_COOKIE = "autoLoginToken";
+    public static final int AUTO_LOGIN_DAYS = 365;
+
     private final UserService userService;
+
 
     @GetMapping("login")
     public String loginForm(HttpSession session,
@@ -46,8 +50,8 @@ public class LoginController {
     public String login(
             String loginId,
             String password,
-            HttpSession session,
             String autoLogin,  // 자동로그인
+            HttpSession session,
             HttpServletResponse response,
             Model model
     ) {
@@ -81,7 +85,10 @@ public class LoginController {
 
         // 자동저장 체크된 경우
         if ("on".equals(autoLogin)) {
-            String token = UUID.randomUUID().toString();    //자동로그인 토큰생성
+
+            userService.clearRememberToken(user.getUserId());   // 1 기존 토큰 무효화
+
+            String token = UUID.randomUUID().toString();    //새 토큰 발급
 
             //토큰 db저장- service내 메서드가 내부 sql쿼리문 실행
             userService.saveRememberToken(user.getUserId(), token);
