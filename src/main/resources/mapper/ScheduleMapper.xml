@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.Workneed.workneed.Schedule.mapper.ScheduleMapper">
+
+    <insert id="insertSchedule"
+            parameterType="com.Workneed.workneed.Schedule.dto.ScheduleDTO"
+            useGeneratedKeys="true"
+            keyProperty="scheduleId">
+        INSERT INTO schedule
+        (status, title, description, event_type, start_at, end_at, location, type, created_by)
+        VALUES
+        (#{status}, #{title}, #{description}, #{eventType}, #{startAt}, #{endAt}, #{location}, #{type}, #{createdBy})
+    </insert>
+
+    <select id="selectAll"
+            resultType="com.Workneed.workneed.Schedule.dto.ScheduleDTO">
+        SELECT
+        schedule_id AS scheduleId,
+        status,
+        title,
+        description,
+        event_type AS eventType,
+        start_at AS startAt,
+        end_at AS endAt,
+        location,
+        type,
+        created_by AS createdBy,
+        created_at AS createdAt
+        FROM schedule
+        ORDER BY schedule_id DESC
+    </select>
+
+    <select id="selectByStatus"
+            parameterType="string"
+            resultType="com.Workneed.workneed.Schedule.dto.ScheduleDTO">
+        SELECT
+        schedule_id AS scheduleId,
+        status,
+        title,
+        description,
+        event_type AS eventType,
+        start_at AS startAt,
+        end_at AS endAt,
+        location,
+        type,
+        created_by AS createdBy,
+        created_at AS createdAt
+        FROM schedule
+        WHERE status = #{status}
+        ORDER BY schedule_id DESC
+    </select>
+
+    <select id="selectById"
+            parameterType="long"
+            resultType="com.Workneed.workneed.Schedule.dto.ScheduleDTO">
+        SELECT
+        schedule_id AS scheduleId,
+        status,
+        title,
+        description,
+        event_type AS eventType,
+        start_at AS startAt,
+        end_at AS endAt,
+        location,
+        type,
+        created_by AS createdBy,
+        created_at AS createdAt
+        FROM schedule
+        WHERE schedule_id = #{scheduleId}
+    </select>
+
+    <update id="updateStatus">
+        UPDATE schedule
+        SET status = #{status}
+        WHERE schedule_id = #{scheduleId}
+    </update>
+
+</mapper>

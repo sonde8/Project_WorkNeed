@@ -1,0 +1,102 @@
+main{
+    padding: 2.4rem;
+}
+
+a{
+    display: inline-block;
+    margin: 1.5rem;
+    font-size: 1rem;
+    font-weight: 500;
+    text-decoration: none;
+    color: inherit;
+}
+
+.frame{
+    display: grid;
+    grid-template-columns: 1fr 30rem;
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
+    "detail etc"
+    "comment etc";
+    gap: 2rem;
+}
+.block{
+    background: rgba(0,0,0,.05);
+    border-radius: 1rem;
+    padding: 2rem;
+}
+
+/* ===== Detail block ===== */
+#detail{
+    grid-area: detail;
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    align-items: center;
+}
+#detail .title-event-type{
+
+}
+#detail .title{
+    display: inline-block;
+    font-size: 2.2rem;
+    font-weight: 700;
+}
+#detail .event-type{
+    display: inline-block;
+    margin-left: 2rem;
+    font-size: 1.2rem;
+    font-weight: 700;
+    padding: .6rem 1rem;
+    border-radius: 99.9rem;
+    background: rgba(0,0,0,.12);
+}
+#detail .date-time{
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+}
+#detail .start-at,
+#detail .end-at{
+    display: inline-block;
+    justify-self: end;
+    font-size: 1.1rem;
+    padding: .6rem 1rem;
+    border-radius: 99.9rem;
+    background: rgba(0,0,0,.08);
+}
+#detail .location{
+    grid-column: 2;
+    justify-self: end;
+    font-size: 1.1rem;
+    padding: .6rem 1rem;
+    border-radius: 99.9rem;
+    background: rgba(0,0,0,.08);
+}
+#detail .description{
+    grid-column: 1 / -1;
+    margin-top:5rem;
+    background: rgba(255,255,255,.6);
+    border: .1rem solid rgba(0,0,0,.08);
+    border-radius: 1rem;
+    padding: 1.6rem;
+    min-height: 14rem;
+    font-size: 1.2rem;
+    line-height: 1.6;
+}
+
+/* ===== Comment block ===== */
+#comment{
+    grid-area: comment;
+    min-height: 30rem;
+}
+#comment .title{
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+/* ===== Etc block ===== */
+#etc{
+    grid-area: etc;
+}
+
