@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+
+<head>
+    <title>Title</title>
+    <th:block layout:fragment="head">
+        <link rel="stylesheet" th:href="@{/css/task.css}">
+    </th:block>
+</head>
+<body>
+<main layout:fragment="content">
+
+    <a th:href="@{/schedule/kanban}">← Back to Kanban</a>
+
+    <div class="frame">
+        <div class="block" id="detail">
+            <div class="title-event-type">
+                <div class="title" th:text="${schedule.title}">Title</div>
+                <div class="event-type" th:text="${schedule.eventType}">Event Type</div>
+            </div>
+
+            <div class="date-time">
+                <div class="start-at" th:text="${#temporals.format(schedule.startAt, 'yyyy-MM-dd HH:mm')}">Start At</div>
+                <div class="end-at" th:text="${#temporals.format(schedule.endAt, 'yyyy-MM-dd HH:mm')}"> End At</div>
+            </div>
+
+            <div class="location" th:text="${schedule.location}">Location</div>
+            <div class="description" th:text="${schedule.description}">Description</div>
+        </div>
+
+        <div class="block" id="comment">
+            <div class="title">Comment</div>
+
+            <div class="comment-list">
+                <!-- empty -->
+                <div class="comment-empty" th:if="${#lists.isEmpty(commentList)}">
+                    아직 댓글이 없습니다.
+                </div>
+
+                <!-- item -->
+                <div class="comment-item" th:each="c : ${commentList}">
+                    <div class="comment-row">
+                        <div class="comment-writer" th:text="${c.writerName}">[user]</div>
+                        <div class="comment-time"   th:text="${#temporals.format(c.createdAt, 'yyyy-MM-dd HH:mm')}"> 2025-00-00 00:00</div>
+                        <button type="button" class="comment-edit-btn">edit</button>
+                    </div>
+                    <div class="comment-content" th:text="${c.content}">content</div>
+                </div>
+            </div>
+
+            <form class="comment-add" th:action="@{/schedule/comment/create}" method="post">
+                <input type="hidden" name="scheduleId" th:value="${schedule.scheduleId}">
+                <input class="comment-input" type="text" name="content" placeholder="add a comment" />
+                <button class="comment-add-btn" type="submit">add</button>
+            </form>
+
+        </div>
+
+        <div class="block" id="etc">
+            <div id="etc-image"></div>
+
+            <div id="etc-chart"></div>
+            <div id="etc-file-str"></div>
+            <div id="etc-git-url"></div>
+        </div>
+    </div>
+
+</main>
+</body>
+
+</html>
