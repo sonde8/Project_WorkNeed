@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+
+<th:block layout:fragment="head">
+    <link rel="stylesheet" th:href="@{/css/chat.css}">
+</th:block>
+
+<main layout:fragment="content" class="chat-inner-layout">
+    <aside class="chat-sidebar">
+        <div class="search-container">
+            <input type="text" placeholder="검색">
+            <button type="button" class="icon-btn">
+                <img th:src="@{/images/search300.svg}" width="18" height="18" alt="검색">
+            </button>
+        </div>
+        <div class="room-list-scroll">
+            <div th:each="r : ${rooms}" class="room-card"
+                 th:data-room-id="${r.roomId}"
+                 th:classappend="${room != null && r.roomId == room.roomId} ? 'active'">
+                <a th:href="@{/chat/room/{id}(id=${r.roomId})}">
+                    <div class="profile-img">
+                        <img th:src="@{/images/profile300.svg}" alt="사용자">
+                    </div>
+                    <div class="room-text">
+                        <span class="name" th:text="${r.roomName}">채팅방 이름</span>
+                        <span class="preview" th:text="${r.lastMessageContent != null ? r.lastMessageContent : '새로운 대화가 없습니다.'}"></span>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </aside>
+
+    <section class="chat-view">
+        <div class="chat-main-content">
+            <header class="view-header">
+                <div class="current-user">
+                    <th:block th:if="${room != null}">
+                        <div class="profile-img-sm">
+                            <img th:src="@{/images/profile300.svg}" alt="프로필">
+                        </div>
+                        <strong th:text="${room.roomName}">방 이름</strong>
+                    </th:block>
+
+                    <th:block th:unless="${room != null}">
+<!--                        <div class="profile-img-sm">-->
+<!--                            <img th:src="@{/images/user-default.svg}" alt="기본 로고">-->
+<!--                        </div>-->
+<!--                        <strong>워크니드 채팅</strong>-->
+                    </th:block>
+                </div>
+
+                <!-- 채팅메인 상단 부분 -->
+                <div class="header-icons">
+                    <th:block th:if="${room != null}">
+                        <button type="button" class="icon-btn" title="방 나가기" onclick="location.href='/chat/rooms'">
+                            <img th:src="@{/images/exit300.svg}" width="22" height="22" alt="나가기">
+                        </button>
+                        <button type="button" class="icon-btn" title="사이드바" onclick="toggleChatSidebar()">
+                            <img th:src="@{/images/sidebar300.svg}" width="22" height="22" alt="메뉴">
+                        </button>
+                    </th:block>
+
+                    <th:block th:unless="${room != null}">
+                        <button type="button" class="icon-btn" title="채팅방 생성" onclick="openCreateRoomModal()">
+                            <img th:src="@{/images/chatadd300.svg}" width="24" height="24" alt="방 생성">
+                        </button>
+                    </th:block>
+                </div>
+            </header>
+
+            <th:block th:if="${room != null}">
+                <!-- 채팅 내역 부분 -->
+                <ul id="messageLog" class="message-log">
+                    <li th:each="msg : ${history}"
+                        th:class="${msg.messageType != null && #strings.trim(msg.messageType).toUpperCase() == 'ENTER'} ? 'system-msg' : (${msg.senderId == currentUserId} ? 'my-msg' : 'other-msg')">
+
+                        <th:block th:if="${msg.messageType != null && #strings.trim(msg.messageType).toUpperCase() == 'ENTER'}">
+                            <div class="system-inner">
+                                <span th:text="${msg.content}">시스템 메시지</span>
+                            </div>
+                        </th:block>
+
+                        <th:block th:unless="${msg.messageType != null && #strings.trim(msg.messageType).toUpperCase() == 'ENTER'}">
+                            <div class="msg-unit">
+                                <span class="sender" th:if="${msg.senderId != currentUserId}" th:text="${msg.senderName}">이름</span>
+
+                                <div class="bubble-row">
+                                    <div class="bubble">
+                                        <th:block th:with="mType=${msg.messageType != null ? #strings.trim(msg.messageType).toUpperCase() : 'TALK'}" th:switch="${mType}">
+
+                                            <img th:case="'IMAGE'" th:src="${msg.content}"
+                                                 style="max-width: 250px; border-radius: 8px; display: block;"
+                                                 onclick="window.open(this.src)">
+
+                                            <a th:case="'FILE'" th:href="${msg.content}" download class="file-link"
+                                               style="display: inline-block; color: inherit; white-space: nowrap;">
+                                                📎 <span th:text="${#strings.contains(msg.content, '_') ? #strings.substringAfter(msg.content, '_') : '파일 다운로드'}">파일명</span>
+                                            </a>
+
+                                            <span th:case="*" th:text="${msg.content}" style="display: inline-block; word-break: break-all; vertical-align: top;"></span>
+                                        </th:block>
+                                    </div>
+
+                                    <div class="msg-info">
+                                        <span class="unread-count" th:if="${msg.unreadCount > 0}" th:text="${msg.unreadCount}">1</span>
+                                        <span class="msg-time" th:text="${msg.displayTime}">시간</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </th:block>
+                    </li>
+                </ul>
+
+                <!-- 채팅방 내부 채팅 입력부분 -->
+                <footer class="chat-footer">
+                    <div class="toolbar">
+                        <input type="file" id="imageInput" accept="image/*" style="display:none;" onchange="handleFileUpload(this, 'IMAGE')">
+                        <input type="file" id="fileInput" accept="*/*" style="display:none;" onchange="handleFileUpload(this, 'FILE')">
+
+                        <button type="button" class="icon-btn" onclick="document.getElementById('imageInput').click()">
+                            <img th:src="@{/images/image300.svg}" width="22">
+                        </button>
+                        <button type="button" class="icon-btn" onclick="document.getElementById('fileInput').click()">
+                            <img th:src="@{/images/attach_file300.svg}" width="22">
+                        </button>
+                    </div>
+                    <form id="messageForm" class="input-form">
+                        <textarea id="message" placeholder="메시지를 입력하세요..." rows="2"></textarea>
+                        <div class="form-bottom">
+                            <span class="info">사용자를 태그하려면 @를 입력하세요.</span>
+                            <button type="submit" class="send-btn">
+                                <img th:src="@{/images/send300.svg}" width="26">
+                            </button>
+                        </div>
+                    </form>
+                </footer>
+            </th:block>
+
+            <!-- 채팅방을 선택하지 않은 상태의 메인 부분 -->
+            <th:block th:unless="${room != null}">
+                <div class="empty-chat-view">
+                    <p>채팅방을 선택하여 대화를 시작하세요.</p>
+                </div>
+            </th:block>
+        </div>
+
+        <!-- 사이드바 토글 -->
+        <div id="mediaSidebar" class="chat-media-sidebar">
+            <div class="sidebar-header">
+                <h3>채팅방 서랍</h3>
+                <button class="close-btn" onclick="toggleChatSidebar()">&times;</button>
+            </div>
+
+            <div class="sidebar-content">
+                <div class="media-section">
+                    <div class="section-title">사진, 동영상</div>
+                    <div id="sidebarImageList" class="image-grid">
+                    </div>
+                </div>
+
+                <div class="media-section">
+                    <div class="section-title">파일</div>
+                    <div id="sidebarFileList" class="file-list-vertical">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- 모달을 불러오는 것 -->
+        <div th:replace="~{Chat/chatModal :: createRoomModal}"></div>
+    </section>
+</main>
+
+<th:block layout:fragment="script">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <script th:inline="javascript">
+        var currentUserId = /*[[${currentUserId}]]*/ null;
+        var currentRoomId = /*[[${room != null ? room.roomId : null}]]*/ null;
+    </script>
+    <script th:src="@{/js/chatModal.js}"></script>
+    <script th:src="@{/js/Socket.js}"></script>
+</th:block>
+</html>

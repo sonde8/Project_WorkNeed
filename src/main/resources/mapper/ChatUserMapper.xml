@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.Workneed.workneed.Chat.mapper.ChatUserMapper">
+    <select id="findUserByUsername" parameterType="String" resultType="Long">
+        SELECT user_id
+        FROM User
+        WHERE username = #{username}
+    </select>
+
+    <select id="findUserById" parameterType="Long" resultType="com.Workneed.workneed.Chat.dto.UserDTO">
+        SELECT
+            user_id AS userId,
+            user_name AS username,
+            user_profile_image AS userProfileImage,
+            user_login_id AS userLoginId
+        FROM User
+        WHERE user_id = #{userId}
+    </select>
+
+    <select id="findAllUsersWithDept" resultType="com.Workneed.workneed.Chat.dto.UserDTO">
+        SELECT
+            u.user_id AS userId,
+            u.user_name AS username,
+            d.dept_name AS deptname,
+            r.rank_name AS rankname
+        FROM User u
+                 JOIN Dept d ON u.dept_id = d.dept_id
+                 JOIN Ranks r ON u.rank_id = r.rank_id
+        WHERE u.user_status = 'ACTIVE'
+        ORDER BY d.dept_name ASC, r.rank_level DESC, u.user_name ASC
+    </select>
+</mapper>
