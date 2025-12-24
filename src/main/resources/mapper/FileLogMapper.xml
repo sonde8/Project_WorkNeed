@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.Workneed.workneed.Chat.mapper.FileLogMapper">
+
+    <insert id="insertFileLog" parameterType="com.Workneed.workneed.Chat.dto.FileLogDTO" useGeneratedKeys="true" keyProperty="fileLogId">
+        INSERT INTO FileLog (
+            room_id, origin_name, stored_name, file_path, file_size, file_type
+        ) VALUES (
+            #{roomId}, #{fileName}, #{storedName}, #{filePath}, #{fileSize}, #{fileType}
+        )
+    </insert>
+
+    <update id="updateMessageId">
+        UPDATE FileLog SET message_id = #{messageId} WHERE file_log_id = #{fileLogId}
+    </update>
+
+    <select id="findFilesByRoomId" parameterType="long">
+        SELECT * FROM FileLog
+        WHERE room_id = #{roomId}
+        ORDER BY file_log_id DESC
+    </select>
+
+</mapper>

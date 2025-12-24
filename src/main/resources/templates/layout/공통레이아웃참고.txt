@@ -3,6 +3,7 @@
 
 content : 1340px를 max로 넣어주세요
 
+
 각자 페이지에서 layout 기본틀
 
 <!DOCTYPE html>
