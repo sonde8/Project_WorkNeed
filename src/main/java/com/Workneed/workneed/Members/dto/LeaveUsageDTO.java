@@ -1,14 +1,15 @@
-package com.Workneed.workneed.Members.entity;
+package com.Workneed.workneed.Members.dto;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
-public class LeaveUsage {
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class LeaveUsageDTO {
 
     private Long leaveId;
     private Long requestId;

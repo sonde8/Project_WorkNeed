@@ -1,6 +1,6 @@
 package com.Workneed.workneed.Members.controller;
 
-import com.Workneed.workneed.Members.entity.User;
+import com.Workneed.workneed.Members.dto.UserDTO;
 import com.Workneed.workneed.Members.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -16,13 +16,13 @@ public class RegisterController {
 
     @GetMapping("/register")
     public String registerForm(Model model) {
-        model.addAttribute("user", new User());
+        model.addAttribute("user", new UserDTO());
         return "Members/register";
     }
 
     //회원가입
     @PostMapping("/register")
-    public String register(User user, Model model) {
+    public String register(UserDTO user, Model model) {
 
         // 필수값 검증 (Controller 책임)
         if (user.getUserLoginId() == null || user.getUserLoginId().isBlank()

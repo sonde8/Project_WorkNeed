@@ -2,7 +2,7 @@ package com.Workneed.workneed.Chat.controller;
 
 import com.Workneed.workneed.Chat.dto.ChatRoomDTO;
 import com.Workneed.workneed.Chat.dto.MessageDTO;
-import com.Workneed.workneed.Chat.dto.UserDTO;
+import com.Workneed.workneed.Members.dto.UserDTO;
 import com.Workneed.workneed.Chat.service.ChatService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,17 +28,14 @@ public class ChatRoomController {
     */
     @GetMapping("/rooms")
     public String roomList(Model model, HttpSession session) {
-        // 1. 임시 세션 주입 (Layout 에러 방지용)
-        if (session.getAttribute("user") == null) {
-            UserDTO loginUser = UserDTO.builder()
-                    .userId(1L)
-                    .username("나")
-                    .build();
-            session.setAttribute("user", loginUser);
-        }
-
         // 세션에서 실제 로그인한 유저 ID 연동
         UserDTO user = (UserDTO) session.getAttribute("user");
+
+        // 로그인이 안 된 상태라면 로그인 페이지로 리다이렉트
+        if (user == null) {
+            return "redirect:/login";
+        }
+
         Long currentUserId = user.getUserId();
 
         // 왼쪽 사이드바용 전체 목록 조회
@@ -58,33 +55,16 @@ public class ChatRoomController {
     public String joinRoom(@PathVariable Long roomId, @RequestParam(value="userId", required=false) Long tempId, // URL 파라미터 추가
                            Model model, HttpSession session) {
 
-        if (tempId != null) {
-            // DB에 있는 데이터와 일치하도록 이름을 매핑
-            // 실제 로그인 기능 구현되면 if문 전체 삭제하기!
-            System.out.println("파라미터로 들어온 ID: " + tempId);
-
-            String actualName = (tempId == 1L) ? "나" : (tempId == 2L) ? "상대방" : "미등록유저";
-
-            UserDTO loginUser = UserDTO.builder().userId(tempId).username(actualName).build();
-            session.setAttribute("user", loginUser);
-            System.out.println("세션 유저 변경: " + actualName + "(" + tempId + ")");
-        }
-        // 처음 접속 했을 때 tempId도 없고 세션도 없으면 기본값 1번 유저 세팅
-        else if (session.getAttribute("user") == null) {
-            UserDTO loginUser = UserDTO.builder().userId(1L).username("나").build();
-            session.setAttribute("user", loginUser);
-        }
-
         // 테스트를 위해 하드코딩 했던 1L 지우고 만든 세션에서 정보를 가져오는 코드
-        UserDTO sessionUser = (UserDTO) session.getAttribute("user");
-        System.out.println("실제 세션에서 꺼낸 ID: " + sessionUser.getUserId());
+        UserDTO user = (UserDTO) session.getAttribute("user");
+        System.out.println("실제 세션에서 꺼낸 ID: " + user.getUserId());
 
         // null 체크
-        if (sessionUser == null) {
-            return "redirect:/chat/rooms";
+        if (user == null) {
+            return "redirect:/login";
         }
 
-        Long currentUserId = sessionUser.getUserId();
+        Long currentUserId = user.getUserId();
 
         // 왼쪽 목록 유지를 위해 전체 리스트 다시 조회
         List<ChatRoomDTO> rooms = chatService.getUserRooms(currentUserId);
@@ -124,7 +104,10 @@ public class ChatRoomController {
     */
     @PostMapping("/room/{roomId}/leave")
     public String leaveRoom(@PathVariable("roomId") Long roomId, HttpSession session) {
-        Long currentUserId = 1L;
+        UserDTO user = (UserDTO) session.getAttribute("user");
+        if (user == null) return "redirect:/login";
+
+        Long currentUserId = user.getUserId();
 
         // 퇴장 메시지 브로드캐스팅
         MessageDTO leaveMsg = chatService.sendSystemMessage(roomId, currentUserId, "LEAVE");
@@ -146,8 +129,10 @@ public class ChatRoomController {
                              HttpSession session) {
         // 세션 유저 정보 가져오기
         UserDTO user = (UserDTO) session.getAttribute("user");
-        // 세션이 비어있다면 기본값 1 사용
-        Long creatorId = (user != null) ? user.getUserId() : 1L;
+        // 세션이 비어있다면 로그인 페이지로
+        if (user == null) return "redirect:/login";
+
+        Long creatorId = user.getUserId();
 
         // 방 타입 판별
         // inviteUserIds에 나를 제외한 인원수가 들어오기 때문에 이를 기준으로 판단

@@ -5,23 +5,23 @@
     <select id="findUserByUsername" parameterType="String" resultType="Long">
         SELECT user_id
         FROM User
-        WHERE username = #{username}
+        WHERE user_name = #{userName}
     </select>
 
-    <select id="findUserById" parameterType="Long" resultType="com.Workneed.workneed.Chat.dto.UserDTO">
+    <select id="findUserById" parameterType="Long" resultType="com.Workneed.workneed.Members.dto.UserDTO">
         SELECT
             user_id AS userId,
-            user_name AS username,
+            user_name AS userName,
             user_profile_image AS userProfileImage,
             user_login_id AS userLoginId
         FROM User
         WHERE user_id = #{userId}
     </select>
 
-    <select id="findAllUsersWithDept" resultType="com.Workneed.workneed.Chat.dto.UserDTO">
+    <select id="findAllUsersWithDept" resultType="com.Workneed.workneed.Members.dto.UserDTO">
         SELECT
             u.user_id AS userId,
-            u.user_name AS username,
+            u.user_name AS userName,
             d.dept_name AS deptname,
             r.rank_name AS rankname
         FROM User u

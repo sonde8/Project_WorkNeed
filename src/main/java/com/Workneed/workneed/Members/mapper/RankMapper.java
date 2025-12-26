@@ -1,6 +1,6 @@
 package com.Workneed.workneed.Members.mapper;
 
-import com.Workneed.workneed.Members.entity.Rank;
+import com.Workneed.workneed.Members.dto.RankDTO;
 import org.apache.ibatis.annotations.Mapper;
 
 
@@ -9,13 +9,13 @@ import java.util.List;
 @Mapper
 public interface RankMapper {
 
-    List<Rank> findAll();
+    List<RankDTO> findAll();
 
-    Rank findById(Long rankId);
+    RankDTO findById(Long rankId);
 
-    void insertRank(Rank rank);
+    void insertRank(RankDTO rank);
 
-    void updateRank(Rank rank);
+    void updateRank(RankDTO rank);
 
     void deleteRank(Long rankId);
 }

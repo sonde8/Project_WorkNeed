@@ -1,6 +1,6 @@
 package com.Workneed.workneed.Members.controller;
 
-import com.Workneed.workneed.Members.entity.User;
+import com.Workneed.workneed.Members.dto.UserDTO;
 import com.Workneed.workneed.Members.service.UserService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
@@ -20,7 +20,7 @@ public class LogoutController {
     public String logout(HttpSession session,
                          HttpServletResponse response) {
 
-        User user = (User) session.getAttribute("user");
+        UserDTO user = (UserDTO) session.getAttribute("user");
 
         // DB 토큰 제거
         if (user != null) {

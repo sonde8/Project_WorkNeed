@@ -1,13 +1,12 @@
 package com.Workneed.workneed.Chat.service;
 
-import com.Workneed.workneed.Chat.dto.UserDTO;
 import com.Workneed.workneed.Chat.dto.ChatRoomDTO;
 import com.Workneed.workneed.Chat.dto.MessageDTO;
+import com.Workneed.workneed.Members.dto.UserDTO;
 import com.Workneed.workneed.Chat.mapper.ChatRoomMapper;
 import com.Workneed.workneed.Chat.mapper.ChatUserMapper;
 import com.Workneed.workneed.Chat.mapper.FileLogMapper;
 import com.Workneed.workneed.Chat.mapper.MessageMapper;
-import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -155,7 +154,7 @@ public class ChatService {
         // 발신자 정보 보완
         UserDTO user = chatUserMapper.findUserById(messageDTO.getSenderId());
         if (user != null) {
-            messageDTO.setSenderName(user.getUsername());
+            messageDTO.setSenderName(user.getUserName());
         }
 
         // 시간 포맷팅
@@ -178,10 +177,10 @@ public class ChatService {
         if (room !=null && "GROUP".equals(room.getRoomType())) {
             // 2-2-1. 유저 정보 조회
             UserDTO user = chatUserMapper.findUserById(userId);
-            String username = (user != null) ? user.getUsername() : "알 수 없는 사용자";
+            String userName = (user != null) ? user.getUserName() : "알 수 없는 사용자";
 
             // 2-2-2. 메세지 내용 생성
-            String content = "ENTER".equals(type) ? username + "님이 입장하셨습니다." : username + "님이 퇴장하셨습니다.";
+            String content = "ENTER".equals(type) ? userName + "님이 입장하셨습니다." : userName + "님이 퇴장하셨습니다.";
 
             // 2-2-3. 빌더로 DTO 생성
             MessageDTO systemMsg = MessageDTO.builder()
@@ -238,13 +237,13 @@ public class ChatService {
     public void sendInviteMessage(Long roomId, Long creatorId, List<Long> inviteUserIds) {
         // 생성자 이름 조회
         UserDTO creator = chatUserMapper.findUserById(creatorId);
-        String creatorName = (creator != null) ? creator.getUsername() : "알 수 없는 사용자";
+        String creatorName = (creator != null) ? creator.getUserName() : "알 수 없는 사용자";
 
         // 초대받은 유저들의 이름 리스트 조회
         List<String> invitedNames = inviteUserIds.stream()
                 .map(id -> {
                     UserDTO user = chatUserMapper.findUserById(id);
-                    return (user != null) ? user.getUsername() : "알 수 없는 사용자";
+                    return (user != null) ? user.getUserName() : "알 수 없는 사용자";
                 }).collect(Collectors.toList());
 
         // 메세지 내용 조합 (예 : A님이 B님, C님을 초대하였습니다.)

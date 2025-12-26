@@ -1,6 +1,6 @@
 package com.Workneed.workneed.Members.mapper;
 
-import com.Workneed.workneed.Members.entity.Dept;
+import com.Workneed.workneed.Members.dto.DeptDTO;
 import org.apache.ibatis.annotations.Mapper;
 
 
@@ -9,13 +9,13 @@ import java.util.List;
 @Mapper
 public interface DeptMapper {
 
-    List<Dept> findAll();
+    List<DeptDTO> findAll();
 
-    Dept findById(Long deptId);
+    DeptDTO findById(Long deptId);
 
-    void insertDept(Dept dept);
+    void insertDept(DeptDTO dept);
 
-    void updateDept(Dept dept);
+    void updateDept(DeptDTO dept);
 
     void deleteDept(Long deptId);
 }

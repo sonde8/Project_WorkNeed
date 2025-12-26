@@ -1,13 +1,14 @@
-package com.Workneed.workneed.Members.entity;
+package com.Workneed.workneed.Members.dto;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
-public class AdminActivityLog {
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class AdminActivityLogDTO {
 
     private Long logId;
     private Long adminId;
