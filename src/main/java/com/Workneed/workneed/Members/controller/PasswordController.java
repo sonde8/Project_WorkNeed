@@ -1,6 +1,6 @@
 package com.Workneed.workneed.Members.controller;
 
-import com.Workneed.workneed.Members.entity.User;
+import com.Workneed.workneed.Members.dto.UserDTO;
 import com.Workneed.workneed.Members.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +16,7 @@ public class PasswordController {
 
     @PostMapping("/my/password/change")
     public String changePassword(HttpSession session, String currentPassword, String newPassword, String confirmPassword, Model model) {
-        User user = (User) session.getAttribute("user");
+        UserDTO user = (UserDTO) session.getAttribute("user");
 
         if (user == null) {
             return "redirect:/login";

@@ -1,13 +1,14 @@
-package com.Workneed.workneed.Members.entity;
+package com.Workneed.workneed.Members.dto;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
-public class AdminPermission {
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class AdminPermissionDTO {
 
     private Long permissionId;
     private String permissionCode;

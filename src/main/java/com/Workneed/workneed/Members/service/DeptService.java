@@ -1,6 +1,6 @@
 package com.Workneed.workneed.Members.service;
 
-import com.Workneed.workneed.Members.entity.Dept;
+import com.Workneed.workneed.Members.dto.DeptDTO;
 import com.Workneed.workneed.Members.mapper.DeptMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,19 +13,19 @@ public class DeptService {
 
     private final DeptMapper deptMapper;
 
-    public List<Dept> getAllDepts() {
+    public List<DeptDTO> getAllDepts() {
         return deptMapper.findAll();
     }
 
-    public Dept getDept(Long deptId) {
+    public DeptDTO getDept(Long deptId) {
         return deptMapper.findById(deptId);
     }
 
-    public void createDept(Dept dept) {
+    public void createDept(DeptDTO dept) {
         deptMapper.insertDept(dept);
     }
 
-    public void updateDept(Dept dept) {
+    public void updateDept(DeptDTO dept) {
         deptMapper.updateDept(dept);
     }
 

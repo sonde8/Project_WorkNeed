@@ -1,6 +1,6 @@
 package com.Workneed.workneed.Members.service;
 
-import com.Workneed.workneed.Members.entity.User;
+import com.Workneed.workneed.Members.dto.UserDTO;
 import com.Workneed.workneed.Members.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,7 +18,7 @@ public class UserService {
 
     // 회원가입
 
-    public void register(User user) {
+    public void register(UserDTO user) {
 
         // 상태 기본값
         user.setUserStatus("ACTIVE");
@@ -45,9 +45,9 @@ public class UserService {
 
 
     // 로그인
-    public User login(String loginId, String rawPassword) {
+    public UserDTO login(String loginId, String rawPassword) {
 
-        User user = userMapper.findByLoginId(loginId);
+        UserDTO user = userMapper.findByLoginId(loginId);
 
         if (user == null) {
             return null;
@@ -71,7 +71,7 @@ public class UserService {
     }
 
     // 자동 로그인에 쓸 토큰 찾기
-    public User findByRememberToken(String token) {
+    public UserDTO findByRememberToken(String token) {
         return userMapper.findByRememberToken(token);
     }
 
@@ -89,7 +89,7 @@ public class UserService {
     ) {
 
 
-        User user = userMapper.findById(userId);
+        UserDTO user = userMapper.findById(userId);
         if (user == null) {
             throw new IllegalArgumentException("사용자 정보가 없습니다.");
         }
@@ -123,25 +123,25 @@ public class UserService {
 
 
     // 아이디 찾기 (이름 + 이메일)
-    public User findByNameAndEmail(String name, String email) {
+    public UserDTO findByNameAndEmail(String name, String email) {
         return userMapper.findByNameAndEmail(name, email);
     }
 
 
     // User CRUD (관리 / 공용)
-    public List<User> getAllUsers() {
+    public List<UserDTO> getAllUsers() {
         return userMapper.findAll();
     }
 
-    public User getUser(Long userId) {
+    public UserDTO getUser(Long userId) {
         return userMapper.findById(userId);
     }
 
-    public void createUser(User user) {
+    public void createUser(UserDTO user) {
         userMapper.insertUser(user);
     }
 
-    public void updateUser(User user) {
+    public void updateUser(UserDTO user) {
         userMapper.updateUser(user);
     }
 

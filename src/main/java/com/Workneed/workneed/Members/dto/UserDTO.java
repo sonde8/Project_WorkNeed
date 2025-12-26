@@ -1,14 +1,15 @@
-package com.Workneed.workneed.Members.entity;
+package com.Workneed.workneed.Members.dto;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
-public class User {
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class UserDTO {
 
     private Long userId;
     private String userLoginId;
@@ -27,4 +28,7 @@ public class User {
 
     private Long rankId;
     private Long deptId;
+
+    private String deptname;      // 부서 이름
+    private String rankname;      // 직급
 }
