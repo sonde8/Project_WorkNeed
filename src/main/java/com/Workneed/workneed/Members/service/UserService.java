@@ -1,6 +1,7 @@
 package com.Workneed.workneed.Members.service;
 
 import com.Workneed.workneed.Members.entity.User;
+import com.Workneed.workneed.Members.mapper.SocialAccountMapper;
 import com.Workneed.workneed.Members.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -15,9 +16,9 @@ public class UserService {
 
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
+    private final SocialAccountMapper socialAccountMapper;
 
     // 회원가입
-
     public void register(User user) {
 
         // 상태 기본값
@@ -87,8 +88,6 @@ public class UserService {
             String newPassword,
             String confirmPassword
     ) {
-
-
         User user = userMapper.findById(userId);
         if (user == null) {
             throw new IllegalArgumentException("사용자 정보가 없습니다.");
@@ -121,14 +120,22 @@ public class UserService {
         userMapper.updatePassword(userId, encodedPassword);
     }
 
-
     // 아이디 찾기 (이름 + 이메일)
     public User findByNameAndEmail(String name, String email) {
         return userMapper.findByNameAndEmail(name, email);
     }
 
+//    public  void linkGoogleAccount(
+//            User user,
+//            String gooleUserId,
+//
+//    )
 
-    // User CRUD (관리 / 공용)
+
+
+
+
+    // //////////////////////////////// User CRUD (관리 / 공용)
     public List<User> getAllUsers() {
         return userMapper.findAll();
     }

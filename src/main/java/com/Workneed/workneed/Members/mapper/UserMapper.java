@@ -38,6 +38,13 @@ public interface UserMapper {
                               @Param("expiredAt") LocalDateTime expiredAt
     );
 
+    //프로필이미지 업데이트
+    void updateProfileImage(
+            @Param("userId") Long userId,
+            @Param("imageUrl") String imageUrl
+    );
+
+
     User findByNameAndEmail(
             @Param("name") String name,
             @Param("email") String email

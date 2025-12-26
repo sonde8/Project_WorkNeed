@@ -26,6 +26,19 @@
     <button id="openPwModal" type="button">비밀번호 변경</button>
 </div>
 
+
+<!-- 임시용 프로필 이미지 -->
+<div>
+    <img th:src="${user.userProfileImage != null
+                     ? user.userProfileImage
+                     : '/images/default-profile.png'}"
+         alt="프로필 이미지"
+         width="120"
+         height="120"
+         style="border-radius: 50%; object-fit: cover;"/>
+</div>
+
+
 <!-- 비밀번호 변경 모달 -->
 <div th:if="${user != null}">
     <div id="pwModal" style="display:none;">

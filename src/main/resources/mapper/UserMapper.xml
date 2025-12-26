@@ -166,6 +166,12 @@
         WHERE user_id = #{userId}
     </update>
 
+    <update id="updateProfileImage">
+        UPDATE User
+        SET user_profile_image = #{imageUrl}
+        WHERE user_id = #{userId}
+    </update>
+
     <delete id="deleteUser" parameterType="long">
         DELETE FROM User
         WHERE user_id = #{userId}
