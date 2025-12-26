@@ -17,6 +17,16 @@
 
 <!-- 로그인 -->
 <div th:if="${user != null}">
+
+    <!-- 임시용 프로필 이미지 -->
+    <img th:src="${user.userProfileImage != null
+                     ? user.userProfileImage
+                     : '/images/default-profile.png'}"
+         alt="프로필 이미지"
+         width="120"
+         height="120"
+         style="border-radius: 50%; object-fit: cover;"/>
+
     <p th:text="${user.userName} + ' 님 환영합니다'"></p>
 
     <form action="/logout" method="post">
@@ -25,19 +35,6 @@
 
     <button id="openPwModal" type="button">비밀번호 변경</button>
 </div>
-
-
-<!-- 임시용 프로필 이미지 -->
-<div>
-    <img th:src="${user.userProfileImage != null
-                     ? user.userProfileImage
-                     : '/images/default-profile.png'}"
-         alt="프로필 이미지"
-         width="120"
-         height="120"
-         style="border-radius: 50%; object-fit: cover;"/>
-</div>
-
 
 <!-- 비밀번호 변경 모달 -->
 <div th:if="${user != null}">
@@ -53,6 +50,24 @@
            th:text="${passwordChangeError}"
            style="color:red;"></p>
     </div>
+</div>
+
+
+
+<!--소셜 프로필 이미지 연동버튼,연동여부-->
+<div th:if="${user != null}">
+    <hr>
+    <h3>소셜 계정 연동 (테스트)</h3>
+
+    <!-- Google 연동 버튼 -->
+    <a href="/auth/google/link">
+        <button type="button">Google 계정 연동</button>
+    </a>
+
+    <!-- 연동 상태 표시 (나중에) -->
+    <!--
+    <p>Google 계정 연동됨</p>
+    -->
 </div>
 
 </body>

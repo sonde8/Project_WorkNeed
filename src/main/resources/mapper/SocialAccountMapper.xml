@@ -5,8 +5,8 @@
 
 <mapper namespace="com.Workneed.workneed.Members.mapper.SocialAccountMapper">
 
-    <!-- provider + providerUserId 로 소셜 계정 조회 -->
-    <select id="findByProviderAndProviderUserId"
+    <!--소셜에서 연동된적 있나 확인용 -->
+    <select id="findBySocialAccount"
             resultType="com.Workneed.workneed.Members.dto.SocialAccountDTO">
         SELECT
         social_id,
@@ -22,8 +22,8 @@
         AND social_provider_user_id = #{providerUserId}
     </select>
 
-    <!-- userId + provider 로 소셜 계정 조회 -->
-    <select id="findByUserIdAndProvider"
+    <!-- 유저 기준 조회 아이디 + 소셜고유(naver,google 등)-->
+    <select id="findByUserAndProvider"
             resultType="com.Workneed.workneed.Members.dto.SocialAccountDTO">
         SELECT
         social_id,

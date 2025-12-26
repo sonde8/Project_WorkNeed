@@ -5,7 +5,8 @@
 
 <mapper namespace="com.Workneed.workneed.Members.mapper.DeptMapper">
 
-    <select id="findAll" resultType="com.Workneed.workneed.Members.dto.DeptDTO">
+    <select id="findAll"
+            resultType="com.Workneed.workneed.Members.dto.DeptDTO">
         SELECT
         dept_id,
         dept_name
@@ -13,28 +14,33 @@
         ORDER BY dept_id
     </select>
 
-    <select id="findById" parameterType="long" resultType="com.Workneed.workneed.Members.dto.DeptDTO">
+    <select id="findById"
+            parameterType="long"
+            resultType="com.Workneed.workneed.Members.dto.DeptDTO">
         SELECT
         dept_id,
         dept_name
         FROM Dept
-        WHERE dept_id = #{deptId}
+        WHERE dept_id = #{deptId}   <!-- ★ 수정 -->
     </select>
 
-    <insert id="insertDept" parameterType="com.Workneed.workneed.Members.dto.DeptDTO">
+    <insert id="insertDept"
+            parameterType="com.Workneed.workneed.Members.dto.DeptDTO">
         INSERT INTO Dept (dept_name)
         VALUES (#{deptName})
     </insert>
 
-    <update id="updateDept" parameterType="com.Workneed.workneed.Members.dto.DeptDTO">
+    <update id="updateDept"
+            parameterType="com.Workneed.workneed.Members.dto.DeptDTO">
         UPDATE Dept
         SET dept_name = #{deptName}
         WHERE dept_id = #{deptId}
     </update>
 
-    <delete id="deleteDept" parameterType="long">
+    <delete id="deleteDept"
+            parameterType="long">
         DELETE FROM Dept
-        WHERE dept_id = #{deptId}
+        WHERE dept_id = #{deptId}   <!-- ★ 수정 -->
     </delete>
 
 </mapper>
