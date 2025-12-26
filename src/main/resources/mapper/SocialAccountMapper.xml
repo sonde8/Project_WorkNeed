@@ -5,42 +5,65 @@
 
 <mapper namespace="com.Workneed.workneed.Members.mapper.SocialAccountMapper">
 
+    <!-- provider + providerUserId 로 소셜 계정 조회 -->
     <select id="findByProviderAndProviderUserId"
-            resultType="com.Workneed.workneed.Members.entity.SocialAccount">
-        SELECT *
-        FROM SocialAccount
-        WHERE social_provider = #{provider}
-        AND social_provider_user_id = #{providerUserId}
-    </select>
-
-    <select id="findByUserIdAndProvider"
-            resultType="com.Workneed.workneed.Members.entity.SocialAccount">
-        SELECT *
-        FROM SocialAccount
-        WHERE user_id = #{userId}
-        AND social_provider = #{provider}
-    </select>
-
-    <insert id="insertSocialAccount">
-        INSERT INTO SocialAccount (
+            resultType="com.Workneed.workneed.Members.dto.SocialAccountDTO">
+        SELECT
+        social_id,
         user_id,
         social_provider,
         social_provider_user_id,
         social_email,
         social_access_token,
-        social_refresh_token
+        social_refresh_token,
+        social_linked_at
+        FROM social_account
+        WHERE social_provider = #{provider}
+        AND social_provider_user_id = #{providerUserId}
+    </select>
+
+    <!-- userId + provider 로 소셜 계정 조회 -->
+    <select id="findByUserIdAndProvider"
+            resultType="com.Workneed.workneed.Members.dto.SocialAccountDTO">
+        SELECT
+        social_id,
+        user_id,
+        social_provider,
+        social_provider_user_id,
+        social_email,
+        social_access_token,
+        social_refresh_token,
+        social_linked_at
+        FROM social_account
+        WHERE user_id = #{userId}
+        AND social_provider = #{provider}
+    </select>
+
+    <!-- 소셜 계정 등록 -->
+    <insert id="insertSocialAccount"
+            parameterType="com.Workneed.workneed.Members.dto.SocialAccountDTO">
+        INSERT INTO social_account (
+        user_id,
+        social_provider,
+        social_provider_user_id,
+        social_email,
+        social_access_token,
+        social_refresh_token,
+        social_linked_at
         ) VALUES (
         #{userId},
         #{socialProvider},
         #{socialProviderUserId},
         #{socialEmail},
         #{socialAccessToken},
-        #{socialRefreshToken}
+        #{socialRefreshToken},
+        #{socialLinkedAt}
         )
     </insert>
 
+    <!-- 소셜 계정 삭제 -->
     <delete id="deleteByUserIdAndProvider">
-        DELETE FROM SocialAccount
+        DELETE FROM social_account
         WHERE user_id = #{userId}
         AND social_provider = #{provider}
     </delete>

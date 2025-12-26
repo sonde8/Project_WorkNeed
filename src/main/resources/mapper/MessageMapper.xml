@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.Workneed.workneed.Chat.mapper.MessageMapper">
+    <resultMap id="MessageResultMap" type="com.Workneed.workneed.Chat.dto.MessageDTO">
+        <id property="messageId" column="message_id"/>
+        <result property="roomId" column="room_id"/>
+        <result property="senderId" column="sender_id"/>
+        <result property="content" column="content"/>
+        <result property="messageType" column="message_type"/>
+        <result property="createdAt" column="created_at"/>
+
+        <result property="senderName" column="sender_name"/>
+    </resultMap>
+
+    <insert id="insertMessage" parameterType="MessageDTO" useGeneratedKeys="true" keyProperty="messageId">
+        INSERT INTO Message (room_id, sender_id, content, message_type)
+        VALUES (#{roomId}, #{senderId}, #{content}, #{messageType})
+    </insert>
+
+    <select id="findMessagesByRoomId" parameterType="Long" resultMap="MessageResultMap">
+        SELECT
+            m.message_id,
+            m.room_id,
+            m.sender_id,
+            m.content,
+            m.message_type,  m.created_at,
+            cu.user_name AS sender_name, (
+                ((SELECT COUNT(*) FROM RoomParticipant WHERE room_id = m.room_id AND left_at IS NULL) - 1)
+                    - (SELECT COUNT(*) FROM MessageReadReceipt WHERE message_id = m.message_id)
+                ) AS unread_count FROM Message m
+                                           JOIN User cu ON m.sender_id = cu.user_id
+        WHERE m.room_id = #{roomId}
+        ORDER BY m.message_id ASC
+    </select>
+
+    <insert id="insertReadReceipt">
+        INSERT IGNORE INTO MessageReadReceipt (message_id, user_id, read_at)
+        SELECT message_id, #{userId}, NOW()
+        FROM Message
+        WHERE room_id = #{roomId}
+    </insert>
+
+    <insert id="insertSingleReadReceipt">
+        INSERT IGNORE INTO MessageReadReceipt (message_id, user_id, read_at)
+        VALUES (#{messageId}, #{userId}, NOW())
+    </insert>
+
+    <select id="findLastMessageIdByRoomId" parameterType="Long" resultType="Long">
+        SELECT message_id
+        FROM Message
+        WHERE room_id = #{roomId}
+        ORDER BY message_id DESC
+            LIMIT 1
+    </select>
+</mapper>

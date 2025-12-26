@@ -1,13 +1,12 @@
 package com.Workneed.workneed.config;
 
-import com.Workneed.workneed.Members.entity.User;
+import com.Workneed.workneed.Members.dto.UserDTO;
 import com.Workneed.workneed.Members.service.UserService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
-import org.apache.el.parser.Token;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
@@ -53,7 +52,7 @@ public class AutoLoginInterceptor implements HandlerInterceptor {
             return true;
 
 
-        User user = userService.findByRememberToken(token);
+        UserDTO user = userService.findByRememberToken(token);
 
         // db에 없거나 만료되면 쿠키삭제
         if (user == null) {

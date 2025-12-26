@@ -5,21 +5,21 @@
 
 <mapper namespace="com.Workneed.workneed.Members.mapper.RankMapper">
 
-    <select id="findAll" resultType="com.Workneed.workneed.Members.entity.Rank">
+    <select id="findAll" resultType="com.Workneed.workneed.Members.dto.RankDTO">
         SELECT * FROM Ranks
     </select>
 
     <select id="findById" parameterType="long"
-            resultType="com.Workneed.workneed.Members.entity.Rank">
+            resultType="com.Workneed.workneed.Members.dto.RankDTO">
         SELECT * FROM Ranks WHERE rank_id = #{rankId}
     </select>
 
-    <insert id="insertRank" parameterType="Rank">
+    <insert id="insertRank" parameterType="com.Workneed.workneed.Members.dto.RankDTO">
         INSERT INTO Ranks (rank_name, rank_level)
         VALUES (#{rankName}, #{rankLevel})
     </insert>
 
-    <update id="updateRank" parameterType="Rank">
+    <update id="updateRank" parameterType="com.Workneed.workneed.Members.dto.RankDTO">
         UPDATE Ranks
         SET rank_name = #{rankName},
         rank_level = #{rankLevel}

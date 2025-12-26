@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>새 채팅 모달</title>
+    <link rel="stylesheet" th:href="@{/css/chat.css}">
+</head>
+<body>
+
+<div th:fragment="createRoomModal" id="createRoomModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>새 채팅</h2>
+            <button class="close-btn" onclick="closeCreateRoomModal()">&times;</button>
+        </div>
+
+        <div class="modal-body-top">
+            <input type="text" id="newRoomName" placeholder="채팅방 이름을 입력하세요 (미입력 시 자동 생성)">
+        </div>
+
+        <div class="modal-body-main">
+            <div class="selection-panel">
+                <div class="search-box">
+                    <span>🔍</span>
+                    <input type="text" placeholder="이름 검색" onkeyup="filterUsers(this.value)">
+                </div>
+
+                <div class="dept-list-container">
+                    <ul id="deptTree" class="dept-tree">
+                        <li>
+                            <div class="dept-item" onclick="toggleDept('dev-dept')">
+                                <span class="arrow">▶</span> 개발팀
+                            </div>
+                            <ul id="dev-dept" class="user-list hidden">
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="selected-panel">
+                <div id="selectedUsersCount" class="selected-header">선택된 대상 (0)</div>
+                <div id="selectedUserList" class="selected-user-list">
+                    <p class="placeholder-text">대상을 선택해주세요.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn-cancel" onclick="closeCreateRoomModal()">취소</button>
+            <button class="btn-confirm" onclick="submitCreateRoom()">초대하기</button>
+        </div>
+    </div>
+</div>
+
+<script th:src="@{/js/chatModal.js}"></script>
+</body>
+</html>

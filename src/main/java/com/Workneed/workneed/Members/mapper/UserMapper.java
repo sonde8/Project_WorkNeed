@@ -1,6 +1,6 @@
 package com.Workneed.workneed.Members.mapper;
 
-import com.Workneed.workneed.Members.entity.User;
+import com.Workneed.workneed.Members.dto.UserDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -11,19 +11,19 @@ import java.util.List;
 @Mapper
 public interface UserMapper {
 
-    List<User> findAll();
+    List<UserDTO> findAll();
 
-    User findByLoginId(String loginId); //아이디중복체크
+    UserDTO findByLoginId(String loginId); //아이디중복체크
 
-    User findByEmail(String email); //이메일중복체크
+    UserDTO findByEmail(String email); //이메일중복체크
 
-    User findById(Long userId);
+    UserDTO findById(Long userId);
 
-    User findByRememberToken(String token); // 자동로그인 토큰저장
+    UserDTO findByRememberToken(String token); // 자동로그인 토큰저장
 
-    void insertUser(User user);
+    void insertUser(UserDTO user);
 
-    void updateUser(User user);
+    void updateUser(UserDTO user);
 
     void deleteUser(Long userId);
 
@@ -38,6 +38,7 @@ public interface UserMapper {
                               @Param("expiredAt") LocalDateTime expiredAt
     );
 
+
     //프로필이미지 업데이트
     void updateProfileImage(
             @Param("userId") Long userId,
@@ -45,7 +46,8 @@ public interface UserMapper {
     );
 
 
-    User findByNameAndEmail(
+    UserDTO findByNameAndEmail(
+
             @Param("name") String name,
             @Param("email") String email
     );

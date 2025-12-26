@@ -1,11 +1,12 @@
 package com.Workneed.workneed.Members.service;
 
-import com.Workneed.workneed.Members.entity.User;
-import com.Workneed.workneed.Members.mapper.SocialAccountMapper;
+
+import com.Workneed.workneed.Members.dto.UserDTO;
 import com.Workneed.workneed.Members.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import com.Workneed.workneed.Members.mapper.SocialAccountMapper;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,8 +20,9 @@ public class UserService {
     private final SocialAccountMapper socialAccountMapper;
 
     // 회원가입
-    public void register(User user) {
 
+
+    public void register(UserDTO user) {
         // 상태 기본값
         user.setUserStatus("ACTIVE");
 
@@ -46,9 +48,9 @@ public class UserService {
 
 
     // 로그인
-    public User login(String loginId, String rawPassword) {
+    public UserDTO login(String loginId, String rawPassword) {
 
-        User user = userMapper.findByLoginId(loginId);
+        UserDTO user = userMapper.findByLoginId(loginId);
 
         if (user == null) {
             return null;
@@ -72,7 +74,7 @@ public class UserService {
     }
 
     // 자동 로그인에 쓸 토큰 찾기
-    public User findByRememberToken(String token) {
+    public UserDTO findByRememberToken(String token) {
         return userMapper.findByRememberToken(token);
     }
 
@@ -81,14 +83,15 @@ public class UserService {
     }
 
     // 로그인된 사용자 비밀번호 변경
-
     public void changePassword(
             Long userId,
             String currentPassword,
             String newPassword,
             String confirmPassword
     ) {
-        User user = userMapper.findById(userId);
+
+        UserDTO user = userMapper.findById(userId);
+
         if (user == null) {
             throw new IllegalArgumentException("사용자 정보가 없습니다.");
         }
@@ -121,38 +124,14 @@ public class UserService {
     }
 
     // 아이디 찾기 (이름 + 이메일)
-    public User findByNameAndEmail(String name, String email) {
+    public UserDTO findByNameAndEmail(String name, String email) {
         return userMapper.findByNameAndEmail(name, email);
     }
 
-//    public  void linkGoogleAccount(
-//            User user,
+//    public void linkGoogleAccount(
+//            UserDTO user,
 //            String gooleUserId,
 //
-//    )
+//            )
 
-
-
-
-
-    // //////////////////////////////// User CRUD (관리 / 공용)
-    public List<User> getAllUsers() {
-        return userMapper.findAll();
     }
-
-    public User getUser(Long userId) {
-        return userMapper.findById(userId);
-    }
-
-    public void createUser(User user) {
-        userMapper.insertUser(user);
-    }
-
-    public void updateUser(User user) {
-        userMapper.updateUser(user);
-    }
-
-    public void deleteUser(Long userId) {
-        userMapper.deleteUser(userId);
-    }
-}

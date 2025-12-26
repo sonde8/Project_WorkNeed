@@ -1,23 +1,22 @@
 package com.Workneed.workneed.Members.mapper;
-
-import com.Workneed.workneed.Members.entity.SocialAccount;
+import com.Workneed.workneed.Members.dto.SocialAccountDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 @Mapper
 public interface SocialAccountMapper {
 
-    SocialAccount findByProviderAndProviderUserId(
+    SocialAccountDTO findByProviderAndProviderUserId(
             @Param("provider") String provider,
             @Param("providerUserId") String providerUserId
     );
 
-    SocialAccount findByUserIdAndProvider(
+    SocialAccountDTO findByUserIdAndProvider(
             @Param("userId") Long userId,
             @Param("provider") String provider
     );
 
-    void insertSocialAccount(SocialAccount account);
+    void insertSocialAccount(SocialAccountDTO account);
 
     void deleteByUserIdAndProvider(
             @Param("userId") Long userId,
