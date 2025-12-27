@@ -2,79 +2,35 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Main</title>
-
-    <script th:inline="javascript">
-        /*<![CDATA[*/
-        window.passwordChangeError = [[${passwordChangeError != null}]];
-        /*]]>*/
-    </script>
-
-    <script src="/js/main.js"></script>
+    <title>Workneed Main</title>
 </head>
 <body>
-
 <h1>메인 페이지</h1>
 
-<!-- 비로그인 -->
-<div th:if="${user == null}">
-    <a href="/login">로그인</a>
-    <a href="/register">회원가입</a>
+<div th:if="${session.user == null}">
+    <p>로그인이 필요합니다.</p>
+    <a href="/login">로그인 하러가기</a>
 </div>
 
-<!-- 로그인 -->
-<div th:if="${user != null}">
+<div th:if="${session.user != null}">
+    <div class="profile-section">
+        <img th:src="${session.user.userProfileImage != null ? session.user.userProfileImage : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'}"
+             alt="프로필"
+             style="width:50px; height:50px; border-radius:50%;">
+    </div>
 
-    <!-- 임시용 프로필 이미지 -->
-    <img th:src="${user.userProfileImage != null
-                     ? user.userProfileImage
-                     : '/images/default-profile.png'}"
-         alt="프로필 이미지"
-         width="120"
-         height="120"
-         style="border-radius: 50%; object-fit: cover;"/>
+    <p><span th:text="${session.user.userName}"></span>님 환영합니다!</p>
 
-    <p th:text="${user.userName} + ' 님 환영합니다'"></p>
+    <div style="margin: 15px 0;">
+        <a href="/oauth2/authorization/google" class="btn btn-google" style="text-decoration: none;">
+            <img src="/images/google_icon.png" alt="" style="width:20px; vertical-align: middle;">
+            <span style="vertical-align: middle;">구글 계정 연동하기</span>
+        </a>
+    </div>
 
-    <form action="/logout" method="post">
+    <form th:action="@{/logout}" method="post">
         <button type="submit">로그아웃</button>
     </form>
-
-    <button id="openPwModal" type="button">비밀번호 변경</button>
 </div>
-
-<!-- 비밀번호 변경 모달 -->
-<div th:if="${user != null}">
-    <div id="pwModal" style="display:none;">
-        <form method="post" action="/my/password/change">
-            <input type="password" name="currentPassword" placeholder="현재 비밀번호">
-            <input type="password" name="newPassword" placeholder="새 비밀번호">
-            <input type="password" name="confirmPassword" placeholder="새 비밀번호 확인">
-            <button type="submit">확인</button>
-        </form>
-
-        <p th:if="${passwordChangeError}"
-           th:text="${passwordChangeError}"
-           style="color:red;"></p>
-    </div>
-</div>
-
-
-<!--소셜 프로필 이미지 연동버튼,연동여부-->
-<div th:if="${user != null}">
-    <hr>
-    <h3>소셜 계정 연동 (테스트)</h3>
-
-    <!-- Google 연동 버튼 -->
-    <a href="/auth/google/link">
-        <button type="button">Google 계정 연동</button>
-    </a>
-
-    <!-- 연동 상태 표시 (나중에) -->
-    <!--
-    <p>Google 계정 연동됨</p>
-    -->
-</div>
-
 </body>
 </html>

@@ -5,44 +5,42 @@
 
 <mapper namespace="com.Workneed.workneed.Members.mapper.SocialAccountMapper">
 
-    <!--소셜에서 연동된적 있나 확인용 -->
-    <select id="findBySocialAccount"
-            resultType="com.Workneed.workneed.Members.dto.SocialAccountDTO">
+    <select id="findBySocialAccount" resultType="com.Workneed.workneed.Members.dto.SocialAccountDTO">
         SELECT
-        social_id,
-        user_id,
-        social_provider,
-        social_provider_user_id,
-        social_email,
-        social_access_token,
-        social_refresh_token,
-        social_linked_at
-        FROM social_account
+        social_id AS socialId,
+        user_id AS userId,
+        social_provider AS socialProvider,
+        social_provider_user_id AS socialProviderUserId,
+        social_email AS socialEmail,
+        social_access_token AS socialAccessToken,
+        social_refresh_token AS socialRefreshToken,
+        social_linked_at AS socialLinkedAt
+        FROM SocialAccount
         WHERE social_provider = #{provider}
         AND social_provider_user_id = #{providerUserId}
     </select>
 
-    <!-- 유저 기준 조회 아이디 + 소셜고유(naver,google 등)-->
-    <select id="findByUserAndProvider"
-            resultType="com.Workneed.workneed.Members.dto.SocialAccountDTO">
+    <select id="findByUserAndProvider" resultType="com.Workneed.workneed.Members.dto.SocialAccountDTO">
         SELECT
-        social_id,
-        user_id,
-        social_provider,
-        social_provider_user_id,
-        social_email,
-        social_access_token,
-        social_refresh_token,
-        social_linked_at
-        FROM social_account
+        social_id AS socialId,
+        user_id AS userId,
+        social_provider AS socialProvider,
+        social_provider_user_id AS socialProviderUserId,
+        social_email AS socialEmail,
+        social_access_token AS socialAccessToken,
+        social_refresh_token AS socialRefreshToken,
+        social_linked_at AS socialLinkedAt
+        FROM SocialAccount
         WHERE user_id = #{userId}
         AND social_provider = #{provider}
     </select>
 
-    <!-- 소셜 계정 등록 -->
     <insert id="insertSocialAccount"
-            parameterType="com.Workneed.workneed.Members.dto.SocialAccountDTO">
-        INSERT INTO social_account (
+            parameterType="com.Workneed.workneed.Members.dto.SocialAccountDTO"
+            useGeneratedKeys="true"
+            keyProperty="socialId"
+            keyColumn="social_id">
+        INSERT INTO SocialAccount (
         user_id,
         social_provider,
         social_provider_user_id,
@@ -57,13 +55,12 @@
         #{socialEmail},
         #{socialAccessToken},
         #{socialRefreshToken},
-        #{socialLinkedAt}
+        NOW()
         )
     </insert>
 
-    <!-- 소셜 계정 삭제 -->
     <delete id="deleteByUserIdAndProvider">
-        DELETE FROM social_account
+        DELETE FROM SocialAccount
         WHERE user_id = #{userId}
         AND social_provider = #{provider}
     </delete>

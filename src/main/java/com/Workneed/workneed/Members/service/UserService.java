@@ -1,137 +1,128 @@
 package com.Workneed.workneed.Members.service;
 
-
 import com.Workneed.workneed.Members.dto.UserDTO;
 import com.Workneed.workneed.Members.mapper.UserMapper;
-import lombok.RequiredArgsConstructor;
+import com.Workneed.workneed.config.CustomUserDetails;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import com.Workneed.workneed.Members.mapper.SocialAccountMapper;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Slf4j
 @Service
-@RequiredArgsConstructor
-public class UserService {
+public class UserService implements UserDetailsService {
 
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
-    private final SocialAccountMapper socialAccountMapper;
 
-    // 회원가입
-
-
-    public void register(UserDTO user) {
-        // 상태 기본값
-        user.setUserStatus("ACTIVE");
-
-        // 아이디 중복 체크
-        if (userMapper.findByLoginId(user.getUserLoginId()) != null) {
-            throw new IllegalStateException("DUPLICATE_LOGIN_ID");
-        }
-
-        // 이메일 중복 체크
-        if (userMapper.findByEmail(user.getUserEmail()) != null) {
-            throw new IllegalStateException("DUPLICATE_EMAIL");
-        }
-
-        // 비밀번호 암호화
-        String encodedPassword = passwordEncoder.encode(user.getUserPassword());
-        user.setUserPassword(encodedPassword);
-
-        user.setRankId(1L);  //유저 직급 1=신입
-        user.setDeptId(5L);  //부서 배정 5=미배정  //신규회원은 신입/미배정
-
-        userMapper.insertUser(user);
+    // 생성자 주입 + @Lazy로 시큐리티와의 순환 참조 문제 해결
+    public UserService(UserMapper userMapper, @Lazy PasswordEncoder passwordEncoder) {
+        this.userMapper = userMapper;
+        this.passwordEncoder = passwordEncoder;
     }
 
-
-    // 로그인
-    public UserDTO login(String loginId, String rawPassword) {
-
+    /**
+     * [Spring Security 전용] 로그인 시 아이디로 사용자 정보를 가져오는 메서드
+     * 직접 만든 login() 대신 시큐리티 내부에서 이 메서드를 사용해 인증을 처리합니다.
+     */
+    @Override
+    public UserDetails loadUserByUsername(String loginId) throws UsernameNotFoundException {
         UserDTO user = userMapper.findByLoginId(loginId);
 
         if (user == null) {
-            return null;
+            log.error("사용자를 찾을 수 없음: {}", loginId);
+            throw new UsernameNotFoundException("존재하지 않는 사용자 아이디입니다: " + loginId);
         }
 
-        if (!passwordEncoder.matches(rawPassword, user.getUserPassword())) {
-            return null;
-        }
-
-        return user;
+        // 일반 로그인 시 OAuth2 속성(Map)은 null로 전달
+        return new CustomUserDetails(user, null);
     }
 
+    /**
+     * 회원 가입 (상태, 직급, 부서 고정값 적용)
+     */
+    public void register(UserDTO user) {
+        if (user.getUserPassword() != null) {
+            // 비밀번호 암호화
+            user.setUserPassword(passwordEncoder.encode(user.getUserPassword()));
+        }
 
-    // 자동 로그인 (Remember Me)
+        // DB 제약 조건을 맞추기 위한 고정값 세팅
+        user.setUserStatus("ACTIVE"); // 상태 고정
+        user.setRankId(1L);           // 직급 고정 (사원)
+        user.setDeptId(5L);           // 부서 고정 (미배정)
+
+        userMapper.insertUser(user);
+        log.info("새로운 사용자 등록 완료: {}", user.getUserLoginId());
+    }
+
+    /**
+     * 비밀번호 변경
+     */
+    public void changePassword(Long userId, String currentPassword, String newPassword, String confirmPassword) {
+        if (!newPassword.equals(confirmPassword)) {
+            throw new IllegalArgumentException("새 비밀번호가 일치하지 않습니다.");
+        }
+
+        UserDTO user = userMapper.findById(userId);
+        if (user == null) {
+            throw new IllegalArgumentException("사용자를 찾을 수 없습니다.");
+        }
+
+        if (!passwordEncoder.matches(currentPassword, user.getUserPassword())) {
+            throw new IllegalArgumentException("현재 비밀번호가 일치하지 않습니다.");
+        }
+
+        String encryptedPassword = passwordEncoder.encode(newPassword);
+        userMapper.updatePassword(userId, encryptedPassword);
+    }
+
+    /**
+     * 자동 로그인 관련 로직
+     */
     public void saveRememberToken(Long userId, String token) {
-        userMapper.updateRememberToken(
-                userId,
-                token,
-                LocalDateTime.now().plusDays(365)   // 토큰 저장기간설정
-        );
-    }
-
-    // 자동 로그인에 쓸 토큰 찾기
-    public UserDTO findByRememberToken(String token) {
-        return userMapper.findByRememberToken(token);
+        LocalDateTime expiredAt = LocalDateTime.now().plusYears(1);
+        userMapper.updateRememberToken(userId, token, expiredAt);
     }
 
     public void clearRememberToken(Long userId) {
         userMapper.clearRememberToken(userId);
     }
 
-    // 로그인된 사용자 비밀번호 변경
-    public void changePassword(
-            Long userId,
-            String currentPassword,
-            String newPassword,
-            String confirmPassword
-    ) {
-
-        UserDTO user = userMapper.findById(userId);
-
-        if (user == null) {
-            throw new IllegalArgumentException("사용자 정보가 없습니다.");
-        }
-
-        // 현재 비밀번호 검증
-        if (!passwordEncoder.matches(currentPassword, user.getUserPassword())) {
-            throw new IllegalArgumentException("현재 비밀번호가 올바르지 않습니다.");
-        }
-
-        // 기존 비밀번호와 동일한지 체크
-        if (passwordEncoder.matches(newPassword, user.getUserPassword())) {
-            throw new IllegalArgumentException("새 비밀번호는 현재 비밀번호와 달라야 합니다.");
-        }
-
-        // 새 비밀번호 확인
-        if (!newPassword.equals(confirmPassword)) {
-            throw new IllegalArgumentException("새 비밀번호가 일치하지 않습니다.");
-        }
-
-        // 비밀번호 정책 검증
-        if (!newPassword.matches("^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&]).{8,}$")) {
-            throw new IllegalArgumentException(
-                    "비밀번호는 8자 이상, 영문/숫자/특수문자를 포함해야 합니다."
-            );
-        }
-
-        // 암호화 후 저장
-        String encodedPassword = passwordEncoder.encode(newPassword);
-        userMapper.updatePassword(userId, encodedPassword);
+    public UserDTO findByRememberToken(String token) {
+        return userMapper.findByRememberToken(token);
     }
 
-    // 아이디 찾기 (이름 + 이메일)
-    public UserDTO findByNameAndEmail(String name, String email) {
-        return userMapper.findByNameAndEmail(name, email);
+    /**
+     * 조회 및 유효성 검사 로직
+     */
+    public UserDTO findByLoginId(String loginId) {
+        return userMapper.findByLoginId(loginId);
     }
 
-//    public void linkGoogleAccount(
-//            UserDTO user,
-//            String gooleUserId,
-//
-//            )
+    public UserDTO findByEmail(String email) {
+        return userMapper.findByEmail(email);
+    }
 
+    public UserDTO findById(Long userId) {
+        return userMapper.findById(userId);
+    }
+
+    public List<UserDTO> getAllUsers() {
+        return userMapper.findAll();
+    }
+
+    public void updateRememberToken(Long userId, String token, LocalDateTime expiredAt) {
+        userMapper.updateRememberToken(userId, token, expiredAt);
+    }
+
+    public void logout(Long userId) {
+        userMapper.clearRememberToken(userId);
+    }
 }

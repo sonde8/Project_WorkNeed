@@ -7,87 +7,79 @@
 
     <select id="findAll" resultType="com.Workneed.workneed.Members.dto.UserDTO">
         SELECT
-        user_id,
-        user_login_id,
-        user_email,
-        user_password,
-        user_name,
-        user_profile_image,
-        user_status,
-        user_birthday,
-        rank_id,
-        dept_id,
-        user_created_at,
-        user_updated_at,
-        remember_token,
-        remember_token_expired
+        user_id AS userId,
+        user_login_id AS userLoginId,
+        user_email AS userEmail,
+        user_password AS userPassword,
+        user_name AS userName,
+        user_profile_image AS userProfileImage,
+        user_status AS userStatus,
+        user_birthday AS userBirthday,
+        rank_id AS rankId,
+        dept_id AS deptId,
+        user_created_at AS userCreatedAt,
+        user_updated_at AS userUpdatedAt,
+        remember_token AS rememberToken,
+        remember_token_expired AS rememberTokenExpired
         FROM User
     </select>
 
-    <select id="findByLoginId"
-            resultType="com.Workneed.workneed.Members.dto.UserDTO">
-        SELECT *
+    <select id="findByLoginId" resultType="com.Workneed.workneed.Members.dto.UserDTO">
+        SELECT
+        user_id AS userId, user_login_id AS userLoginId, user_email AS userEmail,
+        user_password AS userPassword, user_name AS userName, user_profile_image AS userProfileImage
         FROM User
         WHERE user_login_id = #{loginId}
     </select>
 
-    <select id="findById"
-            parameterType="long"
-            resultType="com.Workneed.workneed.Members.dto.UserDTO">
-        SELECT *
-        FROM User
-        WHERE user_id = #{loginId}
-    </select>
-
-    <select id="findByEmail"
-            parameterType="string"
-            resultType="com.Workneed.workneed.Members.dto.UserDTO">
-        SELECT *
-        FROM User
-        WHERE user_email = #{loginId}
-    </select>
-
-    <select id="findByNameAndEmail"
-            resultType="com.Workneed.workneed.Members.dto.UserDTO">
+    <select id="findById" parameterType="long" resultType="com.Workneed.workneed.Members.dto.UserDTO">
         SELECT
-        user_login_id,
-        user_email,
-        user_name
+        user_id AS userId, user_login_id AS userLoginId, user_email AS userEmail,
+        user_name AS userName, user_profile_image AS userProfileImage
+        FROM User
+        WHERE user_id = #{userId}
+    </select>
+
+    <select id="findByEmail" resultType="com.Workneed.workneed.Members.dto.UserDTO">
+        SELECT
+        user_id AS userId,
+        user_email AS userEmail,
+        user_name AS userName,
+        user_profile_image AS userProfileImage
+        FROM User
+        WHERE user_email = #{email}
+    </select>
+
+    <select id="findByNameAndEmail" resultType="com.Workneed.workneed.Members.dto.UserDTO">
+        SELECT
+        user_login_id AS userLoginId,
+        user_email AS userEmail,
+        user_name AS userName
         FROM User
         WHERE user_name = #{name}
         AND user_email = #{email}
     </select>
 
-    <select id="findByRememberToken"
-            resultType="com.Workneed.workneed.Members.dto.UserDTO">
-        SELECT *
+    <select id="findByRememberToken" resultType="com.Workneed.workneed.Members.dto.UserDTO">
+        SELECT
+        user_id AS userId, user_login_id AS userLoginId, remember_token AS rememberToken,
+        remember_token_expired AS rememberTokenExpired
         FROM User
         WHERE remember_token = #{value}
         AND remember_token_expired > NOW()
     </select>
 
     <insert id="insertUser"
-            parameterType="com.Workneed.workneed.Members.dto.UserDTO">
+            parameterType="com.Workneed.workneed.Members.dto.UserDTO"
+            useGeneratedKeys="true"
+            keyProperty="userId"
+            keyColumn="user_id">
         INSERT INTO User (
-        user_login_id,
-        user_email,
-        user_password,
-        user_name,
-        user_profile_image,
-        user_status,
-        user_birthday,
-        rank_id,
-        dept_id
+        user_login_id, user_email, user_password, user_name,
+        user_profile_image, user_status, user_birthday, rank_id, dept_id
         ) VALUES (
-        #{userLoginId},
-        #{userEmail},
-        #{userPassword},
-        #{userName},
-        #{userProfileImage},
-        #{userStatus},
-        #{userBirthday},
-        #{rankId},
-        #{deptId}
+        #{userLoginId}, #{userEmail}, #{userPassword}, #{userName},
+        #{userProfileImage}, #{userStatus}, #{userBirthday}, #{rankId}, #{deptId}
         )
     </insert>
 
@@ -97,8 +89,7 @@
         WHERE user_id = #{userId}
     </update>
 
-    <update id="updateUser"
-            parameterType="com.Workneed.workneed.Members.dto.UserDTO">
+    <update id="updateUser" parameterType="com.Workneed.workneed.Members.dto.UserDTO">
         UPDATE User
         SET
         user_email = #{userEmail},
@@ -118,8 +109,7 @@
         WHERE user_id = #{userId}
     </update>
 
-    <update id="clearRememberToken"
-            parameterType="long">
+    <update id="clearRememberToken" parameterType="long">
         UPDATE User
         SET remember_token = NULL,
         remember_token_expired = NULL
@@ -132,8 +122,7 @@
         WHERE user_id = #{userId}
     </update>
 
-    <delete id="deleteUser"
-            parameterType="long">
+    <delete id="deleteUser" parameterType="long">
         DELETE FROM User
         WHERE user_id = #{userId}
     </delete>
