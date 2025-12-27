@@ -85,18 +85,151 @@ a{
 }
 
 /* ===== Comment block ===== */
-#comment{
+#comment {
+    display: grid;
     grid-area: comment;
-    min-height: 30rem;
+    gap: 1rem;
 }
-#comment .title{
-    font-size: 1.5rem;
+
+#comment .title {
+    font-size: 1.6rem;
+    font-weight: 800;
+}
+.comment-list {
+    display: grid;
+    gap: 1.2rem;
+}
+.comment-item {
+    position: relative;
+    padding: 1rem;
+    border-radius: 1.2rem;
+    border: 0.1rem solid rgba(0, 0, 0, 0.12);
+    background: #fff;
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+.comment-item:hover {
+    background: #fafafa;
+    border-color: rgba(0, 0, 0, 0.2);
+}
+
+.comment-row {
+    display: grid;
+    grid-template-columns: auto auto 1fr;
+    align-items: center;
+    gap: 0.8rem;
+}
+.comment-writer {
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+.comment-time {
+    font-size: 1.1rem;
+    color: #888;
+}
+#comment-btns{
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+}
+
+.comment-edit-btn,
+.comment-delete-btn{
+    justify-self: end;
+    padding: 0.4rem 0.8rem;
+    font-size: 1.2rem;
+    height: 2.5rem;
+    border-radius: 0.6rem;
+    border: 0.1rem solid rgba(0, 0, 0, 0.2);
+    background: #fff;
+    cursor: pointer;
+
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.15s ease, visibility 0.15s ease, background 0.15s ease;
+}
+
+.comment-item:hover .comment-edit-btn,
+.comment-item:hover .comment-delete-btn{
+    opacity: 1;
+    visibility: visible;
+}
+
+.comment-edit-btn:hover,
+.comment-delete-btn:hover {
+    background: #f2f2f2;
+}
+
+.comment-empty {
+    padding: 1.4rem;
+    border-radius: 1.2rem;
+    border: 0.1rem dashed rgba(0, 0, 0, 0.2);
+    font-size: 1.3rem;
+    color: #777;
+}
+
+/* ===== Edit Comment ===== */
+.comment-content{
+    font-size: 1.1rem;
+    padding: 1rem 1rem 0.5rem;
+}
+.comment-edit-form {
+    display: none;
+    margin: 1rem;
+}
+.comment-edit-textarea {
+    width: 100%;
+    resize: vertical;
+    padding: 0.8rem;
+    border: 1px solid #dcdcdc;
+    border-radius: 1rem;
+    font-size: 0.95rem;
+    line-height: 1.45;
+    outline: none;
+}
+.comment-edit-btns {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 0.5rem;
+}
+.comment-edit-btns button {
+    padding: 0.4rem 0.8rem;
+    font-size: 1.2rem;
+    height: 2.5rem;
+    border-radius: 0.6rem;
+    border: 0.1rem solid rgba(0, 0, 0, 0.2);
+    background: #fff;
+    cursor: pointer;
+}
+.comment-edit-btns button:hover {
+    background: #f2f2f2;
+}
+
+/* ===== Add Comment ===== */
+.comment-add {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 1rem;
+    margin-top: 0.6rem;
+}
+.comment-input {
+    height: 4.2rem;
+    padding: 0 1.2rem;
+    border-radius: 1.2rem;
+    border: 0.1rem solid rgba(0, 0, 0, 0.2);
+    font-size: 1.3rem;
+    outline: none;
+}
+.comment-input:focus {
+    border-color: #333;
+}
+.comment-add-btn {
+    height: 4.2rem;
+    padding: 0 1.4rem;
+    border-radius: 1.2rem;
+    border: 0.1rem solid rgba(0, 0, 0, 0.2);
+    background: #eee;
+    font-size: 1.3rem;
     font-weight: 700;
-    line-height: 1.2;
+    cursor: pointer;
 }
-
-/* ===== Etc block ===== */
-#etc{
-    grid-area: etc;
-}
-
