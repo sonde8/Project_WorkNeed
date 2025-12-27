@@ -18,4 +18,5 @@ public class SocialAccountDTO {
     private String socialAccessToken;
     private String socialRefreshToken;
     private LocalDateTime socialLinkedAt;
+    private String socialProfileImage;
 }

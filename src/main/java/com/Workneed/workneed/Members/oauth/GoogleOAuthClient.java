@@ -1,6 +1,7 @@
 package com.Workneed.workneed.Members.oauth;
 
 import com.Workneed.workneed.Members.dto.GoogleUserInfoDTO;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -24,6 +25,12 @@ public class GoogleOAuthClient {    // 통신담당 서비스에 모든 비즈�
     // 구글 반환 uri
     @Value("${google.redirect-uri}")
     private String redirectUri;
+
+    @PostConstruct
+    public void checkGoogleConfig() {
+        System.out.println("GOOGLE CLIENT ID = " + clientId);
+        System.out.println("GOOGLE REDIRECT URI = " + redirectUri);
+    }
 
 
     private final RestTemplate restTemplate = new RestTemplate();

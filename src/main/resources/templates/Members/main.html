@@ -3,6 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <title>Main</title>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        window.passwordChangeError = [[${passwordChangeError != null}]];
+        /*]]>*/
+    </script>
+
     <script src="/js/main.js"></script>
 </head>
 <body>
@@ -51,7 +58,6 @@
            style="color:red;"></p>
     </div>
 </div>
-
 
 
 <!--소셜 프로필 이미지 연동버튼,연동여부-->

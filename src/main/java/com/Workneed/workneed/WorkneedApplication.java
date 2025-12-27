@@ -9,7 +9,8 @@ public class WorkneedApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(WorkneedApplication.class, args);
-	}
+
+    }
 
 }
 
