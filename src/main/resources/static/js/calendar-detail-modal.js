@@ -152,7 +152,7 @@
             return;
         }
 
-        window.location.href = `/schedule/${scheduleId}`;
+        window.location.href = `/schedule/task?scheduleId=${scheduleId}`;
     });
 
     editBtn.addEventListener("click", () => {
