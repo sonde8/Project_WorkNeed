@@ -111,7 +111,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const column = btn.closest(".kanban-todo, .kanban-doing, .kanban-done");
 
-            // 2컬럼에 따라 status 값 세팅
             if (column.classList.contains("kanban-todo")) {
                 statusInput.value = "TODO";
             } else if (column.classList.contains("kanban-doing")) {
@@ -167,7 +166,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // ===== Type 선택 + TEAM이면 Invite Team 모달로 전환 =====
+    // ===== Type 선택 (값만 세팅) =====
     if (typeGroup && typeInput) {
         syncActiveFromHidden();
 
@@ -181,34 +180,147 @@ document.addEventListener("DOMContentLoaded", () => {
             typeInput.value = value;
             setActive(typeGroup, ".scope-btn", btn);
 
-            // TEAM이면 Invite Team 모달로 전환
-            if (value === "TEAM") {
-                closeTaskModal();
-                openTeamModal();
+            // 여기서 모달 전환x
+            // TEAM 전환은 "확인(submit) 후 scheduleId 받은 다음"에 처리
+        });
+    }
+
+
+
+// ===== Submit: 확인 버튼 =====
+if (taskForm) {
+    taskForm.addEventListener("submit", async (e) => {
+        const type = typeInput?.value || "PERSONAL";
+
+        // TEAM이 아니면 기존 동작 유지(그냥 서버로 submit)
+        if (type !== "TEAM") {
+            closeTaskModal();
+            return;
+        }
+
+        // TEAM이면 여기서부터 AJAX로 전환
+        e.preventDefault();
+
+        try {
+            const fd = new FormData(taskForm);
+
+            const res = await fetch("/schedule/createAjax", {
+                method: "POST",
+                body: fd
+            });
+
+            if (!res.ok) throw new Error("일정 생성 실패");
+            const data = await res.json();
+            const scheduleId = data.scheduleId;
+
+            // scheduleId를 teamModal에 저장 (teamModal에 hidden input 필요)
+            const scheduleInput = document.getElementById("teamScheduleId");
+            if (scheduleInput) scheduleInput.value = scheduleId;
+
+            closeTaskModal();
+            openTeamModal();
+
+
+            const users = await loadActiveUsers();
+            renderUsers(users);
+
+
+        } catch (err) {
+            console.error(err);
+            alert(err.message || "처리 중 오류가 발생했습니다.");
+        }
+    });
+}
+
+// ===== TEAM Invite Modal Submit =====
+    const teamInviteForm = document.getElementById("teamInviteForm");
+
+    async function loadActiveUsers() {
+        const scheduleId = document.getElementById("teamScheduleId").value;
+
+        const res = await fetch(`/schedule/active-users?scheduleId=${scheduleId}`);
+        if (!res.ok) throw new Error("팀원 목록 조회 실패");
+
+        return await res.json();
+    }
+
+    function renderUsers(users) {
+        const box = document.getElementById("teamUserList");
+        box.innerHTML = "";
+
+        if (!users || users.length === 0) {
+            box.innerHTML = `<div style="padding:12px;">표시할 팀원이 없습니다.</div>`;
+            return;
+        }
+
+        users.forEach(u => {
+            const row = document.createElement("label");
+            row.className = "invite-row";
+            row.innerHTML = `
+              <div class="meta">
+                <div class="name">${u.userName} <span class="sub">(${u.rankName || ""})</span></div>
+                <div class="sub">${u.deptName || ""} · ${u.userEmail || ""}</div>
+              </div>
+              <input type="checkbox" name="userIds" value="${u.userId}">
+            `;
+            box.appendChild(row);
+        });
+
+        function updateInviteCount() {
+            const countEl = document.getElementById("inviteCount");
+            if (!countEl) return;
+
+            const checkedCount = document.querySelectorAll(
+                '#teamUserList input[name="userIds"]:checked'
+            ).length;
+
+
+            countEl.textContent = `[ ${checkedCount}명 ]`;
+        }
+        // 최초 0명 표시
+        updateInviteCount();
+
+        // 체크박스 변경 이벤트(이벤트 위임 방식)
+        const teamUserList = document.getElementById("teamUserList");
+        teamUserList?.addEventListener("change", (e) => {
+            if (e.target && e.target.matches('input[name="userIds"]')) {
+                updateInviteCount();
             }
         });
     }
 
-    // ===== File name =====
-    if (fileInput && fileName) {
-        fileInput.addEventListener("change", () => {
-            fileName.textContent = fileInput.files?.[0]?.name || "";
-        });
-    }
+    teamInviteForm?.addEventListener("submit", async (e) => {
+        e.preventDefault();
 
-    // ===== Submit: 확인 버튼 =====
-    // - 폼 submit은 서버로 전송되어 저장됨
-    // - 저장 후 컨트롤러가 kanban 페이지로 redirect/render 하면 카드에 반영됨
-    if (taskForm) {
-        taskForm.addEventListener("submit", (e) => {
-            // 기본 HTML required 검증은 브라우저가 처리
-            // 추가 검증이 필요하면 여기에서 e.preventDefault() 후 검사
+        const scheduleId = document.getElementById("teamScheduleId")?.value;
+        if (!scheduleId) {
+            alert("scheduleId가 없습니다.");
+            return;
+        }
 
-            // UX상: 서버로 이동(페이지 리로드) 전 모달 닫기
-            // (리다이렉트/렌더링이면 사실상 의미는 적지만 요청사항 반영)
-            closeTaskModal();
+        const userIds = [...document.querySelectorAll('#teamUserList input[name="userIds"]:checked')]
+            .map(el => el.value);
+
+        const params = new URLSearchParams();
+        params.append("scheduleId", scheduleId);
+        userIds.forEach(id => params.append("userIds", id));
+
+        const res = await fetch("/schedule/inviteAjax", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: params.toString()
         });
-    }
+
+        if (!res.ok) {
+            const txt = await res.text();
+            console.error("inviteAjax failed:", res.status, txt);
+            alert("팀 초대 저장 실패");
+            return;
+        }
+
+        closeTeamModal();
+        window.location.href = "/schedule/kanban";
+    });
 });
 
 //// 상세페이지 이동////

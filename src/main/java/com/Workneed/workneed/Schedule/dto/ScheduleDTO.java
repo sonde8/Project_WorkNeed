@@ -4,7 +4,8 @@ import java.time.LocalDateTime;
 
 public class ScheduleDTO {
     private Long scheduleId;
-    private String status;     // TODO/DOING/DONE
+    private Long invitedBy;
+    private String status;
     private String title;
     private String description;
     private String eventType;  // PROJECT/MEETING/REVIEW/ETC
@@ -19,6 +20,9 @@ public class ScheduleDTO {
 
     public Long getScheduleId() {return scheduleId;}
     public void setScheduleId(Long scheduleId) {this.scheduleId = scheduleId;}
+
+    public Long getInvitedBy() {return invitedBy;}
+    public void setInvitedBy(Long invitedBy) {this.invitedBy = invitedBy;}
 
     public String getStatus() {return status;}
     public void setStatus(String status) {this.status = status;}
