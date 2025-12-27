@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.Workneed.workneed.Members.mapper.RankMapper">
+
+    <select id="findAll" resultType="com.Workneed.workneed.Members.dto.RankDTO">
+        SELECT * FROM Ranks
+    </select>
+
+    <select id="findById" parameterType="long"
+            resultType="com.Workneed.workneed.Members.dto.RankDTO">
+        SELECT * FROM Ranks WHERE rank_id = #{rankId}
+    </select>
+
+    <insert id="insertRank" parameterType="com.Workneed.workneed.Members.dto.RankDTO">
+        INSERT INTO Ranks (rank_name, rank_level)
+        VALUES (#{rankName}, #{rankLevel})
+    </insert>
+
+    <update id="updateRank" parameterType="com.Workneed.workneed.Members.dto.RankDTO">
+        UPDATE Ranks
+        SET rank_name = #{rankName},
+        rank_level = #{rankLevel}
+        WHERE rank_id = #{rankId}
+    </update>
+
+    <delete id="deleteRank" parameterType="long">
+        DELETE FROM Ranks WHERE rank_id = #{rankId}
+    </delete>
+
+</mapper>

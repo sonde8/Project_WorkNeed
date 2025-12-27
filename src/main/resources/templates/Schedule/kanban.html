@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+
+<head>
+    <title>Title</title>
+    <th:block layout:fragment="head">
+        <link rel="stylesheet" th:href="@{/css/kanban.css}">
+    </th:block>
+</head>
+
+<body>
+<main layout:fragment="content">
+    <div class="kanban">
+        <div class="kanban-todo">
+            <div class="kanban-header">TODO</div>
+            <div class="kanban-cards" data-status="TODO">
+                <div class="kanban-card" th:each="item : ${todoList}"
+                                         th:attr="data-id=${item.scheduleId}">
+                    <div class="title-event-type">
+                        <div class="title" th:text="${item.title}">Title</div>
+                        <div class="event-type" th:text="${item.eventType}">Event Type</div>
+                    </div>
+                    <div class="date-time">
+                        <div class="start-at" th:text="${#temporals.format(item.startAt, 'yyyy-MM-dd HH:mm')}">Start At</div>
+                        <div class="end-at" th:text="${#temporals.format(item.endAt, 'yyyy-MM-dd HH:mm')}"> End At</div>
+                    </div>
+                    <div class="card-desc" th:text="${#strings.abbreviate(item.description, 40)}">Description</div>
+                    <div class="image"></div>
+
+                </div>
+            </div>
+            <button class="kanban-addTask">+ Add Task</button>
+        </div>
+        <div class="kanban-doing">
+            <div class="kanban-header">DOING</div>
+            <div class="kanban-cards" data-status="DOING">
+                <div class="kanban-card" th:each="item : ${doingList}"
+                                         th:attr="data-id=${item.scheduleId}">
+                    <div class="title-event-type">
+                        <div class="title" th:text="${item.title}">Title</div>
+                        <div class="event-type" th:text="${item.eventType}">Event Type</div>
+                    </div>
+                    <div class="date-time">
+                        <div class="start-at" th:text="${#temporals.format(item.startAt, 'yyyy-MM-dd HH:mm')}">Start At</div>
+                        <div class="end-at" th:text="${#temporals.format(item.endAt, 'yyyy-MM-dd HH:mm')}"> End At</div>
+                    </div>
+                    <div class="card-desc" th:text="${#strings.abbreviate(item.description, 40)}">Description</div>
+                </div>
+            </div>
+            <button class="kanban-addTask">+ Add Task</button>
+        </div>
+        <div class="kanban-done">
+            <div class="kanban-header">DONE</div>
+            <div class="kanban-cards" data-status="DONE">
+                <div class="kanban-card" th:each="item : ${doneList}"
+                                         th:attr="data-id=${item.scheduleId}">
+                    <div class="title-event-type">
+                        <div class="title" th:text="${item.title}">Title</div>
+                        <div class="event-type" th:text="${item.eventType}">Event Type</div>
+                    </div>
+                    <div class="date-time">
+                        <div class="start-at" th:text="${#temporals.format(item.startAt, 'yyyy-MM-dd HH:mm')}">Start At</div>
+                        <div class="end-at" th:text="${#temporals.format(item.endAt, 'yyyy-MM-dd HH:mm')}"> End At</div>
+                    </div>
+                    <div class="card-desc" th:text="${#strings.abbreviate(item.description, 40)}">Description</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-backdrop" id="modal-backdrop" hidden></div>
+
+    <div class="modal" id="taskModal" hidden>
+        <div class="modal-panel" id="taskModal-panel">
+
+            <header class="modal-header">Add Task</header>
+            <button type="button" class="x-btn"> x </button>
+
+            <form class="task-form" id="taskForm" th:action="@{/schedule/create}" method="post" enctype="multipart/form-data">
+
+                <input type="hidden" name="status" id="status" value="TODO" />
+
+                <div class="modal-sheet">
+
+                    <div class="field" id="titleR">
+                        <input id="title" name="title" type="text" placeholder="Task title" aria-label="Task title" required />
+                    </div>
+
+                    <div class="field" id="dateTimeR">
+                        <div class="start">
+                            <input id="startAt" name="startAt" type="datetime-local" aria-label="Start date/time" title="Start date/time" required />
+                        </div>
+                        <div class="end">
+                            <input id="endAt" name="endAt" type="datetime-local"  aria-label="End date/time" title="End date/time" required />
+                        </div>
+                    </div>
+
+                    <div class="field" id="locationR">
+                        <input id="location" name="location" type="text" placeholder="Location" aria-label="Location"/>
+                    </div>
+
+                    <div class="field" id="eventTypeR">
+                        <div class="eventTypeGroup" id="eventTypeGroup">
+                            <button type="button" class="eventBtn" data-value="PROJECT">Project</button>
+                            <button type="button" class="eventBtn" data-value="MEETING">Meeting</button>
+                            <button type="button" class="eventBtn" data-value="REVIEW">Review</button>
+                            <button type="button" class="eventBtn" data-value="EVENT">Event</button>
+                            <button type="button" class="eventBtn" data-value="REPORT">Report</button>
+                            <button type="button" class="eventBtn" data-value="ETC">etc</button>
+                        </div>
+                        <input type="hidden" id="eventType" name="eventType" value="PROJECT" />
+                    </div>
+
+                    <div class="field" id="typeR">
+                        <div class="typeGroup" id="typeGroup">
+                            <button type="button" class="scope-btn" data-value="PERSONAL">
+                                <span class="scope-icon"><img src="/images/person300.svg"></span>
+                                <span class="scope-txt">PERSONAL</span>
+                            </button>
+                            <button type="button" class="scope-btn" data-value="TEAM">
+                                <span class="scope-icon"><img src="/images/team1_300.svg"></span>
+                                <span class="scope-txt">TEAM</span>
+                            </button>
+                            <button type="button" class="scope-btn" data-value="COMPANY">
+                                <span class="scope-icon"><img src="/images/company300.svg"></span>
+                                <span class="scope-txt">COMPANY</span>
+                            </button>
+                        </div>
+                        <input type="hidden" id="type" name="type" value="PERSONAL" />
+                    </div>
+
+                    <div class="field" id="descriptionR">
+                        <textarea id="description" name="description" rows="8" placeholder="Task description" aria-label="Task description"></textarea>
+                    </div>
+
+                    <div class="field" id="fileR">
+                        <label class="file-btn" for="file">+ Add File</label>
+                        <input id="file" name="file" type="file" hidden />
+                        <span class="file-name" id="fileName"></span>
+                    </div>
+                </div>
+
+                <div class="modal-btns">
+                    <button class="btn" type="submit" id="okBtn">확인</button>
+                    <button class="btn" type="button" id="cancelBtn">취소</button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+
+    <div class="modal" id="teamModal" hidden>
+        <div class="modal-panel" id="teamModal-panel">
+
+            <header class="modal-header">Invite Team</header>
+            <button type="button" class="x-btn"> x </button>
+
+
+        </div>
+    </div>
+
+
+</main>
+
+<th:block layout:fragment="script">
+    <!-- 드래그 이동 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
+    <script th:src="@{/js/kanban.js}"></script>
+</th:block>
+
+</body>
+</html>
