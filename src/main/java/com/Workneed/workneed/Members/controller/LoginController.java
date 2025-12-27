@@ -1,6 +1,6 @@
 package com.Workneed.workneed.Members.controller;
 
-import com.Workneed.workneed.Members.entity.User;
+import com.Workneed.workneed.Members.dto.UserDTO;
 import com.Workneed.workneed.Members.service.UserService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
@@ -25,7 +25,7 @@ public class LoginController {
     private final UserService userService;
 
 
-    @GetMapping("login")
+    @GetMapping("/login")
     public String loginForm(HttpSession session,
                             @RequestParam(required = false) String passwordChanged,
                             @RequestParam(required = false) String registerSuccess,
@@ -72,7 +72,7 @@ public class LoginController {
         }
 
         //  인증 시도
-        User user = userService.login(loginId, password);
+        UserDTO user = userService.login(loginId, password);
 
         //  아이디 또는 비밀번호 불일치
         if (user == null) {

@@ -74,11 +74,11 @@ function renderDeptTree(users) {
             return `
                     <li class="user-item ${isSelected ? 'selected-disabled' : ''}" 
                         id="user-item-${user.userId}"
-                        onclick="selectUser(${user.userId}, '${user.username}', '${deptName}')">
+                        onclick="selectUser(${user.userId}, '${user.userName}', '${deptName}')">
                         <div class="user-info-row">
                             <span class="user-icon">👤</span>
                             <div class="user-text">
-                                <span class="u-name">${user.username}</span>
+                                <span class="u-name">${user.userName}</span>
                                 <span class="u-dept">${user.positionName || ''}</span>
                             </div>
                         </div>

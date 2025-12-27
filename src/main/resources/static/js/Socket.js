@@ -10,13 +10,13 @@ var stompClient = null;
 var isSending = false;
 
 // 나중에 로그인 기능 완성되면 삭제하거나 교체하기
-// var currentUserId = window.currentUserId;
-//
-// if (!currentUserId) {
-//     console.error("로그인이 필요합니다.");
-//     // 로그인 페이지로 튕구는 로직 등을 추가할 수 있습니다.
-// }
-var currentUserId = window.currentUserId || 1;
+var currentUserId = window.currentUserId;
+
+if (!currentUserId) {
+    console.error("로그인이 필요합니다.");
+     // 로그인 페이지로 튕구는 로직 등을 추가할 수 있습니다.
+}
+
 
 // 2. 현재 채팅방 ID 추출 (URL 경로 /chat/room/{roomId} 에서 가져오기)
 const pathArray = window.location.pathname.split('/');
@@ -138,10 +138,10 @@ function onMessageReceived(payload) {
 
         // 상대방 이름 표시
         if(!isMe) {
-            var usernameElement = document.createElement('span');
-            usernameElement.className = 'sender';
-            usernameElement.textContent = message.senderName;
-            msgUnit.appendChild(usernameElement);
+            var userNameElement = document.createElement('span');
+            userNameElement.className = 'sender';
+            userNameElement.textContent = message.senderName;
+            msgUnit.appendChild(userNameElement);
         }
 
         var bubbleRow = document.createElement('div');

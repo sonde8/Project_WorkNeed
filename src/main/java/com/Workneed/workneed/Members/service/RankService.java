@@ -1,6 +1,6 @@
 package com.Workneed.workneed.Members.service;
 
-import com.Workneed.workneed.Members.entity.Rank;
+import com.Workneed.workneed.Members.dto.RankDTO;
 import com.Workneed.workneed.Members.mapper.RankMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,19 +13,19 @@ public class RankService {
 
     private final RankMapper rankMapper;
 
-    public List<Rank> getAllRanks() {
+    public List<RankDTO> getAllRanks() {
         return rankMapper.findAll();
     }
 
-    public Rank getRank(Long rankId) {
+    public RankDTO getRank(Long rankId) {
         return rankMapper.findById(rankId);
     }
 
-    public void createRank(Rank rank) {
+    public void createRank(RankDTO rank) {
         rankMapper.insertRank(rank);
     }
 
-    public void updateRank(Rank rank) {
+    public void updateRank(RankDTO rank) {
         rankMapper.updateRank(rank);
     }
 
