@@ -1,0 +1,47 @@
+<!-- ===============================
+     일정 상세 조회 모달 Fragment
+=============================== -->
+<div th:fragment="calendarDetailModal">
+
+    <div class="modal-overlay hidden" id="calendarDetailModalOverlay" aria-hidden="true">
+        <div class="modal-container" role="dialog" aria-modal="true">
+
+            <!-- Header -->
+            <div class="modal-header">
+                <h2>일정 상세</h2>
+                <button type="button"
+                        class="modal-close-btn"
+                        id="detailCloseBtn"
+                        aria-label="닫기">✕</button>
+            </div>
+
+            <!-- Body -->
+            <div class="modal-body">
+                <div class="detail-row">
+                    <label>제목</label>
+                    <p id="detailTitle"></p>
+                </div>
+
+                <div class="detail-row">
+                    <label>내용</label>
+                    <p id="detailDescription"></p>
+                </div>
+
+                <div class="detail-row">
+                    <label>기간</label>
+                    <p id="detailDate"></p>
+                </div>
+
+            </div>
+
+            <!-- Footer -->
+            <div class="modal-footer">
+                <button id="detailGoScheduleBtn" class="btn-secondary">업무 페이지로 이동</button>
+                <button type="button" class="btn-primary" id="detailEditBtn">수정</button>
+                <button type="button" class="btn-danger" id="detailDeleteBtn">삭제</button>
+            </div>
+
+        </div>
+    </div>
+
+</div>

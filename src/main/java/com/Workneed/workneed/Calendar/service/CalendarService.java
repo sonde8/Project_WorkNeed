@@ -1,28 +1,23 @@
 package com.Workneed.workneed.Calendar.service;
 
-
 import com.Workneed.workneed.Calendar.dto.CalendarDTO;
-import com.Workneed.workneed.Calendar.mapper.CalendarMapper;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import com.Workneed.workneed.Calendar.dto.CalendarEventDTO;
 
 import java.util.List;
 
-@Service
-@RequiredArgsConstructor
-public class CalendarService {
+public interface CalendarService {
 
-    private final CalendarMapper mapper;
+    List<CalendarDTO> getAll();
 
-    public List<CalendarDTO> findAll() {
-        return mapper.findAll();
-    }
+    CalendarDTO get(Long calendarId);
 
-    public CalendarDTO findById(Long id) {
-        return mapper.findById(id);
-    }
+    void create(CalendarDTO dto);
 
-    public int insert(CalendarDTO dto) {
-        return mapper.insert(dto);
-    }
+    void update(CalendarDTO dto);
+
+    void delete(Long calendarId);
+
+    //Schedule 연동
+    List<CalendarEventDTO> getScheduleEvents(Long userId);
+
 }
