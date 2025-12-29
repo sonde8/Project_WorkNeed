@@ -21,20 +21,15 @@
         dept_id,
         dept_name
         FROM Dept
-        WHERE dept_id = #{deptId}   <!-- ★ 수정 -->
+        WHERE dept_id = #{deptId}
     </select>
 
-    <insert id="insertDept"
-            parameterType="com.Workneed.workneed.Members.dto.DeptDTO">
-        INSERT INTO Dept (dept_name)
-        VALUES (#{deptName})
+    <insert id="insertDept" parameterType="com.Workneed.workneed.Members.dto.DeptDTO">
+        INSERT INTO Dept (dept_name) VALUES (#{deptName})
     </insert>
 
-    <update id="updateDept"
-            parameterType="com.Workneed.workneed.Members.dto.DeptDTO">
-        UPDATE Dept
-        SET dept_name = #{deptName}
-        WHERE dept_id = #{deptId}
+    <update id="updateDept" parameterType="com.Workneed.workneed.Members.dto.DeptDTO">
+        UPDATE Dept SET dept_name = #{deptName} WHERE dept_id = #{deptId}
     </update>
 
     <delete id="deleteDept"

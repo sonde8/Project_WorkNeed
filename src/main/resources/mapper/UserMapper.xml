@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper
-        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.Workneed.workneed.Members.mapper.UserMapper">
 
-    <select id="findAll" resultType="com.Workneed.workneed.Members.dto.UserDTO">
-        SELECT
+    <sql id="allColumns">
         user_id AS userId,
         user_login_id AS userLoginId,
         user_email AS userEmail,
@@ -21,53 +18,42 @@
         user_updated_at AS userUpdatedAt,
         remember_token AS rememberToken,
         remember_token_expired AS rememberTokenExpired
-        FROM User
-    </select>
+    </sql>
 
     <select id="findByLoginId" resultType="com.Workneed.workneed.Members.dto.UserDTO">
         SELECT
-        user_id AS userId, user_login_id AS userLoginId, user_email AS userEmail,
-        user_password AS userPassword, user_name AS userName, user_profile_image AS userProfileImage
+        user_id AS userId,
+        user_login_id AS userLoginId,
+        user_password AS userPassword,
+        user_status AS userStatus,
+        user_name AS userName
         FROM User
         WHERE user_login_id = #{loginId}
     </select>
 
     <select id="findById" parameterType="long" resultType="com.Workneed.workneed.Members.dto.UserDTO">
         SELECT
-        user_id AS userId, user_login_id AS userLoginId, user_email AS userEmail,
-        user_name AS userName, user_profile_image AS userProfileImage
+        <include refid="allColumns"/>
         FROM User
         WHERE user_id = #{userId}
     </select>
 
-    <select id="findByEmail" resultType="com.Workneed.workneed.Members.dto.UserDTO">
+    <select id="findAllWithDetails" resultType="com.Workneed.workneed.Members.dto.UserDTO">
         SELECT
-        user_id AS userId,
-        user_email AS userEmail,
-        user_name AS userName,
-        user_profile_image AS userProfileImage
-        FROM User
-        WHERE user_email = #{email}
+        u.user_id AS userId,
+        u.user_login_id AS userLoginId,
+        u.user_name AS userName,
+        u.user_status AS userStatus,
+        u.dept_id AS deptId,
+        u.rank_id AS rankId,
+        d.dept_name AS deptName,
+        r.rank_name AS rankName
+        FROM User u
+        JOIN Dept d ON u.dept_id = d.dept_id
+        JOIN Ranks r ON u.rank_id = r.rank_id
+        ORDER BY u.user_id DESC
     </select>
 
-    <select id="findByNameAndEmail" resultType="com.Workneed.workneed.Members.dto.UserDTO">
-        SELECT
-        user_login_id AS userLoginId,
-        user_email AS userEmail,
-        user_name AS userName
-        FROM User
-        WHERE user_name = #{name}
-        AND user_email = #{email}
-    </select>
-
-    <select id="findByRememberToken" resultType="com.Workneed.workneed.Members.dto.UserDTO">
-        SELECT
-        user_id AS userId, user_login_id AS userLoginId, remember_token AS rememberToken,
-        remember_token_expired AS rememberTokenExpired
-        FROM User
-        WHERE remember_token = #{value}
-        AND remember_token_expired > NOW()
-    </select>
 
     <insert id="insertUser"
             parameterType="com.Workneed.workneed.Members.dto.UserDTO"
@@ -75,32 +61,25 @@
             keyProperty="userId"
             keyColumn="user_id">
         INSERT INTO User (
-        user_login_id, user_email, user_password, user_name,
-        user_profile_image, user_status, user_birthday, rank_id, dept_id
+        user_login_id,
+        user_email,
+        user_password,
+        user_name,
+        user_profile_image,
+        user_status,
+        user_birthday, rank_id,
+        dept_id
         ) VALUES (
-        #{userLoginId}, #{userEmail}, #{userPassword}, #{userName},
-        #{userProfileImage}, #{userStatus}, #{userBirthday}, #{rankId}, #{deptId}
+        #{userLoginId},
+        #{userEmail},
+        #{userPassword},
+        #{userName},
+        #{userProfileImage},
+        #{userStatus},
+        #{userBirthday}, #{rankId},
+        #{deptId}
         )
     </insert>
-
-    <update id="updatePassword">
-        UPDATE User
-        SET user_password = #{userPassword}
-        WHERE user_id = #{userId}
-    </update>
-
-    <update id="updateUser" parameterType="com.Workneed.workneed.Members.dto.UserDTO">
-        UPDATE User
-        SET
-        user_email = #{userEmail},
-        user_password = #{userPassword},
-        user_name = #{userName},
-        user_profile_image = #{userProfileImage},
-        user_status = #{userStatus},
-        rank_id = #{rankId},
-        dept_id = #{deptId}
-        WHERE user_id = #{userId}
-    </update>
 
     <update id="updateRememberToken">
         UPDATE User
@@ -116,15 +95,25 @@
         WHERE user_id = #{userId}
     </update>
 
-    <update id="updateProfileImage">
+
+    <!-- 유저 변경 핵심기능-->
+    <update id="updateUser" parameterType="com.Workneed.workneed.Members.dto.UserDTO">
         UPDATE User
-        SET user_profile_image = #{imageUrl}
+        SET user_email = #{userEmail}, user_name = #{userName}, user_status = #{userStatus}, rank_id = #{rankId},
+        dept_id = #{deptId}
         WHERE user_id = #{userId}
     </update>
 
-    <delete id="deleteUser" parameterType="long">
-        DELETE FROM User
-        WHERE user_id = #{userId}
-    </delete>
+    <!-- 일괄업뎃-->
+    <update id="updateUsersStatus">
+        UPDATE User
+        SET user_status = #{status}
+        WHERE user_id IN
+        <foreach item="id" collection="userIds" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+
 
 </mapper>

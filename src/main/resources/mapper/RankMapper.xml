@@ -24,28 +24,25 @@
         rank_level,
         rank_created_at
         FROM Ranks
-        WHERE rank_id = #{value}   <!-- ★ 수정 -->
+        WHERE rank_id = #{value}
     </select>
 
-    <insert id="insertRank"
-            parameterType="com.Workneed.workneed.Members.dto.RankDTO">
+    <insert id="insertRank">
         INSERT INTO Ranks (rank_name, rank_level)
-        VALUES (#{rankName}, #{rankLevel})
+        VALUES (
+        #{rankName},
+        (SELECT COALESCE(MAX(rank_level), 0) + 1 FROM Ranks r)
+        )
     </insert>
 
-    <update id="updateRank"
-            parameterType="com.Workneed.workneed.Members.dto.RankDTO">
-        UPDATE Ranks
-        SET
-        rank_name = #{rankName},
-        rank_level = #{rankLevel}
-        WHERE rank_id = #{rankId}
+    <update id="updateRank" parameterType="com.Workneed.workneed.Members.dto.RankDTO">
+        UPDATE Ranks SET rank_name = #{rankName} WHERE rank_id = #{rankId}
     </update>
 
     <delete id="deleteRank"
             parameterType="long">
         DELETE FROM Ranks
-        WHERE rank_id = #{rankId}   <!-- ★ 수정 -->
+        WHERE rank_id = #{rankId}
     </delete>
 
 </mapper>

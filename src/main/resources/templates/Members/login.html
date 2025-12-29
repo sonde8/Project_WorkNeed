@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>로그인</title>
+    <title>로그인 테스트</title>
 </head>
 <body>
 
@@ -12,28 +12,56 @@
     <p>아이디 또는 비밀번호가 올바르지 않습니다.</p>
 </div>
 
-<form th:action="@{/login}" method="post">
+<form id="loginForm" th:action="@{/login-user}" method="post">
+    <input type="hidden" name="userType" id="userType" value="USER">
+
     <div>
-        <input type="text" name="loginId" placeholder="아이디" required>
+        <input type="text" name="loginId" id="loginId" placeholder="아이디" required>
     </div>
     <div>
-        <input type="password" name="password" placeholder="비밀번호" required>
+        <input type="password" name="password" id="password" placeholder="비밀번호" required>
     </div>
     <div>
         <label>
             <input type="checkbox" name="autoLogin"> 로그인 유지
         </label>
     </div>
-    <button type="submit">로그인</button>
+
+    <br>
+    <button type="submit">일반 유저 로그인</button>
+
+    <button type="submit" onclick="document.getElementById('userType').value='ADMIN'; fillAdmin();">
+        관리자 로그인(자동입력)
+    </button>
 </form>
 
 <hr>
 <a th:href="@{/oauth2/authorization/google}">
-    <button type="button">구글로 로그인/연동</button>
+    <button type="button">구글 로그인</button>
 </a>
-
 <br>
 <a href="/register">회원가입</a>
 
+<script th:inline="javascript">
+    window.onload = function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const error = urlParams.get('error');
+
+        if (error) {
+            if (error === 'inactive') {
+                alert("비활성화된 유저입니다. 관리자에게 문의하세요.");
+            } else if (error === 'banned') {
+                alert("차단된 사용자입니다. 접근이 금지되었습니다.");
+            } else if (error === 'invalid') {
+                alert("아이디 또는 비밀번호가 일치하지 않습니다.");
+            }
+
+            // 팝업 후 URL의 에러 파라미터 지우기 (선택사항 - 새로고침 시 팝업 방지)
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+    }
+</script>
+
+<script src="/js/login.js"></script>
 </body>
 </html>

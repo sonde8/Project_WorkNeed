@@ -38,7 +38,8 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .headers(headers -> headers.frameOptions(frame -> frame.disable()))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/main", "/login/**", "/register/**", "/css/**", "/js/**", "/images/**", "/auth/**").permitAll()
+                        // [수정] /login-user와 /login-admin을 허용 목록에 추가
+                        .requestMatchers("/", "/main", "/login/**", "/login-user", "/login-admin", "/register/**", "/css/**", "/js/**", "/images/**", "/auth/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 // 자동 로그인 필터 등록
@@ -46,35 +47,47 @@ public class SecurityConfig {
 
                 .formLogin(form -> form
                         .loginPage("/login")
-                        .loginProcessingUrl("/login")
+                        .loginProcessingUrl("/login-user")
                         .usernameParameter("loginId")
                         .passwordParameter("password")
+                        // 1. 로그인 성공 시 처리
                         .successHandler((request, response, authentication) -> {
                             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-                            UserDTO userDto = userDetails.getUserDto();
 
-                            // 1. 세션에 유저 정보 저장
-                            request.getSession().setAttribute("user", userDto);
+                            if (userDetails.getAdminDto() != null) {
+                                request.getSession().setAttribute("admin", userDetails.getAdminDto());
+                                response.sendRedirect("/admin/member/list");
+                            } else {
+                                UserDTO userDto = userDetails.getUserDto();
+                                request.getSession().setAttribute("user", userDto);
 
-                            // 2. [추가] 자동 로그인 체크박스 확인 ("on"으로 넘어옴)
-                            String autoLogin = request.getParameter("autoLogin");
-                            if ("on".equals(autoLogin)) {
-                                // 기존 토큰 삭제 및 새 토큰 생성
-                                userService.clearRememberToken(userDto.getUserId());
-                                String token = UUID.randomUUID().toString();
+                                String autoLogin = request.getParameter("autoLogin");
+                                if ("on".equals(autoLogin)) {
+                                    userService.clearRememberToken(userDto.getUserId());
+                                    String token = UUID.randomUUID().toString();
+                                    userService.saveRememberToken(userDto.getUserId(), token);
+                                    Cookie cookie = new Cookie("autoLoginToken", token);
+                                    cookie.setHttpOnly(true);
+                                    cookie.setPath("/");
+                                    cookie.setMaxAge(60 * 60 * 24 * 365);
+                                    response.addCookie(cookie);
+                                }
+                                response.sendRedirect("/main");
+                            }
+                        })
+                        // 2. [추가] 로그인 실패 시 처리 (팝업용 에러 코드 전송)
+                        .failureHandler((request, response, exception) -> {
+                            String errorType = "invalid"; // 기본: 비번 틀림
 
-                                // DB 저장
-                                userService.saveRememberToken(userDto.getUserId(), token);
-
-                                // 쿠키 발급 (1년)
-                                Cookie cookie = new Cookie("autoLoginToken", token);
-                                cookie.setHttpOnly(true);
-                                cookie.setPath("/");
-                                cookie.setMaxAge(60 * 60 * 24 * 365);
-                                response.addCookie(cookie);
+                            // CustomUserDetails에서 설정한 isEnabled, isAccountNonLocked 결과에 따라 예외가 달라짐
+                            if (exception instanceof org.springframework.security.authentication.DisabledException) {
+                                errorType = "inactive";
+                            } else if (exception instanceof org.springframework.security.authentication.LockedException) {
+                                errorType = "banned";
                             }
 
-                            response.sendRedirect("/main");
+                            // 로그인 페이지로 에러 코드를 들고 리다이렉트
+                            response.sendRedirect("/login?error=" + errorType);
                         })
                         .permitAll()
                 )
@@ -85,6 +98,8 @@ public class SecurityConfig {
                         .successHandler((request, response, authentication) -> {
                             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
                             request.getSession().setAttribute("user", userDetails.getUserDto());
+
+
                             response.sendRedirect("/main");
                         })
                 )

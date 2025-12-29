@@ -32,6 +32,9 @@ public interface UserMapper {
             @Param("userPassword") String userPassword
     );
 
+    void updateUsersStatus(@Param("userIds") List<Long> userIds,
+                           @Param("status") String status);
+
     void updateRememberToken( //토큰 정보 업데이트
                               @Param("userId") Long userId,
                               @Param("token") String token,
@@ -45,13 +48,13 @@ public interface UserMapper {
             @Param("imageUrl") String imageUrl
     );
 
-
     UserDTO findByNameAndEmail(
 
             @Param("name") String name,
             @Param("email") String email
     );
 
+    List<UserDTO> findAllWithDetails();
 
     void clearRememberToken(@Param("userId") Long userId); //토큰정보삭제-로그아웃시 같이됨
 

@@ -30,6 +30,6 @@ public class UserDTO implements Serializable {
     private Long rankId;
     private Long deptId;
 
-    private String deptname;      // 부서 이름
-    private String rankname;      // 직급
+    private String deptName;
+    private String rankName;
 }
