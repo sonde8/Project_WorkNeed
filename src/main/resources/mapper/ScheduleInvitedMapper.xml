@@ -23,4 +23,34 @@
         )
     </select>
 
+    <select id="selectOwnerByScheduleId" parameterType="long"
+            resultType="com.Workneed.workneed.Schedule.dto.ScheduleInvitedDTO">
+        SELECT
+        u.user_id     AS userId,
+        u.user_name   AS userName,
+        d.dept_name   AS deptName,
+        u.user_status AS userStatus
+        FROM schedule_participant sp
+        JOIN `user` u ON sp.user_id = u.user_id
+        LEFT JOIN `dept` d ON u.dept_id = d.dept_id
+        WHERE sp.schedule_id = #{scheduleId}
+        AND sp.role = 'OWNER'
+        LIMIT 1
+    </select>
+
+    <select id="selectMembersByScheduleId" parameterType="long"
+            resultType="com.Workneed.workneed.Schedule.dto.ScheduleInvitedDTO">
+        SELECT
+        u.user_id     AS userId,
+        u.user_name   AS userName,
+        d.dept_name   AS deptName,
+        u.user_status AS userStatus
+        FROM schedule_participant sp
+        JOIN `user` u ON sp.user_id = u.user_id
+        LEFT JOIN `dept` d ON u.dept_id = d.dept_id
+        WHERE sp.schedule_id = #{scheduleId}
+        AND sp.role = 'MEMBER'
+        ORDER BY u.user_name ASC
+    </select>
+
 </mapper>

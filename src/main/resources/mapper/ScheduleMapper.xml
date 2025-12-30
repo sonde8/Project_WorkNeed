@@ -64,7 +64,9 @@
         location,
         type,
         created_by AS createdBy,
-        created_at AS createdAt
+        created_at AS createdAt,
+        git_url AS gitUrl,
+        file_storage_url AS fileStorageUrl
         FROM schedule
         WHERE schedule_id = #{scheduleId}
     </select>
@@ -75,4 +77,36 @@
         WHERE schedule_id = #{scheduleId}
     </update>
 
+<!-- git url/ file stroage url-->
+    <select id="selectScheduleLinks" parameterType="long" resultType="map">
+        SELECT
+        schedule_id      AS scheduleId,
+        git_url          AS gitUrl,
+        file_storage_url AS fileStorageUrl
+        FROM schedule
+        WHERE schedule_id = #{scheduleId}
+    </select>
+<!--  git url link-->
+    <update id="updateGitUrl" parameterType="map">
+        UPDATE schedule
+        SET git_url = #{gitUrl}
+        WHERE schedule_id = #{scheduleId}
+    </update>
+    <update id="deleteGitUrl" parameterType="long">
+        UPDATE schedule
+        SET git_url = NULL
+        WHERE schedule_id = #{scheduleId}
+    </update>
+
+<!--  file storage link-->
+    <update id="updateFileStorageUrl" parameterType="map">
+        UPDATE schedule
+        SET file_storage_url = #{fileStorageUrl}
+        WHERE schedule_id = #{scheduleId}
+    </update>
+    <update id="deleteFileStorageUrl" parameterType="long">
+        UPDATE schedule
+        SET file_storage_url = NULL
+        WHERE schedule_id = #{scheduleId}
+    </update>
 </mapper>

@@ -1,5 +1,5 @@
 .kanban{
-    max-width: 1360px;
+    max-width: 1340px;
     width: 100%;
     display: grid;
     grid-template-columns: repeat(3, 1fr);

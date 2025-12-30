@@ -5,6 +5,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface ScheduleMapper {
@@ -19,4 +20,14 @@ public interface ScheduleMapper {
     ScheduleDTO selectById(Long scheduleId);
 
     List<ScheduleDTO> selectAll();
+
+    Map<String, Object> selectScheduleLinks(Long scheduleId);
+
+    int updateGitUrl(@Param("scheduleId") Long scheduleId,
+                     @Param("gitUrl") String gitUrl);
+    int deleteGitUrl(Long scheduleId);
+
+    int updateFileStorageUrl(@Param("scheduleId") Long scheduleId,
+                             @Param("fileStorageUrl") String fileStorageUrl);
+    int deleteFileStorageUrl(Long scheduleId);
 }

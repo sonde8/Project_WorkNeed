@@ -2,12 +2,15 @@ package com.Workneed.workneed.Schedule.controller;
 
 import com.Workneed.workneed.Schedule.dto.ScheduleDTO;
 import com.Workneed.workneed.Schedule.dto.ScheduleInvitedDTO;
+import com.Workneed.workneed.Schedule.dto.ScheduleParticipantDTO;
 import com.Workneed.workneed.Schedule.dto.TaskCommentDTO;
 import com.Workneed.workneed.Schedule.mapper.ScheduleInvitedMapper;
 import com.Workneed.workneed.Schedule.mapper.ScheduleMapper;
 import com.Workneed.workneed.Schedule.mapper.ScheduleParticipantMapper;
 import com.Workneed.workneed.Schedule.mapper.TaskCommentMapper;
-import jakarta.servlet.http.HttpSession;
+import com.Workneed.workneed.Schedule.service.ScheduleParticipantService;
+import com.Workneed.workneed.Schedule.service.ScheduleService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,23 +20,20 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Controller
+@RequiredArgsConstructor
 @RequestMapping("/schedule")
 public class ScheduleController {
 
     private final ScheduleMapper scheduleMapper;
     private final ScheduleParticipantMapper scheduleParticipantMapper;
     private final ScheduleInvitedMapper scheduleInvitedMapper;
+    private final ScheduleParticipantService scheduleParticipantService;
+    private final ScheduleService scheduleService;
+
 
     private final TaskCommentMapper taskCommentMapper;
 
-    public ScheduleController(ScheduleMapper scheduleMapper, ScheduleParticipantMapper scheduleParticipantMapper,
-                              ScheduleInvitedMapper scheduleInvitedMapper, TaskCommentMapper taskCommentMapper) {
-        this.scheduleMapper = scheduleMapper;
-        this.scheduleParticipantMapper = scheduleParticipantMapper;
-        this.scheduleInvitedMapper = scheduleInvitedMapper;
-        this.taskCommentMapper = taskCommentMapper;
 
-    }
 
     @GetMapping("/kanban")
     public String kanban(Model model) {
@@ -249,4 +249,42 @@ public class ScheduleController {
 
         return "schedule/task";
     }
+
+    /* Git 수정 */
+    @PostMapping("/{id}/git/update")
+    public String updateGit(@PathVariable Long id,
+                            @RequestParam String gitUrl) {
+        scheduleService.updateGitUrl(id, gitUrl);
+        return "redirect:/schedule/task?scheduleId=" + id;
+    }
+
+    /* Git 삭제 */
+    @PostMapping("/{id}/git/delete")
+    public String deleteGit(@PathVariable Long id) {
+        scheduleService.deleteGitUrl(id);
+        return "redirect:/schedule/task?scheduleId=" + id;
+    }
+
+    /* File Storage 수정 */
+    @PostMapping("/{id}/file/update")
+    public String updateFile(@PathVariable Long id,
+                             @RequestParam String fileStorageUrl) {
+        scheduleService.updateFileStorageUrl(id, fileStorageUrl);
+        return "redirect:/schedule/task?scheduleId=" + id;
+    }
+
+    /* File Storage 삭제 */
+    @PostMapping("/{id}/file/delete")
+    public String deleteFile(@PathVariable Long id) {
+        scheduleService.deleteFileStorageUrl(id);
+        return "redirect:/schedule/task?scheduleId=" + id;
+    }
+
+
+    @GetMapping("/{id}/participants")
+    @ResponseBody
+    public ScheduleParticipantDTO getParticipants(@PathVariable Long id) {
+        return scheduleParticipantService.getParticipants(id);
+    }
+
 }
