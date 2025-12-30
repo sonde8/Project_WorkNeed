@@ -67,9 +67,76 @@
     font-size: 2rem;
 }
 
+/* 사이드바 텍스트 레이아웃 */
+.room-text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.name-row {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 4px;
+}
+
+.name {
+    font-weight: bold;
+    font-size: 15px;
+    max-width: 120px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* 인원수 스타일 (회색 숫자로 표시) */
+.user-count {
+    font-size: 13px;
+    color: #888;
+    font-weight: normal;
+}
+
+/* 마지막 메시지 시간 스타일 (오른쪽 끝으로 밀기) */
+.last-time {
+    margin-left: auto;
+    font-size: 11px;
+    color: #aaa;
+    white-space: nowrap;
+}
+
+.preview {
+    font-size: 13px;
+    color: #666;
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 .room-text { display: flex; flex-direction: column; }
 .room-text .name { font-weight: bold; font-size: 1.4rem; }
 .room-text .preview { font-size: 1.2rem; color: #888888; margin-top: 3px; }
+
+/* 안 읽은 메세지 개수 표시 */
+.unread-badge {
+    background-color: #ff4d4d;
+    color: white;
+    font-size: 11px;
+    font-weight: bold;
+    min-width: 18px;
+    height: 18px;
+    line-height: 18px;
+    border-radius: 9px;
+    text-align: center;
+    padding: 0 5px;
+    display: inline-block;
+}
+
+.unread-badge.hidden {
+    display: none;
+}
 
 /* ==========================================
     3. 오른쪽 채팅창 메인 영역
@@ -501,4 +568,79 @@ li.other-msg { justify-content: flex-start; display: flex; width: 100%; }
     gap: 8px;
     text-decoration: none;
     color: #333;
+}
+
+/* ==========================================
+    9. 이미지 모달
+========================================== */
+.image-full-modal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0; top: 0;
+    width: 100%; height: 100%;
+    background-color: rgba(0,0,0,0.9);
+    align-items: center; justify-content: center;
+}
+
+.modal-top-bar {
+    position: absolute;
+    top: 0; left: 0; width: 100%;
+    padding: 15px 25px;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 100%);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 2100;
+}
+
+.image-info-text { display: flex; flex-direction: column; color: white; }
+.sender-name { font-size: 16px; font-weight: bold; margin-bottom: 2px; }
+.send-date { font-size: 13px; color: #ccc; }
+
+.top-bar-icons { display: flex; align-items: center; gap: 20px; }
+.icon-btn-light { cursor: pointer; opacity: 0.8; transition: 0.3s; }
+.icon-btn-light:hover { opacity: 1; }
+
+.modal-close-new {
+    color: white; font-size: 35px; cursor: pointer; line-height: 1;
+}
+
+.modal-content-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    max-width: 90%; max-height: 90%;
+}
+
+#fullImage {
+    max-width: 100%; max-height: 85vh;
+    object-fit: contain;
+    border-radius: 4px;
+}
+
+.nav-btn {
+    position: absolute;
+    top: 50%; transform: translateY(-50%);
+    background: rgba(255,255,255,0.2);
+    color: white; border: none;
+    padding: 15px; cursor: pointer;
+    font-size: 24px; border-radius: 50%;
+    transition: 0.3s;
+    width: 58px;
+}
+.nav-btn:hover { background: rgba(255,255,255,0.5); }
+.prev-btn { left: -70px; }
+.next-btn { right: -70px; }
+
+.modal-close {
+    position: absolute; top: 20px; right: 30px;
+    color: white; font-size: 40px; cursor: pointer;
+}
+
+.image-caption {
+    position: absolute; bottom: 30px;
+    background: rgba(255,255,255,0.5);
+    color: black;
+    padding: 5px 15px; border-radius: 20px;
 }
