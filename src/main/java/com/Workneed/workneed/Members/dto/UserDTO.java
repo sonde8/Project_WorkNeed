@@ -2,6 +2,7 @@ package com.Workneed.workneed.Members.dto;
 
 import lombok.*;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -9,7 +10,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserDTO {
+public class UserDTO implements Serializable {
 
     private Long userId;
     private String userLoginId;
@@ -29,6 +30,6 @@ public class UserDTO {
     private Long rankId;
     private Long deptId;
 
-    private String deptname;      // 부서 이름
-    private String rankname;      // 직급
+    private String deptName;
+    private String rankName;
 }

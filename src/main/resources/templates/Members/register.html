@@ -1,36 +1,64 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+
 <head>
-    <meta charset="UTF-8">
-    <title>회원가입</title>
+    <title>회원가입 - WORKNEED</title>
+    <link rel="stylesheet" th:href="@{/css/register.css}">
 </head>
+
 <body>
 
-<h2>회원가입</h2>
+<main layout:fragment="content">
+    <div class="register-wrapper">
+        <div class="register-container">
+            <h2>회원가입</h2>
 
-<!-- 회원가입 시 서버 검증 에러 -->
-<div th:if="${errorMessage}" style="color:red;">
-    <p th:text="${errorMessage}"></p>
-</div>
+            <div th:if="${errorMessage}" class="error-msg" th:text="${errorMessage}"></div>
 
-<form th:action="@{/register}" method="post" th:object="${user}">
-    <input type="text" th:field="*{userLoginId}" placeholder="아이디">
-    <input type="email" th:field="*{userEmail}" placeholder="이메일">
-    <input type="password"
-           th:field="*{userPassword}"
-           placeholder="비밀번호"
-           autocomplete="off"
-           oncopy="return false"
-           onpaste="return false"
-           oncut="return false">
+            <form th:action="@{/register}" method="post" th:object="${user}">
 
-    <input type="text" th:field="*{userName}" placeholder="이름">
-    <input type="date" th:field="*{userBirthday}">
+                <div class="input-group">
+                    <img th:src="@{/images/person300.svg}" class="input-icon" alt="아이디">
+                    <input type="text" th:field="*{userLoginId}" placeholder="아이디" required>
+                </div>
 
-    <button type="submit">회원가입</button>
-</form>
+                <div class="input-group">
+                    <img th:src="@{/images/lock300.svg}" class="input-icon" alt="비밀번호">
+                    <input type="password" th:field="*{userPassword}" placeholder="비밀번호"
+                           autocomplete="off" oncopy="return false" onpaste="return false" oncut="return false" required>
+                </div>
 
-<a href="/login">로그인으로 돌아가기</a>
+                <div class="input-group">
+                    <img th:src="@{/images/mail300.svg}" class="input-icon" alt="이메일">
+                    <input type="email" th:field="*{userEmail}" placeholder="이메일 (비밀번호 찾기 본인확인용)" required>
+                </div>
+
+                <div class="input-group">
+                    <img th:src="@{/images/person300.svg}" class="input-icon" alt="이름">
+                    <input type="text" th:field="*{userName}" placeholder="이름" required>
+                </div>
+
+                <div class="input-group">
+                    <img th:src="@{/images/calendar300.svg}" class="input-icon" alt="생년월일">
+                    <input type="date" th:field="*{userBirthday}" required>
+                </div>
+
+                <div class="input-group">
+                    <img th:src="@{/images/phone300.svg}" class="input-icon" alt="전화번호">
+                    <input type="tel" name="userPhone" placeholder="전화번호" required>
+                </div>
+
+                <button type="submit" class="btn-submit">인증 요청</button>
+            </form>
+
+            <div class="footer-links">
+                <a th:href="@{/login}">로그인으로 돌아가기</a>
+            </div>
+        </div>
+    </div>
+</main>
 
 </body>
 </html>

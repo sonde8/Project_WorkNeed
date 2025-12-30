@@ -1,0 +1,131 @@
+/* 1. 전체 레이아웃 및 중앙 정렬 */
+.login-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh; /* 화면 중앙 배치를 위한 높이 설정 */
+    width: 1340px;
+}
+
+/* 로그인 박스 메인 컨테이너 (이미지의 회색 배경 부분) */
+.login-container {
+    background-color: #d9d9d9; /* 이미지와 동일한 회색 배경 */
+    padding: 50px 40px;
+    border-radius: 5px;
+    width: 100%;
+    max-width: 450px;
+    text-align: center;
+}
+
+.login-container h2 {
+    margin-bottom: 30px;
+    font-size: 24px;
+    font-weight: 500;
+}
+
+/* 2. 입력창 (ID, PW) 및 SVG 아이콘 스타일 */
+.input-group {
+    position: relative;
+    margin-bottom: 15px;
+}
+
+/* 입력창 내부 왼쪽 SVG 아이콘 위치 설정 */
+.input-icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 24px;  /* SVG 아이콘 크기 조절 */
+    height: 24px;
+}
+
+/* 입력창 자체 스타일 */
+.input-group input {
+    width: 100%;
+    padding: 15px 15px 15px 50px; /* 아이콘 공간을 위해 왼쪽 패딩 50px */
+    border: 1px solid #000;
+    border-radius: 15px; /* 둥근 모서리 */
+    box-sizing: border-box;
+    font-size: 18px;
+    background-color: #f8f9fa;
+}
+
+/* 3. 체크박스 및 유틸리티 영역 (로그인 유지, 링크들) */
+.options-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    font-size: 15px;
+    padding-left: 5px;
+}
+
+.options-row input[type="checkbox"] {
+    margin-right: 8px;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+/* 비밀번호 찾기 | 회원가입 링크 영역 */
+.links {
+    margin-bottom: 30px;
+    font-size: 15px;
+    color: #333;
+}
+
+.links a {
+    text-decoration: none;
+    color: #333;
+}
+
+/* 4. 버튼 스타일 (로그인, 구글, 관리자) */
+/* 상단 메인 로그인 버튼 */
+.btn-submit {
+    width: 100%;
+    padding: 15px;
+    background-color: #e0e0e0;
+    border: 1px solid #000;
+    border-radius: 15px;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-bottom: 20px;
+}
+
+/* 하단 소셜/관리자 로그인 버튼 공통 */
+.social-btn {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #000;
+    border-radius: 15px;
+    margin-bottom: 12px;
+    background-color: #f8f9fa;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    font-size: 18px;
+    text-decoration: none;
+    color: #000;
+}
+
+.social-btn img,
+.input-icon-small {
+    width: 24px;
+    height: 24px;
+    margin-right: 12px;
+}
+
+.social-btn i {
+    margin-right: 12px;
+    font-size: 22px;
+}
+
+.google-icon {
+    width: 24px;
+    height: 24px;
+}
+
+/* 5. 알림 메시지 스타일 (에러, 성공) */
+.error-msg { color: red; margin-bottom: 15px; font-weight: bold; }
+.info-msg { color: green; margin-bottom: 15px; font-weight: bold; }

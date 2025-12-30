@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>관리자 - 직원관리</title>
+    <style>
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1px solid #444; padding: 8px; text-align: left; }
+        th { background-color: #f4f4f4; }
+        .admin-controls { background: #f9f9f9; padding: 15px; border: 1px solid #ddd; margin-bottom: 20px; }
+        .flex-container { display: flex; gap: 30px; align-items: center; }
+
+        #editModal {
+            display:none;
+            position:fixed;
+            top:50%;
+            left:50%;
+            transform: translate(-50%, -50%);
+            background:white;
+            border:2px solid #000;
+            padding:20px;
+            z-index:100;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            min-width: 300px;
+        }
+    </style>
+</head>
+<body>
+
+<h2>직원 관리 시스템</h2>
+
+<div class="admin-controls">
+    <div class="flex-container">
+        <div>
+            <strong>🏢 부서 등록:</strong>
+            <input type="text" id="newDeptName" placeholder="새 부서명">
+            <button type="button" onclick="fnAddDept()">추가</button>
+        </div>
+        <div>
+            <strong>🎖️ 직급 등록:</strong>
+            <input type="text" id="newRankName" placeholder="새 직급명">
+            <button type="button" onclick="fnAddRank()">추가</button>
+        </div>
+    </div>
+</div>
+
+<div style="margin-bottom: 10px;">
+    <strong>상태 변경:</strong>
+    <select id="batchStatus">
+        <option value="ACTIVE">활성(ACTIVE)</option>
+        <option value="INACTIVE">비활성(INACTIVE)</option>
+        <option value="SUSPENDED">정지(SUSPENDED)</option>
+        <option value="BANNED">차단(BANNED)</option>
+    </select>
+    <button type="button" onclick="fnBatchUpdate()">일괄 적용</button>
+</div>
+
+<table>
+    <thead>
+    <tr>
+        <th><input type="checkbox" id="checkAll" onclick="toggleAll(this)"></th>
+        <th>아이디</th>
+        <th>이름</th>
+        <th>부서</th>
+        <th>직급</th>
+        <th>상태</th>
+        <th>수정</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="u : ${user}">
+        <td><input type="checkbox" name="userCheck" th:value="${u.userId}"></td>
+        <td th:text="${u.userLoginId}">아이디</td>
+        <td th:text="${u.userName}">이름</td>
+        <td th:text="${u.deptName}">부서</td>
+        <td th:text="${u.rankName}">직급</td>
+        <td th:text="${u.userStatus}">상태</td>
+        <td>
+            <button th:onclick="openModal([[${u.userId}]], [[${u.deptId}]], [[${u.rankId}]], [[${u.userStatus}]])">정보
+                변경
+            </button>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<div id="editModal">
+    <h3>정보 수정</h3>
+    <input type="hidden" id="targetUserId">
+
+    <p><label>부서:</label>
+        <select id="modalDept">
+            <option th:each="d : ${dept}" th:value="${d.deptId}" th:text="${d.deptName}"></option>
+        </select></p>
+
+    <p><label>직급:</label>
+        <select id="modalRank">
+            <option th:each="r : ${rank}" th:value="${r.rankId}" th:text="${r.rankName}"></option>
+        </select></p>
+
+    <p><label>상태:</label>
+        <select id="modalStatus">
+            <option value="ACTIVE">ACTIVE (정상)</option>
+            <option value="INACTIVE">INACTIVE (비활성)</option>
+            <option value="SUSPENDED">SUSPENDED (정지)</option>
+            <option value="BANNED">BANNED (차단)</option>
+        </select></p>
+
+    <br>
+    <button onclick="saveChanges()">저장</button>
+    <button onclick="closeModal()">취소</button>
+</div>
+
+<script th:inline="javascript">
+    // 전체 선택 체크박스
+    function toggleAll(source) {
+        const checkboxes = document.querySelectorAll('input[name="userCheck"]');
+        checkboxes.forEach(cb => cb.checked = source.checked);
+    }
+
+    // 모달 제어
+    function openModal(id, deptId, rankId, status) {
+        document.getElementById('targetUserId').value = id;
+        document.getElementById('modalDept').value = deptId;
+        document.getElementById('modalRank').value = rankId;
+        document.getElementById('modalStatus').value = status;
+        document.getElementById('editModal').style.display = 'block';
+    }
+
+    function closeModal() {
+        document.getElementById('editModal').style.display = 'none';
+    }
+
+    // [기능 1] 부서 추가
+    function fnAddDept() {
+        const name = document.getElementById('newDeptName').value;
+        if(!name) return alert("부서명을 입력하세요.");
+        fetch('/admin/dept/add', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ deptName: name })
+        }).then(res => res.text()).then(result => {
+            if(result === "success") { alert("부서 추가 완료"); location.reload(); }
+        });
+    }
+
+    // [기능 2] 직급 추가
+    function fnAddRank() {
+        const name = document.getElementById('newRankName').value;
+        if(!name) return alert("직급명을 입력하세요.");
+        fetch('/admin/rank/add', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ rankName: name })
+        }).then(res => res.text()).then(result => {
+            if(result === "success") { alert("직급 추가 완료"); location.reload(); }
+        });
+    }
+
+    // [기능 3] 개별 정보 저장
+    function saveChanges() {
+        const data = {
+            userId: document.getElementById('targetUserId').value,
+            deptId: document.getElementById('modalDept').value,
+            rankId: document.getElementById('modalRank').value,
+            userStatus: document.getElementById('modalStatus').value
+        };
+        fetch('/admin/member/edit/save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        }).then(res => res.text()).then(result => {
+            if (result === "success") { alert('저장되었습니다.'); location.reload(); }
+        });
+    }
+
+    // [기능 4] 일괄 상태 변경
+    function fnBatchUpdate() {
+        const selectedIds = [];
+        document.querySelectorAll('input[name="userCheck"]:checked').forEach(cb => {
+            selectedIds.push(cb.value);
+        });
+        if (selectedIds.length === 0) return alert("유저를 선택해주세요.");
+
+        const status = document.getElementById('batchStatus').value;
+        const params = new URLSearchParams();
+        selectedIds.forEach(id => params.append('userIds', id));
+        params.append('status', status);
+
+        fetch('/admin/member/batch-update', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: params
+        }).then(res => res.text()).then(result => {
+            if (result === "success") { alert('일괄 변경 완료'); location.reload(); }
+        });
+    }
+</script>
+
+</body>
+</html>

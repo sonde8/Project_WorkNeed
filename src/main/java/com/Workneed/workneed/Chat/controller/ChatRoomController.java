@@ -6,6 +6,7 @@ import com.Workneed.workneed.Members.dto.UserDTO;
 import com.Workneed.workneed.Chat.service.ChatService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -44,6 +45,7 @@ public class ChatRoomController {
         model.addAttribute("pageTitle", "워크니드 채팅");
         model.addAttribute("rooms", rooms);
         model.addAttribute("room", null); // 오른쪽 영역 비우기
+        model.addAttribute("user", user);
 
         return "Chat/chatroom";
     }
@@ -73,28 +75,12 @@ public class ChatRoomController {
         ChatRoomDTO room = chatService.getRoomDetail(roomId, currentUserId);
         List<MessageDTO> history = chatService.getChatHistory(roomId, currentUserId);
 
-        // --- 입장 알림 전송 (무한 루프 방지) ---
-
-        /*
-        String sessionKey = "entered_room_" + roomId;
-        if (room != null && "GROUP".equals(room.getRoomType())) {
-            if (session.getAttribute(sessionKey) == null) {
-                MessageDTO enterMsg = chatService.sendSystemMessage(roomId, currentUserId, "ENTER");
-
-                // 서비스에서 DIRECT일 때 null을 반환하게 수정했다면 null 체크가 필요합니다.
-                if (enterMsg != null) {
-                    messagingTemplate.convertAndSend("/sub/chat/room/" + roomId, enterMsg);
-                }
-                session.setAttribute(sessionKey, true);
-            }
-        }
-        */
-
         model.addAttribute("rooms", rooms);
         model.addAttribute("room", room);
         model.addAttribute("history", history);
         model.addAttribute("pageTitle", (room != null) ? room.getRoomName() : "채팅방");
         model.addAttribute("currentUserId", currentUserId);
+        model.addAttribute("user", user);
 
         return "Chat/chatroom";
     }
@@ -103,20 +89,24 @@ public class ChatRoomController {
      * 3. 채팅방 나가기 (퇴장 알림 처리)
     */
     @PostMapping("/room/{roomId}/leave")
-    public String leaveRoom(@PathVariable("roomId") Long roomId, HttpSession session) {
+    @ResponseBody // [추가] 중요: 페이지 이동이 아닌 데이터(JSON)로 응답함
+    public ResponseEntity<String> leaveRoom(@PathVariable("roomId") Long roomId, HttpSession session) {
         UserDTO user = (UserDTO) session.getAttribute("user");
-        if (user == null) return "redirect:/login";
+        if (user == null) {
+            return ResponseEntity.status(401).body("로그인이 필요합니다.");
+        }
 
         Long currentUserId = user.getUserId();
 
-        // 퇴장 메시지 브로드캐스팅
-        MessageDTO leaveMsg = chatService.sendSystemMessage(roomId, currentUserId, "LEAVE");
-        messagingTemplate.convertAndSend("/sub/chat/room/" + roomId, leaveMsg);
+        // 1. 서비스 계층에서 DB 상태 업데이트 (left_at 기록) 및 시스템 메시지 발송
+        // 서비스 내부에 이미 messagingTemplate 로직을 넣으셨다면 여기서 한 번만 호출하면 됩니다.
+        chatService.leaveChatRoom(roomId, currentUserId);
 
-        // 다시 입장 시 알림을 위해 세션 기록 삭제
+        // 2. 다시 입장 시 알림을 위해 세션 기록 삭제
         session.removeAttribute("entered_room_" + roomId);
 
-        return "redirect:/chat/rooms";
+        // 3. 성공 신호 반환
+        return ResponseEntity.ok("success");
     }
 
     /*
@@ -141,6 +131,17 @@ public class ChatRoomController {
         // 서비스 호출 (방 생성 + 참여자 추가)
         ChatRoomDTO newRoom = chatService.createChatRoom(roomName, creatorId, inviteUserIds, roomType);
 
+        // 초대된 모든 유저에게 실시간으로 방 생성 알림 전송
+        // 나를 포함하여 초대받은 모든 사람들의 개인 채널로 새 방 정보를
+        /*
+        for (Long memberId : inviteUserIds) {
+            messagingTemplate.convertAndSend("/sub/user/" + memberId + "/rooms", newRoom);
+        }
+
+        // 본인에게도 알림
+        messagingTemplate.convertAndSend("/sub/user/" + creatorId + "/rooms", newRoom);
+        */
+
         // 그룹 채팅방일 때만 초대 시스템 메세지 발송
         if ("GROUP".equals(roomType)) {
             chatService.sendInviteMessage(newRoom.getRoomId(), creatorId, inviteUserIds);
@@ -158,5 +159,35 @@ public class ChatRoomController {
     public List<UserDTO> getAllUsers() {
         // ChatService를 통해 DB의 모든 유저(부서 직급 포함) 가져옴
         return chatService.getAllUsersWithDept();
+    }
+
+    /*
+    * 6. 채팅방 검색
+    */
+    @GetMapping("/api/search")
+    @ResponseBody
+    public List<ChatRoomDTO> searchApi(@RequestParam(value = "keyword", required = false) String keyword, HttpSession session) {
+        UserDTO user = (UserDTO) session.getAttribute("user");
+        if (user == null) return null;
+
+        // 키워드가 없거나 공백이면 전체 목록을 반환, 있으면 검색 결과 반환
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return chatService.getUserRooms(user.getUserId());
+        }
+
+        return chatService.searchRooms(user.getUserId(), keyword);
+    }
+
+    /*
+     * 7. 안 읽은 메세지 개수 뱃지 (실시간 호출용 API)
+     */
+    @PostMapping("/room/{roomId}/read")
+    @ResponseBody
+    public void markAsRead(@PathVariable("roomId") Long roomId, HttpSession session) {
+        UserDTO user = (UserDTO) session.getAttribute("user");
+        if (user != null) {
+            // user 객체에서 직접 ID를 꺼내서 서비스로 넘겨줘야 합니다.
+            chatService.markAsRead(roomId, user.getUserId());
+        }
     }
 }

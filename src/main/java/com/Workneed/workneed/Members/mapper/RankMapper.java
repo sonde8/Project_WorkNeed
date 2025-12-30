@@ -13,9 +13,9 @@ public interface RankMapper {
 
     RankDTO findById(Long rankId);
 
-    void insertRank(RankDTO rank);
+    void insertRank(RankDTO rankDto);
 
-    void updateRank(RankDTO rank);
+    void updateRank(RankDTO rankDto);
 
     void deleteRank(Long rankId);
 }
