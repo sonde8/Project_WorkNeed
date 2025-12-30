@@ -1,0 +1,35 @@
+<title layout:fragment="title">로그인 - WORKNEED</title>
+      -> 컨트롤러에서 model.addAttribute("pageTitle", "각자 페이지타이틀(브라우저 탭 제목)로 넣어주세요");
+
+content : 1340px를 max로 넣어주세요
+
+
+각자 페이지에서 layout 기본틀
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{layout/layout}">
+<head>
+    <title>새 페이지 제목</title>
+
+    <th:block layout:fragment="head">
+        <link rel="stylesheet" th:href="@{각자css}">
+    </th:block>
+</head>
+<body>
+
+    <main layout:fragment="content">
+
+        <h1>각 페이지 제작 부분</h1>
+        <p>이 영역에 필요한 내용들 작성하면 됨/p>
+
+    </main>
+
+    <th:block layout:fragment="script">
+        <script th:src="@{각자js}"></script>
+    </th:block>
+
+
+</body>
+</html>
