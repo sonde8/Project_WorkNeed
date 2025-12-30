@@ -1,15 +1,3 @@
-/* =========================================================
- * calendar-modal.js (FINAL - COLOR FIXED + COMPANY GUARD + A11Y FIX)
- *
- * ✅ Color UI: data-color + active class + realColorPicker + selectedColorInput(hidden)
- * ✅ Company edit guard: 일반 유저는 COMPANY 수정 모달 진입 불가
- * ✅ Flatpickr 안정화: minDate/clear/setDate 처리
- * ✅ aria-hidden 접근성 경고 해결 (focus release)
- *
- * DTO: calendarId, createdBy, title, description, start, end, type, color
- * API: POST /api/calendar, PUT /api/calendar/{id}
- * ========================================================= */
-
 (function () {
     const API_BASE = "/api/calendar";
 
@@ -76,7 +64,6 @@
             : v.replace(" ", "T") + ":00";
     }
 
-    // ⭐ 접근성 핵심: aria-hidden 전에 focus 해제
     function releaseFocus() {
         if (document.activeElement instanceof HTMLElement) {
             document.activeElement.blur();
@@ -108,20 +95,20 @@
         const matched = document.querySelector(`.color-option[data-color="${c}"]`);
 
         if (matched) {
-            // [CASE A] 프리셋 색상인 경우
+            // 프리셋 색상인 경우
             matched.classList.add("active");
 
-            // ★ 핵심: 커스텀 버튼의 배경색을 지워서 다시 '무지개(CSS)'가 보이게 복구
+            // 커스텀 버튼의 배경색을 지워서 다시 '무지개(CSS)'가 보이게 복구
             if (customColorBtn) {
                 customColorBtn.style.background = "";
             }
         } else {
-            // [CASE B] 커스텀 색상인 경우 (무지개에서 선택)
+            // 커스텀 색상인 경우 (무지개에서 선택)
             if (customColorBtn) {
                 customColorBtn.classList.add("active");
                 customColorBtn.classList.add("is-custom");
 
-                // ★ 핵심: 무지개 위에 선택한 색상을 덮어씌움
+                // 무지개 위에 선택한 색상을 덮어씌움
                 customColorBtn.style.background = c;
             }
         }
@@ -147,7 +134,7 @@
     }
 
     function closeModal() {
-        releaseFocus(); // ✅ 경고 제거 핵심
+        releaseFocus();
 
         overlay.classList.add("hidden");
         overlay.setAttribute("aria-hidden", "true");
@@ -191,8 +178,6 @@
                 if (c) setSelectedColorUI(c);
             });
 
-            // (선택) 픽커 클릭 시 동작은 CSS z-index로 처리되므로 JS 클릭 이벤트 불필요
-            // 하지만 명시적으로 버튼 클릭시 열리게 하고 싶다면 유지:
             if (customColorBtn) {
                 customColorBtn.addEventListener("click", () => {
                     realColorPicker.click();
