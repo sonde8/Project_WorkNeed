@@ -1,0 +1,161 @@
+/* =========================
+   전체 위젯
+========================= */
+.meetingroom-widget {
+    border: 1px solid #ddd;
+    padding: 16px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* =========================
+   헤더
+========================= */
+.meetingroom-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.meetingroom-header h3 {
+    margin: 0;
+}
+
+.date-picker {
+    width: 130px;
+    padding: 4px 6px;
+}
+
+/* =========================
+   시간 헤더
+========================= */
+.time-header {
+    display: flex;
+    margin-bottom: 6px;
+}
+
+.room-title-spacer {
+    width: 100px; /* 회의실 이름 영역 */
+}
+
+.time-scale {
+    display: flex;
+    flex: 1;
+}
+
+.time-scale .time-cell {
+    width: 18px;          /* 30분 */
+    text-align: left;     /* 칸의 시작선 기준 */
+    font-size: 12px;
+    color: #555;
+}
+
+/* =========================
+   회의실 행
+========================= */
+.room-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.room-title {
+    width: 100px;
+    font-weight: bold;
+}
+
+/* =========================
+   타임라인
+========================= */
+.timeline {
+    display: flex;
+    flex: 1;
+}
+
+.time-slot {
+    width: 18px;
+    height: 22px;
+    border: 1px solid #ccc;
+    background: #f9f9f9;
+    box-sizing: border-box;
+
+    pointer-events: auto;
+    position: relative;
+}
+
+.time-slot.reserved {
+    background-color: #222;
+}
+
+.time-slot[data-tooltip]:hover::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 130%;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: pre;
+
+    background: #222;
+    color: #fff;
+    padding: 6px 8px;
+    font-size: 12px;
+    border-radius: 4px;
+    z-index: 9999;
+
+    pointer-events: none;
+}
+
+/* =========================
+   하단 버튼
+========================= */
+.meetingroom-footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 12px;
+}
+
+.reserve-btn {
+    padding: 6px 12px;
+    cursor: pointer;
+}
+
+
+/* ===== modal ===== */
+.modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.hidden {
+    display: none;
+}
+
+.modal-content {
+    background: #fff;
+    padding: 20px;
+    width: 360px;
+}
+
+.modal-content label {
+    display: block;
+    margin-top: 10px;
+}
+
+.modal-content input,
+.modal-content select,
+.modal-content textarea {
+    width: 100%;
+    margin-top: 4px;
+}
+
+.modal-actions {
+    margin-top: 16px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}

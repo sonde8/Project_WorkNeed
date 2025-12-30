@@ -1,22 +1,6 @@
-/* =========================================================
- * calendar.js (DTO/Controller MATCHED - STABLE)
- *
- * ✔ API: /api/calendar  (CalendarApiController)
- * ✔ DTO keys: calendarId, createdBy, title, description, start, end, type, color
- * ✔ Month 다일 일정: 날짜 드래그 → 시작/종료 09:00 고정
- * ✔ Week/Day 시간 일정: 30분 단위
- * ✔ 색상 반영(표시/드래그/리사이즈 후 유지)
- * ✔ Today’s Schedule / Weekly Progress Bar / Filter
- * ✔ 등록/수정/삭제/드래그/리사이즈 후 무조건 재로딩(단일 소스)
- *
- * ✅ (추가) SCHEDULE 연동: /api/calendar/schedules
- * ✅ (수정) WORK 필터: type=WORK(테스트용) → source=SCHEDULE 기준
- * ✅ (수정) 업무 일정은 드래그/리사이즈 불가(읽기전용)
- * ========================================================= */
-
 (function () {
     const API_BASE = "/api/calendar";
-    const SCHEDULE_API = `${API_BASE}/schedules`; // ✅ 서버에 추가한 일정연동 API
+    const SCHEDULE_API = `${API_BASE}/schedules`; // 서버에 추가한 일정연동 API
 
     // createdBy가 DB NOT NULL이면 반드시 필요할 수 있음.
     // 1) 서버가 세션으로 세팅한다면 이 값은 무시될 수 있고,
@@ -47,7 +31,7 @@
     }
 
     function getSource(dto) {
-        // ✅ 기존 캘린더 일정은 source가 없으니 CALENDAR로 보정
+        // 기존 캘린더 일정은 source가 없으니 CALENDAR로 보정
         return (dto?.source || "CALENDAR").toString().toUpperCase();
     }
 
@@ -69,7 +53,7 @@
 
         // 업무:
         // 1) 칸반에서 온 모든 일정
-        // 2) 캘린더에서 등록한 회사(COMPANY) 일정
+        // 2) 캘린더에서 등록한 회사(COMPANY) 일정 (관리자만 접근가능)
         if (currentFilter === "WORK") {
             return (
                 source === "SCHEDULE" ||
@@ -79,7 +63,6 @@
 
         return true;
     }
-
 
     function safeOpenCreateModal(dtoLike) {
         if (typeof window.openCalendarCreateModal !== "function") {
@@ -111,7 +94,7 @@
         // 캘린더 일정은 dto.color 우선
         if (dto?.color) return dto.color;
 
-        // 업무 일정은 type 기반 기본색 (원하면 서버에서 내려주면 그걸 우선하면 됨)
+        // 업무 일정은 type 기반 기본색
         const type = (dto?.type || "").toString().toUpperCase();
         if (type === "COMPANY") return "#ef4444";
         if (type === "TEAM") return "#22c55e";
@@ -123,24 +106,23 @@
         const type = (dto?.type || "").toUpperCase();
         const source = getSource(dto); // CALENDAR | SCHEDULE
 
-        // 1️⃣ 칸반에서 온 모든 일정
+        // 1. 칸반에서 온 모든 일정
         if (source === "SCHEDULE") {
             return "👥";
         }
 
-        // 2️⃣ 캘린더에서 등록한 회사 일정
+        // 2. 캘린더에서 등록한 회사 일정
         if (source === "CALENDAR" && type === "COMPANY") {
             return "🏢";
         }
 
-        // 3️⃣ 캘린더에서 등록한 개인 일정
+        // 3. 캘린더에서 등록한 개인 일정
         if (source === "CALENDAR" && type === "PERSONAL") {
             return "👤";
         }
 
         return "📌";
     }
-
 
     function getDtoId(dto) {
         // 캘린더: calendarId
@@ -160,7 +142,7 @@
     }
 
     async function apiGetScheduleEvents() {
-        // ✅ 스케줄 연동 API
+        // 스케줄 연동 API
         const res = await fetch(SCHEDULE_API);
         if (!res.ok) {
             // 서버 아직 미구현이면 캘린더 기능은 그대로 동작해야 해서 [] 반환
@@ -196,8 +178,7 @@
         if (!id) return null;
 
         /* ================= COMPANY (캘린더 "회사전체 일정"은 종일 블록 + 편집 불가 유지) ================= */
-        // 기존 로직 보존: "회사 전체 일정은 시작날만 블록" 등
-        // ✅ 단, 업무 스케줄의 COMPANY는 '회사전체 캘린더'와 의미가 다를 수 있으니 "업무 스케줄"은 아래 일반 로직으로 처리
+        // 단, 업무 스케줄의 COMPANY는 '회사전체 캘린더'와 의미가 다를 수 있으니 "업무 스케줄"은 아래 일반 로직으로 처리
         if (!isSchedule && isCompany) {
             const s = new Date(
                 start.getFullYear(),
@@ -229,8 +210,7 @@
                 start: s,
                 end: endExclusive,
                 allDay: true,
-                backgroundColor: "#ef4444",
-                borderColor: "#ef4444",
+                backgroundColor: "#8b5cf6",
                 textColor: "#ffffff",
                 editable: false,
                 startEditable: false,
@@ -243,7 +223,7 @@
         const color = getEventColor(dto);
         const fixedEnd = end ? new Date(end) : addMinutes(start, 30);
 
-        // ✅ 업무 스케줄은 읽기 전용(드래그/리사이즈 불가)
+        // 업무 스케줄은 읽기 전용 (드래그/리사이즈 불가)
         const editable = !isSchedule;
 
         return {
@@ -262,6 +242,8 @@
 
     /* ================= Calendar Init ================= */
 
+    /* calendar.js 내부의 initCalendar 함수 전체 교체 */
+
     function initCalendar() {
         const el = document.getElementById("calendar");
         if (!el) {
@@ -273,11 +255,55 @@
             locale: "ko",
             initialView: "dayGridMonth",
 
-            /* ===== 레이아웃 & 그리드 ===== */
-            height: "100%",          // 카드 높이에 맞게 꽉 채움
-            expandRows: true,        // 빈 공간 자동 확장
-            dayMaxEvents: true,      // 일정 많으면 +more
-            fixedWeekCount: false,   // 불필요한 빈 주 제거
+            // ==========================================
+            // [Google Calendar 연동 설정]
+            // ==========================================
+            googleCalendarApiKey: 'AIzaSyBM_oNQ8dkUcn_lK-EmAn2iwXgVGz_cp_s',
+
+            eventSources: [
+                {
+                    googleCalendarId: 'ko.south_korea#holiday@group.v.calendar.google.com',
+                    className: 'korean-holiday',
+                    color: '#ef4444',     // 기본 빨간색 (법정 공휴일용)
+                    textColor: '#ffffff',
+                    editable: false,
+                    display: 'block'
+                }
+            ],
+
+            // 3. 이벤트 데이터 변환 (공휴일 vs 기념일 구분 처리)
+            eventDataTransform: function(eventDef) {
+                // 구글 캘린더에서 온 이벤트인지 확인 (url이나 source ID로 식별)
+                if (eventDef.url || (eventDef.source && eventDef.source.googleCalendarId)) {
+
+                    // 빨간 날이 아닌 기념일 키워드 목록
+                    const notRedDays = [
+                        "어버이날", "스승의날", "제헌절", "국군의 날",
+                        "식목일", "발렌타인", "화이트", "할로윈", "빼빼로",
+                        "동지", "초복", "중복", "말복", "입춘", "소한", "대한",
+                        "칠석", "단오", "근로자의 날"
+                    ];
+
+                    const title = eventDef.title || "";
+
+                    // 제목에 해당 키워드가 포함되어 있으면 색상 변경
+                    if (notRedDays.some(keyword => title.includes(keyword))) {
+                        eventDef.color = '#10b981';       // 초록색 (기념일)
+                        eventDef.borderColor = '#10b981';
+
+                        // 만약 캘린더에서 아예 숨기고 싶다면 아래 주석 해제
+                        // return false;
+                    }
+                }
+                return eventDef;
+            },
+            // ==========================================
+
+            /* ===== 레이아웃 & 그리드 설정 (기존 유지) ===== */
+            height: "100%",
+            expandRows: true,
+            dayMaxEvents: true,
+            fixedWeekCount: false,
 
             selectable: true,
             selectMirror: true,
@@ -294,7 +320,7 @@
                 right: "dayGridMonth,timeGridWeek,timeGridDay",
             },
 
-            /* ===== 날짜/시간 선택 ===== */
+            /* ===== 날짜/시간 선택 (기존 유지) ===== */
             select(info) {
                 const viewType = calendar.view.type;
 
@@ -303,7 +329,6 @@
                     const startDate = info.start;
                     const endExclusive = info.end;
 
-                    // FullCalendar select의 end는 exclusive라서 하루 빼서 inclusive 처리
                     const endInclusive = new Date(endExclusive);
                     endInclusive.setDate(endInclusive.getDate() - 1);
 
@@ -330,12 +355,11 @@
                     return;
                 }
 
-                // Week/Day: 시간 드래그 그대로 (end null 방지)
+                // Week/Day: 시간 드래그 그대로
                 const start = info.start;
                 let end = info.end ? new Date(info.end) : null;
                 if (!end) end = addMinutes(start, 30);
 
-                // 선택 end가 딱 떨어지는 경우(예: 14:00) 모달 UX상 그대로 써도 OK
                 safeOpenCreateModal({
                     start: toDtoDateTime(start),
                     end: toDtoDateTime(end),
@@ -346,22 +370,27 @@
 
             /* ===== 일정 클릭 ===== */
             eventClick(info) {
+                // 1. 구글 캘린더(공휴일)인 경우: 링크 이동 막기
+                if (info.event.url) {
+                    info.jsEvent.preventDefault();
+                    return;
+                }
+
+                // 2. 내가 등록한(DB) 일정인 경우: 상세 모달 열기
                 const raw = info?.event?.extendedProps?.raw;
                 if (raw) safeOpenDetailModal(raw);
             },
 
-            /* ===== 드래그 이동 ===== */
+            /* ===== 드래그 이동 (기존 유지) ===== */
             eventDrop(info) {
                 const raw = info.event.extendedProps?.raw;
 
-                // ✅ 업무 스케줄은 캘린더에서 편집 불가
                 if (raw && isScheduleSource(raw)) {
                     alert("업무 일정은 캘린더에서 이동할 수 없습니다.");
                     info.revert();
                     return;
                 }
 
-                // 기존 COMPANY 가드 유지
                 if (raw?.type === "COMPANY") {
                     alert("회사 전체 일정은 이동할 수 없습니다.");
                     info.revert();
@@ -371,18 +400,16 @@
                 syncEvent(info.event);
             },
 
-            /* ===== 리사이즈 ===== */
+            /* ===== 리사이즈 (기존 유지) ===== */
             eventResize(info) {
                 const raw = info.event.extendedProps?.raw;
 
-                // ✅ 업무 스케줄은 캘린더에서 편집 불가
                 if (raw && isScheduleSource(raw)) {
                     alert("업무 일정은 캘린더에서 변경할 수 없습니다.");
                     info.revert();
                     return;
                 }
 
-                // 기존 COMPANY 가드 유지
                 if (raw?.type === "COMPANY") {
                     alert("회사 전체 일정은 변경할 수 없습니다.");
                     info.revert();
@@ -401,7 +428,7 @@
     async function syncEvent(fcEvent) {
         const raw = fcEvent?.extendedProps?.raw;
 
-        // ✅ 업무 스케줄은 sync 대상 아님
+        // 업무 스케줄은 sync 대상 아님
         if (raw && isScheduleSource(raw)) return;
 
         if (!raw?.calendarId) return;
@@ -442,7 +469,7 @@
     async function loadCalendarEvents() {
         if (!calendar) return;
 
-        // ✅ 캘린더 + 업무 스케줄을 한 번에 로드해서 합침
+        // 캘린더 + 업무 스케줄을 한 번에 로드해서 합침
         const [calendarData, scheduleData] = await Promise.all([
             apiGetEvents(),
             apiGetScheduleEvents(),
@@ -451,13 +478,19 @@
         const calArr = Array.isArray(calendarData) ? calendarData : [];
         const schArr = Array.isArray(scheduleData) ? scheduleData : [];
 
-        // ✅ source 보정 (서버가 내려주면 그대로, 없으면 보정)
+        // source 보정 (서버가 내려주면 그대로, 없으면 보정)
         const normalizedCalendarDtos = calArr.map((e) => ({ ...e, source: getSource(e) })); // CALENDAR
         const normalizedScheduleDtos = schArr.map((e) => ({ ...e, source: "SCHEDULE" }));  // SCHEDULE
 
         allEventsCache = [...normalizedCalendarDtos, ...normalizedScheduleDtos];
 
-        calendar.removeAllEvents();
+        const currentEvents = calendar.getEvents();
+        currentEvents.forEach(ev => {
+            // extendedProps.raw가 있는 것은 우리가 DB에서 넣어준 이벤트임
+            if (ev.extendedProps && ev.extendedProps.raw) {
+                ev.remove();
+            }
+        });
 
         allEventsCache
             .filter((e) => matchFilter(e))
@@ -538,10 +571,17 @@
             return Math.round((done / arr.length) * 100);
         };
 
-        // ✅ PERSONAL(개인 타입) / WORK(스케줄 소스) / TOTAL 유지
+        // PERSONAL(개인 타입)
         setProgress(".personal", ".personal-text", percent((e) => (e.type || "").toUpperCase() === "PERSONAL"));
+
+        // WORK(스케줄 소스)
         setProgress(".work", ".work-text", percent((e) => getSource(e) === "SCHEDULE"));
-        setProgress(".total", ".total-text", percent(() => true));
+
+        // TOTAL: 회사 공지(CALENDAR 소스의 COMPANY 타입)는 제외
+        setProgress(".total", ".total-text", percent((e) => {
+            const isCompanyNotice = getSource(e) === "CALENDAR" && (e.type || "").toUpperCase() === "COMPANY";
+            return !isCompanyNotice; // 회사 공지가 아닌 것만 합산 (개인 + 업무스케줄)
+        }));
     }
 
     function setProgress(barSel, textSel, p) {
