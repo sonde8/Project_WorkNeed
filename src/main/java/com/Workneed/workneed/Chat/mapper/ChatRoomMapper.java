@@ -28,4 +28,16 @@ public interface ChatRoomMapper {
     // 5. 채팅방 나가기
     void leaveRoom(@Param("roomId") Long roomId, @Param("userId") Long userId);
 
+    // 6. 참여자 조회
+    List<Long> findAllParticipantIdsByRoomId(Long roomId);
+
+    // 7. 채팅방 검색
+    List<ChatRoomDTO> searchUserRooms(@Param("userId") Long userId, @Param("keyword") String keyword);
+
+    // 8. 안 읽은 뱃지 개수 업데이트
+    void updateReadStatus(@Param("roomId") Long roomId, @Param("userId") Long userId);
+
+    // 9. 특정 메시지에 대해 나를 제외한 모든 참여자의 '안 읽음' 상태를 생성
+    void insertInitialReadStatus(@Param("messageId") Long messageId, @Param("roomId") Long roomId, @Param("senderId") Long senderId);
+
 }

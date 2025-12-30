@@ -1,4 +1,4 @@
-<title th:text="${pageTitle}">WORKNEED</title>
+<title layout:fragment="title">로그인 - WORKNEED</title>
       -> 컨트롤러에서 model.addAttribute("pageTitle", "각자 페이지타이틀(브라우저 탭 제목)로 넣어주세요");
 
 content : 1340px를 max로 넣어주세요

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<form th:action="@{/schedule/invite}" method="post">
+    <input type="hidden" name="scheduleId" th:value="${scheduleId}" />
+
+    <div th:each="u : ${userList}">
+        <label>
+            <input type="checkbox" name="userIds" th:value="${u.userId}">
+            <span th:text="${u.userName}"></span>
+            <span th:text="${u.deptName}"></span>
+            <span th:text="${u.rankName}"></span>
+        </label>
+    </div>
+
+    <button type="submit">초대하기</button>
+</form>
+
+</body>
+</html>

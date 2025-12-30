@@ -44,9 +44,32 @@
                     <div class="comment-row">
                         <div class="comment-writer" th:text="${c.writerName}">[user]</div>
                         <div class="comment-time"   th:text="${#temporals.format(c.createdAt, 'yyyy-MM-dd HH:mm')}"> 2025-00-00 00:00</div>
-                        <button type="button" class="comment-edit-btn">edit</button>
+                        <div class="comment-btns" id="comment-btns" > <!--th:if="${c.writerId == loginUserId}"-->
+                            <button type="button" class="comment-edit-btn">edit</button>
+
+                            <form th:action="@{/schedule/comment/delete}"method="post">
+                                <input type="hidden" name="scheduleId" th:value="${schedule.scheduleId}">
+                                <input type="hidden" name="commentId" th:value="${c.commentId}">
+                                <button type="submit" class="comment-delete-btn">delete</button>
+                            </form>
+                        </div>
                     </div>
-                    <div class="comment-content" th:text="${c.content}">content</div>
+
+                    <!-- 보기 모드 -->
+                    <div class="comment-view">
+                        <div class="comment-content" th:text="${c.content}"></div>
+                    </div>
+
+                    <!-- 수정 모드 -->
+                    <form class="comment-edit-form" th:action="@{/schedule/comment/update}" method="post">
+                        <input type="hidden" name="scheduleId" th:value="${schedule.scheduleId}">
+                        <input type="hidden" name="commentId" th:value="${c.commentId}">
+                        <textarea name="content" class="comment-edit-textarea" rows="3" th:text="${c.content}"></textarea>
+                        <div class="comment-edit-btns">
+                            <button type="submit">저장</button>
+                            <button type="button" class="comment-cancel-btn">취소</button>
+                        </div>
+                    </form>
                 </div>
             </div>
 
@@ -68,6 +91,9 @@
     </div>
 
 </main>
+<th:block layout:fragment="script">
+    <script th:src="@{/js/task.js}"></script>
+</th:block>
 </body>
 
 </html>

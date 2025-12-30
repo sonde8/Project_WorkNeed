@@ -1,67 +1,68 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+
 <head>
-    <meta charset="UTF-8">
-    <title>로그인 테스트</title>
+    <title layout:fragment="title">로그인 - WORKNEED</title>
+    <link rel="stylesheet" th:href="@{/css/login.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
+
 <body>
 
-<h2>로그인</h2>
+<main layout:fragment="content">
+    <div class="login-wrapper">
+        <div class="login-container">
+            <h2>로그인</h2>
 
-<div th:if="${param.error}" style="color:red;">
-    <p>아이디 또는 비밀번호가 올바르지 않습니다.</p>
-</div>
+            <div th:if="${infoMessage}" class="info-msg" th:text="${infoMessage}"></div>
+            <div th:if="${loginError}" class="error-msg" th:text="${loginError}"></div>
 
-<form id="loginForm" th:action="@{/login-user}" method="post">
-    <input type="hidden" name="userType" id="userType" value="USER">
+            <form th:action="@{/login}" method="post">
+                <div class="input-group">
+                    <img th:src="@{/images/person300.svg}" class="input-icon" alt="아이디 아이콘">
+                    <input type="text" name="loginId" placeholder="아이디" autocomplete="off" required>
+                </div>
 
-    <div>
-        <input type="text" name="loginId" id="loginId" placeholder="아이디" required>
+                <div class="input-group">
+                    <img th:src="@{/images/lock300.svg}" class="input-icon" alt="비밀번호 아이콘">
+                    <input type="password" name="password" placeholder="비밀번호"
+                           oncopy="return false" onpaste="return false" oncut="return false" required>
+                </div>
+
+                <div class="options-row">
+                    <label class="checkbox-container">
+                        <input type="checkbox" name="autoLogin">
+                        <span class="checkmark"></span> 로그인 상태 유지
+                    </label>
+                </div>
+
+                <button type="submit" class="btn-submit">로그인</button>
+            </form>
+
+            <div class="links">
+                <a href="#">비밀번호 찾기</a> |
+                <a href="#">아이디 찾기</a> |
+                <a th:href="@{/register}">회원가입</a>
+            </div>
+
+            <a href="/oauth2/authorization/google" class="social-btn google-btn">
+                <img th:src="@{/images/google-icon.svg}" class="google-icon" alt="아이디 아이콘">
+                구글 로그인
+            </a>
+
+            <a href="/admin/login" class="social-btn admin-btn">
+                <i class="fa-solid fa-user-lock"></i>
+                관리자 로그인
+            </a>
+        </div>
     </div>
-    <div>
-        <input type="password" name="password" id="password" placeholder="비밀번호" required>
-    </div>
-    <div>
-        <label>
-            <input type="checkbox" name="autoLogin"> 로그인 유지
-        </label>
-    </div>
+</main>
 
-    <br>
-    <button type="submit">일반 유저 로그인</button>
+<th:block layout:fragment="script">
+    <script th:src="@{/js/login.js}"></script>
+</th:block>
 
-    <button type="submit" onclick="document.getElementById('userType').value='ADMIN'; fillAdmin();">
-        관리자 로그인(자동입력)
-    </button>
-</form>
-
-<hr>
-<a th:href="@{/oauth2/authorization/google}">
-    <button type="button">구글 로그인</button>
-</a>
-<br>
-<a href="/register">회원가입</a>
-
-<script th:inline="javascript">
-    window.onload = function() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const error = urlParams.get('error');
-
-        if (error) {
-            if (error === 'inactive') {
-                alert("비활성화된 유저입니다. 관리자에게 문의하세요.");
-            } else if (error === 'banned') {
-                alert("차단된 사용자입니다. 접근이 금지되었습니다.");
-            } else if (error === 'invalid') {
-                alert("아이디 또는 비밀번호가 일치하지 않습니다.");
-            }
-
-            // 팝업 후 URL의 에러 파라미터 지우기 (선택사항 - 새로고침 시 팝업 방지)
-            window.history.replaceState({}, document.title, window.location.pathname);
-        }
-    }
-</script>
-
-<script src="/js/login.js"></script>
 </body>
 </html>

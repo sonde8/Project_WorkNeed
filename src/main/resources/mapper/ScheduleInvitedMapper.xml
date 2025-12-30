@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.Workneed.workneed.Schedule.mapper.ScheduleInvitedMapper">
+
+    <select id="selectActiveUsersExcludeOwner"  parameterType="long"
+            resultType="com.Workneed.workneed.Schedule.dto.ScheduleInvitedDTO">
+        SELECT
+        u.user_id     AS userId,
+        u.user_name   AS userName,
+        d.dept_name   AS deptName,
+        r.rank_name   AS rankName,
+        u.user_email  AS userEmail,
+        u.user_status AS userStatus
+        FROM `user` u
+        LEFT JOIN `dept` d ON u.dept_id = d.dept_id
+        LEFT JOIN `ranks` r ON u.rank_id = r.rank_id
+        WHERE u.user_status = 'ACTIVE'
+        AND u.user_id NOT IN (
+        SELECT sp.user_id
+        FROM schedule_participant sp
+        WHERE sp.schedule_id = #{scheduleId}
+        AND sp.role = 'OWNER'
+        )
+    </select>
+
+</mapper>

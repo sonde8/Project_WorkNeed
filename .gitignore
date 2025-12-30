@@ -36,9 +36,9 @@ out/
 ### VS Code ###
 .vscode/
 
+# application.properties 파일에 민감한 정보가 포함되어 있다면,
 # 이 파일을 Git 추적 대상에서 제외합니다.
-src/main/resources/application.properties
-
-# OAuth secrets - google api 비번 -커밋금지
+application.properties
+.DS_Store
+/uploads/
 src/main/resources/application-oauth.properties
-
