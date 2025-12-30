@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+
+<head>
+    <meta charset="UTF-8">
+    <title>문서 상세</title>
+
+    <th:block layout:fragment="head">
+        <link rel="stylesheet" th:href="@{/css/approve.css}">
+    </th:block>
+</head>
+
+<body>
+
+<!-- ✅ 반드시 content fragment -->
+<th:block layout:fragment="content">
+
+    <div class="wrap approval-detail">
+
+        <h1 class="page-title">문서 상세</h1>
+
+        <!-- 결재라인 -->
+        <div class="card">
+            <div class="card-head">
+                <h3>결재 라인</h3>
+                <p class="meta">차수 / 결재자 / 상태</p>
+            </div>
+
+            <ul class="line-list">
+                <li th:each="l : ${lines}" class="line-item">
+    <span class="ord">
+      <b th:text="${l.orderNum}"></b>차
+    </span>
+
+                    <!-- ✅ approverName 말고 username -->
+                    <span class="name" th:text="${l.username}"></span>
+
+                    <span class="status" th:text="${l.status}"></span>
+                </li>
+
+                <li th:if="${#lists.isEmpty(lines)}" class="line-empty">
+                    결재 라인이 없습니다.
+                </li>
+            </ul>
+
+        </div>
+
+        <!-- 문서 존재 -->
+        <div th:if="${doc != null}" class="card">
+
+            <div class="card-head">
+                <h3>문서 정보</h3>
+                <p class="meta">문서 기본 정보</p>
+            </div>
+
+            <div class="rows">
+
+                <div class="row">
+                    <span class="label">문서 ID</span>
+                    <span class="value" th:text="${doc.docId}"></span>
+                </div>
+
+                <div class="row">
+                    <span class="label">상태</span>
+                    <span class="value" th:text="${doc.status}">DRAFT</span>
+                </div>
+
+                <div class="row">
+                    <span class="label">문서 종류</span>
+                    <span class="value" th:text="${doc.typeId}">TYPE</span>
+                </div>
+
+                <div class="row">
+                    <span class="label">제목</span>
+                    <span class="value" th:text="${doc.title}">TITLE</span>
+                </div>
+
+                <div class="row row-content">
+                    <span class="label">내용</span>
+                    <pre class="content" th:text="${doc.content}">CONTENT</pre>
+                </div>
+                <!-- 첨부 파일 -->
+                <div class="card">
+                    <div class="card-head">
+                        <h3>첨부 파일</h3>
+                        <p class="meta">첨부된 파일 목록</p>
+                    </div>
+
+                    <ul class="file-list">
+                        <li th:each="f : ${files}">
+                            <a th:href="@{/approval/file/{id}(id=${f.fileId})}"
+                               th:text="${f.originalName}">
+                            </a>
+                        </li>
+
+                        <li th:if="${#lists.isEmpty(files)}" class="empty">
+                            첨부 파일이 없습니다.
+                        </li>
+                    </ul>
+                </div>
+
+
+                <div class="row">
+                    <span class="label">작성일</span>
+                    <span class="value" th:text="${doc.createdAt}">-</span>
+                </div>
+
+                <div class="row">
+                    <span class="label">수정일</span>
+                    <span class="value" th:text="${doc.updatedAt}">-</span>
+                </div>
+            </div>
+
+            <!-- 버튼 영역 -->
+            <div class="btns">
+
+                <!-- 승인/반려: IN_PROGRESS + 내 차례(isMyTurn) -->
+                <form th:if="${doc.status.name() == 'IN_PROGRESS' and isMyTurn}"
+                      method="post" th:action="@{/approval/approve}">
+                    <input type="hidden" name="docId" th:value="${doc.docId}">
+                    <button type="submit" class="primary">승인</button>
+                </form>
+
+                <form th:if="${doc.status.name() == 'IN_PROGRESS' and isMyTurn}"
+                      method="post" th:action="@{/approval/reject}">
+                    <input type="hidden" name="docId" th:value="${doc.docId}">
+                    <button type="submit" class="danger">반려</button>
+                </form>
+
+                <!-- 회수: IN_PROGRESS + 작성자 + canRecall -->
+                <form th:if="${doc.status.name() == 'IN_PROGRESS' and (canRecall == true)}"
+
+                      method="post" th:action="@{/approval/recall}">
+                    <input type="hidden" name="docId" th:value="${doc.docId}">
+                    <button type="submit">회수</button>
+                </form>
+
+
+            </div>
+
+
+            <!-- 문서 없음 -->
+        <div th:if="${doc == null}" class="card">
+            <div class="card-head">
+                <h3>오류</h3>
+                <p class="meta">문서를 찾을 수 없습니다.</p>
+            </div>
+
+            <div class="empty">
+                <p>문서를 찾을 수 없습니다.</p>
+                <button type="button"
+                        class="btn btn-ghost"
+                        onclick="history.back()">
+                    뒤로가기
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+</th:block>
+
+</body>
+</html>

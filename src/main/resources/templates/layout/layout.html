@@ -1,35 +1,37 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
-
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
     <meta charset="UTF-8">
     <title th:text="${pageTitle} ?: 'WORKNEED'">WORKNEED</title>
+
+    <!-- 공통 레이아웃 CSS -->
     <link rel="stylesheet" th:href="@{/layout/layout.css}">
 
+    <!-- 각 페이지 head -->
     <th:block layout:fragment="head"></th:block>
 </head>
 <body>
 
 <div class="main-layout">
     <aside class="sidebar">
-<!--<aside class="sidebar" th:replace="layout/sidebar :: sidebar">-->
-        <!--사이드바-->
+        <!-- sidebar -->
+        <!-- th:replace="layout/sidebar :: sidebar" -->
     </aside>
 
     <header class="header">
-<!--<header class="header" th:replace="layout/header :: header">-->
-        <!--헤더-->
+        <!-- header -->
+        <!-- th:replace="layout/header :: header" -->
     </header>
 
-    <main class="content">
-        <!-- <main class="content" layout:fragment="content"></main>> -->
-        <!--메인 컨텐츠 내용-->
+    <!-- ✅ 여기 하나만 존재해야 함 -->
+    <main class="content" layout:fragment="content">
+        <!-- page content -->
     </main>
 </div>
 
+<!-- 각 페이지 script -->
 <th:block layout:fragment="script"></th:block>
 
 </body>
 </html>
-
