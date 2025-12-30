@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+
+<!-- ================= HEAD ================= -->
+<th:block layout:fragment="head">
+    <!-- FullCalendar -->
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet"/>
+
+    <!-- flatpickr -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"/>
+
+    <!-- Calendar CSS -->
+    <link rel="stylesheet" th:href="@{/css/calendar.css}"/>
+    <link rel="stylesheet" th:href="@{/css/calendar-modal.css}"/>
+    <link rel="stylesheet" th:href="@{/css/calendar-detail-modal.css}"/>
+</th:block>
+
+<!-- ================= CONTENT ================= -->
+<main layout:fragment="content">
+
+    <div class="calendar-container">
+
+        <!-- LEFT -->
+        <aside class="calendar-left">
+
+            <!-- 일정 등록 -->
+            <button class="schedule-add-btn" id="openCalendarCreateModal" type="button">
+                + 일정 등록
+            </button>
+
+            <!-- Today -->
+            <section class="left-box today-box">
+                <h3 class="left-title" id="today-title">Today's Schedule</h3>
+                <ul class="today-list" id="todayList"></ul>
+            </section>
+
+            <!-- Weekly Progress -->
+            <section class="left-box">
+                <h3 class="left-title">Weekly Progress Bar</h3>
+
+                <div class="weekly-progress-group">
+
+                    <div class="weekly-progress-item">
+                        <span class="label">전체</span>
+                        <div class="progress">
+                            <div class="progress-bar total"></div>
+                        </div>
+                        <span class="progress-text total-text">0%</span>
+                    </div>
+
+                    <div class="weekly-progress-item">
+                        <span class="label">개인</span>
+                        <div class="progress">
+                            <div class="progress-bar personal"></div>
+                        </div>
+                        <span class="progress-text personal-text">0%</span>
+                    </div>
+
+                    <div class="weekly-progress-item">
+                        <span class="label">업무</span>
+                        <div class="progress">
+                            <div class="progress-bar work"></div>
+                        </div>
+                        <span class="progress-text work-text">0%</span>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- Filter -->
+            <section class="left-box">
+                <h3 class="left-title">Calendars</h3>
+
+                <div class="filter-radio-group" role="radiogroup">
+                    <label class="filter-radio">
+                        <input type="radio" name="scheduleFilter" value="ALL" checked/>
+                        전체
+                    </label>
+                    <label class="filter-radio">
+                        <input type="radio" name="scheduleFilter" value="PERSONAL"/>
+                        개인
+                    </label>
+                    <label class="filter-radio">
+                        <input type="radio" name="scheduleFilter" value="WORK"/>
+                        업무
+                    </label>
+                </div>
+            </section>
+
+        </aside>
+
+        <div class="calendar-gap"></div>
+
+        <!-- RIGHT -->
+        <section class="calendar-right">
+            <div class="calendar-inner">
+                <div id="calendar"></div>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- 모달 -->
+    <div th:replace="~{Calendar/calendar-modal :: calendarCreateModal}"></div>
+    <div th:replace="~{Calendar/calendar-detail-modal :: calendarDetailModal}"></div>
+
+</main>
+
+<!-- ================= SCRIPT ================= -->
+<th:block layout:fragment="script">
+    <!-- FullCalendar -->
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+
+    <!-- flatpickr -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+    <!-- Calendar JS -->
+    <script th:src="@{/js/calendar.js}"></script>
+    <script th:src="@{/js/calendar-detail-modal.js}"></script>
+    <script th:src="@{/js/calendar-modal.js}"></script>
+</th:block>
+
+</html>

@@ -1,0 +1,202 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Noto Sans KR', sans-serif;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #fff;
+}
+
+/* ============================
+   메인 레이아웃 구조 (전체 1340px)
+   ============================ */
+.calendar-container {
+    width: 1340px;
+    height: 100vh;
+    display: flex;
+    margin: 0 auto;
+
+    border: 1px solid black;
+    background-color: #fff;
+}
+
+/* --- 왼쪽 사이드바 (420px) --- */
+.calendar-left {
+    width: 420px;
+    height: 100%;
+
+    border: 1px solid black;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    overflow-y: auto;
+}
+
+/* 일정 등록 버튼 */
+.schedule-add-btn {
+    width: 100%;
+    padding: 15px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    background-color: #f0f0f0;
+    border: 1px solid black;
+    text-align: center;
+    transition: background-color 0.2s;
+}
+.schedule-add-btn:hover {
+    background-color: #e0e0e0;
+}
+
+/* 왼쪽 박스 공통 스타일 */
+.left-box {
+    border: 1px solid black;
+    padding: 15px;
+    border-radius: 4px;
+}
+
+.left-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 5px;
+}
+
+/* Today List */
+.today-list {
+    list-style: none;
+    min-height: 50px;
+}
+.today-list li {
+    cursor: pointer;
+    padding: 5px 0;
+    border-bottom: 1px dotted #ccc;
+    font-size: 14px;
+}
+.today-list li:hover {
+    background-color: #f3f4f6;
+}
+
+/* Weekly Progress */
+.weekly-progress-item {
+    margin-bottom: 10px;
+}
+.weekly-progress-item .label {
+    display: block;
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+.progress {
+    width: 100%;
+    height: 10px;
+    background-color: #eee;
+    border: 1px solid #000;
+    border-radius: 5px;
+    overflow: hidden;
+}
+.progress-bar {
+    height: 100%;
+    background-color: #333;
+    width: 0%;
+}
+.progress-text {
+    font-size: 12px;
+    float: right;
+    margin-top: 2px;
+}
+
+/* Filter Radio */
+.filter-radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.filter-radio {
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* --- 중앙 갭 간격 (20px) --- */
+.calendar-gap {
+    width: 20px;
+    height: 100%;
+    background-color: #fff;
+}
+
+
+/* --- 오른쪽 메인 캘린더 (900px) --- */
+.calendar-right {
+    width: 900px;
+    height: 100%;
+
+    border: 1px solid black;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.calendar-inner {
+    flex: 1;
+    position: relative;
+    border: 1px solid black;
+    padding: 10px;
+    overflow: hidden;
+}
+
+/* FullCalendar 스타일 */
+#calendar {
+    width: 100%;
+    height: 100%;
+}
+
+/* 툴바 (년/월 이동 버튼 등) */
+.fc-toolbar-title {
+    font-size: 24px !important;
+    font-weight: bold;
+}
+.fc-button {
+    background-color: #333 !important;
+    border-color: #333 !important;
+    border-radius: 4px !important;
+    font-size: 14px !important;
+}
+.fc-button:hover {
+    background-color: #555 !important;
+}
+
+.fc-scroller {
+    overflow: hidden !important;
+}
+
+/* 날짜 셀 스타일 */
+.fc-daygrid-day-frame {
+    min-height: 100% !important;
+}
+
+.fc-daygrid-more-link {
+    font-size: 12px;
+    color: #555;
+    font-weight: bold;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.fc-event {
+    cursor: pointer;
+}
+.fc-event:hover {
+    opacity: 0.85;
+}
+

@@ -1,0 +1,86 @@
+<!-- ===============================
+     개인 일정 등록 / 수정 모달 Fragment
+=============================== -->
+<div th:fragment="calendarCreateModal">
+
+    <div class="modal-overlay hidden" id="calendarCreateModalOverlay" aria-hidden="true">
+        <div class="modal-container" role="dialog" aria-modal="true" aria-labelledby="calendarModalTitle">
+
+            <!-- Header -->
+            <div class="modal-header">
+                <h2 id="calendarModalTitle">개인 일정 등록</h2>
+                <button type="button"
+                        class="modal-close-btn"
+                        id="closeCalendarCreateModal"
+                        aria-label="닫기">✕</button>
+            </div>
+
+            <!-- Form -->
+            <form id="calendarCreateForm" class="modal-body" autocomplete="off">
+
+                <!-- 수정 모드용 hidden -->
+                <input type="hidden" id="calendarId" />
+
+                <!-- 제목 -->
+                <div class="form-group">
+                    <label for="calendarTitle">일정 제목</label>
+                    <input type="text"
+                           id="calendarTitle"
+                           required
+                           placeholder="일정 제목을 입력하세요" />
+                </div>
+
+                <!-- 날짜 / 시간 -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="calendarStartAt">시작</label>
+                        <input type="text"
+                               id="calendarStartAt"
+                               readonly />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="calendarEndAt">종료</label>
+                        <input type="text"
+                               id="calendarEndAt"
+                               readonly />
+                    </div>
+                </div>
+
+                <!-- 설명 -->
+                <div class="form-group">
+                    <label for="calendarDescription">설명 (선택)</label>
+                    <textarea id="calendarDescription"
+                              rows="3"
+                              placeholder="일정에 대한 메모를 입력하세요"></textarea>
+                </div>
+
+                <!-- ✅ 색상 선택 -->
+                <div class="form-group">
+                    <label class="input-label">일정 색상</label>
+
+                    <div class="color-picker-container">
+                        <button type="button" class="color-option active" data-color="#3b82f6" style="background-color:#3b82f6;"></button>
+                        <button type="button" class="color-option" data-color="#22c55e" style="background-color: #22c55e;"></button>
+                        <button type="button" class="color-option" data-color="#ef4444" style="background-color: #ef4444;"></button>
+
+                        <div class="custom-color-wrapper">
+                            <input type="color" id="realColorPicker" value="#ffffff">
+                            <button type="button" class="color-option custom-trigger" id="customColorBtn" title="직접 선택"></button>
+                        </div>
+                    </div>
+
+                    <input type="hidden" name="scheduleColor" id="selectedColorInput" value="#3b82f6">
+                </div>
+
+                <!-- Footer -->
+                <div class="modal-footer">
+                    <button type="button" class="btn-cancel" id="cancelCalendarCreateModal">취소</button>
+                    <button type="submit" class="btn-submit" id="calendarSubmitBtn">등록</button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+</div>

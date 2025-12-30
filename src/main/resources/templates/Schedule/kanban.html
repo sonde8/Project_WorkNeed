@@ -120,7 +120,7 @@
                                 <span class="scope-txt">PERSONAL</span>
                             </button>
                             <button type="button" class="scope-btn" data-value="TEAM">
-                                <span class="scope-icon"><img src="/images/team1_300.svg"></span>
+                                <span class="scope-icon"><img src="/images/team2_300.svg"></span>
                                 <span class="scope-txt">TEAM</span>
                             </button>
                             <button type="button" class="scope-btn" data-value="COMPANY">
@@ -158,6 +158,19 @@
 
             <header class="modal-header">Invite Team</header>
             <button type="button" class="x-btn"> x </button>
+
+            <form id="teamInviteForm">
+                <input type="hidden" id="teamScheduleId" name="scheduleId" />
+
+                <div id="teamUserList">
+                    <!-- JS로 ACTIVE 유저 체크박스 렌더링 -->
+                </div>
+
+                <div class="modal-btns">
+                    <span id="inviteCount" class="invite-count">[ 0명 ]</span>
+                    <button class="btn" type="submit">invite</button>
+                </div>
+            </form>
 
 
         </div>
