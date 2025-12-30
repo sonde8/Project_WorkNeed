@@ -1,8 +1,10 @@
 package com.Workneed.workneed.Members.service;
 
 import com.Workneed.workneed.Members.dto.AdminUserDTO;
+import com.Workneed.workneed.Members.dto.SocialAccountDTO;
 import com.Workneed.workneed.Members.dto.UserDTO;
 import com.Workneed.workneed.Members.mapper.AdminUserMapper;
+import com.Workneed.workneed.Members.mapper.SocialAccountMapper;
 import com.Workneed.workneed.Members.mapper.UserMapper;
 import com.Workneed.workneed.config.CustomUserDetails;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,6 +15,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -25,15 +28,17 @@ public class UserService implements UserDetailsService {
     private final PasswordEncoder passwordEncoder;
     private final AdminUserMapper adminUserMapper;
     private final HttpServletRequest request;
+    private final SocialAccountMapper socialAccountMapper;
 
     public UserService(UserMapper userMapper,
                        AdminUserMapper adminUserMapper,
                        @Lazy PasswordEncoder passwordEncoder,
-                       HttpServletRequest request) {
+                       HttpServletRequest request, SocialAccountMapper socialAccountMapper) {
         this.userMapper = userMapper;
         this.adminUserMapper = adminUserMapper;
         this.passwordEncoder = passwordEncoder;
         this.request = request;
+        this.socialAccountMapper = socialAccountMapper;
     }
 
     @Override
@@ -60,6 +65,14 @@ public class UserService implements UserDetailsService {
         }
         return new CustomUserDetails(user, "ROLE_USER");
     }
+
+    @Transactional
+    public void updateProfileImage(Long userId, String profileImage) {
+        userMapper.updateProfileImage(userId, profileImage);
+        log.info("유저 ID {} 의 프로필 사진이 업데이트되었습니다.", userId);
+    }
+
+
 
     // --- 기존 유지 메서드들 (수정 없음) ---
 
@@ -108,4 +121,31 @@ public class UserService implements UserDetailsService {
     public List<UserDTO> getAllUsers() {
         return userMapper.findAll();
     }
+
+
+
+
+    @Transactional
+    public void linkSocialAccount(Long userId, String provider, String providerId, String email, String pic) {
+        // 1. 이미 연동되어 있는지 체크
+        if (socialAccountMapper.findByUserAndProvider(userId, provider) != null) {
+            log.info("이미 연동된 계정입니다. (UserID: {})", userId);
+        } else {
+            // 2. 소셜 연동 정보 저장
+            SocialAccountDTO dto = new SocialAccountDTO();
+            dto.setUserId(userId);
+            dto.setSocialProvider(provider);
+            dto.setSocialProviderUserId(providerId);
+            dto.setSocialEmail(email);
+            socialAccountMapper.insertSocialAccount(dto);
+            log.info("소셜 연동 테이블 저장 완료");
+        }
+
+        // 3. 연동 여부와 상관없이 사진 정보가 있으면 무조건 업데이트
+        if (pic != null) {
+            userMapper.updateProfileImage(userId, pic);
+            log.info("유저 프로필 이미지 업데이트 완료: {}", pic);
+        }
+    }
+
 }

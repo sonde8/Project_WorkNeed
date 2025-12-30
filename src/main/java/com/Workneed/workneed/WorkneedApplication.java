@@ -11,6 +11,11 @@ public class WorkneedApplication {
     public static void main(String[] args) {
         SpringApplication.run(WorkneedApplication.class, args);
 
+        BCryptPasswordEncoder e = new BCryptPasswordEncoder();
+        System.out.println(e.encode("1234"));
+
+
+
     }
 
 }

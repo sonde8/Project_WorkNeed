@@ -56,7 +56,7 @@ public class AdminUserController {
             if (adminDto.getAdminPassword() != null && !adminDto.getAdminPassword().isEmpty()) {
                 adminDto.setAdminPassword(passwordEncoder.encode(adminDto.getAdminPassword()));
             }
-            adminUserMapper.insertNewAdmin(adminDto);
+            adminUserMapper.insertAdmin(adminDto);
             return "success";
         } catch (Exception e) {
             e.printStackTrace();

@@ -39,6 +39,17 @@ public class CustomUserDetails implements UserDetails, OAuth2User {
         this.role = "ROLE_USER";
     }
 
+    public String getProfileImage() {
+        // 1. 유저 정보가 있고, 그 안에 사진 경로가 있다면 반환
+        if (this.userDto != null && this.userDto.getUserProfileImage() != null) {
+            return this.userDto.getUserProfileImage();
+        }
+
+        // 2. 관리자이거나 사진이 없는 경우 null 반환 (HTML에서 기본이미지 처리됨)
+        return null;
+    }
+
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         // 지정된 권한(ROLE_USER 또는 ROLE_ADMIN)을 반환합니다.
@@ -96,7 +107,6 @@ public class CustomUserDetails implements UserDetails, OAuth2User {
         if (adminDto != null) {
             return true;
         }
-
 
         // 3. 일반 유저인 경우 'ACTIVE' 상태일 때만 true 반환
         if (userDto != null && userDto.getUserStatus() != null) {

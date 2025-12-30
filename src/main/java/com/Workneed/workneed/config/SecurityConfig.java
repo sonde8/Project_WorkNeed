@@ -10,8 +10,11 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import java.util.UUID;
 
@@ -31,6 +34,7 @@ public class SecurityConfig {
         this.autoLoginFilterConfig = autoLoginFilterConfig;
         this.userService = userService;
     }
+
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -75,6 +79,7 @@ public class SecurityConfig {
                                 response.sendRedirect("/main");
                             }
                         })
+
                         // 2. [추가] 로그인 실패 시 처리 (팝업용 에러 코드 전송)
                         .failureHandler((request, response, exception) -> {
                             String errorType = "invalid"; // 기본: 비번 틀림
@@ -96,10 +101,30 @@ public class SecurityConfig {
                         .loginPage("/login")
                         .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
                         .successHandler((request, response, authentication) -> {
-                            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-                            request.getSession().setAttribute("user", userDetails.getUserDto());
+                            // 1. 현재 일반 로그인된 유저 가져오기
+                            UserDTO loginUser = (UserDTO) request.getSession().getAttribute("user");
 
+                            // 2. 구글에서 넘겨준 정보들 가져오기
+                            OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
+                            String googleId = oAuth2User.getAttribute("sub");
+                            String googleEmail = oAuth2User.getAttribute("email");
+                            String pic = oAuth2User.getAttribute("picture"); // 이게 구글 프로필 사진 주소
 
+                            if (loginUser != null) {
+                                // 3. 서비스 호출 (연동 + 사진 업데이트를 한 번에!)
+                                // ※ 아까 UserService에 pic 매개변수를 추가한 버전으로 만드셨어야 합니다.
+                                userService.linkSocialAccount(loginUser.getUserId(), "google", googleId, googleEmail, pic);
+
+                                // 4. 세션 정보 최신화 (사진이 바로 보이게)
+                                if (pic != null) {
+                                    loginUser.setUserProfileImage(pic);
+                                    request.getSession().setAttribute("user", loginUser);
+                                }
+
+                                System.out.println("연동 및 사진 업데이트 성공: " + loginUser.getUserName());
+                            }
+
+                            // 5. 작업 완료 후 메인으로 리다이렉트
                             response.sendRedirect("/main");
                         })
                 )

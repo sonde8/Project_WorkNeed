@@ -24,7 +24,7 @@
     </select>
 
 
-    <insert id="insertNewAdmin">
+    <insert id="insertAdmin" parameterType="com.Workneed.workneed.Members.dto.AdminUserDTO">
         INSERT INTO AdminUser (
         admin_email,
         admin_password,
@@ -32,15 +32,17 @@
         role_id,
         admin_status,
         admin_created_at
-        ) VALUES (
+        )
+        VALUES (
         #{adminEmail},
         #{adminPassword},
         #{adminName},
         #{roleId},
-        'ACTIVE',
+        #{adminStatus},
         NOW()
         )
     </insert>
+
 
     <update id="updateMemberStatus">
         UPDATE User

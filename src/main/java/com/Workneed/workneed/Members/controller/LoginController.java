@@ -45,9 +45,4 @@ public class LoginController {
         return "Members/login";
     }
 
-    /*
-     * [중요] @PostMapping("/login") 메서드는 삭제되었습니다.
-     * 이유: SecurityConfig의 .loginProcessingUrl("/login") 설정에 의해
-     * Spring Security가 직접 가로채서 UserService.loadUserByUsername()으로 인증을 수행합니다.
-     */
 }

@@ -26,7 +26,8 @@
         user_login_id AS userLoginId,
         user_password AS userPassword,
         user_status AS userStatus,
-        user_name AS userName
+        user_name AS userName,
+        user_profile_image AS userProfileImage
         FROM User
         WHERE user_login_id = #{loginId}
     </select>
@@ -36,6 +37,13 @@
         <include refid="allColumns"/>
         FROM User
         WHERE user_id = #{userId}
+    </select>
+
+    <select id="findByEmail" resultType="com.Workneed.workneed.Members.dto.UserDTO">
+        SELECT
+        <include refid="allColumns"/>
+        FROM User
+        WHERE user_email = #{email}
     </select>
 
     <select id="findAllWithDetails" resultType="com.Workneed.workneed.Members.dto.UserDTO">
@@ -54,7 +62,6 @@
         ORDER BY u.user_id DESC
     </select>
 
-
     <insert id="insertUser"
             parameterType="com.Workneed.workneed.Members.dto.UserDTO"
             useGeneratedKeys="true"
@@ -67,7 +74,8 @@
         user_name,
         user_profile_image,
         user_status,
-        user_birthday, rank_id,
+        user_birthday,
+        rank_id,
         dept_id
         ) VALUES (
         #{userLoginId},
@@ -76,7 +84,8 @@
         #{userName},
         #{userProfileImage},
         #{userStatus},
-        #{userBirthday}, #{rankId},
+        #{userBirthday},
+        #{rankId},
         #{deptId}
         )
     </insert>
@@ -95,16 +104,16 @@
         WHERE user_id = #{userId}
     </update>
 
-
-    <!-- 유저 변경 핵심기능-->
     <update id="updateUser" parameterType="com.Workneed.workneed.Members.dto.UserDTO">
         UPDATE User
-        SET user_email = #{userEmail}, user_name = #{userName}, user_status = #{userStatus}, rank_id = #{rankId},
+        SET user_email = #{userEmail},
+        user_name = #{userName},
+        user_status = #{userStatus},
+        rank_id = #{rankId},
         dept_id = #{deptId}
         WHERE user_id = #{userId}
     </update>
 
-    <!-- 일괄업뎃-->
     <update id="updateUsersStatus">
         UPDATE User
         SET user_status = #{status}
@@ -114,6 +123,10 @@
         </foreach>
     </update>
 
-
+    <update id="updateProfileImage">
+        UPDATE User
+        SET user_profile_image = #{profileImage}
+        WHERE user_id = #{userId}
+    </update>
 
 </mapper>

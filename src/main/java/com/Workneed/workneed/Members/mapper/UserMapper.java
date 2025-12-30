@@ -45,7 +45,7 @@ public interface UserMapper {
     //프로필이미지 업데이트
     void updateProfileImage(
             @Param("userId") Long userId,
-            @Param("imageUrl") String imageUrl
+            @Param("profileImage") String profileImage
     );
 
     UserDTO findByNameAndEmail(

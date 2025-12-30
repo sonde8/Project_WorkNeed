@@ -20,7 +20,7 @@ public interface AdminUserMapper {
     void updateMemberStatus(UserDTO userDto);
 
     // 3. 별도의 신규 관리자 계정 생성 (계정 발급용)
-    void insertNewAdmin(AdminUserDTO adminDto);
+    void insertAdmin(AdminUserDTO adminDto);
 
     // 4. 휴가/결재 요청 처리 (명세서 4번 하단 기능 예상)
     void processRequest(@Param("requestId") Long requestId,
