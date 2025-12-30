@@ -1,0 +1,128 @@
+.att-lv{
+    display : flex;
+    gap: 20px;
+}
+
+/* 오른쪽 */
+.right_2{
+    width: 870px;
+    height: 845px;
+    border: 1px solid black;
+    box-sizing: border-box;
+    padding: 18px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.yearChart{
+    border: 1px solid black;
+    padding: 12px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 65px;
+}
+
+.yearBtn{
+    border: none;
+    background: transparent;
+    font-size: 25px;
+    cursor: pointer;
+}
+
+.yearTxt{
+    font-size: 25px;
+    font-weight: 800;
+}
+
+.leaveSummary{
+    border: 1px solid black;
+    padding: 15px 10px;
+
+    display: grid;
+    grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr;
+    align-items: center;
+    text-align: center;
+}
+
+.leaveSum{
+    display: grid;
+    gap: 20px;
+    padding: 10px 0;
+}
+
+.sumTitle{
+    font-size: 25px;
+    font-weight: 800;
+}
+
+.sumValue{
+    font-size: 20px;
+    font-weight: 800;
+}
+
+.divide{
+    width: 3px;
+    height: 90px;
+    background: black;
+    justify-self: center;
+}
+
+.LeaveTitle{
+    border: 1px solid black;
+    padding: 10px 12px;
+    font-size: 20px;
+    font-weight: 500;
+}
+
+.leaveWrap{
+    flex: 1 1 auto;
+    overflow-y: auto;
+    border: 2px solid black;
+}
+
+
+.colCheck{ width: 52px; }
+
+.leaveTable input[type="checkbox"]{
+    transform: scale(1.1);
+}
+
+
+.leaveFooter{
+    display: flex;
+    justify-content: flex-end;
+}
+
+.footerBtn{
+    padding: 10px 20px;
+    font-size: 15px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+
+/* 테이블 */
+.leaveTable{
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.leaveTable thead th{
+    position: sticky;
+    top: 0;
+    z-index: 2;
+}
+
+.leaveTable th,
+.leaveTable td{
+    border: 1px solid black;
+    padding: 16px 10px;
+    text-align: center;
+    font-size: 18px;
+}
+
