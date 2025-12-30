@@ -13,6 +13,7 @@
         <result property="lastMessageTime" column="last_message_time"/>
         <result property="lastMessageType" column="last_message_type"/>
         <result property="userCount" column="user_count"/>
+        <result property="unreadCount" column="unread_count"></result>
     </resultMap>
 
     <!-- 채팅방 생성 -->
@@ -58,7 +59,17 @@
             (SELECT message_type FROM Message WHERE room_id = cr.room_id ORDER BY message_id DESC LIMIT 1) AS last_message_type,
 
             -- [파생 필드] 마지막 메시지 시간 조회 (정렬용)
-            (SELECT created_at FROM Message WHERE room_id = cr.room_id ORDER BY message_id DESC LIMIT 1) AS last_message_time
+            (SELECT created_at FROM Message WHERE room_id = cr.room_id ORDER BY message_id DESC LIMIT 1) AS last_message_time,
+
+            -- 내가 읽지 않은 메세지 개수 조회
+            -- 1. 해당 방의 메세지 중
+            -- 2. 메세지 읽음 상태 테이블에 나의 기록이 안 읽음 것들만 카운트
+            (SELECT COUNT(*)
+            FROM Message m
+            JOIN MessageReadStatus mrs ON m.message_id = mrs.message_id
+            WHERE m.room_id = cr.room_id
+            AND mrs.user_id = #{userId}
+            AND mrs.is_read = 0) AS unread_count
 
         FROM ChatRoom cr
             INNER JOIN RoomParticipant rp ON cr.room_id = rp.room_id
@@ -71,10 +82,10 @@
     <select id="getParticipantNamesExceptMe" resultType="string">
         SELECT u.user_name
         FROM RoomParticipant rp
-                 JOIN User u ON rp.user_id = u.user_id
+        JOIN User u ON rp.user_id = u.user_id
         WHERE rp.room_id = #{roomId}
-          AND rp.user_id != #{userId}
-          AND rp.left_at IS NULL
+        AND rp.user_id != #{userId}
+        AND rp.left_at IS NULL
         ORDER BY u.user_name ASC
     </select>
 
@@ -98,4 +109,66 @@
         SET left_at = NOW()
         WHERE room_id = #{param1} AND user_id = #{param2}
     </update>
+
+    <select id="findAllParticipantIdsByRoomId" resultType="long">
+        SELECT user_id
+        FROM RoomParticipant
+        WHERE room_id = #{roomId}
+        AND left_at IS NULL
+    </select>
+
+    <!-- 채팅방 검색 -->
+    <select id="searchUserRooms" resultMap="ChatRoomResultMap">
+        SELECT DISTINCT
+            cr.room_id,
+            cr.room_name,
+            cr.room_type,
+            cr.creator_id,
+            cr.created_at,
+
+        -- 마지막 메시지 내용
+        (SELECT content FROM Message WHERE room_id = cr.room_id ORDER BY message_id DESC LIMIT 1) AS last_message_content,
+        -- 마지막 메시지 타입
+        (SELECT message_type FROM Message WHERE room_id = cr.room_id ORDER BY message_id DESC LIMIT 1) AS last_message_type,
+        -- 마지막 메시지 시간
+        (SELECT created_at FROM Message WHERE room_id = cr.room_id ORDER BY message_id DESC LIMIT 1) AS last_message_time,
+
+        -- 안 읽은 개수 표시 (FROM 절 이전에 위치해야 합니다)
+        (SELECT COUNT(*)
+        FROM Message m
+        JOIN MessageReadStatus mrs ON m.message_id = mrs.message_id
+        WHERE m.room_id = cr.room_id
+        AND mrs.user_id = #{userId}
+        AND mrs.is_read = 0) AS unread_count
+
+        FROM ChatRoom cr
+            INNER JOIN RoomParticipant rp ON cr.room_id = rp.room_id
+            LEFT JOIN RoomParticipant rp2 ON cr.room_id = rp2.room_id
+            LEFT JOIN User u ON rp2.user_id = u.user_id
+        WHERE rp.user_id = #{userId}
+            AND rp.left_at IS NULL
+            AND (
+            cr.room_name LIKE CONCAT('%', #{keyword}, '%')
+            OR u.user_name LIKE CONCAT('%', #{keyword}, '%')
+            )
+        ORDER BY last_message_time DESC, cr.created_at DESC
+    </select>
+
+    <!-- 읽음 상태 확인 -->
+    <update id="updateReadStatus">
+        UPDATE MessageReadStatus
+        SET is_read = 1
+        WHERE user_id = #{userId}
+        AND message_id IN (SELECT message_id FROM Message WHERE room_id = #{roomId})
+        AND is_read = 0
+    </update>
+
+    <insert id="insertInitialReadStatus">
+        INSERT INTO MessageReadStatus (message_id, user_id, is_read)
+        SELECT #{messageId}, user_id, 0
+        FROM RoomParticipant
+        WHERE room_id = #{roomId}
+        AND user_id != #{senderId}
+        AND left_at IS NULL
+    </insert>
 </mapper>

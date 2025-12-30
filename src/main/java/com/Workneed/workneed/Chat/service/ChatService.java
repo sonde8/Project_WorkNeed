@@ -8,6 +8,7 @@ import com.Workneed.workneed.Chat.mapper.ChatUserMapper;
 import com.Workneed.workneed.Chat.mapper.FileLogMapper;
 import com.Workneed.workneed.Chat.mapper.MessageMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +33,9 @@ public class ChatService {
 
     @Autowired
     private FileLogMapper fileLogMapper;
+
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
 
     // 1. 채팅방 관리 로직
 
@@ -66,6 +70,12 @@ public class ChatService {
                     chatRoomMapper.addParticipant(roomDTO.getRoomId(), targetUserId);
                 }
             }
+        }
+
+        // 1-1-5. 실시간 채팅방 생성 알림
+        for (Long targetId : inviteUserIds) {
+            // 각 유저의 개인 채널로 전송
+            messagingTemplate.convertAndSend("/sub/user/" + targetId + "/rooms", roomDTO);
         }
         return roomDTO;
     }
@@ -119,6 +129,11 @@ public class ChatService {
         // 기존에 구현한 sendSystemMessage 호출
         // 내부 로직에 의해 GROUP 방일 때만 메세지가 DB에 저장되고 발송
         MessageDTO leaveMsg = sendSystemMessage(roomId, userId, "LEAVE");
+
+        // 1-5-3. 소켓을 통해 다른 사람들에게 퇴장 알림 전송
+        if (leaveMsg != null) {
+            messagingTemplate.convertAndSend("/sub/chat/room/" + roomId, leaveMsg);
+        }
     }
 
 
@@ -133,15 +148,20 @@ public class ChatService {
             messageDTO.setMessageType(messageDTO.getMessageType().trim());
         }
 
-        // DB 저장
         if (messageDTO.getCreatedAt() == null) {
             messageDTO.setCreatedAt(LocalDateTime.now());
         }
 
+        // DB 저장
         messageMapper.insertMessage(messageDTO);
 
-        // 로그를 찍어 파일로그 아이디가 넘어오는지 확인
-        System.out.println("전달된 fileLogId: " + messageDTO.getFileLogId());
+        // 타인들의 안 읽음 상태 생성
+        chatRoomMapper.insertInitialReadStatus(messageDTO.getMessageId(), messageDTO.getRoomId(), messageDTO.getSenderId());
+
+        // 메세지 저장 후 즉시 unreadCount 계산
+        // 전체 인원 - 1 을 초기값으로 설정
+        int initialUnread = messageMapper.getUnreadCount(messageDTO.getRoomId(), messageDTO.getMessageId());
+        messageDTO.setUnreadCount(initialUnread);
 
         // 파일이 첨부된 메세지라면 FileLog 테이블에 messageId 업데이트
         if (messageDTO.getFileLogId() != null) {
@@ -160,6 +180,23 @@ public class ChatService {
         // 시간 포맷팅
         if (messageDTO.getCreatedAt() != null) {
             messageDTO.setDisplayTime(messageDTO.getCreatedAt().format(DateTimeFormatter.ofPattern("a h:mm")));
+        }
+
+        // 목록 갱신을 위해 방 이름을 조회해서 세팅
+        ChatRoomDTO room = getRoomDetail(messageDTO.getRoomId(), messageDTO.getSenderId());
+        if (room != null) {
+            messageDTO.setRoomName(room.getRoomName());
+        }
+
+        // 1. 방 채널로 메시지 전송 (방 내부에 있는 사람들용)
+        messagingTemplate.convertAndSend("/sub/chat/room/" + messageDTO.getRoomId(), messageDTO);
+
+        // 2. [추가] 방 참여자 전원의 개인 채널로 메시지 전송 (방 외부에 있는 사람들 목록/배지 갱신용)
+        List<Long> participantIds = chatRoomMapper.findAllParticipantIdsByRoomId(messageDTO.getRoomId());
+        for (Long participantId : participantIds) {
+            // 본인이 보낸 메시지도 목록 상단 이동을 위해 전송하거나, 타인에게만 보낼지 선택 가능
+            // 여기서는 모든 참여자의 목록을 실시간으로 갱신하기 위해 전원에게 발송합니다.
+            messagingTemplate.convertAndSend("/sub/user/" + participantId + "/rooms", messageDTO);
         }
 
         return messageDTO;
@@ -227,9 +264,15 @@ public class ChatService {
     // 2-4. 실시간 읽음 상태
     // 메세지 목록을 불러오지 않고 단순히 읽음 상태만 최신화 할 때 사용
     @Transactional
+    public void markAsRead(Long roomId, Long userId) {
+        // ChatRoomMapper.xml에 작성한 <update id="updateReadStatus">를 호출합니다.
+        chatRoomMapper.updateReadStatus(roomId, userId);
+    }
+
+    @Transactional
     public void updateMessageReadStatus(Long roomId, Long userId) {
         // 이미 Mapper에 만들어두신 메서드를 호출합니다.
-        messageMapper.insertReadReceipt(roomId, userId);
+        this.markAsRead(roomId, userId);
     }
 
     // 2-5. 단체 메세지 초대 시스템 메세지
@@ -266,5 +309,25 @@ public class ChatService {
     public List<UserDTO> getAllUsersWithDept() {
         // 수정된 ChatUserMapper의 쿼리 실행
         return chatUserMapper.findAllUsersWithDept();
+    }
+
+    // 4. 사이드바
+    public List<Long> getParticipantIds(Long roomId) {
+        return chatRoomMapper.findAllParticipantIdsByRoomId(roomId);
+    }
+
+    // 5. 채팅방 검색
+    public List<ChatRoomDTO> searchRooms(Long userId, String keyword) {
+        List<ChatRoomDTO> rooms = chatRoomMapper.searchUserRooms(userId, keyword);
+
+        if (rooms != null) {
+            for (ChatRoomDTO room : rooms) {
+                // [중요] 1:1 채팅방(DIRECT)은 roomName이 null이므로 여기서 상대방 이름으로 채워줘야 함
+                if (room.getRoomName() == null || room.getRoomName().trim().isEmpty()) {
+                    room.setRoomName(generateAutoRoomName(room.getRoomId(), userId));
+                }
+            }
+        }
+        return rooms;
     }
 }

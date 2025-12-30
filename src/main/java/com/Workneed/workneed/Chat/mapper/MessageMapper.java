@@ -23,4 +23,8 @@ public interface MessageMapper {
     // 4. 메세지 읽음 처리를 위한 로직
     void insertReadReceipt(@Param("roomId") Long roomId, @Param("userId") Long userId);
     void insertSingleReadReceipt(@Param("messageId") Long messageId, @Param("userId") Long userId);
+
+    // 5. 특정 메세지의 현재 안 읽은 인원수 조회
+    // XML의 #{roomId}와 #{messageId}에 값을 바인딩합니다.
+    int getUnreadCount(@Param("roomId") Long roomId, @Param("messageId") Long messageId);
 }
