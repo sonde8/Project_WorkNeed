@@ -29,5 +29,7 @@ content : 1340px를 max로 넣어주세요
     <th:block layout:fragment="script">
         <script th:src="@{각자js}"></script>
     </th:block>
+
+
 </body>
 </html>

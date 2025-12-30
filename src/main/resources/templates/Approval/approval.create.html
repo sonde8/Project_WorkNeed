@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+
+<head>
+    <meta charset="UTF-8"/>
+    <title>문서 작성</title>
+
+    <th:block layout:fragment="head">
+        <link rel="stylesheet" th:href="@{/css/approve.css}">
+    </th:block>
+</head>
+
+<body>
+
+<main layout:fragment="content">
+
+    <div class="wrap approval-create">
+
+        <h2 class="page-title">전자결재 문서 작성</h2>
+
+        <form th:action="@{/approval/submit}"
+              method="post"
+              enctype="multipart/form-data">
+
+            <!-- 문서 정보 -->
+            <div class="box">
+                <h3>문서 정보</h3>
+
+                <div class="row">
+                    <label>문서 유형</label>
+                    <select name="typeId">
+                        <option th:each="t : ${types}"
+                                th:value="${t.approvalTypeId}"
+                                th:text="${t.typeName}">
+                        </option>
+                    </select>
+                </div>
+
+                <div class="row">
+                    <label>제목</label>
+                    <input type="text"
+                           name="title"
+                           th:value="${dto != null ? dto.title : ''}"
+                           placeholder="제목을 입력하세요"/>
+                </div>
+
+                <div class="row">
+                    <label>내용</label>
+                    <textarea name="content"
+                              placeholder="내용을 입력하세요"
+                              th:text="${dto != null ? dto.content : ''}">
+                    </textarea>
+                </div>
+            </div>
+
+            <!-- 첨부 파일 -->
+            <div class="box">
+                <h3>첨부 파일</h3>
+
+                <div class="row">
+                     <label>파일</label>
+                    <input type="file" name="files" multiple>
+                </div>
+            </div>
+
+            <!-- 결재자 선택 -->
+            <div class="box" id="approverBox">
+                <h3>결재자 선택</h3>
+                <p class="meta">체크 후 “현재 차수에 추가”를 누르십시오.</p>
+
+                <div class="list">
+                    <div th:each="a : ${approverCandidates}">
+                        <label>
+                            <input type="checkbox"
+                                   class="candChk"
+                                   th:value="${a.userId}"
+                                   th:data-name="${a.username}"
+                                   th:data-dept="${a.deptName}"
+                                   th:data-rank="${a.rankName}">
+                            <span th:text="${a.username}"></span>
+                            (
+                            <span th:text="${a.deptName}"></span>
+                            /
+                            <span th:text="${a.rankName}"></span>
+                            )
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 결재선 구성 -->
+            <div class="box">
+                <h3>결재선 구성</h3>
+
+                <div class="btns" style="justify-content:flex-start; margin:10px 0;">
+                    <button type="button" id="btnPrevOrder">-</button>
+
+                    <span>
+                        현재 차수:
+                        <b id="orderBadge">1</b>
+                    </span>
+
+                    <button type="button" id="btnNextOrder">+</button>
+                    <button type="button" id="btnAddToCurrent">현재 차수에 추가</button>
+                    <button type="button" id="btnClear">전체 초기화</button>
+                </div>
+
+                <div id="linePreview" class="list"></div>
+            </div>
+
+            <!-- hidden inputs -->
+            <div id="hiddenContainer"></div>
+
+            <!-- 하단 버튼 -->
+            <div class="btns">
+                <button type="submit" formaction="/approval/save">임시저장</button>
+
+                <button type="button"
+                        id="btnOpenSubmitModal"
+                        class="primary">
+                    제출
+                </button>
+            </div>
+
+            <!-- 제출 확인 모달 -->
+            <div class="modal" id="submitModal" aria-hidden="true">
+                <div class="modal__backdrop" data-close="1"></div>
+
+                <div class="modal__panel"
+                     role="dialog"
+                     aria-modal="true"
+                     aria-labelledby="submitModalTitle">
+
+                    <div class="modal__head">
+                        <h3 id="submitModalTitle">제출 확인</h3>
+                        <button type="button"
+                                class="modal__x"
+                                data-close="1">✕</button>
+                    </div>
+
+                    <div class="modal__body">
+                        <p class="modal__desc">
+                            결재선을 확인한 뒤 “결재하기”를 누르면 제출됩니다.
+                        </p>
+
+                        <div id="modalLineSummary" class="modal__summary"></div>
+                    </div>
+
+                    <div class="modal__foot">
+                        <button type="button"
+                                class="btn"
+                                data-close="1">취소</button>
+
+                        <button type="submit"
+                                class="btn primary">
+                            결재하기
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+    </div>
+
+</main>
+
+<th:block layout:fragment="script">
+    <script th:src="@{/js/approval.js}" defer></script>
+</th:block>
+
+</body>
+</html>
