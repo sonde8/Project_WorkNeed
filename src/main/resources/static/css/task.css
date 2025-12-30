@@ -233,3 +233,416 @@ a{
     font-weight: 700;
     cursor: pointer;
 }
+
+/*etc*/
+#etc{
+    display: flex;
+    flex-direction: column;
+    grid-column: 2;
+    grid-row: 1 / span 2
+}
+.etc-block{
+    padding: 1rem;
+    margin: 1rem;
+}
+#etc-chart{
+    display: flex;
+    margin: 4rem auto;
+}
+#etc-chart button{
+    border: none;
+}
+canvas{
+    width: 18rem !important;
+    height: 18rem !important;
+}
+#etc-chart .progress-header{
+    margin-top: 3rem;
+    font-weight: 700;
+    font-size: 1.6rem;
+}
+
+#etc-file,
+#etc-git{
+    padding: 2rem 1rem;
+    border-radius: 0.5rem;
+    border: 0.1rem solid rgba(0, 0, 0, 0.2);
+}
+.btn-etc-edit,
+.btn-etc-save,
+.btn-etc-cancel {
+    height: 2rem;
+    padding: 0.5rem;
+    margin: 0 0.3rem;
+    border-radius: 0.5rem;
+    border: 0.1rem solid rgba(0, 0, 0, 0.2);
+    background: #eee;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+}
+.etc-label{
+    font-size: 1.4rem;
+    font-weight: 900;
+    opacity: 0.6;
+    padding: 0.5rem;
+}
+.etc-view{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    position: relative;
+}
+.no-url{
+    margin: 1rem auto;
+    opacity: 0.6;
+    font-size: 1rem;
+}
+.etc-edit{
+    text-align: center;
+}
+.etc-edit input{
+    margin: 2rem;
+    padding: 0.4rem;
+    border: 0.1rem solid rgba(0, 0, 0, 0.2);
+}
+.btn-etc-delete{
+    position: absolute;
+    font-size: 1rem;
+    font-weight: 600;
+    top: 0.3rem;
+    right: 0.3rem;
+    background-color: transparent;
+    border: none; !important
+}
+.etc-edit { display: none; }
+.etc-block.is-editing .etc-view { display: none; }
+.etc-block.is-editing .etc-edit { display: block;}
+
+
+
+.btn-send-message-modal{
+    display: flex;
+    align-items: flex-end;
+    border: none;
+    margin: 0 1rem 0 auto;
+}
+.btn-send-message-modal img{
+
+}
+
+
+/* ===== Modal ===== */
+
+#modal-backdrop{
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.45);
+    z-index: 1000;
+}
+#sendMessageModal,
+#memberPerformanceModal,
+#memberTasksModal{
+    display: none;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    inset: 0;
+    place-items: center;
+    z-index: 1001;
+    padding: 2.4rem;
+}
+#sendMessageModal.is-open,
+#memberPerformanceModal.is-open,
+#memberTasksModal.is-open{
+    display: flex;
+}
+#sendMessageModal-panel,
+#memberPerformanceModal-panel,
+#memberTasksModal-panel{
+    width: 70rem;
+    padding: 2rem;
+    background: #fff;
+    border-radius: 0.5rem;
+    box-shadow: 0 1.8rem 5rem rgba(0,0,0,.25);
+    position: relative;
+}
+#memberTasksModal-panel{
+    padding-bottom: 4rem;
+}
+.modal-header{
+    padding: 1.8rem;
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+.x-btn{
+    position: absolute;
+    font-weight: 700;
+    top: 2rem;
+    right: 1rem;
+    width: 4rem;
+    height: 4rem;
+    background-color: transparent;
+    border: 0;
+    border-radius: 1rem;
+    cursor: pointer;
+}
+.x-btn:hover{
+    color: red;
+}
+
+
+/*sendMessageModal*/
+.owner{
+    position: absolute;
+    top: 7rem;
+    right: 7rem;
+}
+.owner-row{
+    display: flex;
+    align-items: center;
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+.owner-img{
+    width: 4rem;
+    opacity: 0.8;
+}
+.member{
+    display: flex;
+    margin: 6rem auto 2rem;
+    justify-content: center;
+}
+
+.member-list{
+    display: none;
+    position: absolute;
+    list-style: none;
+    font-size: 1rem;
+    top: 12rem;
+    right: 10rem;
+
+
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 0.8rem;
+    padding: 0.6rem 0.8rem;
+    min-width: 16rem;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    z-index: 1010;
+}
+.member-img:hover + .member-list {
+    display: block;
+}
+#btn-start-chat{
+    display: block;
+    height: 4rem;
+    padding: 1rem;
+    margin: 3rem auto;
+    border-radius: 0.5rem;
+    border: 0.1rem solid rgba(0, 0, 0, 0.6);
+    background: #eee;
+    font-size: 1.5rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+
+/*memberPerformance Modal*/
+.performance-summary{
+    text-align: end;
+    padding: 1rem 3rem;
+    font-size: 1.3rem;
+    font-weight: 800;
+}
+.performance-head{
+    margin: 3.5rem auto 1.6rem;
+    width: min(92rem, 94%);
+}
+.performance-body{
+    width: min(92rem, 94%);
+    margin: 0 auto;
+    padding-bottom: 2rem ;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+.performance-grid{
+    display: grid;
+    grid-template-columns: 26rem 1fr 1fr 1fr;
+    align-items: center;
+    column-gap: 1.8rem;
+}
+.performance-grid.head{
+    padding: 0 1.4rem;
+}
+.head-cell{
+    font-size: 1.4rem;
+    font-weight: 700;
+    text-align: center;
+    color: rgba(0,0,0,0.75);
+}
+.head-cell:first-child{
+    text-align: left;
+}
+.performance-row{
+    border: 0.1rem solid rgba(0,0,0,0.08);
+    border-radius: 1.2rem;
+    background: #fff;
+}
+.performance-row .performance-grid{
+    padding: 1.4rem;
+}
+.member-cell{
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    min-width: 0;
+}
+.member-avatar{
+    width: 3.8rem;
+    height: 3.8rem;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 0.1rem solid rgba(0,0,0,0.08);
+    flex: 0 0 auto;
+}
+.member-text{
+    min-width: 0;
+}
+.member-name{
+    font-size: 1.4rem;
+    font-weight: 700;
+    line-height: 1.1;
+    white-space: nowrap;
+    overflow: hidden;
+}
+.member-meta{
+    margin-top: 0.2rem;
+    font-size: 1.2rem;
+    color: rgba(0,0,0,0.55);
+    white-space: nowrap;
+}
+.cell{
+    text-align: center;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: rgba(0,0,0,0.85);
+}
+.performance-row:hover{
+    background: rgba(0,0,0,0.02);
+    border-color: rgba(0,0,0,0.12);
+}
+
+/*member Task Modal*/
+
+.tasks-summary {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1.2rem;
+    margin: 1.6rem 0 1.8rem;
+}
+
+.tasks-summary > div {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0.8rem 1.2rem;
+    border: 0.1rem solid rgba(0, 0, 0, 0.08);
+    border-radius: 1rem;
+    font-size: 1.3rem;
+    font-weight: 700;
+    background: rgba(255, 255, 255, 0.7);
+}
+.tasks-summary span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.8rem;
+    height: 2.2rem;
+    border-radius: 0.8rem;
+    font-size: 1.3rem;
+    font-weight: 800;
+    background: rgba(0, 0, 0, 0.06);
+}
+.tasks-section-title {
+    font-size: 1.4rem;
+    font-weight: 800;
+    margin: 2rem 0 0.8rem;
+}
+.tasks-section {
+    margin: 1.6rem auto;
+}
+
+#doingTaskList,
+#todoTaskList,
+#doneTaskList{
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.task-item {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    padding: 1rem 1.2rem;
+    border: 0.1rem solid rgba(0, 0, 0, 0.08);
+    border-radius: 1.2rem;
+    background: #fff;
+}
+.task-text {
+    font-size: 1.2rem;
+    font-weight: 500;
+    line-height: 1.3;
+    word-break: break-word;
+}
+
+#memberTasksModal .loading,
+#memberTasksModal .empty,
+#memberTasksModal .error {
+    padding: 1.4rem;
+    border-radius: 1.2rem;
+    border: 0.1rem dashed rgba(0, 0, 0, 0.18);
+    font-size: 1.3rem;
+    text-align: center;
+    background: rgba(0, 0, 0, 0.02);
+}
+.task-item { cursor: grab; }
+.task-item:active { cursor: grabbing; }
+.drag-ghost { opacity: 0.5; }
+
+
+.task-add{
+    text-align: end;
+    margin: 3rem 2rem 0;
+}
+.task-add-trigger {
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 0.5rem;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 0.6rem 1rem;
+}
+.task-add-form.hidden {
+    display: none;
+}
+.task-add-form {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+.task-add-form input {
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    flex: 1;
+    padding: 0.7rem;
+    margin: 0rem 3rem;
+}
+.btn-add, .btn-cancel{
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 0.5rem;
+    padding: 0.3rem;
+    font-size: 1rem;
+}

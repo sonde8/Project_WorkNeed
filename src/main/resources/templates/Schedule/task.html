@@ -9,7 +9,7 @@
         <link rel="stylesheet" th:href="@{/css/task.css}">
     </th:block>
 </head>
-<body>
+<body th:data-schedule-id="${schedule.scheduleId}">
 <main layout:fragment="content">
 
     <a th:href="@{/schedule/kanban}">← Back to Kanban</a>
@@ -82,16 +82,180 @@
         </div>
 
         <div class="block" id="etc">
-            <div id="etc-image"></div>
+            <div class="etc-block" id="etc-image">
+                <button type="button" class="btn-send-message-modal" th:attr="data-schedule-id=${schedule.scheduleId}">
+                    <!--임시 이미지-->
+                    <img src="/images/person300.svg">
+                    <img src="/images/team2_300.svg">
 
-            <div id="etc-chart"></div>
-            <div id="etc-file-str"></div>
-            <div id="etc-git-url"></div>
+                </button>
+            </div>
+
+            <div class="etc-block"id="etc-chart">
+                <button type="button" class="btn-member-performance-modal" th:attr="data-schedule-id=${schedule.scheduleId}">
+                <div class="progress-widget">
+                    <canvas id="scheduleProgressChart"></canvas>
+                    <div class="progress-header">
+                        진행률
+                        <span class="progress-percent" id="scheduleProgressText">0%</span>
+                    </div>
+                </div>
+                </button>
+            </div>
+
+            <div class="etc-block"id="etc-file">
+
+                <div class="file-view etc-view">
+                    <div class="etc-label">File 저장소</div>
+
+                    <a class="etc-url" th:if="${schedule.fileStorageUrl != null}"
+                       th:href="${schedule.fileStorageUrl}" target="_blank" th:text="${schedule.fileStorageUrl}"></a>
+
+                    <span class="no-url" th:if="${schedule.fileStorageUrl == null }">등록된 File 저장소가 없습니다</span>
+                    <button type="button" class="btn-etc-edit">Edit</button>
+
+                    <form th:if="${schedule.fileStorageUrl != null}"
+                          th:action="@{/schedule/{id}/file/delete(id=${schedule.scheduleId})}"
+                          method="post" class="etc-delete-form">
+                        <button type="submit" class="btn-etc-delete"> X </button>
+                    </form>
+                </div>
+                <div class="file-edit etc-edit">
+                    <form th:action="@{/schedule/{id}/file/update(id=${schedule.scheduleId})}" method="post">
+                        <input type="text" name="fileStorageUrl" placeholder="File URL"
+                               th:value="${schedule.fileStorageUrl}"
+                               th:attr="data-original=${schedule.fileStorageUrl}" />
+                        <button type="submit" class="btn-etc-save">Save</button>
+                        <button type="button" class="btn-etc-cancel">Cancel</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="etc-block"id="etc-git">
+
+                <div class="git-view etc-view">
+                    <div class="etc-label">Git 저장소</div>
+
+                    <a class="etc-url" th:if="${schedule.gitUrl != null}"
+                       th:href="${schedule.gitUrl}" target="_blank" th:text="${schedule.gitUrl}"></a>
+                    <span class="no-url" th:if="${schedule.gitUrl == null}">등록된 Git 저장소가 없습니다</span>
+                    <button type="button" class="btn-etc-edit">Edit</button>
+
+                    <form th:if="${schedule.gitUrl != null}"
+                          th:action="@{/schedule/{id}/git/delete(id=${schedule.scheduleId})}"
+                          method="post" class="etc-delete-form">
+                        <button type="submit" class="btn-etc-delete"> X </button>
+                    </form>
+                </div>
+                <div class="git-edit etc-edit">
+                    <form th:action="@{/schedule/{id}/git/update(id=${schedule.scheduleId})}" method="post">
+                        <input type="text"
+                               name="gitUrl"
+                               placeholder="Git URL"
+                               th:value="${schedule.gitUrl}"
+                               th:attr="data-original=${schedule.gitUrl}" />
+                        <button type="submit" class="btn-etc-save">Save</button>
+                        <button type="button" class="btn-etc-cancel">Cancel</button>
+                    </form>
+                </div>
+
+            </div>
+
         </div>
     </div>
 
+    <div class="modal-backdrop" id="modal-backdrop" hidden></div>
+
+    <div class="modal" id="sendMessageModal" >
+        <div class="modal-panel" id="sendMessageModal-panel">
+
+            <header class="modal-header">send message</header>
+            <button type="button" class="x-btn"> x </button>
+
+            <div class="owner"></div>
+            <div class="member"></div>
+            <button type="button" id="btn-start-chat">Start Chat</button>
+
+        </div>
+    </div>
+
+    <div class="modal" id="memberPerformanceModal" >
+        <div class="modal-panel" id="memberPerformanceModal-panel">
+
+            <header class="modal-header">member performance</header>
+            <button type="button" class="x-btn"> x </button>
+
+            <div class="performance-summary" id="scheduleProgressRateText">
+                현재 진행률 0%
+            </div>
+            <div class="performance-head">
+                <div class="performance-grid head">
+                    <div class="head-cell"></div>
+                    <div class="head-cell">미완료 Task</div>
+                    <div class="head-cell">완료 Task</div>
+                    <div class="head-cell">진행률</div>
+                </div>
+            </div>
+            <div class="performance-body" id="performanceList">
+                <!-- member row-->
+            </div>
+
+
+        </div>
+    </div>
+
+    <div class="modal" id="memberTasksModal">
+        <div class="modal-panel" id="memberTasksModal-panel">
+
+            <button type="button" class="x-btn">x</button>
+
+            <div class="member-cell" id="memberInfoBox">
+                <img class="member-avatar" id="memberAvatar" src="/img/default-avatar.png" alt="" />
+                <div class="member-text">
+                    <div class="member-name" id="memberName">-</div>
+                    <div class="member-meta" id="memberMeta"></div>
+                </div>
+            </div>
+
+            <div class="tasks-summary">
+                <div>PENDING <span id="pendingCountText">00</span></div>
+                <div>DONE <span id="doneCountText">00</span></div>
+            </div>
+
+            <div class="task-add" id="taskAddBox">
+                <button type="button" class="task-add-trigger" id="taskAddTrigger">
+                    + Add task
+                </button>
+
+                <form id="memberTaskAddForm" class="task-add-form hidden">
+                    <input id="memberTaskDescInput" type="text"  placeholder="task 입력" autocomplete="off"/>
+                    <button type="submit" class="btn-add">add</button>
+                    <button type="button" class="btn-cancel" id="taskAddCancel">cancle</button>
+                </form>
+            </div>
+
+            <div class="tasks-section-title">TODO</div>
+            <div class="tasks-section task-list" id="todoTaskList" data-status="TODO">
+            </div>
+
+            <div class="tasks-section-title">DOING</div>
+            <div class="tasks-section task-list" id="doingTaskList" data-status="DOING">
+            </div>
+
+            <div class="tasks-section-title">DONE</div>
+            <div class="tasks-section task-list" id="doneTaskList" data-status="DONE">
+            </div>
+
+
+        </div>
+    </div>
 </main>
+
 <th:block layout:fragment="script">
+    <!-- 그래프 차트    -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- 드래그 이동 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
     <script th:src="@{/js/task.js}"></script>
 </th:block>
 </body>

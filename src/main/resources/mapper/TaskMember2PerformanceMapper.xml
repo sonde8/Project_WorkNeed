@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.Workneed.workneed.Schedule.mapper.TaskMember2PerformanceMapper">
+
+    <select id="selectTasksByStatus" resultType="com.Workneed.workneed.Schedule.dto.TaskMember2PerformanceDTO">
+        SELECT
+            mt.task_id AS taskId,
+            mt.task_description AS taskDescription,
+            mt.personal_status AS personalStatus
+        FROM my_task mt
+        WHERE mt.schedule_id = #{scheduleId}
+            AND mt.user_id = #{userId}
+            AND mt.personal_status = #{status}
+        ORDER BY mt.task_id DESC
+    </select>
+
+    <select id="countTasksByStatus" resultType="int">
+        SELECT COUNT(*)
+        FROM my_task mt
+        WHERE mt.schedule_id = #{scheduleId}
+            AND mt.user_id = #{userId}
+            AND mt.personal_status = #{status}
+    </select>
+
+    <insert id="insertMemberTask">
+        INSERT INTO my_task (
+        schedule_id,
+        user_id,
+        task_description,
+        personal_status
+        )
+        VALUES (
+        #{scheduleId},
+        #{userId},
+        #{taskDescription},
+        'TODO'
+        )
+    </insert>
+
+    <update id="updateTaskStatus">
+        UPDATE my_task
+        SET personal_status = #{personalStatus}
+        WHERE task_id = #{taskId}
+        AND schedule_id = #{scheduleId}
+        AND user_id = #{userId}
+    </update>
+
+</mapper>
