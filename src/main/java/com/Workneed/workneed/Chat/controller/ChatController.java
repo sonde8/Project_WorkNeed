@@ -23,12 +23,7 @@ public class ChatController {
      */
     @MessageMapping("/chat/sendMessage")
     public void sendMessage(MessageDTO message) {
-        // 1. 서비스 호출 : DB 저장 및 가공
-        MessageDTO savedMessage = chatService.saveMessage(message);
-
-        // 2. 가공된 메시지를 해당 방 구독자들에게 전송
-        // savedMessage.getRoomId()를 통해 해당 방 경로로 브로드캐스팅
-        messagingTemplate.convertAndSend("/sub/chat/room/" + savedMessage.getRoomId(), savedMessage);
+        chatService.saveMessage(message);
     }
 
     @MessageMapping("/chat/read")

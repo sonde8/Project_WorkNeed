@@ -5,6 +5,71 @@
     <title>Title</title>
 </head>
 <body>
-
+<aside th:fragment="sidebar" class="sidebar">
+    <nav class="sidebar-nav">
+        <ul>
+            <li class="nav-item">
+                <a th:href="@{/main}">
+                    <span class="icon">
+                        <img th:src="@{/images/home300.svg}" alt="홈">
+                    </span>
+                    <span class="text">
+                        홈
+                    </span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a th:href="@{/chat/rooms}">
+                    <span class="icon">
+                    <img th:src="@{/images/chat300.svg}" alt="채팅">
+                </span>
+                    <span class="text">
+                        채팅
+                </span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a th:href="@{/main}">
+                    <span class="icon">
+                        <img th:src="@{/images/work300.svg}" alt="업무">
+                    </span>
+                    <span class="text">
+                        업무
+                    </span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a th:href="@{/main}">
+                    <span class="icon">
+                        <img th:src="@{/images/calendar300.svg}" alt="캘린더">
+                    </span>
+                    <span class="text">
+                        캘린더
+                    </span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a th:href="@{/main}">
+                    <span class="icon">
+                        <img th:src="@{/images/approval300.svg}" alt="결재">
+                    </span>
+                    <span class="text">
+                        결재
+                    </span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a th:href="@{/main}">
+                    <span class="icon">
+                        <img th:src="@{/images/timeclock.svg}" alt="근태관리">
+                    </span>
+                    <span class="text">
+                        근태관리
+                    </span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</aside>
 </body>
 </html>

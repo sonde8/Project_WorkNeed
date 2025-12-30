@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.Workneed.workneed.Members.mapper.AdminUserMapper">
+
+    <select id="findAllMembersForAdmin" resultType="com.Workneed.workneed.Members.dto.UserDTO">
+        SELECT u.*, r.rank_name AS rankname, d.dept_name AS deptname
+        FROM User u
+        LEFT JOIN Ranks r ON u.rank_id = r.rank_id
+        LEFT JOIN Dept d ON u.dept_id = d.dept_id
+    </select>
+
+    <select id="findByAdminEmail" resultType="com.Workneed.workneed.Members.dto.AdminUserDTO">
+        SELECT
+        admin_id AS adminId,
+        admin_email AS adminEmail,
+        admin_password AS adminPassword,
+        admin_name AS adminName,
+        role_id AS roleId,
+        admin_status AS adminStatus,
+        admin_last_login_at AS adminLastLoginAt,
+        admin_created_at AS adminCreatedAt
+        FROM AdminUser
+        WHERE admin_email = #{adminEmail}
+    </select>
+
+
+    <insert id="insertAdmin" parameterType="com.Workneed.workneed.Members.dto.AdminUserDTO">
+        INSERT INTO AdminUser (
+        admin_email,
+        admin_password,
+        admin_name,
+        role_id,
+        admin_status,
+        admin_created_at
+        )
+        VALUES (
+        #{adminEmail},
+        #{adminPassword},
+        #{adminName},
+        #{roleId},
+        #{adminStatus},
+        NOW()
+        )
+    </insert>
+
+
+    <update id="updateMemberStatus">
+        UPDATE User
+        <set>
+            rank_id = #{rankId},
+            dept_id = #{deptId},
+            <if test="userStatus != null">
+                user_status = #{userStatus}
+            </if>
+        </set>
+        WHERE user_id = #{userId}
+    </update>
+
+    <update id="processRequest">
+        UPDATE Request
+        SET status = #{status},
+        admin_id = #{adminId},
+        request_updated_at = NOW()
+        WHERE request_id = #{requestId}
+    </update>
+
+</mapper>

@@ -4,27 +4,23 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 
 <head>
     <meta charset="UTF-8">
-    <title th:text="${pageTitle} ?: 'WORKNEED'">WORKNEED</title>
+    <title layout:fragment="title">WORKNEED</title>
     <link rel="stylesheet" th:href="@{/layout/layout.css}">
-
     <th:block layout:fragment="head"></th:block>
 </head>
 <body>
 
 <div class="main-layout">
-    <aside class="sidebar">
-<!--<aside class="sidebar" th:replace="layout/sidebar :: sidebar">-->
-        <!--사이드바-->
-    </aside>
+
+    <aside class="sidebar" th:replace="layout/sidebar :: sidebar"></aside>
 
     <header class="header">
-<!--<header class="header" th:replace="layout/header :: header">-->
-        <!--헤더-->
+        <div th:replace="~{layout/header :: header}"></div>
     </header>
 
-
-    <main class="content" layout:fragment="content"></main>
-
+    <main class="content">
+        <main class="content" layout:fragment="content"></main>
+    </main>
 </div>
 
 <th:block layout:fragment="script"></th:block>

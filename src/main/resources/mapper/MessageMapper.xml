@@ -24,12 +24,24 @@
             m.room_id,
             m.sender_id,
             m.content,
-            m.message_type,  m.created_at,
-            cu.user_name AS sender_name, (
-                ((SELECT COUNT(*) FROM RoomParticipant WHERE room_id = m.room_id AND left_at IS NULL) - 1)
-                    - (SELECT COUNT(*) FROM MessageReadReceipt WHERE message_id = m.message_id)
-                ) AS unread_count FROM Message m
-                                           JOIN User cu ON m.sender_id = cu.user_id
+            m.message_type,
+            m.created_at,
+            cu.user_name AS sender_name,
+            (
+                SELECT COUNT(*)
+                FROM RoomParticipant rp
+                WHERE rp.room_id = m.room_id
+                  AND rp.left_at IS NULL
+                  AND rp.user_id != m.sender_id  -- 발신자 본인은 카운트에서 제외
+            AND NOT EXISTS (               -- 읽음 기록이 없는 사람만 카운트
+            SELECT 1
+            FROM MessageReadReceipt mrr
+            WHERE mrr.message_id = m.message_id
+            AND mrr.user_id = rp.user_id
+            )
+            ) AS unread_count
+        FROM Message m
+            JOIN User cu ON m.sender_id = cu.user_id
         WHERE m.room_id = #{roomId}
         ORDER BY m.message_id ASC
     </select>
@@ -52,5 +64,12 @@
         WHERE room_id = #{roomId}
         ORDER BY message_id DESC
             LIMIT 1
+    </select>
+
+    <select id="getUnreadCount" resultType="int">
+        SELECT
+            ((SELECT COUNT(*) FROM RoomParticipant WHERE room_id = #{roomId} AND left_at IS NULL) - 1)
+                - (SELECT COUNT(*) FROM MessageReadReceipt WHERE message_id = #{messageId})
+                AS unread_count
     </select>
 </mapper>

@@ -5,29 +5,44 @@
 
 <mapper namespace="com.Workneed.workneed.Members.mapper.RankMapper">
 
-    <select id="findAll" resultType="com.Workneed.workneed.Members.dto.RankDTO">
-        SELECT * FROM Ranks
-    </select>
-
-    <select id="findById" parameterType="long"
+    <select id="findAll"
             resultType="com.Workneed.workneed.Members.dto.RankDTO">
-        SELECT * FROM Ranks WHERE rank_id = #{rankId}
+        SELECT
+        rank_id,
+        rank_name,
+        rank_level,
+        rank_created_at
+        FROM Ranks
     </select>
 
-    <insert id="insertRank" parameterType="com.Workneed.workneed.Members.dto.RankDTO">
+    <select id="findById"
+            parameterType="long"
+            resultType="com.Workneed.workneed.Members.dto.RankDTO">
+        SELECT
+        rank_id,
+        rank_name,
+        rank_level,
+        rank_created_at
+        FROM Ranks
+        WHERE rank_id = #{value}
+    </select>
+
+    <insert id="insertRank">
         INSERT INTO Ranks (rank_name, rank_level)
-        VALUES (#{rankName}, #{rankLevel})
+        VALUES (
+        #{rankName},
+        (SELECT COALESCE(MAX(rank_level), 0) + 1 FROM Ranks r)
+        )
     </insert>
 
     <update id="updateRank" parameterType="com.Workneed.workneed.Members.dto.RankDTO">
-        UPDATE Ranks
-        SET rank_name = #{rankName},
-        rank_level = #{rankLevel}
-        WHERE rank_id = #{rankId}
+        UPDATE Ranks SET rank_name = #{rankName} WHERE rank_id = #{rankId}
     </update>
 
-    <delete id="deleteRank" parameterType="long">
-        DELETE FROM Ranks WHERE rank_id = #{rankId}
+    <delete id="deleteRank"
+            parameterType="long">
+        DELETE FROM Ranks
+        WHERE rank_id = #{rankId}
     </delete>
 
 </mapper>

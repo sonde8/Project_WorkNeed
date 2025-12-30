@@ -13,9 +13,9 @@ public interface DeptMapper {
 
     DeptDTO findById(Long deptId);
 
-    void insertDept(DeptDTO dept);
+    void insertDept(DeptDTO deptDto);
 
-    void updateDept(DeptDTO dept);
+    void updateDept(DeptDTO deptDto);
 
     void deleteDept(Long deptId);
 }
