@@ -1,0 +1,86 @@
+.att-bk{
+    display : flex;
+    gap: 20px;
+}
+
+/* 오른쪽 */
+.right_1{
+    width: 870px;
+    height: 845px;
+    border: 1px solid black;
+    box-sizing: border-box;
+
+    display: flex;
+    flex-direction: column;
+}
+
+
+.month_chart{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 65px;
+    padding: 12px;
+    margin: 30px;
+    font-size: 28px;
+    border: 1px solid black;
+    flex: 0 0 auto;
+}
+
+.month_chart button{
+    border: none;
+    background: transparent;
+    font-size: 25px;
+    cursor: pointer;
+}
+
+.tableWrap{
+    margin-top: 12px;
+    border: 2px solid #000;
+    flex: 1 1 auto;
+    overflow-y: auto;
+
+}
+
+.bookWrap{
+    font-weight: 700;
+}
+
+.bookTable{
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    border: none;
+}
+
+.bookTable thead th{
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: #d9d9d9;        /* 겹침 방지 */
+}
+
+.bookTable th, .bookTable td{
+    border: 2px solid #000;
+    padding: 18px 10px;
+    text-align: center;
+    font-size: 17px;
+}
+
+.bookChange{
+    flex: 0 0 auto;
+    font-size: 22px;
+
+    padding: 12px;
+
+
+    display: flex;
+    justify-content: flex-end;
+}
+
+.changeBtn{
+    padding: 10px 20px;
+    font-size: 15px;
+    border-radius: 6px;
+    cursor: pointer;
+}

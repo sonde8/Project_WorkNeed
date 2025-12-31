@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+
+<head>
+    <title th:text="${pageTitle}"> 출석부 </title>
+
+    <!-- 페이지 전용 CSS -->
+    <th:block layout:fragment="head">
+        <link rel="stylesheet" th:href="@{/css/attendanceLeft.css}">
+        <link rel="stylesheet" th:href="@{/css/attendanceMain.css}">
+        <link rel="stylesheet" th:href="@{/css/attendanceBook.css}">
+        <link rel="stylesheet" th:href="@{/css/attendanceLeave.css}">
+    </th:block>
+
+    <th:block layout:fragment="script">
+        <script th:src="@{/js/attendanceLeft.js}"></script>
+        <script th:src="@{/js/attendanceMain.js}"></script>
+        <script th:src="@{/js/attendanceBook.js}"></script>
+        <script th:src="@{/js/attendanceLeave.js}"></script>
+    </th:block>
+</head>
+
+<body>
+
+<main layout:fragment="content">
+
+    <div class="att-bk">
+
+        <!-- 왼쪽 -->
+        <section th:replace="~{Attendance/attendanceLeft :: attendanceLeft}"></section>
+
+        <!-- 오른쪽 -->
+        <section class = "right_1">
+
+            <div class = "month_chart">
+                <button type="button" id="prevMonth">&lt;</button>
+                <div class="bookWrap"><span id="bookYm"></span></div>
+                <button type="button" id="nextMonth">&gt;</button>
+            </div>
+
+            <div class = "tableWrap">
+                <table class="bookTable">
+                    <thead>
+                        <tr>
+                            <th> 일자 </th>
+                            <th> 구분 </th>
+                            <th> 출근시간 </th>
+                            <th> 퇴근시간 </th>
+                            <th> 연장근무시간 </th>
+                            <th> 근로시간 </th>
+                        </tr>
+                    </thead>
+                    <tbody id="bookTbody"></tbody>
+                </table>
+            </div>
+
+            <div class = "bookChange">
+            <button type="button" class="changeBtn" > 수정 </button>
+            </div>
+        </section>
+
+    </div>
+
+</main>
+
+
+</body>
+</html>
+
+
+

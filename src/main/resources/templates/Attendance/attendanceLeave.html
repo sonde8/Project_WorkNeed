@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+
+<head>
+    <title th:text="${pageTitle}"> 출석부 </title>
+
+    <!-- 페이지 전용 CSS -->
+    <th:block layout:fragment="head">
+        <link rel="stylesheet" th:href="@{/css/attendanceLeft.css}">
+        <link rel="stylesheet" th:href="@{/css/attendanceMain.css}">
+        <link rel="stylesheet" th:href="@{/css/attendanceBook.css}">
+        <link rel="stylesheet" th:href="@{/css/attendanceLeave.css}">
+    </th:block>
+
+    <th:block layout:fragment="script">
+        <script th:src="@{/js/attendanceLeft.js}"></script>
+        <script th:src="@{/js/attendanceMain.js}"></script>
+        <script th:src="@{/js/attendanceBook.js}"></script>
+        <script th:src="@{/js/attendanceLeave.js}"></script>
+    </th:block>
+</head>
+
+<body>
+
+<main layout:fragment="content">
+
+    <div class="att-lv">
+
+        <!-- 왼쪽 -->
+        <section th:replace="~{Attendance/attendanceLeft :: attendanceLeft}"></section>
+
+        <!-- 오른쪽 -->
+        <section class = "right_2">
+
+            <div class = "yearChart">
+                <button type="button" class = "yearBtn" id="prevYear">&lt;</button>
+                <div class = "yearTxt"><span id = "leaveYear"></span></div>
+                <button type="button" class = "yearBtn" id="nextYear">&gt;</button>
+            </div>
+
+            <div class = "leaveSummary">
+
+                <div class = "leaveSum">
+                    <div class = "sumTitle"> 총 연차 </div>
+                    <div class = "sumValue" id="totalLeave"> 0d 0h </div>
+                </div>
+
+                <div class = "divide"></div>
+
+                <div class = "leaveSum">
+                    <div class = "sumTitle"> 사용 연차 </div>
+                    <div class = "sumValue" id="usedLeave"> 0d 0h </div>
+                </div>
+
+                <div class = "divide"></div>
+
+                <div class = "leaveSum">
+                    <div class = "sumTitle"> 잔여 연차 </div>
+                    <div class = "sumValue" id="remainLeave"> 0d 0h </div>
+                </div>
+
+                <div class = "divide"></div>
+
+                <div class = "leaveSum">
+                    <div class = "sumTitle"> 이월 연차 </div>
+                    <div class = "sumValue" id = "carryLeave"> 0d 0h </div>
+                </div>
+            </div>
+
+            <div class="LeaveTitle"> 사용 내역 </div>
+
+            <div class="leaveWrap">
+                <table class="leaveTable">
+                    <thead>
+                    <tr>
+                        <th class="colCheck">
+                            <input type="checkbox" id="leaveCheckAll" aria-label="전체선택">
+                        </th>
+                        <th>일자</th>
+                        <th>유형</th>
+                        <th>시작 시간</th>
+                        <th>종료 시간</th>
+                        <th>소요시간</th>
+                        <th>상태</th>
+                    </tr>
+                    </thead>
+
+                    <tbody id = "leaveTbody"></tbody>
+                </table>
+            </div>
+
+            <div class = "leaveFooter">
+                <button type="button" class = "footerBtn" id="approveLeave"> 요청 </button>
+            </div>
+
+        </section>
+
+    </div>
+
+</main>
+
+
+</body>
+</html>
