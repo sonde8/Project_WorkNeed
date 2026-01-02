@@ -4,48 +4,46 @@
 
     <select id="findAllMembersForAdmin" resultType="com.Workneed.workneed.Members.dto.UserDTO">
         SELECT u.*, r.rank_name AS rankname, d.dept_name AS deptname
-        FROM User u
-        LEFT JOIN Ranks r ON u.rank_id = r.rank_id
-        LEFT JOIN Dept d ON u.dept_id = d.dept_id
+        FROM user u
+                 LEFT JOIN ranks r ON u.rank_id = r.rank_id
+                 LEFT JOIN dept d ON u.dept_id = d.dept_id
     </select>
 
     <select id="findByAdminEmail" resultType="com.Workneed.workneed.Members.dto.AdminUserDTO">
         SELECT
-        admin_id AS adminId,
-        admin_email AS adminEmail,
-        admin_password AS adminPassword,
-        admin_name AS adminName,
-        role_id AS roleId,
-        admin_status AS adminStatus,
-        admin_last_login_at AS adminLastLoginAt,
-        admin_created_at AS adminCreatedAt
-        FROM AdminUser
+            admin_id AS adminId,
+            admin_email AS adminEmail,
+            admin_password AS adminPassword,
+            admin_name AS adminName,
+            role_id AS roleId,
+            admin_status AS adminStatus,
+            admin_last_login_at AS adminLastLoginAt,
+            admin_created_at AS adminCreatedAt
+        FROM adminuser
         WHERE admin_email = #{adminEmail}
     </select>
 
-
     <insert id="insertAdmin" parameterType="com.Workneed.workneed.Members.dto.AdminUserDTO">
-        INSERT INTO AdminUser (
-        admin_email,
-        admin_password,
-        admin_name,
-        role_id,
-        admin_status,
-        admin_created_at
+        INSERT INTO adminuser (
+            admin_email,
+            admin_password,
+            admin_name,
+            role_id,
+            admin_status,
+            admin_created_at
         )
         VALUES (
-        #{adminEmail},
-        #{adminPassword},
-        #{adminName},
-        #{roleId},
-        #{adminStatus},
-        NOW()
-        )
+                   #{adminEmail},
+                   #{adminPassword},
+                   #{adminName},
+                   #{roleId},
+                   #{adminStatus},
+                   NOW()
+               )
     </insert>
 
-
     <update id="updateMemberStatus">
-        UPDATE User
+        UPDATE user
         <set>
             rank_id = #{rankId},
             dept_id = #{deptId},
@@ -57,10 +55,10 @@
     </update>
 
     <update id="processRequest">
-        UPDATE Request
+        UPDATE request
         SET status = #{status},
-        admin_id = #{adminId},
-        request_updated_at = NOW()
+            admin_id = #{adminId},
+            request_updated_at = NOW()
         WHERE request_id = #{requestId}
     </update>
 
