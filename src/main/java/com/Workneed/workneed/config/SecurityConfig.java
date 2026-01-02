@@ -43,7 +43,10 @@ public class SecurityConfig {
                 .headers(headers -> headers.frameOptions(frame -> frame.disable()))
                 .authorizeHttpRequests(auth -> auth
                         // [수정] /login-user와 /login-admin을 허용 목록에 추가
-                        .requestMatchers("/", "/main", "/login/**", "/login-user", "/login-admin", "/register/**", "/css/**", "/js/**", "/images/**", "/auth/**").permitAll()
+                        .requestMatchers("/", "/main", "/login/**", "/login-user",
+                                "/login-admin", "/register/**", "/css/**", "/js/**", "/images/**",
+                                "/auth/**", "/layout/**", "/favicon.ico").permitAll()
+
                         .anyRequest().authenticated()
                 )
                 // 자동 로그인 필터 등록

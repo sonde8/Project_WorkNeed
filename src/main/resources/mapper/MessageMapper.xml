@@ -14,7 +14,7 @@
     </resultMap>
 
     <insert id="insertMessage" parameterType="MessageDTO" useGeneratedKeys="true" keyProperty="messageId">
-        INSERT INTO Message (room_id, sender_id, content, message_type)
+        INSERT INTO message (room_id, sender_id, content, message_type)
         VALUES (#{roomId}, #{senderId}, #{content}, #{messageType})
     </insert>
 
@@ -29,38 +29,38 @@
             cu.user_name AS sender_name,
             (
                 SELECT COUNT(*)
-                FROM RoomParticipant rp
+                FROM roomparticipant rp
                 WHERE rp.room_id = m.room_id
                   AND rp.left_at IS NULL
-                  AND rp.user_id != m.sender_id  -- 발신자 본인은 카운트에서 제외
-            AND NOT EXISTS (               -- 읽음 기록이 없는 사람만 카운트
+                  AND rp.user_id != m.sender_id
+            AND NOT EXISTS (
             SELECT 1
-            FROM MessageReadReceipt mrr
+            FROM messagereadreceipt mrr
             WHERE mrr.message_id = m.message_id
             AND mrr.user_id = rp.user_id
             )
             ) AS unread_count
-        FROM Message m
-            JOIN User cu ON m.sender_id = cu.user_id
+        FROM message m
+            JOIN user cu ON m.sender_id = cu.user_id
         WHERE m.room_id = #{roomId}
         ORDER BY m.message_id ASC
     </select>
 
     <insert id="insertReadReceipt">
-        INSERT IGNORE INTO MessageReadReceipt (message_id, user_id, read_at)
+        INSERT IGNORE INTO messagereadreceipt (message_id, user_id, read_at)
         SELECT message_id, #{userId}, NOW()
-        FROM Message
+        FROM message
         WHERE room_id = #{roomId}
     </insert>
 
     <insert id="insertSingleReadReceipt">
-        INSERT IGNORE INTO MessageReadReceipt (message_id, user_id, read_at)
+        INSERT IGNORE INTO messagereadreceipt (message_id, user_id, read_at)
         VALUES (#{messageId}, #{userId}, NOW())
     </insert>
 
     <select id="findLastMessageIdByRoomId" parameterType="Long" resultType="Long">
         SELECT message_id
-        FROM Message
+        FROM message
         WHERE room_id = #{roomId}
         ORDER BY message_id DESC
             LIMIT 1
@@ -68,8 +68,8 @@
 
     <select id="getUnreadCount" resultType="int">
         SELECT
-            ((SELECT COUNT(*) FROM RoomParticipant WHERE room_id = #{roomId} AND left_at IS NULL) - 1)
-                - (SELECT COUNT(*) FROM MessageReadReceipt WHERE message_id = #{messageId})
+            ((SELECT COUNT(*) FROM roomparticipant WHERE room_id = #{roomId} AND left_at IS NULL) - 1)
+                - (SELECT COUNT(*) FROM messagereadreceipt WHERE message_id = #{messageId})
                 AS unread_count
     </select>
 </mapper>

@@ -8,9 +8,9 @@
     <select id="findAll"
             resultType="com.Workneed.workneed.Members.dto.DeptDTO">
         SELECT
-        dept_id,
-        dept_name
-        FROM Dept
+            dept_id,
+            dept_name
+        FROM dept
         ORDER BY dept_id
     </select>
 
@@ -18,24 +18,27 @@
             parameterType="long"
             resultType="com.Workneed.workneed.Members.dto.DeptDTO">
         SELECT
-        dept_id,
-        dept_name
-        FROM Dept
+            dept_id,
+            dept_name
+        FROM dept
         WHERE dept_id = #{deptId}
     </select>
 
     <insert id="insertDept" parameterType="com.Workneed.workneed.Members.dto.DeptDTO">
-        INSERT INTO Dept (dept_name) VALUES (#{deptName})
+        INSERT INTO dept (dept_name)
+        VALUES (#{deptName})
     </insert>
 
     <update id="updateDept" parameterType="com.Workneed.workneed.Members.dto.DeptDTO">
-        UPDATE Dept SET dept_name = #{deptName} WHERE dept_id = #{deptId}
+        UPDATE dept
+        SET dept_name = #{deptName}
+        WHERE dept_id = #{deptId}
     </update>
 
     <delete id="deleteDept"
             parameterType="long">
-        DELETE FROM Dept
-        WHERE dept_id = #{deptId}   <!-- ★ 수정 -->
+        DELETE FROM dept
+        WHERE dept_id = #{deptId}
     </delete>
 
 </mapper>

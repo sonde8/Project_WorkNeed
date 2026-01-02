@@ -111,17 +111,32 @@
 
 <!-- ================= SCRIPT ================= -->
 <th:block layout:fragment="script">
-    <!-- FullCalendar -->
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        // IDE에서 붉은 줄이 뜨지 않도록 주석 감싸기 기법 사용
+        // 실제 실행 시에는 Thymeleaf가 값을 주입하고, 값이 없으면 null이 할당됨
+        const loginUser = /*[[${loginUser}]]*/ null;
+
+        // JS 전역 변수 세팅
+        window.USER_ID = loginUser ? loginUser.userId : null;
+        window.USER_NAME = loginUser ? loginUser.userName : 'Guest';
+        window.IS_ADMIN = false; // 필요시 loginUser.rankId 등으로 권한 로직 추가
+
+        console.log("Logged in as:", window.USER_ID);
+        /*]]>*/
+    </script>
+
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
 
-    <!-- flatpickr -->
+    <script src='https://cdn.jsdelivr.net/npm/@fullcalendar/google-calendar@6.1.10/index.global.min.js'></script>
+
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
-    <!-- Calendar JS -->
     <script th:src="@{/js/calendar.js}"></script>
     <script th:src="@{/js/calendar-detail-modal.js}"></script>
     <script th:src="@{/js/calendar-modal.js}"></script>
-    <script src='https://cdn.jsdelivr.net/npm/@fullcalendar/google-calendar@6.1.10/index.global.min.js'></script>
+
 </th:block>
 
 </html>
