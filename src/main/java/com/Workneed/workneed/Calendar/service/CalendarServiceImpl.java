@@ -5,7 +5,6 @@ import com.Workneed.workneed.Calendar.dto.CalendarEventDTO;
 import com.Workneed.workneed.Calendar.mapper.CalendarMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 
 @Service
@@ -15,8 +14,8 @@ public class CalendarServiceImpl implements CalendarService {
     private final CalendarMapper calendarMapper;
 
     @Override
-    public List<CalendarDTO> getAll() {
-        return calendarMapper.findAll();
+    public List<CalendarDTO> getAll(Long userId) {
+        return calendarMapper.findAll(userId); // Mapper 호출 시 ID 전달
     }
 
     @Override
@@ -39,10 +38,8 @@ public class CalendarServiceImpl implements CalendarService {
         calendarMapper.delete(calendarId);
     }
 
-    //Schedule 연동
     @Override
     public List<CalendarEventDTO> getScheduleEvents(Long userId) {
         return calendarMapper.findScheduleEventsForCalendar(userId);
     }
-
 }
