@@ -15,7 +15,7 @@
         social_access_token AS socialAccessToken,
         social_refresh_token AS socialRefreshToken,
         social_linked_at AS socialLinkedAt
-        FROM SocialAccount
+        FROM socialaccount
         WHERE social_provider = #{provider}
         AND social_provider_user_id = #{providerUserId}
     </select>
@@ -30,7 +30,7 @@
         social_access_token AS socialAccessToken,
         social_refresh_token AS socialRefreshToken,
         social_linked_at AS socialLinkedAt
-        FROM SocialAccount
+        FROM socialaccount
         WHERE user_id = #{userId}
         AND social_provider = #{provider}
     </select>
@@ -40,7 +40,7 @@
             useGeneratedKeys="true"
             keyProperty="socialId"
             keyColumn="social_id">
-        INSERT INTO SocialAccount (
+        INSERT INTO socialaccount (
         user_id,
         social_provider,
         social_provider_user_id,
@@ -60,7 +60,7 @@
     </insert>
 
     <delete id="deleteByUserIdAndProvider">
-        DELETE FROM SocialAccount
+        DELETE FROM socialaccount
         WHERE user_id = #{userId}
         AND social_provider = #{provider}
     </delete>

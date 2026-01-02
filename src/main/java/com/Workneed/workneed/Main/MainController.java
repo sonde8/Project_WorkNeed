@@ -1,5 +1,4 @@
-package com.Workneed.workneed.Members.controller;
-
+package com.Workneed.workneed.Main;
 
 import com.Workneed.workneed.Members.dto.UserDTO;
 import jakarta.servlet.http.HttpSession;
@@ -10,13 +9,17 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class MainController {
 
+    // 메인페이지
     @GetMapping("/main")
-    public String main(HttpSession session, Model model) {
+    public String Main(HttpSession session, Model model){
 
         UserDTO user = (UserDTO) session.getAttribute("user");
-
         model.addAttribute("user", user);
 
-        return "Members/main";
+        model.addAttribute("pageTitle","메인");
+
+        return "Main/Main";
     }
+
 }
+

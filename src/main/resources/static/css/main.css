@@ -1,0 +1,32 @@
+.mainPage{
+    display : flex;
+    gap: 20px;
+}
+
+.leftPage{
+    width: 470px;
+    height: 845px;
+    border: 1px solid black;
+    box-sizing: border-box;
+}
+
+.toDay{
+    border: 1px solid black;
+    margin: 20px;
+    text-align: center;
+}
+
+.profileCard{
+    border: 1px solid black;
+}
+
+.attendancePage{
+    border: 1px solid black;
+}
+
+.rightPage{
+    width: 870px;
+    height: 845px;
+    border: 1px solid black;
+    box-sizing: border-box;
+}

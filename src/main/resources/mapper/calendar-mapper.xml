@@ -7,10 +7,9 @@
 
     <!-- ==================================================
          전체 일정 조회
-         Mapper: findAll()
-         DTO: CalendarDTO
          ================================================== -->
     <select id="findAll"
+            parameterType="long"
             resultType="com.Workneed.workneed.Calendar.dto.CalendarDTO">
         SELECT
             calendar_id   AS calendarId,
@@ -24,16 +23,13 @@
             created_at    AS createdAt,
             updated_at    AS updatedAt
         FROM calendar
-        ORDER BY start_at ASC
+        WHERE created_by = #{userId}  ORDER BY start_at ASC
     </select>
 
     <!-- ==================================================
          일정 단건 조회 (상세조회)
-         Mapper: findById(Long calendarId)
          ================================================== -->
-    <select id="findById"
-            parameterType="long"
-            resultType="com.Workneed.workneed.Calendar.dto.CalendarDTO">
+    <select id="findById" parameterType="long" resultType="com.Workneed.workneed.Calendar.dto.CalendarDTO">
         SELECT
             calendar_id   AS calendarId,
             created_by    AS createdBy,
@@ -51,81 +47,48 @@
 
     <!-- ==================================================
          일정 등록
-         Mapper: insert(CalendarDTO dto)
          ================================================== -->
-    <insert id="insert"
-            parameterType="com.Workneed.workneed.Calendar.dto.CalendarDTO">
-        INSERT INTO calendar (
-            created_by,
-            title,
-            description,
-            start_at,
-            end_at,
-            calendar_type,
-            color
-        ) VALUES (
-                     #{createdBy},
-                     #{title},
-                     #{description},
-                     #{start},
-                     #{end},
-                     #{type},
-                     #{color}
-                 )
+    <insert id="insert" parameterType="com.Workneed.workneed.Calendar.dto.CalendarDTO">
+        INSERT INTO calendar (created_by, title, description, start_at, end_at, calendar_type, color)
+        VALUES (#{createdBy}, #{title}, #{description}, #{start}, #{end}, #{type}, #{color})
     </insert>
 
     <!-- ==================================================
          일정 수정
-         Mapper: update(CalendarDTO dto)
          ================================================== -->
-    <update id="update"
-            parameterType="com.Workneed.workneed.Calendar.dto.CalendarDTO">
+    <update id="update" parameterType="com.Workneed.workneed.Calendar.dto.CalendarDTO">
         UPDATE calendar
-        SET
-            title         = #{title},
-            description   = #{description},
-            start_at      = #{start},
-            end_at        = #{end},
-            calendar_type = #{type},
-            color         = #{color},
-            updated_at    = NOW()
+        SET title = #{title}, description = #{description}, start_at = #{start}, end_at = #{end}, calendar_type = #{type}, color = #{color}, updated_at = NOW()
         WHERE calendar_id = #{calendarId}
     </update>
 
     <!-- ==================================================
          일정 삭제
-         Mapper: delete(Long calendarId)
          ================================================== -->
-    <delete id="delete"
-            parameterType="long">
-        DELETE FROM calendar
-        WHERE calendar_id = #{calendarId}
+    <delete id="delete" parameterType="long">
+        DELETE FROM calendar WHERE calendar_id = #{calendarId}
     </delete>
 
     <!-- ==================================================
          업무-캘린더 연동
-         Mapper: findScheduleEventsForCalendar(Long userId)
          ================================================== -->
     <select id="findScheduleEventsForCalendar"
             parameterType="long"
             resultType="com.Workneed.workneed.Calendar.dto.CalendarEventDTO">
-
         SELECT DISTINCT
             s.schedule_id AS id,
             s.title,
             s.description,
             s.start_at    AS start,
             s.end_at      AS end,
-        s.type,
-        'SCHEDULE'    AS source,
-        s.event_type,
-        s.location,
-        s.status
+            s.type,
+            'SCHEDULE'    AS source,
+            s.event_type,
+            s.location,
+            s.status
         FROM schedule s
-            JOIN schedule_participant sp
-        ON s.schedule_id = sp.schedule_id
+            JOIN schedule_participant sp ON s.schedule_id = sp.schedule_id
         WHERE sp.user_id = #{userId}
-
     </select>
 
 </mapper>
