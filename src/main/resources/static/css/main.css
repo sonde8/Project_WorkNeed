@@ -4,29 +4,79 @@
 }
 
 .leftPage{
-    width: 470px;
-    height: 845px;
+    width: 420px;
+    height: 100vh;
     border: 1px solid black;
     box-sizing: border-box;
 }
 
 .toDay{
     border: 1px solid black;
-    margin: 20px;
+    border-radius: 16px;
+    margin-top: 30px;
+    padding: 18px;
     text-align: center;
+    font-size: 34px;
+    font-weight: 800;
 }
 
-.profileCard{
+.profile {
     border: 1px solid black;
+    border-radius: 16px;
+    box-shadow: 0 6px 20px rgba(31, 41, 55, 0.08);
+
+    margin-top: 20px;
+    padding: 18px;
+    display: grid;
+    grid-template-columns: 90px 1fr;
+    column-gap: 14px;
+    row-gap: 6px;
+    align-items: center;
 }
+
+.profileImg {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    background: #f2f4ff;
+    border: 1px solid #f2f4ff;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 700;
+    color: #6b7280;
+    grid-row: 1 / 5;
+}
+
+
 
 .attendancePage{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-align: center;
+
+    margin-top: 5px;
+    padding: 14px 16px;
+    border-radius: 14px;
+    text-decoration: none;
+
+    border: 1px solid black;
+    color: black;
+
+    font-size: 15px;
+    font-weight: 800;
+
+}
+
+.pay{
     border: 1px solid black;
 }
 
 .rightPage{
-    width: 870px;
-    height: 845px;
+    width: 900px;
+    height: 100vh;
     border: 1px solid black;
     box-sizing: border-box;
 }
