@@ -101,6 +101,7 @@ a{
 }
 .comment-item {
     position: relative;
+    height: 7rem;
     padding: 1rem;
     border-radius: 1.2rem;
     border: 0.1rem solid rgba(0, 0, 0, 0.12);
@@ -170,7 +171,7 @@ a{
 /* ===== Edit Comment ===== */
 .comment-content{
     font-size: 1.1rem;
-    padding: 1rem 1rem 0.5rem;
+    padding: 0.5rem;
 }
 .comment-edit-form {
     display: none;

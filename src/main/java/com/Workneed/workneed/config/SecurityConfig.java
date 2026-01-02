@@ -46,6 +46,7 @@ public class SecurityConfig {
                         .requestMatchers("/", "/main", "/login/**", "/login-user",
                                 "/login-admin", "/register/**", "/css/**", "/js/**", "/images/**",
                                 "/auth/**", "/layout/**", "/favicon.ico").permitAll()
+
                         .anyRequest().authenticated()
                 )
                 // 자동 로그인 필터 등록

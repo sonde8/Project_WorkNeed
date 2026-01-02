@@ -56,6 +56,7 @@
             <div class="kanban-cards" data-status="DONE">
                 <div class="kanban-card" th:each="item : ${doneList}"
                                          th:attr="data-id=${item.scheduleId}">
+                    <button type="button" class="card-delete-btn" aria-label="삭제"> delete </button>
                     <div class="title-event-type">
                         <div class="title" th:text="${item.title}">Title</div>
                         <div class="event-type" th:text="${item.eventType}">Event Type</div>
