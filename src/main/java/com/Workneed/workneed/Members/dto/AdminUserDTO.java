@@ -16,6 +16,7 @@ public class AdminUserDTO {
     private String adminName;
     private Long roleId;
     private String adminStatus;
+    private String roleName;
     private LocalDateTime adminLastLoginAt;
     private LocalDateTime adminCreatedAt;
 }

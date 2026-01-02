@@ -6,7 +6,6 @@
 <head>
     <title th:text="${pageTitle}"> 메인 </title>
 
-    <!-- 페이지 전용 CSS -->
     <th:block layout:fragment="head">
         <link rel="stylesheet" th:href="@{/css/attendanceLeft.css}">
         <link rel="stylesheet" th:href="@{/css/Main.css}">
@@ -25,24 +24,35 @@
     <div class="mainPage">
 
         <!-- 왼쪽 -->
-        <section class = "leftPage">
+        <section class="leftPage">
 
-            <!-- 오늘 날짜 -->
-            <div class = "toDay" id="todayStart"
+            <div class="toDay" id="todayStart"
                  th:text="${today != null ? today : '날짜'}"> 날짜 </div>
 
             <!-- 프로필 -->
-            <div class = "profile">
+            <div class="profile">
 
-                <div class = "profileImg"> 이미지 </div>
+                <div class="profileImg">
+                    <img th:src="${user != null and user.userProfileImage != null
+              ? user.userProfileImage
+              : '/images/default-profile.svg'}"
+                         style="width:100%; height:100%; border-radius:50%; object-fit:cover;">
+                </div>
 
                 <div class="profileText">
-                    <div class="name">이름</div>
+                    <div class="name" th:text="${user.userName}">이름</div>
 
                     <div class="profileMeta">
-                        <span class="dept">부서이름</span>
+                        <span class="dept" th:text="${user.deptName}">부서이름</span>
                         <span class="bar">|</span>
-                        <span class="rank">직급</span>
+                        <span class="rank" th:text="${user.rankName}">직급</span>
+                    </div>
+
+                    <div style="margin-top: 6px;">
+                        <button id="openPwModal" type="button"
+                                style="font-size: 11px; padding: 2px 8px; cursor: pointer; border: 1px solid black; background: #fff; border-radius: 4px; font-weight: 700;">
+                            비밀번호 변경
+                        </button>
                     </div>
                 </div>
 
@@ -52,27 +62,43 @@
             <a class="attendancePage" th:href="@{/attendance}"> 근 태 관 리 👉 </a>
 
             <!-- 출 퇴근 -->
-            <div class = "attendWidget">
+            <div class="attendWidget">
                 <section th:replace="~{Attendance/attendanceLeft :: attendanceLeft}"></section>
             </div>
 
             <!-- 결제 -->
-            <div class = "pay"> 결제 </div>
+            <div class="pay"> 결제 </div>
 
         </section>
 
         <!-- 오른쪽-->
-        <section class = "rightPage">
+        <section class="rightPage">
+            <div style="padding: 10px; text-align: right;">
+                <form th:action="@{/logout}" method="post">
+                    <button type="submit" style="cursor:pointer; background:none; border:1px solid #ccc; border-radius:4px; font-size:12px; padding:4px 10px;">로그아웃</button>
+                </form>
+            </div>
 
         </section>
     </div>
 
+    <div id="pwModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:9999;">
+        <div style="background:#fff; margin:15% auto; padding:25px; width:350px; border-radius:12px; box-shadow: 0 10px 20px rgba(0,0,0,0.2);">
+            <h3 style="margin-top:0;">비밀번호 변경</h3>
+            <form th:action="@{/my/password/change}" method="post" id="pwChangeForm">
+                <input type="password" name="currentPassword" placeholder="현재 비밀번호" required style="width:100%; margin-bottom:10px; padding:8px; box-sizing:border-box;">
+                <input type="password" name="newPassword" id="newPassword" placeholder="새 비밀번호" required style="width:100%; margin-bottom:10px; padding:8px; box-sizing:border-box;">
+                <input type="password" name="confirmPassword" id="confirmPassword" placeholder="새 비밀번호 확인" required style="width:100%; margin-bottom:15px; padding:8px; box-sizing:border-box;">
+                <div style="text-align:right;">
+                    <button type="submit" style="padding:5px 15px; cursor:pointer;">확인</button>
+                    <button type="button" onclick="closePwModal()" style="padding:5px 15px; cursor:pointer; margin-left:5px;">취소</button>
+                </div>
+            </form>
+            <p th:if="${passwordChangeError}" th:text="${passwordChangeError}" style="color:red; font-size:12px; margin-top:10px;"></p>
+        </div>
+    </div>
 
 </main>
 
-
 </body>
 </html>
-
-
-
