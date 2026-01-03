@@ -1,4 +1,4 @@
-package com.Workneed.workneed.config;
+package com.Workneed.workneed.Members.auth.principal;
 
 import com.Workneed.workneed.Members.dto.AdminUserDTO;
 import com.Workneed.workneed.Members.dto.UserDTO;
@@ -39,17 +39,6 @@ public class CustomUserDetails implements UserDetails, OAuth2User {
         this.role = "ROLE_USER";
     }
 
-    public String getProfileImage() {
-        // 1. 유저 정보가 있고, 그 안에 사진 경로가 있다면 반환
-        if (this.userDto != null && this.userDto.getUserProfileImage() != null) {
-            return this.userDto.getUserProfileImage();
-        }
-
-        // 2. 관리자이거나 사진이 없는 경우 null 반환 (HTML에서 기본이미지 처리됨)
-        return null;
-    }
-
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         // 지정된 권한(ROLE_USER 또는 ROLE_ADMIN)을 반환합니다.
@@ -76,7 +65,17 @@ public class CustomUserDetails implements UserDetails, OAuth2User {
         return "UNKNOWN_USER";
     }
 
-    // --- 이하 기존 로직 동일 ---
+    public String getProfileImage() {
+        // 1. 유저 정보가 있고, 그 안에 사진 경로가 있다면 반환
+        if (this.userDto != null && this.userDto.getUserProfileImage() != null) {
+            return this.userDto.getUserProfileImage();
+        }
+
+        // 2. 관리자이거나 사진이 없는 경우 null 반환 (HTML에서 기본이미지 처리됨)
+        return null;
+    }
+
+
     @Override
     public Map<String, Object> getAttributes() {
         return attributes;
@@ -103,9 +102,9 @@ public class CustomUserDetails implements UserDetails, OAuth2User {
 
     @Override
     public boolean isEnabled() {
-        // 1. 관리자인 경우 항상 true (아직미구현 추후확장-db컬럼추가필요)
         if (adminDto != null) {
-            return true;
+            // 관리자 상태가 ACTIVE일 때만 true 반환
+            return "ACTIVE".equals(adminDto.getAdminStatus());
         }
 
         // 3. 일반 유저인 경우 'ACTIVE' 상태일 때만 true 반환
