@@ -680,14 +680,61 @@ document.addEventListener('keydown', function (event) {
     }
 });
 
-// 페이지 로드 시 실행
+// 페이지 로드 시 실행 (기존 코드를 아래와 같이 수정하세요)
 window.onload = function() {
+    // 1. 웹소켓 연결 (기존 로직)
     if (currentUserId) connect();
+
+    // 2. 현재 방 배지 초기화 (기존 로직)
     if (window.roomId) {
         const currentBadge = document.getElementById('unread-badge-' + window.roomId);
         if (currentBadge) {
             currentBadge.textContent = '0';
             currentBadge.classList.add('hidden');
         }
+    }
+
+    // [신규 추가] 3. URL 파라미터를 통한 채팅방 생성 모달 자동 제어
+    const urlParams = new URLSearchParams(window.location.search);
+    const inviteIdsStr = urlParams.get('invite');
+    const roomNameParam = urlParams.get('roomName'); // 업무(Task) 제목
+
+    if (inviteIdsStr) {
+        // 초대할 ID 리스트 추출
+        const inviteIds = inviteIdsStr.split(",").map(Number);
+
+        // A. 모달 열기 (별도 파일에 정의된 함수 호출)
+        if (typeof openCreateRoomModal === 'function') {
+            openCreateRoomModal();
+        }
+
+        // B. 전달받은 업무 제목이 있다면 채팅방 이름 입력창에 자동 세팅
+        if (roomNameParam) {
+            const roomNameInput = document.getElementById('newRoomName');
+            if (roomNameInput) {
+                // 인코딩되어 넘어온 제목을 다시 텍스트로 변환하여 삽입
+                roomNameInput.value = decodeURIComponent(roomNameParam);
+            }
+        }
+
+        // C. 유저 목록 로드 및 자동 선택
+        // /chat/users API 결과가 로드된 후 처리를 위해 fetch를 한 번 더 사용하거나,
+        // loadDeptAndUsers() 내부의 렌더링이 끝난 시점을 기다려야 합니다.
+        fetch('/chat/users')
+            .then(res => res.json())
+            .then(users => {
+                inviteIds.forEach(id => {
+                    const user = users.find(u => Number(u.userId) === Number(id));
+                    if (user && typeof selectUser === 'function') {
+                        // 기존 selectUser 함수를 사용하여 오른쪽 '선택된 대상'에 추가
+                        selectUser(user.userId, user.userName, user.deptname || '기타');
+                    }
+                });
+            })
+            .catch(err => console.error("자동 초대 유저 로드 실패:", err));
+
+        // URL의 파라미터를 제거하여 새로고침 시 모달이 다시 뜨지 않게 하고 싶다면 아래 주석 해제
+        // const cleanUrl = window.location.origin + window.location.pathname;
+        // window.history.replaceState({}, document.title, cleanUrl);
     }
 };

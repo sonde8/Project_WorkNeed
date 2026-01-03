@@ -116,15 +116,23 @@
 
     function resetForm() {
         form.reset();
+
         if (calendarIdInput) calendarIdInput.value = "";
         isEditMode = false;
         if (submitBtn) submitBtn.textContent = "등록";
 
         selectedType = "PERSONAL";
         if (hiddenTypeInput) hiddenTypeInput.value = selectedType;
+        if (selectedColorInput) selectedColorInput.value = "#3b82f6";
+        if (realColorPicker) realColorPicker.value = "#ffffff";
 
-        const base = (selectedColorInput?.value || "#3b82f6");
-        setSelectedColorUI(base);
+        if (customColorBtn) {
+            customColorBtn.style.background = "";
+            customColorBtn.classList.remove("active");
+            customColorBtn.classList.remove("is-custom");
+        }
+
+        setSelectedColorUI("#3b82f6");
 
         startPicker?.clear();
         if (endPicker) {
