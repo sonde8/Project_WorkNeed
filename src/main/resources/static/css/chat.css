@@ -20,18 +20,78 @@
     flex-direction: column;
 }
 
+/*.search-container {*/
+/*    padding: 15px;*/
+/*    display: flex;*/
+/*    gap: 5px;*/
+/*    border-bottom: 1px solid #eeeeee;*/
+/*}*/
+
 .search-container {
-    padding: 15px;
-    display: flex;
-    gap: 5px;
+    height: 60px !important;
+    min-height: 60px !important;
+    padding: 0px 15px;
+    background-color: #f7f7f7;
     border-bottom: 1px solid #eeeeee;
 }
 
-.search-container input {
+/* 1. 왼쪽 검색창 컨테이너 */
+/*.search-container {*/
+/*    height: 60px; !* 높이 고정 *!*/
+/*    display: flex;*/
+/*    align-items: center; !* 내부 요소를 세로 중앙 정렬 *!*/
+/*    padding: 0 15px; !* 위아래 패딩은 0으로 하고 center로 맞춤 *!*/
+/*    background-color: #f7f7f7;*/
+/*    border-bottom: 1px solid #dddddd; !* 하단 선 색상 통일 *!*/
+/*    box-sizing: border-box;*/
+/*}*/
+
+.search-box-wrapper {
+    display: flex;
+    align-items: center;
+    background-color: #ffffff; /* 내부를 흰색으로 */
+    border: 1px solid #cccccc;  /* 여기에 테두리 부여 */
+    padding: 2px 5px;           /* 내부 여백 */
+    border-radius: 4px;         /* 살짝 둥글게 (선택사항) */
+    margin-top: 10px;
+}
+
+/*.search-container input {*/
+/*    flex: 1;*/
+/*    padding: 6px 10px;*/
+/*    border: 1px solid #cccccc;*/
+/*    font-size: 1.2rem;*/
+/*}*/
+
+/* input의 기본 테두리 제거 */
+.search-box-wrapper input {
     flex: 1;
-    padding: 6px 10px;
-    border: 1px solid #cccccc;
+    border: none !important;    /* 기존 테두리 제거 */
+    outline: none;              /* 클릭 시 파란 테두리 제거 */
+    padding: 8px 10px;
     font-size: 1.2rem;
+    background: transparent;
+}
+
+/* 버튼 스타일 정리 */
+.create-room-btn {
+    background: none;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 4px;
+    transition: opacity 0.2s;
+}
+
+.create-room-btn:hover {
+    opacity: 0.7;
+}
+
+.create-room-btn img {
+    display: block;
+    /* 필터 등을 이용해 아이콘 색상을 살짝 조정할 수도 있습니다 */
 }
 
 .room-list-scroll {
@@ -160,12 +220,39 @@
 
 
 
+/*.view-header {*/
+/*    padding: 15px 20px;*/
+/*    border-bottom: 1px solid #dddddd;*/
+/*    display: flex;*/
+/*    justify-content: space-between;*/
+/*    align-items: center;*/
+/*}*/
+
+/*.view-header {*/
+/*    height: 60px; !* 왼쪽과 동일한 높이 부여 *!*/
+/*    display: flex;*/
+/*    align-items: center; !* 세로 중앙 정렬 *!*/
+/*    padding: 0 20px;*/
+/*    background-color: #ffffff;*/
+/*    border-bottom: 1px solid #dddddd; !* 하단 선 색상 통일 *!*/
+/*    box-sizing: border-box;*/
+/*}*/
+
 .view-header {
-    padding: 15px 20px;
-    border-bottom: 1px solid #dddddd;
+    /* 높이를 60px로 엄격하게 고정 */
+    height: 60px !important;
+    min-height: 60px !important;
+
+    /* 패딩과 테두리를 높이에 포함시킴 */
+    box-sizing: border-box;
+
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: center; /* 내부 요소 세로 중앙 정렬 */
+
+    padding: 0 20px;
+    background-color: #ffffff;
+    border-bottom: 1px solid #dddddd;
 }
 
 .current-user { display: flex; align-items: center; gap: 10px; }
@@ -192,6 +279,17 @@
     gap: 15px;
     list-style: none;
     background-color: #fcfcfc;
+
+    /* --- 튕김 방지 추가 --- */
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease-in;
+}
+
+/* 준비 완료 시 노출 */
+.message-log.ready {
+    opacity: 1 !important;
+    visibility: visible !important;
 }
 
 .system-msg {
@@ -514,8 +612,19 @@ li.other-msg { justify-content: flex-start; display: flex; width: 100%; }
     width: 300px; /* 열렸을 때 너비 */
 }
 
+.chat-media-sidebar .sidebar-header .close-btn {
+    background: none;        /* 배경 제거 */
+    border: none;            /* 테두리 제거 */
+    padding: 0;              /* 패딩 제거 */
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.2s;
+}
+
 .sidebar-header {
-    padding: 19px 15px 19px 15px;
+    padding: 19px 15px 18px 15px;
     border-bottom: 1px solid #eeeeee;
     display: flex;
     justify-content: space-between;

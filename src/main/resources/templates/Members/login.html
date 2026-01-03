@@ -34,7 +34,7 @@
 
                 <div class="options-row">
                     <label class="checkbox-container">
-                        <input type="checkbox" name="autoLogin">
+                        <input type="checkbox" name="remember-me">
                         <span class="checkmark"></span> 로그인 상태 유지
                     </label>
                 </div>
@@ -53,7 +53,8 @@
                 구글 로그인
             </a>
 
-            <a href="/admin/login" class="social-btn admin-btn">
+            <a href="/admin/login" class="social-btn admin-btn"
+               onclick="return adminLoginNotice();">
                 <i class="fa-solid fa-user-lock"></i>
                 관리자 로그인
             </a>

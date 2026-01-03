@@ -29,9 +29,8 @@ public class PasswordController {
 
 
         } catch (IllegalArgumentException e) {
-            model.addAttribute("passwordChangeError", e.getMessage());
-            model.addAttribute("user", user);
-            return "Members/main";
+            session.setAttribute("passwordChangeError", e.getMessage());
+            return "redirect:/main";
         }
     }
 }

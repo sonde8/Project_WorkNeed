@@ -4,7 +4,7 @@ import com.Workneed.workneed.Members.dto.SocialAccountDTO;
 import com.Workneed.workneed.Members.dto.UserDTO;
 import com.Workneed.workneed.Members.mapper.SocialAccountMapper;
 import com.Workneed.workneed.Members.mapper.UserMapper;
-import com.Workneed.workneed.config.CustomUserDetails;
+import com.Workneed.workneed.Members.auth.principal.CustomUserDetails;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j; // 로그 사용을 위한 임포트
@@ -68,13 +68,27 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             log.info("최초 소셜 연동 성공: {}", email);
         }
 
-        // 3. 프로필 이미지 업데이트 (연동 여부와 상관없이 로그인 시마다 최신화)
-        if (pic != null) {
-            // DB 업데이트
-            userMapper.updateProfileImage(userDto.getUserId(), pic);
-            // 세션에 담길 객체에도 주소 주입 (그래야 화면에 바로 뜸)
-            userDto.setUserProfileImage(pic);
-            log.info("유저 [{}]의 프로필 사진 업데이트 완료", userDto.getUserName());
+        // 3. 프로필 이미지 업데이트 (기본 이미지 정책 적용)
+        // 현재 DB에 저장된 이미지 경로를 가져옵니다.
+        String currentImg = userDto.getUserProfileImage();
+
+        // [핵심 로직] 이미 내가 직접 업로드한 사진(/upload/...)이 있다면 구글 사진으로 덮어쓰지 않습니다.
+        if (currentImg != null && currentImg.startsWith("/upload/")) {
+            log.info("유저 [{}]는 직접 업로드한 프로필을 사용 중이므로 구글 사진으로 덮어쓰지 않습니다.", userDto.getUserName());
+            // 업데이트 로직을 건너뜁니다.
+        } else {
+            // 직접 올린 사진이 없는 경우에만 구글 사진 또는 기본 이미지 적용
+            String finalPic = pic;
+
+            // 구글 주소가 없거나 기본 프로필 패턴일 때 우리 svg로 교체
+            if (finalPic == null || finalPic.contains("picture/0") || finalPic.contains("picture/1")) {
+                finalPic = "images/default-profile.svg";
+            }
+
+            // DB 업데이트 및 DTO 반영
+            userMapper.updateProfileImage(userDto.getUserId(), finalPic);
+            userDto.setUserProfileImage(finalPic);
+            log.info("유저 [{}]의 프로필 이미지를 소셜/기본 이미지로 업데이트했습니다: {}", userDto.getUserName(), finalPic);
         }
 
         // 4. 세션 저장 (Thymeleaf 레이아웃 등에서 session.user로 접근하기 위함)
@@ -84,7 +98,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             session.setAttribute("user", userDto);
         }
 
-        // 5. 시큐리티 인증 객체 생성 (CustomUserDetails가 UserDTO를 받도록 설계된 경우)
+        // 5. 시큐리티 인증 객체 생성
         return new CustomUserDetails(userDto, attributes);
     }
 }

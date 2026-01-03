@@ -1,15 +1,10 @@
 package com.Workneed.workneed.Members.controller;
 
 import com.Workneed.workneed.Members.dto.AdminUserDTO;
-import com.Workneed.workneed.Members.dto.DeptDTO;
-import com.Workneed.workneed.Members.dto.RankDTO;
 import com.Workneed.workneed.Members.dto.UserDTO;
-import com.Workneed.workneed.Members.mapper.AdminUserMapper;
-import com.Workneed.workneed.Members.mapper.DeptMapper;
-import com.Workneed.workneed.Members.mapper.RankMapper;
-import com.Workneed.workneed.Members.mapper.UserMapper;
+import com.Workneed.workneed.Members.service.AdminUserService;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -21,18 +16,37 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AdminUserController {
 
-    private final AdminUserMapper adminUserMapper;
-    private final UserMapper userMapper;
-    private final DeptMapper deptMapper;
-    private final RankMapper rankMapper;
-    private final BCryptPasswordEncoder passwordEncoder;
+    private final AdminUserService adminUserService;
 
+    //세션100구조
     @GetMapping("/member/list")
-    public String adminUserList(Model model) {
-        // 세부 정보가 들어있는 메서드 호출
-        model.addAttribute("user", userMapper.findAllWithDetails());
-        model.addAttribute("dept", deptMapper.findAll());
-        model.addAttribute("rank", rankMapper.findAll());
+    public String adminUserList(
+            @RequestParam(required = false) String userName,
+            @RequestParam(required = false) String userLoginId,
+            @RequestParam(required = false) Long deptId,
+            @RequestParam(required = false) Long rankId,
+            @RequestParam(required = false) String userStatus,
+            HttpSession session,
+            Model model) {
+
+        AdminUserDTO admin = (AdminUserDTO) session.getAttribute("admin");
+        if (admin == null) return "redirect:/login";
+
+
+
+        // 파라미터를 서비스에 그대로 전달합니다.
+        List<UserDTO> memberList = adminUserService.getAllMembers(userName, userLoginId, deptId, rankId, userStatus);
+
+        model.addAttribute("admin", admin);
+        model.addAttribute("user", memberList);
+        model.addAttribute("dept", adminUserService.getAllDepts());
+        model.addAttribute("rank", adminUserService.getAllRanks());
+
+        // 검색창에 입력했던 값이 유지되도록 모델에 다시 담아줍니다 (선택사항이지만 UX에 좋음)
+        model.addAttribute("selectedDeptId", deptId);
+        model.addAttribute("selectedRankId", rankId);
+        model.addAttribute("selectedStatus", userStatus);
+
         return "members/admin_user_list";
     }
 
@@ -40,8 +54,10 @@ public class AdminUserController {
     @ResponseBody
     public String adminUserEditSave(@RequestBody UserDTO userDto) {
         try {
-            // 실제 수정을 수행하는 매퍼 메서드 확인 필요 (updateUser 또는 전용 메서드)
-            adminUserMapper.updateMemberStatus(userDto);
+
+            adminUserService.updateMember(userDto);
+
+
             return "success";
         } catch (Exception e) {
             e.printStackTrace();
@@ -53,10 +69,7 @@ public class AdminUserController {
     @ResponseBody
     public String addAdminAccount(@RequestBody AdminUserDTO adminDto) {
         try {
-            if (adminDto.getAdminPassword() != null && !adminDto.getAdminPassword().isEmpty()) {
-                adminDto.setAdminPassword(passwordEncoder.encode(adminDto.getAdminPassword()));
-            }
-            adminUserMapper.insertAdmin(adminDto);
+            adminUserService.createAdmin(adminDto);
             return "success";
         } catch (Exception e) {
             e.printStackTrace();
@@ -71,7 +84,7 @@ public class AdminUserController {
                                     @RequestParam("status") String status) {
         try {
             // UserMapper에 작성한 일괄 업데이트 메서드 호출
-            userMapper.updateUsersStatus(userIds, status);
+            adminUserService.batchUpdateUserStatus(userIds, status);
             return "success";
         } catch (Exception e) {
             e.printStackTrace();
@@ -84,9 +97,7 @@ public class AdminUserController {
     @ResponseBody
     public String addDept(@RequestParam("deptName") String deptName) {
         try {
-            DeptDTO dto = new DeptDTO();
-            dto.setDeptName(deptName);
-            deptMapper.insertDept(dto);
+            adminUserService.createDept(deptName);
             return "success";
         } catch (Exception e) {
             return "fail";
@@ -98,15 +109,24 @@ public class AdminUserController {
     @ResponseBody
     public String addRank(@RequestParam("rankName") String rankName) {
         try {
-            RankDTO dto = new RankDTO();
-            dto.setRankName(rankName);
-            rankMapper.insertRank(dto);
+            adminUserService.createRank(rankName);
             return "success";
         } catch (Exception e) {
             return "fail";
         }
     }
 
+    @PostMapping("/dept/delete")
+    @ResponseBody
+    public String deleteDept(@RequestParam("deptId") Long deptId) {
+        // 컨트롤러가 직접 DB를 건드리는 대신, 서비스의 메서드를 호출합니다.
+        return adminUserService.deleteDept(deptId);
+    }
 
-
+    @PostMapping("/rank/delete")
+    @ResponseBody
+    public String deleteRank(@RequestParam("rankId") Long rankId) {
+        // 마찬가지로 서비스 호출
+        return adminUserService.deleteRank(rankId);
+    }
 }

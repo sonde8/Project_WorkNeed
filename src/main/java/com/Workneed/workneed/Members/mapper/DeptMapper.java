@@ -15,7 +15,5 @@ public interface DeptMapper {
 
     void insertDept(DeptDTO deptDto);
 
-    void updateDept(DeptDTO deptDto);
-
     void deleteDept(Long deptId);
 }
