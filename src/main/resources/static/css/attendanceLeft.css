@@ -112,18 +112,3 @@
     border-radius: 10px;
 
 }
-
-/* 메인 출 퇴근 버튼 이외 숨기기 */
-.attendWidget .title,
-.attendWidget .clock,
-.attendWidget .click,
-.attendWidget .row:has([data-monthtotal]){
-    display: none;
-}
-
-.attendWidget .att-left {
-    width: auto;
-    height: auto;
-    border: none;
-    padding: 0;
-}
