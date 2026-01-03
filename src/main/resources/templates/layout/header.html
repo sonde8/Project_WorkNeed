@@ -16,7 +16,7 @@
             </div>
         </div>
 
-        <div class="profile-info" th:unless="${user != null}">
+        <div class="profile-info" th:unless="${session.user != null}">
             <a th:href="@{/login}" class="login-link">로그인</a>
         </div>
     </div>

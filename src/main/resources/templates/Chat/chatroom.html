@@ -15,11 +15,14 @@
 <main layout:fragment="content" class="chat-inner-layout">
     <aside class="chat-sidebar">
         <div class="search-container">
-            <input type="text" placeholder="검색">
-            <button type="button" class="icon-btn">
-                <img th:src="@{/images/search300.svg}" width="18" height="18" alt="검색">
-            </button>
+            <div class="search-box-wrapper">
+                <input type="text" placeholder="검색">
+                <button type="button" class="icon-btn create-room-btn" title="채팅방 생성" onclick="openCreateRoomModal()">
+                    <img th:src="@{/images/chatadd300.svg}" width="24" height="24" alt="방 생성">
+                </button>
+            </div>
         </div>
+
         <div id="room-list" class="room-list-scroll">
             <div th:each="r : ${rooms}" class="room-card"
                  th:id="'room-' + ${r.roomId}"
@@ -69,11 +72,6 @@
                         </button>
                         <button type="button" class="icon-btn" title="채팅방 나가기" onclick="leaveRoom()">
                             <img th:src="@{/images/exit300.svg}" width="22" height="22" alt="나가기">
-                        </button>
-                    </th:block>
-                    <th:block th:unless="${room != null}">
-                        <button type="button" class="icon-btn" title="채팅방 생성" onclick="openCreateRoomModal()">
-                            <img th:src="@{/images/chatadd300.svg}" width="24" height="24" alt="방 생성">
                         </button>
                     </th:block>
                 </div>
@@ -150,7 +148,9 @@
         <div id="mediaSidebar" class="chat-media-sidebar">
             <div class="sidebar-header">
                 <h3>채팅방 서랍</h3>
-                <button class="close-btn" onclick="toggleChatSidebar()">&times;</button>
+                <button class="close-btn" onclick="toggleChatSidebar()" title="서랍 닫기">
+                    <img th:src="@{/images/close300.svg}" width="22" height="22" alt="닫기">
+                </button>
             </div>
             <div class="sidebar-content">
                 <div class="media-section">
@@ -189,15 +189,11 @@
 </main>
 
 <th:block layout:fragment="script">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
     <script th:inline="javascript">
-        window.currentUserId = /*[[${currentUserId != null ? currentUserId : session.user.userId}]]*/ null;
         window.roomId = /*[[${room != null ? room.roomId : null}]]*/ null;
         window.lastDisplayDate = /*[[${history != null && !history.isEmpty() ? #temporals.format(history.get(history.size()-1).createdAt, 'yyyy-MM-dd') : null}]]*/ null;
     </script>
     <script th:src="@{/js/chatModal.js}"></script>
-    <script th:src="@{/js/Socket.js}"></script>
 </th:block>
 </body>
 </html>
