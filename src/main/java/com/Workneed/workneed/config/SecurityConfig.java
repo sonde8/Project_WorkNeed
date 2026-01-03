@@ -19,6 +19,7 @@ public class SecurityConfig {
     private final CustomOAuth2UserService customOAuth2UserService;
     private final LocalUserDetailsService totalAuthService;
     private final PrincipalSessionSyncFilter principalSessionSyncFilter;
+    private  final  OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -31,16 +32,36 @@ public class SecurityConfig {
                 // 접근 권한
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/", "/main",
-                                "/login", "/login-user",
+                                "/",
+                                "/login",
+                                "/login-user",
                                 "/register/**",
-                                "/css/**", "/js/**", "/images/**",
-                                "/oauth2/**", "/layout/**", "/favicon.ico"
+
+
+                                "/oauth2/authorization/**",
+                                "/login/oauth2/**",
+
+                                "/css/**",
+                                "/js/**",
+                                "/images/**",
+                                "/layout/**",
+                                "/favicon.ico"
                         ).permitAll()
                         //  관리자는 아직 세션 기반이므로 일단 permit
                         .requestMatchers("/admin/**").permitAll()
                         .anyRequest().authenticated()
                 )
+
+                // OAuth2 로그인
+                .oauth2Login(oauth2 -> oauth2
+                        .loginPage("/login")
+
+                        .userInfoEndpoint(userInfo ->
+                                userInfo.userService(customOAuth2UserService)
+                        )
+                        .defaultSuccessUrl("/main", true)
+                )
+
 
                 // 일반 로그인 (HTML 구조에 맞춤)
                 .formLogin(form -> form
@@ -51,6 +72,7 @@ public class SecurityConfig {
                         .defaultSuccessUrl("/main", true)
                         .failureUrl("/login?error")
                 )
+
 
                 // 자동 로그인 (remember-me) — 핵심 5줄
                 .rememberMe(r -> r
@@ -66,16 +88,6 @@ public class SecurityConfig {
                         UsernamePasswordAuthenticationFilter.class
                 )
 
-
-                // OAuth2 로그인
-                // OAuth 관련 DB 작업은 CustomOAuth2UserService 안에서 모두 처리
-                .oauth2Login(oauth2 -> oauth2
-                        .loginPage("/login")
-                        .userInfoEndpoint(userInfo ->
-                                userInfo.userService(customOAuth2UserService)
-                        )
-                        .defaultSuccessUrl("/main", true)
-                )
 
                 // 로그아웃
                 .logout(logout -> logout

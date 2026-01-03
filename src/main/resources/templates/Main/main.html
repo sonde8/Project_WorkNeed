@@ -48,6 +48,16 @@
                         <span class="rank" th:text="${user.rankName}">직급</span>
                     </div>
 
+                    <!--구글연동문구-->
+                    <div style="margin: 10px 0;">
+                        <a th:href="@{/oauth2/authorization/google}" style="color: #4285F4; font-size: 0.9em; text-decoration: none;">
+                            <i class="fa-brands fa-google"></i> [테스트] 구글 계정 연동하기
+                        </a>
+                    </div>
+
+
+
+
                     <div style="margin-top: 6px;">
                         <button id="openPwModal" type="button"
                                 style="font-size: 11px; padding: 2px 8px; cursor: pointer; border: 1px solid black; background: #fff; border-radius: 4px; font-weight: 700;">

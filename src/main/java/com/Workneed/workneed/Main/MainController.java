@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 public class MainController {
@@ -25,6 +26,14 @@ public class MainController {
         model.addAttribute("pageTitle", "메인");
 
         return "Main/main";
+    }
+
+    @GetMapping("/debug")
+    @ResponseBody
+    public String debug(HttpSession session) {
+        return session.getAttribute("user") == null
+                ? "NO USER IN SESSION"
+                : "USER IN SESSION";
     }
 
 }

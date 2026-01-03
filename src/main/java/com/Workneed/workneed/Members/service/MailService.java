@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+
+import java.io.UnsupportedEncodingException;
 import java.util.Random;
 
 @Slf4j
@@ -33,7 +35,7 @@ public class MailService {
         try {
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
-            helper.setFrom(fromEmail);
+            helper.setFrom(fromEmail, "Workneed");
             helper.setTo(toEmail);
             helper.setSubject("[Workneed] 회원가입 인증번호입니다.");
 
@@ -43,11 +45,9 @@ public class MailService {
 
             helper.setText(body, true);
 
-            log.info("메일 발송 요청: {}", toEmail);
             mailSender.send(message);
-            log.info("메일 발송 성공: {}", toEmail);
 
-        } catch (MessagingException e) {
+        } catch (MessagingException | UnsupportedEncodingException e) {
             log.error("메일 발송 실패: {}", toEmail, e);
         }
     }

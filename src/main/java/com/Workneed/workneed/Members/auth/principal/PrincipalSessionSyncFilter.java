@@ -22,6 +22,16 @@ public class PrincipalSessionSyncFilter extends OncePerRequestFilter {
                                     FilterChain filterChain)
             throws ServletException, IOException {
 
+        String uri = request.getRequestURI();
+
+        if (uri.startsWith("/oauth2/")
+                || uri.startsWith("/login")
+                || uri.startsWith("/register")) {
+
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         HttpSession session = request.getSession(false);
 
         if (session != null && session.getAttribute("user") == null) {

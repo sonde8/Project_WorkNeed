@@ -16,7 +16,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 
+import java.util.Collections;
 import java.time.LocalDateTime;
 import java.util.Map;
 
@@ -98,7 +101,11 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             session.setAttribute("user", userDto);
         }
 
-        // 5. 시큐리티 인증 객체 생성
-        return new CustomUserDetails(userDto, attributes);
+        // 5. 시큐리티 인증 객체 생성 (OAuth 표준 Principal로 반환)
+        return new DefaultOAuth2User(
+                Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")),
+                attributes,
+                "sub" // Google의 고유 식별자
+        );
     }
 }
