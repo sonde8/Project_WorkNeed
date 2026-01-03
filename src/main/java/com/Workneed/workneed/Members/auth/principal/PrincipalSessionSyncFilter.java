@@ -30,9 +30,16 @@ public class PrincipalSessionSyncFilter extends OncePerRequestFilter {
             if (auth != null && auth.isAuthenticated()
                     && auth.getPrincipal() instanceof CustomUserDetails cud) {
 
-                // 관리자 제외
-                if (cud.getAdminDto() == null && cud.getUserDto() != null) {
+                // 관리자 로그인
+                if (cud.getAdminDto() != null) {
+                    session.setAttribute("admin", cud.getAdminDto());
+                    session.removeAttribute("user");
+                }
+
+                // 일반 로그인
+                else if (cud.getUserDto() != null) {
                     session.setAttribute("user", cud.getUserDto());
+                    session.removeAttribute("admin");
                 }
             }
         }

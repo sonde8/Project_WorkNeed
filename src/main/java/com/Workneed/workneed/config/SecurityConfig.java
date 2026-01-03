@@ -37,7 +37,7 @@ public class SecurityConfig {
                                 "/css/**", "/js/**", "/images/**",
                                 "/oauth2/**", "/layout/**", "/favicon.ico"
                         ).permitAll()
-                        // ※ 관리자는 아직 세션 기반이므로 일단 permit
+                        //  관리자는 아직 세션 기반이므로 일단 permit
                         .requestMatchers("/admin/**").permitAll()
                         .anyRequest().authenticated()
                 )
