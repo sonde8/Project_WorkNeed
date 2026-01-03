@@ -4,97 +4,76 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/layout}">
 
-<!-- ================= HEAD ================= -->
 <th:block layout:fragment="head">
-    <!-- FullCalendar -->
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet"/>
-
-    <!-- flatpickr -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"/>
-
-    <!-- Calendar CSS -->
     <link rel="stylesheet" th:href="@{/css/calendar.css}"/>
     <link rel="stylesheet" th:href="@{/css/calendar-modal.css}"/>
     <link rel="stylesheet" th:href="@{/css/calendar-detail-modal.css}"/>
 </th:block>
 
-<!-- ================= CONTENT ================= -->
 <main layout:fragment="content">
 
     <div class="calendar-container">
 
-        <!-- LEFT -->
         <aside class="calendar-left">
-
-            <!-- 일정 등록 -->
             <button class="schedule-add-btn" id="openCalendarCreateModal" type="button">
                 + 일정 등록
             </button>
 
-            <!-- Today -->
             <section class="left-box today-box">
                 <h3 class="left-title" id="today-title">Today's Schedule</h3>
                 <ul class="today-list" id="todayList"></ul>
-            </section>
-
-            <!-- Weekly Progress -->
-            <section class="left-box">
-                <h3 class="left-title">Weekly Progress Bar</h3>
-
-                <div class="weekly-progress-group">
-
-                    <div class="weekly-progress-item">
-                        <span class="label">전체</span>
-                        <div class="progress">
-                            <div class="progress-bar total"></div>
-                        </div>
-                        <span class="progress-text total-text">0%</span>
-                    </div>
-
-                    <div class="weekly-progress-item">
-                        <span class="label">개인</span>
-                        <div class="progress">
-                            <div class="progress-bar personal"></div>
-                        </div>
-                        <span class="progress-text personal-text">0%</span>
-                    </div>
-
-                    <div class="weekly-progress-item">
-                        <span class="label">업무</span>
-                        <div class="progress">
-                            <div class="progress-bar work"></div>
-                        </div>
-                        <span class="progress-text work-text">0%</span>
-                    </div>
-
+                <div id="todayEmptyMsg" class="today-empty-msg hidden">
+                    오늘의 일정이 없습니다.
                 </div>
             </section>
 
-            <!-- Filter -->
+            <section class="left-box">
+                <h3 class="left-title">Week Preview <span style="font-size:0.8em; color:#888; font-weight:normal;">(Mon-Sun)</span></h3>
+
+                <div class="preview-container">
+                    <div class="preview-group">
+                        <span class="category-badge" style="background-color: #fee2e2; color: #b91c1c; font-size: 13px; padding: 4px 8px;">업무</span>
+                        <ul class="preview-list">
+                            <li>
+                                <span class="preview-label">오늘 마감</span>
+                                <div class="preview-right">
+                                    <span class="preview-count" id="workDueTodayCount">0건</span>
+                                    <span id="workDueWarning" class="warning-icon hidden">⚠️</span>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="preview-label">이번 주 마감</span>
+                                <span class="preview-count" id="workDueWeekCount">0건</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="preview-group">
+                        <span class="category-badge" style="background-color: #dbeafe; color: #1d4ed8; font-size: 13px; padding: 4px 8px;">개인</span>
+                        <ul class="preview-list">
+                            <li>
+                                <span class="preview-label">이번 주 일정</span>
+                                <span class="preview-count" id="personalWeekCount">0건</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
             <section class="left-box">
                 <h3 class="left-title">Calendars</h3>
-
                 <div class="filter-radio-group" role="radiogroup">
-                    <label class="filter-radio">
-                        <input type="radio" name="scheduleFilter" value="ALL" checked/>
-                        전체
-                    </label>
-                    <label class="filter-radio">
-                        <input type="radio" name="scheduleFilter" value="PERSONAL"/>
-                        개인
-                    </label>
-                    <label class="filter-radio">
-                        <input type="radio" name="scheduleFilter" value="WORK"/>
-                        업무
-                    </label>
+                    <label class="filter-radio"><input type="radio" name="scheduleFilter" value="ALL" checked/> 전체</label>
+                    <label class="filter-radio"><input type="radio" name="scheduleFilter" value="WORK"/> 업무</label>
+                    <label class="filter-radio"><input type="radio" name="scheduleFilter" value="PERSONAL"/> 개인</label>
                 </div>
             </section>
-
         </aside>
 
         <div class="calendar-gap"></div>
 
-        <!-- RIGHT -->
         <section class="calendar-right">
             <div class="calendar-inner">
                 <div id="calendar"></div>
@@ -103,40 +82,49 @@
 
     </div>
 
-    <!-- 모달 -->
+    <div class="modal-overlay hidden" id="calendarDailyListModalOverlay" aria-hidden="true" style="z-index: 50;">
+        <div class="modal-container" style="max-height: 500px; display: flex; flex-direction: column;">
+
+            <div class="modal-header">
+                <h2 id="dailyListTitle"></h2>
+                <button type="button" class="modal-close-btn" id="closeDailyListBtn">✕</button>
+            </div>
+
+            <div class="modal-body" style="flex: 1; overflow-y: auto;">
+                <ul id="dailyEventList" class="daily-list-simple-ul">
+                </ul>
+                <div id="dailyListEmptyMsg" class="hidden" style="text-align: center; color: #999; padding: 20px;">
+                    등록된 일정이 없습니다.
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn-submit" id="dailyListAddBtn" style="width: 100%;">
+                    + 이 날짜에 일정 등록
+                </button>
+            </div>
+        </div>
+    </div>
+
     <div th:replace="~{Calendar/calendar-modal :: calendarCreateModal}"></div>
     <div th:replace="~{Calendar/calendar-detail-modal :: calendarDetailModal}"></div>
 
 </main>
 
-<!-- ================= SCRIPT ================= -->
 <th:block layout:fragment="script">
-
     <script th:inline="javascript">
         /*<![CDATA[*/
-        // IDE에서 붉은 줄이 뜨지 않도록 주석 감싸기 기법 사용
-        // 실제 실행 시에는 Thymeleaf가 값을 주입하고, 값이 없으면 null이 할당됨
         const loginUser = /*[[${loginUser}]]*/ null;
-
-        // JS 전역 변수 세팅
         window.USER_ID = loginUser ? loginUser.userId : null;
         window.USER_NAME = loginUser ? loginUser.userName : 'Guest';
-        window.IS_ADMIN = false; // 필요시 loginUser.rankId 등으로 권한 로직 추가
-
-        console.log("Logged in as:", window.USER_ID);
+        window.IS_ADMIN = false;
         /*]]>*/
     </script>
-
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
-
     <script src='https://cdn.jsdelivr.net/npm/@fullcalendar/google-calendar@6.1.10/index.global.min.js'></script>
-
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-
     <script th:src="@{/js/calendar.js}"></script>
     <script th:src="@{/js/calendar-detail-modal.js}"></script>
     <script th:src="@{/js/calendar-modal.js}"></script>
-
 </th:block>
-
 </html>

@@ -91,16 +91,31 @@
     }
 
     function getEventColor(dto) {
-        // 캘린더 일정은 dto.color 우선
-        if (dto?.color) return dto.color;
 
-        // 업무 일정은 type 기반 기본색
-        const type = (dto?.type || "").toString().toUpperCase();
-        if (type === "COMPANY") return "#ef4444";
-        if (type === "TEAM") return "#22c55e";
-        if (type === "PERSONAL") return "#3b82f6";
-        return "#3b82f6";
-    }
+            // 사용자가 직접 지정한 색상이 있다면 최우선 적용
+            if (dto?.color) return dto.color;
+
+            const type = (dto?.type || "").toString().toUpperCase();
+            const source = getSource(dto);
+
+            // 1. [업무] (스케줄 소스) -> 빨간색 계열 통일
+            if (source === "SCHEDULE") {
+                return "#ef4444";
+            }
+
+            // 2. [회사] (관리자 등록) -> 보라색 계열 통일
+            if (type === "COMPANY") {
+                return "#8b5cf6";
+            }
+
+            // 3. [팀] -> 초록색 (필요시 업무 색상인 #ef4444로 변경 가능)
+            if (type === "TEAM") {
+                return "#22c55e";
+            }
+
+            // 4. [개인] (기본) -> 파란색 계열 통일
+            return "#3b82f6";
+        }
 
     function getTypeEmoji(dto) {
         const type = (dto?.type || "").toUpperCase();
@@ -122,6 +137,23 @@
         }
 
         return "📌";
+    }
+    function getCategoryInfo(dto) {
+        const type = (dto?.type || "").toUpperCase();
+        const source = getSource(dto);
+
+        // 1. 회사 (연한 보라 배경 + 진한 보라 글씨)
+        if (source === "CALENDAR" && type === "COMPANY") {
+            return { text: "회사", bg: "#f3e8ff", color: "#7e22ce" };
+        }
+
+        // 2. 업무 (연한 빨강 배경 + 진한 빨강 글씨)
+        if (source === "SCHEDULE") {
+            return { text: "업무", bg: "#fee2e2", color: "#b91c1c" };
+        }
+
+        // 3. 개인 (연한 파랑 배경 + 진한 파랑 글씨)
+        return { text: "개인", bg: "#dbeafe", color: "#1d4ed8" };
     }
 
     function getDtoId(dto) {
@@ -239,10 +271,103 @@
             extendedProps: { raw: dto },
         };
     }
+    /* ================= Daily List Modal Logic (Simple Version) ================= */
 
+    /* ================= Daily List Modal Logic (Time Fix) ================= */
+
+    function openDailyListModal(targetDate) {
+        const overlay = document.getElementById("calendarDailyListModalOverlay");
+        const titleEl = document.getElementById("dailyListTitle");
+        const listUl = document.getElementById("dailyEventList");
+        const emptyMsg = document.getElementById("dailyListEmptyMsg");
+        const addBtn = document.getElementById("dailyListAddBtn");
+        const closeBtn = document.getElementById("closeDailyListBtn");
+
+        if (!overlay) return;
+
+        // 1. 날짜 범위 설정
+        const baseDate = new Date(targetDate);
+        baseDate.setHours(0, 0, 0, 0);
+        const nextDate = new Date(baseDate);
+        nextDate.setDate(baseDate.getDate() + 1);
+
+        // 2. 헤더 제목 설정
+        titleEl.textContent = `${baseDate.getFullYear()}년 ${baseDate.getMonth() + 1}월 ${baseDate.getDate()}일`;
+
+        // 3. 해당 날짜 일정 필터링
+        const dailyEvents = allEventsCache.filter(e => {
+            if (!e.start) return false;
+            if (typeof matchFilter === "function" && !matchFilter(e)) return false;
+
+            const s = new Date(e.start);
+            const ed = e.end ? new Date(e.end) : addMinutes(s, 30);
+            return s < nextDate && ed > baseDate;
+        });
+
+        // 4. 리스트 렌더링
+        listUl.innerHTML = "";
+
+        if (dailyEvents.length === 0) {
+            emptyMsg.classList.remove("hidden");
+        } else {
+            emptyMsg.classList.add("hidden");
+
+            // 시간순 정렬
+            dailyEvents.sort((a, b) => new Date(a.start) - new Date(b.start));
+
+            dailyEvents.forEach(e => {
+                const li = document.createElement("li");
+
+                const emoji = getTypeEmoji(e);
+                const category = getCategoryInfo(e);
+
+                // [수정됨] 시간 표시 로직 (Start ~ End 모두 표시)
+                const sTime = new Date(e.start);
+                const eTime = e.end ? new Date(e.end) : addMinutes(sTime, 30); // 끝 시간 없으면 30분 뒤로
+
+                const startStr = `${pad(sTime.getHours())}:${pad(sTime.getMinutes())}`;
+                const endStr = `${pad(eTime.getHours())}:${pad(eTime.getMinutes())}`;
+                const timeRange = `${startStr} ~ ${endStr}`; // 예: 09:00 ~ 10:00
+
+                li.innerHTML = `
+                <span style="font-size:1.4rem; margin-right: 8px;">${emoji}</span>
+                
+                <span class="category-badge" style="background-color: ${category.bg}; color: ${category.color};">
+                    ${category.text}
+                </span>
+                <div style="flex:1;">
+                    <div style="flex:1;">
+                        <div style="font-weight:bold; font-size:1rem; color:#333; margin-bottom:2px;">${e.title || "(제목 없음)"}</div>
+                        <div style="font-size:0.85rem; color:#666;">${timeRange}</div>
+                    </div>
+                `;
+
+                li.onclick = () => {
+                    overlay.classList.add("hidden");
+                    safeOpenDetailModal(e);
+                };
+                listUl.appendChild(li);
+            });
+        }
+
+        // 5. 버튼 이벤트
+        closeBtn.onclick = () => overlay.classList.add("hidden");
+
+        addBtn.onclick = () => {
+            overlay.classList.add("hidden");
+            const startAt = new Date(baseDate);
+            startAt.setHours(9, 0, 0);
+            const endAt = new Date(startAt);
+            endAt.setMinutes(30);
+            safeOpenCreateModal({
+                start: toDtoDateTime(startAt),
+                end: toDtoDateTime(endAt)
+            });
+        };
+
+        overlay.classList.remove("hidden");
+    }
     /* ================= Calendar Init ================= */
-
-    /* calendar.js 내부의 initCalendar 함수 전체 교체 */
 
     function initCalendar() {
         const el = document.getElementById("calendar");
@@ -254,65 +379,55 @@
         calendar = new FullCalendar.Calendar(el, {
             locale: "ko",
             initialView: "dayGridMonth",
-
-            // ==========================================
-            // [Google Calendar 연동 설정]
-            // ==========================================
             googleCalendarApiKey: 'AIzaSyBM_oNQ8dkUcn_lK-EmAn2iwXgVGz_cp_s',
 
+            /* ================= 레이아웃 설정 ================= */
+            height: '100%',
+            expandRows: true,      // 행 높이 균등
+            dayMaxEvents: true,    // 자동 +more 처리
+            fixedWeekCount: false, // 빈 줄 제거
+
+            /* [중요] 모든 이벤트를 블록(Bar) 형태로 통일 */
+            eventDisplay: 'block',
+
+            /* ============================================== */
+
+            // 공휴일
             eventSources: [
                 {
                     googleCalendarId: 'ko.south_korea#holiday@group.v.calendar.google.com',
                     className: 'korean-holiday',
-                    color: '#ef4444',     // 기본 빨간색 (법정 공휴일용)
-                    textColor: '#ffffff',
+                    color: 'transparent',
+                    textColor: '#ef4444',
                     editable: false,
                     display: 'block'
                 }
             ],
 
-            // 3. 이벤트 데이터 변환 (공휴일 vs 기념일 구분 처리)
+            // 공휴일 스타일
             eventDataTransform: function(eventDef) {
-                // 구글 캘린더에서 온 이벤트인지 확인 (url이나 source ID로 식별)
                 if (eventDef.url || (eventDef.source && eventDef.source.googleCalendarId)) {
-
-                    // 빨간 날이 아닌 기념일 키워드 목록
-                    const notRedDays = [
-                        "어버이날", "스승의날", "제헌절", "국군의 날",
-                        "식목일", "발렌타인", "화이트", "할로윈", "빼빼로",
-                        "동지", "초복", "중복", "말복", "입춘", "소한", "대한",
-                        "칠석", "단오", "근로자의 날"
-                    ];
-
+                    const notRedDays = ["어버이날", "스승의날", "제헌절", "국군의 날", "식목일", "발렌타인", "화이트", "할로윈", "빼빼로", "동지", "초복", "중복", "말복", "입춘", "소한", "대한", "칠석", "단오", "근로자의 날"];
                     const title = eventDef.title || "";
 
-                    // 제목에 해당 키워드가 포함되어 있으면 색상 변경
+                    eventDef.className = "holiday-event";
                     if (notRedDays.some(keyword => title.includes(keyword))) {
-                        eventDef.color = '#10b981';       // 초록색 (기념일)
-                        eventDef.borderColor = '#10b981';
-
-                        // 만약 캘린더에서 아예 숨기고 싶다면 아래 주석 해제
-                        // return false;
+                        eventDef.textColor = '#10b981';
                     }
                 }
                 return eventDef;
             },
-            // ==========================================
 
-            /* ===== 레이아웃 & 그리드 설정 (기존 유지) ===== */
-            height: "100%",
-            expandRows: true,
-            dayMaxEvents: true,
-            fixedWeekCount: false,
+            // more 링크 클릭 -> 리스트 모달
+            moreLinkClick: function(info) {
+                openDailyListModal(info.date);
+                return "void";
+            },
 
             selectable: true,
             selectMirror: true,
             editable: true,
             allDaySlot: false,
-
-            slotDuration: "00:30:00",
-            snapDuration: "00:30:00",
-            slotLabelInterval: "00:30",
 
             headerToolbar: {
                 left: "prev,next today",
@@ -320,107 +435,97 @@
                 right: "dayGridMonth,timeGridWeek,timeGridDay",
             },
 
-            /* ===== 날짜/시간 선택 (기존 유지) ===== */
+            /* [핵심 수정] 날짜 선택 로직 분기 */
             select(info) {
-                const viewType = calendar.view.type;
+                // Month 뷰일 때만 적용
+                if (calendar.view.type === "dayGridMonth") {
 
-                // Month: 다일 일정 UX (09:00 고정)
-                if (viewType === "dayGridMonth") {
-                    const startDate = info.start;
-                    const endExclusive = info.end;
+                    const diffTime = info.end.getTime() - info.start.getTime();
+                    const diffDays = diffTime / (1000 * 60 * 60 * 24);
 
-                    const endInclusive = new Date(endExclusive);
-                    endInclusive.setDate(endInclusive.getDate() - 1);
+                    // 1일 초과 선택(드래그) -> 바로 등록 모달 (다일 일정 등록)
+                    if (diffDays > 1) {
+                        // 종료일이 exclusive하므로 -1일 처리 안 하고 그대로 둬야
+                        // 모달에서 00:00 기준으로 처리하거나, 사용자가 원하는 대로
+                        // 여기서 -1일 해서 inclusive로 넘겨도 됨.
+                        // FullCalendar 드래그는 종료일이 다음날 00시임.
+                        // 보통 등록 모달에서는 종료일 전날까지로 보정해주는게 UX상 좋음.
 
-                    const start = new Date(
-                        startDate.getFullYear(),
-                        startDate.getMonth(),
-                        startDate.getDate(),
-                        9, 0, 0
-                    );
+                        const endDateInclusive = new Date(info.end);
+                        endDateInclusive.setDate(endDateInclusive.getDate() - 1);
 
-                    const end = new Date(
-                        endInclusive.getFullYear(),
-                        endInclusive.getMonth(),
-                        endInclusive.getDate(),
-                        9, 0, 0
-                    );
-
-                    safeOpenCreateModal({
-                        start: toDtoDateTime(start),
-                        end: toDtoDateTime(end),
-                    });
+                        safeOpenCreateModal({
+                            start: toDtoDateTime(info.start),
+                            end: toDtoDateTime(info.end), // 또는 info.end 그대로
+                        });
+                    }
+                    // 딱 하루 클릭 -> 리스트 모달
+                    else {
+                        openDailyListModal(info.start);
+                    }
 
                     calendar.unselect();
                     return;
                 }
 
-                // Week/Day: 시간 드래그 그대로
+                // 주간/일간 뷰
                 const start = info.start;
                 let end = info.end ? new Date(info.end) : null;
                 if (!end) end = addMinutes(start, 30);
-
-                safeOpenCreateModal({
-                    start: toDtoDateTime(start),
-                    end: toDtoDateTime(end),
-                });
-
+                safeOpenCreateModal({ start: toDtoDateTime(start), end: toDtoDateTime(end) });
                 calendar.unselect();
             },
 
-            /* ===== 일정 클릭 ===== */
-            eventClick(info) {
-                // 1. 구글 캘린더(공휴일)인 경우: 링크 이동 막기
-                if (info.event.url) {
-                    info.jsEvent.preventDefault();
-                    return;
-                }
+            // 일정 클릭
+                eventClick(info) {
 
-                // 2. 내가 등록한(DB) 일정인 경우: 상세 모달 열기
-                const raw = info?.event?.extendedProps?.raw;
-                if (raw) safeOpenDetailModal(raw);
-            },
+                    if (info.event.url) {
+                        info.jsEvent.preventDefault();
+                        return;
+                    }
 
-            /* ===== 드래그 이동 (기존 유지) ===== */
+                    const raw = info.event.extendedProps?.raw;
+                    if (raw) {
+
+                        const clickedDate = calendar.getDateFromPixel({
+                            x: info.jsEvent.clientX,
+                            y: info.jsEvent.clientY
+                        });
+
+                        // 클릭 좌표에서 날짜를 못 찾으면(예외 상황) 이벤트 시작일 사용
+                        const targetDate = clickedDate || info.event.start;
+
+                        openDailyListModal(targetDate);
+                    }
+                },
+
+            // 드래그/리사이즈
             eventDrop(info) {
                 const raw = info.event.extendedProps?.raw;
-
-                if (raw && isScheduleSource(raw)) {
-                    alert("업무 일정은 캘린더에서 이동할 수 없습니다.");
-                    info.revert();
-                    return;
-                }
-
-                if (raw?.type === "COMPANY") {
-                    alert("회사 전체 일정은 이동할 수 없습니다.");
-                    info.revert();
-                    return;
-                }
-
+                if (checkReadOnly(raw)) { info.revert(); return; }
                 syncEvent(info.event);
             },
-
-            /* ===== 리사이즈 (기존 유지) ===== */
             eventResize(info) {
                 const raw = info.event.extendedProps?.raw;
-
-                if (raw && isScheduleSource(raw)) {
-                    alert("업무 일정은 캘린더에서 변경할 수 없습니다.");
-                    info.revert();
-                    return;
-                }
-
-                if (raw?.type === "COMPANY") {
-                    alert("회사 전체 일정은 변경할 수 없습니다.");
-                    info.revert();
-                    return;
-                }
-
+                if (checkReadOnly(raw)) { info.revert(); return; }
                 syncEvent(info.event);
             },
         });
 
         calendar.render();
+    }
+
+    // (참고용) 읽기 전용 체크
+    function checkReadOnly(raw) {
+        if (raw && isScheduleSource(raw)) {
+            alert("업무 일정은 캘린더에서 변경할 수 없습니다.");
+            return true;
+        }
+        if (raw?.type === "COMPANY") {
+            alert("회사 전체 일정은 변경할 수 없습니다.");
+            return true;
+        }
+        return false;
     }
 
     /* ================= Sync (drag/resize) ================= */
@@ -499,24 +604,52 @@
             .forEach((ev) => calendar.addEvent(ev));
 
         renderTodayList();
-        renderWeeklyProgress();
+        renderWeekPreview()
     }
 
-    /* ================= Today List ================= */
+    /* ================= Today List (수정됨) ================= */
 
     function renderTodayList() {
         const ul = document.getElementById("todayList");
+        const emptyMsg = document.getElementById("todayEmptyMsg");
+
+        // 1. [날짜 표시 로직] Week Preview와 스타일 100% 동일하게
+        const headerTitle = document.getElementById("today-title");
+        if (headerTitle) {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, "0"); // 01, 02...
+            const day = String(now.getDate()).padStart(2, "0");       // 01, 02...
+
+            // 날짜 포맷: 2026.01.02
+            const dateStr = `${year}.${month}.${day}`;
+
+            // 중복 추가 방지 (이미 날짜가 있으면 텍스트만 업데이트, 없으면 태그 추가)
+            const existingSuffix = headerTitle.querySelector(".today-date-suffix");
+
+            // Week Preview와 동일한 스타일: font-size:0.8em; color:#888; font-weight:normal;
+            const suffixHtml = ` <span class="today-date-suffix" style="font-size:0.8em; color:#888; font-weight:normal;">(${dateStr})</span>`;
+
+            if (existingSuffix) {
+                existingSuffix.innerHTML = `(${dateStr})`;
+            } else {
+                headerTitle.innerHTML += suffixHtml;
+            }
+        }
+
         if (!ul) return;
 
         ul.innerHTML = "";
 
+        // 오늘 날짜 범위 설정
         const todayStart = new Date();
         todayStart.setHours(0, 0, 0, 0);
 
         const todayEnd = new Date();
         todayEnd.setHours(23, 59, 59, 999);
 
-        allEventsCache
+        // 오늘 날짜에 해당하는 일정 필터링
+        const todayEvents = allEventsCache
             .filter((e) => {
                 const s = e.start ? new Date(e.start) : null;
                 const ed = e.end ? new Date(e.end) : null;
@@ -525,71 +658,120 @@
                 const end = ed || addMinutes(s, 30);
                 return s <= todayEnd && end >= todayStart;
             })
-            .sort((a, b) => new Date(a.start) - new Date(b.start))
-            .forEach((e) => {
+            .sort((a, b) => new Date(a.start) - new Date(b.start));
+
+        // 리스트 렌더링
+        if (todayEvents.length === 0) {
+            if (emptyMsg) emptyMsg.classList.remove("hidden");
+        } else {
+            if (emptyMsg) emptyMsg.classList.add("hidden");
+
+            todayEvents.forEach((e) => {
                 const li = document.createElement("li");
 
                 const emoji = getTypeEmoji(e);
-                li.textContent = `${emoji} ${e.title || "(제목 없음)"}`;
+                const category = getCategoryInfo(e);
+
+                li.innerHTML = `
+                <span style="margin-right:4px;">${emoji}</span> 
+                
+                <span class="category-badge" style="background-color: ${category.bg}; color: ${category.color};">
+                    ${category.text}
+                </span>
+                
+                <span style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                    ${e.title || "(제목 없음)"}
+                </span>
+            `;
 
                 li.onclick = () => safeOpenDetailModal(e);
                 ul.appendChild(li);
             });
+        }
     }
 
-    /* ================= Weekly Progress ================= */
+    /* ================= Week Preview (Mon-Sun) ================= */
 
-    function renderWeeklyProgress() {
+    function renderWeekPreview() {
         const now = new Date();
+        const todayStr = toDtoDateTime(now).split('T')[0]; // "YYYY-MM-DD"
 
-        // 일요일~토요일
-        const start = new Date(now);
-        start.setHours(0, 0, 0, 0);
-        start.setDate(now.getDate() - now.getDay());
+        // 1. 이번 주 월요일 ~ 일요일 구하기
+        const currentDay = now.getDay(); // 0(일) ~ 6(토)
+        // 일요일(0)이면 7로 취급하여 지난 월요일을 찾음
+        const distToMon = currentDay === 0 ? 6 : currentDay - 1;
 
-        const end = new Date(start);
-        end.setHours(23, 59, 59, 999);
-        end.setDate(start.getDate() + 6);
+        const monday = new Date(now);
+        monday.setDate(now.getDate() - distToMon);
+        monday.setHours(0, 0, 0, 0);
 
-        const weekEvents = allEventsCache.filter((e) => {
-            if (!e.start) return false;
-            const s = new Date(e.start);
-            return s >= start && s <= end;
+        const sunday = new Date(monday);
+        sunday.setDate(monday.getDate() + 6);
+        sunday.setHours(23, 59, 59, 999);
+
+        // 2. 카운트 변수 초기화
+        let workDueToday = 0;
+        let workDueWeek = 0;
+        let personalWeek = 0;
+
+        // 3. 전체 일정 순회하며 집계
+        allEventsCache.forEach(e => {
+            if (!e.start) return;
+
+            const source = getSource(e); // 'SCHEDULE' or 'CALENDAR'
+            const type = (e.type || "").toUpperCase();
+
+            const startDate = new Date(e.start);
+            // end가 없으면 start + 30분으로 간주
+            const endDate = e.end ? new Date(e.end) : addMinutes(startDate, 30);
+
+            // 날짜 비교용 문자열 (YYYY-MM-DD)
+            const endDateStr = toDtoDateTime(endDate).split('T')[0];
+
+            /* --- [업무] 로직: 스케줄 소스 --- */
+            /* 업무는 '마감일'이 중요하므로 endDate 기준 판단 */
+            if (source === 'SCHEDULE') {
+                // 1) 오늘 마감: 마감일이 오늘 날짜와 같음 (시간 무관, 날짜만 비교)
+                if (endDateStr === todayStr) {
+                    workDueToday++;
+                }
+
+                // 2) 이번 주 마감: 마감일이 월~일 사이에 포함됨
+                if (endDate >= monday && endDate <= sunday) {
+                    workDueWeek++;
+                }
+            }
+
+                /* --- [개인] 로직: 캘린더 소스 & PERSONAL 타입 --- */
+            /* 개인 일정은 '시작일' 기준으로 이번 주에 있는지 판단 */
+            else if (source === 'CALENDAR' && type === 'PERSONAL') {
+                // 이번 주 일정: 시작일이 월~일 사이에 있거나, 기간이 겹치는 경우
+                // 간단하게 '시작일'이 이번 주 안에 있는 것으로 카운트
+                if (startDate >= monday && startDate <= sunday) {
+                    personalWeek++;
+                }
+            }
         });
 
-        const percent = (filterFn) => {
-            const arr = weekEvents.filter(filterFn);
-            if (!arr.length) return 0;
+        // 4. UI 업데이트
+        // 업무
+        updateText("#workDueTodayCount", `${workDueToday}건`);
+        updateText("#workDueWeekCount", `${workDueWeek}건`);
 
-            // 완료 기준: end < now (end 없으면 start+30분으로 가정)
-            const done = arr.filter((e) => {
-                const s = new Date(e.start);
-                const ed = e.end ? new Date(e.end) : addMinutes(s, 30);
-                return ed < now;
-            }).length;
+        // 오늘 마감 있으면 경고 아이콘 표시
+        const warningIcon = document.getElementById("workDueWarning");
+        if (warningIcon) {
+            if (workDueToday > 0) warningIcon.classList.remove("hidden");
+            else warningIcon.classList.add("hidden");
+        }
 
-            return Math.round((done / arr.length) * 100);
-        };
-
-        // PERSONAL(개인 타입)
-        setProgress(".personal", ".personal-text", percent((e) => (e.type || "").toUpperCase() === "PERSONAL"));
-
-        // WORK(스케줄 소스)
-        setProgress(".work", ".work-text", percent((e) => getSource(e) === "SCHEDULE"));
-
-        // TOTAL: 회사 공지(CALENDAR 소스의 COMPANY 타입)는 제외
-        setProgress(".total", ".total-text", percent((e) => {
-            const isCompanyNotice = getSource(e) === "CALENDAR" && (e.type || "").toUpperCase() === "COMPANY";
-            return !isCompanyNotice; // 회사 공지가 아닌 것만 합산 (개인 + 업무스케줄)
-        }));
+        // 개인
+        updateText("#personalWeekCount", `${personalWeek}건`);
     }
 
-    function setProgress(barSel, textSel, p) {
-        const bar = document.querySelector(barSel);
-        const text = document.querySelector(textSel);
-        if (!bar || !text) return;
-        bar.style.width = `${p}%`;
-        text.textContent = `${p}%`;
+    function updateText(selector, text) {
+        const el = document.querySelector(selector);
+        if (el) el.textContent = text;
     }
 
     /* ================= UI Bind ================= */
