@@ -20,7 +20,7 @@
     font-weight: 800;
 }
 
-.profile {
+.profile-card {
     border: 1px solid black;
     border-radius: 16px;
     box-shadow: 0 6px 20px rgba(31, 41, 55, 0.08);
@@ -47,9 +47,27 @@
     font-weight: 700;
     color: #6b7280;
     grid-row: 1 / 5;
+
+    /* 이미지가 넘치지 않게 방지 */
+    overflow: hidden;
 }
 
+/* 프로필 이미지가 있을 때 적용될 스타일 */
+.profileImg img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* 가로세로 비율 유지하며 영역 꽉 채움 */
+    display: block;
+}
 
+.name {
+    font-size: 20px;
+}
+
+.profileMeta {
+    font-size: 15px;
+    margin-top: 5px;
+}
 
 .attendancePage{
     display: flex;
@@ -74,11 +92,48 @@
     border: 1px solid black;
 }
 
-.rightPage{
+/* 오른쪽 영역 */
+.rightPage {
     width: 900px;
-    height: 100%;
-    border: 1px solid black;
+    display: grid;
+
+    /* 2 : 2 : 1.5 비율 */
+    grid-template-columns: 2fr 2fr 1.5fr;
+
+    /* 위 / 아래 */
+    grid-template-rows: 260px 1fr;
+
+    gap: 16px;
     box-sizing: border-box;
+}
+
+.borad {
+    grid-column: 1 / 2;
+    grid-row: 1 / 2;
+}
+
+.mini-calendar {
+    grid-column: 2 / 3;
+    grid-row: 1 / 2;
+}
+
+.mini-kanban {
+    grid-column: 1 / 3;
+    grid-row: 2 / 3;
+}
+
+.mini-meetingroom {
+    grid-column: 3 / 4;
+    grid-row: 1 / 3;
+}
+
+.rightPage > div {
+    border: 1px dashed #999;
+    background: whitesmoke;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 /* attendanceLeft에서 제거 영역 */

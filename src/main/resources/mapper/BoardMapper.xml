@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.Workneed.workneed.Board.mapper.BoardMapper">
+    <select id="selectCategoryList" resultType="com.Workneed.workneed.Board.dto.BoardCategoryDTO">
+        SELECT
+            category_id,
+            category_name
+        FROM board_category
+    </select>
+
+    <select id="selectPostList" resultType="com.Workneed.workneed.Board.dto.BoardPostDTO">
+        SELECT
+            p.post_id,
+            p.category_id,
+            c.category_name,
+            p.writer_id,
+            u.user_name,
+            p.title,
+            p.create_at
+        FROM board_post p
+                JOIN board_category c ON p.category_id = c.category_id
+                LEFT JOIN user u ON p.writer_id = u.user_id
+        ORDER BY p.post_id DESC
+    </select>
+
+    <select id="selectPostById" parameterType="long" resultType="com.Workneed.workneed.Board.dto.BoardPostDTO">
+        SELECT
+            post_id,
+            category_id,
+            writer_id,
+            title,
+            content,
+            create_at
+        FROM board_post
+        WHERE post_id = #{postId}
+    </select>
+
+    <insert id="insertPost" parameterType="com.Workneed.workneed.Board.dto.BoardPostDTO" useGeneratedKeys="true" keyProperty="postId">
+        INSERT INTO board_post (
+            category_id,
+            writer_id,
+            title,
+            content,
+            create_at
+        ) VALUES (
+                    #{categoryId},
+                    #{writerId},
+                    #{title},
+                    #{content},
+                    NOW()
+                )
+    </insert>
+</mapper>

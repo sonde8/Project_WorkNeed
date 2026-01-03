@@ -22,14 +22,16 @@
 
     <select id="findByLoginId" resultType="com.Workneed.workneed.Members.dto.UserDTO">
         SELECT
-        user_id AS userId,
-        user_login_id AS userLoginId,
-        user_password AS userPassword,
-        user_status AS userStatus,
-        user_name AS userName,
-        user_profile_image AS userProfileImage
-        FROM user
-        WHERE user_login_id = #{loginId}
+            u.user_id AS userId,
+            u.user_login_id AS userLoginId,
+            u.user_password AS userPassword,
+            u.user_status AS userStatus,
+            u.user_name AS userName,
+            u.user_profile_image AS userProfileImage,
+            u.dept_id AS deptId,
+            u.rank_id AS rankId,
+            d.dept_name AS deptName,  r.rank_name AS rankName   FROM user u
+                                                                         LEFT JOIN dept d ON u.dept_id = d.dept_id   LEFT JOIN ranks r ON u.rank_id = r.rank_id  WHERE u.user_login_id = #{loginId}
     </select>
 
     <select id="findById" parameterType="long" resultType="com.Workneed.workneed.Members.dto.UserDTO">

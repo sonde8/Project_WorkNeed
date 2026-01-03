@@ -12,6 +12,7 @@ public class MainController {
     @GetMapping("/main")
     public String main(HttpSession session, Model model) {
 
+
         if (session.getAttribute("admin") != null) {
             return "redirect:/admin/member/list";
         }
