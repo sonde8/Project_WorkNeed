@@ -14,6 +14,9 @@
             <div class="profile-img-wrapper">
                 <img th:src="@{/images/profile300.svg}" alt="프로필" class="profile">
             </div>
+            <form th:action="@{/logout}" method="post" style="margin-left: 10px;">
+                <button type="submit" class="logout-btn">로그아웃</button>
+            </form>
         </div>
 
         <div class="profile-info" th:unless="${session.user != null}">

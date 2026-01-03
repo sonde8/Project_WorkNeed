@@ -140,6 +140,22 @@ html {
     gap: 12px;                /* 이름과 아이콘 사이 간격 */
 }
 
+.logout-btn {
+    cursor: pointer;
+    background: #f8f9fa;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 11px;
+    padding: 3px 8px;
+    color: #666;
+    transition: all 0.2s;
+}
+
+.logout-btn:hover {
+    background: #eeeeee;
+    color: #333;
+}
+
 /* 사용자 이름 스타일 */
 .profile-name {
     font-size: 14px;
