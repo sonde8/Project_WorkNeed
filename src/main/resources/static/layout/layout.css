@@ -166,3 +166,87 @@ html {
     height: 100%;
     object-fit: cover; /* 이미지가 찌그러지지 않게 채움 */
 }
+
+/* 알림 전체 컨테이너 */
+/* 전체 알림 컨테이너: 위치와 크기 고정 */
+/* 알림창 본체: 오른쪽 상단 작게 고정 */
+.chat-toast {
+    position: fixed !important;
+    top: 15px !important;
+    right: -350px !important; /* 화면 밖 대기 */
+    width: 280px !important; /* 너비 고정 */
+    max-width: 300px !important;
+    /* 1. 배경 투명도 대폭 수정 (0.7 -> 0.4) */
+    background-color: rgba(255, 255, 255, 0.3) !important;
+
+    /* 2. 블러 효과 (접두사 포함하여 확실하게 적용) */
+    backdrop-filter: blur(15px) saturate(150%) !important;
+    -webkit-backdrop-filter: blur(15px) !important;
+
+
+    border-radius: 12px !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1) !important;
+    z-index: 999999 !important;
+    transition: right 0.5s cubic-bezier(0.19, 1, 0.22, 1) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    cursor: pointer;
+    overflow: hidden !important;
+}
+
+/* 나타났을 때 */
+.chat-toast.active {
+    right: 20px !important;
+}
+
+/* 내부 레이아웃 */
+.toast-inner {
+    display: flex !important;
+    padding: 15px !important;
+    align-items: center !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+/* 프로필 이미지 영역 */
+.toast-profile {
+    width: 42px !important;
+    height: 42px !important;
+    margin-right: 12px !important;
+    flex-shrink: 0 !important;
+}
+
+.toast-profile img {
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 50% !important; /* 원형 프로필 */
+    object-fit: cover !important;
+}
+
+/* 텍스트 영역 */
+.toast-text-area {
+    flex: 1 !important;
+    min-width: 0 !important; /* 텍스트 생략 처리를 위한 필수 설정 */
+}
+
+.toast-user-name {
+    display: block !important;
+    font-weight: 700 !important;
+    font-size: 13px !important;
+    color: #1d1d1f !important;
+    margin-bottom: 2px !important;
+}
+
+.toast-message {
+    display: block !important;
+    font-size: 13px !important;
+    color: #3a3a3c !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important; /* 길면 ... 처리 */
+}
+
+/* 호버 시 살짝 반응 */
+.chat-toast:hover {
+    background: #ffffff !important;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15) !important;
+}
