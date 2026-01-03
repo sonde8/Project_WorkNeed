@@ -49,6 +49,7 @@ public class SecurityConfig {
 
                         .anyRequest().authenticated()
                 )
+
                 // 자동 로그인 필터 등록
                 .addFilterBefore(autoLoginFilterConfig.autoLoginFilter(), UsernamePasswordAuthenticationFilter.class)
 

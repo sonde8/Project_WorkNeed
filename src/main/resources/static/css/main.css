@@ -5,7 +5,7 @@
 
 .leftPage{
     width: 420px;
-    height: 100vh;
+    height: 100%;
     border: 1px solid black;
     box-sizing: border-box;
 }
@@ -76,7 +76,21 @@
 
 .rightPage{
     width: 900px;
-    height: 100vh;
+    height: 100%;
     border: 1px solid black;
     box-sizing: border-box;
+}
+
+/* attendanceLeft에서 제거 영역 */
+.pageMain .state-wrap { display:none; }
+.pageMain .title,
+.pageMain .clock,
+.pageMain .click,
+.pageMain .rowMonth { display:none; }
+
+.pageMain .attendWidget .att-left {
+    width: auto;
+    height: auto;
+    border: none;
+    padding: 0;
 }

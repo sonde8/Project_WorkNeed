@@ -8,19 +8,19 @@
 
     <!-- 페이지 전용 CSS -->
     <th:block layout:fragment="head">
-        <link rel="stylesheet" th:href="@{/css/attendanceLeft.css}">
         <link rel="stylesheet" th:href="@{/css/Main.css}">
+        <link rel="stylesheet" th:href="@{/css/attendanceLeft.css}">
     </th:block>
 
     <th:block layout:fragment="script">
-        <script th:src="@{/js/attendanceLeft.js}"></script>
         <script th:src="@{/js/Main.js}"></script>
+        <script th:src="@{/js/attendanceLeft.js}"></script>
     </th:block>
 </head>
 
 <body>
 
-<main layout:fragment="content">
+<div layout:fragment="content" class = "pageMain">
 
     <div class="mainPage">
 
@@ -68,7 +68,7 @@
     </div>
 
 
-</main>
+</div>
 
 
 </body>
