@@ -45,7 +45,7 @@ function renderDeptTree(users) {
 
     // 부서명으로 그룹화 (부서명이 없는 경우 기타 처리)
     const groupedData = users.reduce((acc, user) => {
-        const dept = user.deptname || '기타';
+        const dept = user.deptName || '기타';
         if (!acc[dept]) acc[dept] = [];
         acc[dept].push(user);
         return acc;
