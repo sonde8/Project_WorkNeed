@@ -20,9 +20,10 @@ public interface ScheduleMapper {
 
     ScheduleDTO selectById(Long scheduleId);
 
-    List<ScheduleDTO> selectAll();
 
     Map<String, Object> selectScheduleLinks(Long scheduleId);
+
+    int deleteByScheduleIds(@Param("scheduleIds") List<Long> scheduleIds);
 
     int updateGitUrl(@Param("scheduleId") Long scheduleId,
                      @Param("gitUrl") String gitUrl);

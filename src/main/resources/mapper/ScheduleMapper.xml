@@ -109,6 +109,14 @@
         WHERE schedule_id = #{scheduleId}
     </update>
 
+    <delete id="deleteByScheduleIds">
+        DELETE FROM schedule
+        WHERE schedule_id IN
+        <foreach collection="scheduleIds" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </delete>
+
 <!-- git url/ file stroage url-->
     <select id="selectScheduleLinks" parameterType="long" resultType="map">
         SELECT

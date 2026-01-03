@@ -527,7 +527,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             new Sortable(el, {
                 group: "memberTasks",
-                animation: 150,
+                animation: 300,
                 draggable: ".task-item",
                 filter: ".tasks-section-title",
                 ghostClass: "drag-ghost",

@@ -40,24 +40,6 @@
 .kanban-done .kanban-card .event-type {
     opacity: 0.6;
 }
-.card-delete-btn {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    font-weight: 900;
-    border: none;
-    background: transparent;
-    pointer-events: auto;
-    cursor: pointer;
-    opacity: 0;
-    transition: opacity 150ms ease, background 150ms ease;
-}
-.kanban-card:hover .card-delete-btn {
-    color: red;
-    opacity: 1;
-}
-
-
 .kanban-card .title-event-type{
     display: flex;
     flex-direction: column;
@@ -91,12 +73,11 @@
     border-radius: 99.9rem;
     background: rgba(0,0,0,.05);
 }
-
-.kanban-card .description{
+.kanban-card .description {
     grid-column: 1 / -1;
-    margin-top:5rem;
-    background: rgba(255,255,255,.6);
-    border: .1rem solid rgba(0,0,0,.08);
+    margin-top: 5rem;
+    background: rgba(255, 255, 255, .6);
+    border: .1rem solid rgba(0, 0, 0, .08);
     border-radius: 1rem;
     padding: 1.6rem;
     min-height: 14rem;
@@ -113,6 +94,36 @@
     background-color: transparent;
     cursor: pointer;
 }
+.kanban-done .kanban-header{
+    display: flex;
+    justify-content: space-between;
+}
+.kanban-done .done-delete-btn {
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    padding: 0 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+}
+.kanban-done .kanban-card{
+    position: relative;
+}
+.kanban-done .done-check{
+     position: absolute;
+     top: 0;
+     right: 0;
+     padding: 1rem 1rem 3rem 3rem;
+     z-index: 1000;
+ }
+.kanban-done .done-select:checked {
+    accent-color: #222;
+}
+.done-check input[type="checkbox"] {
+    transform: scale(1.5);
+    cursor: pointer;
+}
+
 
 
 /*Add Task Modal*/
