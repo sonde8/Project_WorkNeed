@@ -15,7 +15,8 @@ public interface ScheduleMapper {
     int updateStatus(@Param("scheduleId") Long scheduleId,
                      @Param("status") String status);
 
-    List<ScheduleDTO> selectByStatus(String status);
+    List<ScheduleDTO> selectVisibleByStatus(@Param("status") String status,
+                                     @Param("userId") Long userId);
 
     ScheduleDTO selectById(Long scheduleId);
 

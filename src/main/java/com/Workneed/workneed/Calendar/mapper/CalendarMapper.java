@@ -9,7 +9,7 @@ import java.util.List;
 @Mapper
 public interface CalendarMapper {
 
-    List<CalendarDTO> findAll();
+    List<CalendarDTO> findAll(Long userId);
 
     CalendarDTO findById(Long calendarId);
 

@@ -50,6 +50,38 @@
         ORDER BY schedule_id DESC
     </select>
 
+    <select id="selectVisibleByStatus"
+            resultType="com.Workneed.workneed.Schedule.dto.ScheduleDTO">
+        SELECT
+            s.schedule_id AS scheduleId,
+            s.status,
+            s.title,
+            s.description,
+            s.event_type AS eventType,
+            s.start_at AS startAt,
+            s.end_at AS endAt,
+            s.location,
+            s.type,
+            s.created_by AS createdBy,
+            s.created_at AS createdAt
+        FROM schedule s
+        WHERE s.status = #{status}
+            AND (
+            -- PERSONAL: 내가 만든 것만
+            (s.type = 'PERSONAL' AND s.created_by = #{userId})
+            OR
+            -- TEAM/COMPANY: 내가 참가자인 것만
+            (s.type IN ('TEAM', 'COMPANY') AND EXISTS (
+             SELECT 1
+             FROM schedule_participant sp
+             WHERE sp.schedule_id = s.schedule_id
+                  AND sp.user_id = #{userId}
+                ))
+            )
+            ORDER BY s.schedule_id DESC
+    </select>
+
+
     <select id="selectById"
             parameterType="long"
             resultType="com.Workneed.workneed.Schedule.dto.ScheduleDTO">

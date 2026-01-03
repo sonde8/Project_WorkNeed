@@ -123,6 +123,12 @@
         </foreach>
     </update>
 
+    <update id="updatePassword">
+        UPDATE User
+        SET user_password = #{userPassword}
+        WHERE user_id = #{userId}
+    </update>
+
     <update id="updateProfileImage">
         UPDATE user
         SET user_profile_image = #{profileImage}

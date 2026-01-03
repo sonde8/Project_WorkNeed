@@ -22,10 +22,12 @@ public class LoginController {
                             @RequestParam(required = false) String error, // 시큐리티 로그인 실패 시 넘어옴
                             @RequestParam(required = false) String passwordChanged,
                             @RequestParam(required = false) String registerSuccess,
+                            @RequestParam(required = false) String needApproval,
                             Model model) {
 
         // 이미 로그인된 세션이 있다면 메인으로 보냄
-        if (session.getAttribute("user") != null) {
+        if (session.getAttribute("user") != null
+                || session.getAttribute("admin") != null) {
             return "redirect:/main";
         }
 
@@ -37,6 +39,11 @@ public class LoginController {
         if (passwordChanged != null) {
             model.addAttribute("infoMessage", "비밀번호가 변경되었습니다. 다시 로그인해주세요.");
         }
+
+        if (needApproval != null) {
+            model.addAttribute("needApproval", true);
+        }
+
 
         if (registerSuccess != null) {
             model.addAttribute("infoMessage", "회원가입이 완료되었습니다. 로그인해주세요.");

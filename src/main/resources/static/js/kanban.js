@@ -326,12 +326,45 @@ if (taskForm) {
 //// 상세페이지 이동////
 document.querySelectorAll(".kanban-card").forEach(card => {
     card.addEventListener("click", () => {
+        // if (e.target.closest(".card-delete-btn")) return;
+
         const scheduleId = card.dataset.id;
         if (!scheduleId) return;
 
         window.location.href = `/schedule/task?scheduleId=${scheduleId}`;
     });
 });
+// //// 카드 삭제 ////
+// document.addEventListener("click", async (e) => {
+//     const delBtn = e.target.closest(".card-delete-btn");
+//     if (!delBtn) return;
+//
+//     // 카드 클릭 이벤트로 전파X
+//     e.stopPropagation();
+//
+//     const card = delBtn.closest(".kanban-card");
+//     const scheduleId = card?.dataset?.id;
+//     if (!scheduleId) return;
+//
+//     if (!confirm("이 일정을 삭제할까요?")) return;
+//
+//     try {
+//         const res = await fetch(`/schedule/${scheduleId}/delete`, {
+//             method: "POST"
+//         });
+//
+//         const text = await res.text();
+//         if (!res.ok || text !== "OK") {
+//             throw new Error(text || "DELETE_FAIL");
+//         }
+//
+//         card.remove();
+//
+//     } catch (err) {
+//         console.error(err);
+//         alert("삭제에 실패했습니다.");
+//     }
+// });
 
 //// 카드 드래그 상태변경////
 document.addEventListener("DOMContentLoaded", () => {

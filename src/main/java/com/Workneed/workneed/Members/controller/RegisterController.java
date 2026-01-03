@@ -38,7 +38,7 @@ public class RegisterController {
         try {
             userService.register(user);
             // 성공만 redirect
-            return "redirect:/login?signup=success";
+            return "redirect:/login?needApproval=true";
 
         } catch (IllegalStateException e) {
             model.addAttribute("errorMessage", e.getMessage());
