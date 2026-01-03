@@ -27,6 +27,14 @@ document.addEventListener("DOMContentLoaded", () => {
     if (modal && modal.querySelector("p")) {
         modal.style.display = "block";
     }
+
+    const adminBtn = document.getElementById("adminLoginBtn");
+
+        if (adminBtn) {
+            adminBtn.addEventListener("click", (e) => {
+                alert("관리자는 별도의 계정으로 로그인합니다.");
+            });
+        }
 });
 
 

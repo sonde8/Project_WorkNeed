@@ -31,5 +31,9 @@ public interface TaskMember2PerformanceMapper {
     int updateTaskStatus(@Param("taskId") Long taskId,
                          @Param("scheduleId") Long scheduleId,
                          @Param("userId") Long userId,
-                         @Param("personalStatus") String personalStatus);
+                         @Param("personalStatus") String personalStatus
+    );
+
+    int deleteByScheduleIds(@Param("scheduleIds") List<Long> scheduleIds);
+
 }

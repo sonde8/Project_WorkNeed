@@ -28,21 +28,21 @@
         user_status AS userStatus,
         user_name AS userName,
         user_profile_image AS userProfileImage
-        FROM User
+        FROM user
         WHERE user_login_id = #{loginId}
     </select>
 
     <select id="findById" parameterType="long" resultType="com.Workneed.workneed.Members.dto.UserDTO">
         SELECT
         <include refid="allColumns"/>
-        FROM User
+        FROM user
         WHERE user_id = #{userId}
     </select>
 
     <select id="findByEmail" resultType="com.Workneed.workneed.Members.dto.UserDTO">
         SELECT
         <include refid="allColumns"/>
-        FROM User
+        FROM user
         WHERE user_email = #{email}
     </select>
 
@@ -56,9 +56,9 @@
         u.rank_id AS rankId,
         d.dept_name AS deptName,
         r.rank_name AS rankName
-        FROM User u
-        JOIN Dept d ON u.dept_id = d.dept_id
-        JOIN Ranks r ON u.rank_id = r.rank_id
+        FROM user u
+        JOIN dept d ON u.dept_id = d.dept_id
+        JOIN ranks r ON u.rank_id = r.rank_id
         ORDER BY u.user_id DESC
     </select>
 
@@ -91,21 +91,21 @@
     </insert>
 
     <update id="updateRememberToken">
-        UPDATE User
+        UPDATE user
         SET remember_token = #{token},
         remember_token_expired = #{expiredAt}
         WHERE user_id = #{userId}
     </update>
 
     <update id="clearRememberToken" parameterType="long">
-        UPDATE User
+        UPDATE user
         SET remember_token = NULL,
         remember_token_expired = NULL
         WHERE user_id = #{userId}
     </update>
 
     <update id="updateUser" parameterType="com.Workneed.workneed.Members.dto.UserDTO">
-        UPDATE User
+        UPDATE user
         SET user_email = #{userEmail},
         user_name = #{userName},
         user_status = #{userStatus},
@@ -115,7 +115,7 @@
     </update>
 
     <update id="updateUsersStatus">
-        UPDATE User
+        UPDATE user
         SET user_status = #{status}
         WHERE user_id IN
         <foreach item="id" collection="userIds" open="(" separator="," close=")">
@@ -123,8 +123,14 @@
         </foreach>
     </update>
 
-    <update id="updateProfileImage">
+    <update id="updatePassword">
         UPDATE User
+        SET user_password = #{userPassword}
+        WHERE user_id = #{userId}
+    </update>
+
+    <update id="updateProfileImage">
+        UPDATE user
         SET user_profile_image = #{profileImage}
         WHERE user_id = #{userId}
     </update>
