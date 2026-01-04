@@ -33,6 +33,21 @@ public interface AdminUserMapper {
                         @Param("status") String status,
                         @Param("adminId") Long adminId);
 
+    // 5 관리자로그
+    void insertActivityLog(AdminUserDTO logDto);
+
+
+    // 6 관리자 전체 목록 조회
+    List<AdminUserDTO> findAllAdmins();
+
+    // 7 활동 로그 전체 조회
+    List<AdminUserDTO> findAllActivityLogs();
+
+    // 8 관리자 상태 변경
+    void updateAdminStatus(@Param("adminId") Long adminId, @Param("status") String status);
+
+    // 9 마지막 로그인 시간
+    void updateLastLogin(@Param("adminId") Long adminId);
 
 
 

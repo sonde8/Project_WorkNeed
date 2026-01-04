@@ -32,9 +32,6 @@ public class AdminUserController {
         AdminUserDTO admin = (AdminUserDTO) session.getAttribute("admin");
         if (admin == null) return "redirect:/login";
 
-
-
-        // 파라미터를 서비스에 그대로 전달합니다.
         List<UserDTO> memberList = adminUserService.getAllMembers(userName, userLoginId, deptId, rankId, userStatus);
 
         model.addAttribute("admin", admin);
@@ -42,7 +39,8 @@ public class AdminUserController {
         model.addAttribute("dept", adminUserService.getAllDepts());
         model.addAttribute("rank", adminUserService.getAllRanks());
 
-        // 검색창에 입력했던 값이 유지되도록 모델에 다시 담아줍니다 (선택사항이지만 UX에 좋음)
+        model.addAttribute("userName", userName);
+        model.addAttribute("userLoginId", userLoginId);
         model.addAttribute("selectedDeptId", deptId);
         model.addAttribute("selectedRankId", rankId);
         model.addAttribute("selectedStatus", userStatus);
@@ -50,41 +48,50 @@ public class AdminUserController {
         return "members/admin_user_list";
     }
 
+    // 1. 정보 수정
     @PostMapping("/member/edit/save")
     @ResponseBody
-    public String adminUserEditSave(@RequestBody UserDTO userDto) {
+    public String adminUserEditSave(@RequestBody UserDTO userDto, HttpSession session) {
+        AdminUserDTO admin = (AdminUserDTO) session.getAttribute("admin");
+        if (admin == null) return "fail";
+
         try {
-
-            adminUserService.updateMember(userDto);
-
-
+            // 서비스에서 개별 로그를 남기도록 adminId 전달
+            adminUserService.updateMember(userDto, admin.getAdminId());
             return "success";
         } catch (Exception e) {
-            e.printStackTrace();
             return "fail";
         }
     }
 
-    @PostMapping("/member/add-admin")
-    @ResponseBody
-    public String addAdminAccount(@RequestBody AdminUserDTO adminDto) {
-        try {
-            adminUserService.createAdmin(adminDto);
-            return "success";
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "fail";
-        }
-    }
-
-    // 일괄 상태 변경 (AJAX 방식)
+    // 2. 상태 변경
     @PostMapping("/member/batch-update")
     @ResponseBody
     public String batchUpdateStatus(@RequestParam("userIds") List<Long> userIds,
-                                    @RequestParam("status") String status) {
+                                    @RequestParam("status") String status,
+                                    HttpSession session) {
+        AdminUserDTO admin = (AdminUserDTO) session.getAttribute("admin");
+        if (admin == null) return "fail";
+
         try {
-            // UserMapper에 작성한 일괄 업데이트 메서드 호출
-            adminUserService.batchUpdateUserStatus(userIds, status);
+            adminUserService.batchUpdateUserStatus(userIds, status, admin.getAdminId());
+            return "success";
+        } catch (Exception e) {
+            return "fail";
+        }
+    }
+
+
+    // 관리자 생성 매핑
+    @PostMapping("/member/add-admin")
+    @ResponseBody
+    public String addAdminAccount(@RequestBody AdminUserDTO adminDto, HttpSession session) {
+        AdminUserDTO admin = (AdminUserDTO) session.getAttribute("admin"); // 세션에서 수행자 확인
+        if (admin == null) return "fail";
+
+        try {
+            // 기존 생성 로직 + 수행자 ID 전달
+            adminUserService.createAdmin(adminDto, admin.getAdminId());
             return "success";
         } catch (Exception e) {
             e.printStackTrace();
@@ -92,41 +99,117 @@ public class AdminUserController {
         }
     }
 
-    // 부서 자체를 생성하여 추가
+    // 관리자 상태변경
+    @PostMapping("/member/admin-status")
+    @ResponseBody
+    public String updateAdminStatus(@RequestParam("targetId") Long targetId,
+                                    @RequestParam("status") String status,
+                                    HttpSession session) {
+        AdminUserDTO admin = (AdminUserDTO) session.getAttribute("admin");
+        if (admin == null) return "fail";
+
+        try {
+            adminUserService.changeAdminStatus(targetId, status, admin.getAdminId());
+            return "success";
+        } catch (Exception e) {
+            return "fail";
+        }
+    }
+
+
+    // 3. 부서 추가 (adminId 전달)
     @PostMapping("/dept/add")
     @ResponseBody
-    public String addDept(@RequestParam("deptName") String deptName) {
+    public String addDept(@RequestParam("deptName") String deptName, HttpSession session) {
+        AdminUserDTO admin = (AdminUserDTO) session.getAttribute("admin");
+        if (admin == null) return "fail";
         try {
-            adminUserService.createDept(deptName);
+            adminUserService.createDept(deptName, admin.getAdminId());
             return "success";
         } catch (Exception e) {
             return "fail";
         }
     }
 
-    // 직급 자체를 생성하여 추가
+    // 4. 직급 추가 (adminId 전달)
     @PostMapping("/rank/add")
     @ResponseBody
-    public String addRank(@RequestParam("rankName") String rankName) {
+    public String addRank(@RequestParam("rankName") String rankName, HttpSession session) {
+        AdminUserDTO admin = (AdminUserDTO) session.getAttribute("admin");
+        if (admin == null) return "fail";
         try {
-            adminUserService.createRank(rankName);
+            adminUserService.createRank(rankName, admin.getAdminId());
             return "success";
         } catch (Exception e) {
             return "fail";
         }
     }
 
+    // 5. 부서 삭제 (adminId 전달)
     @PostMapping("/dept/delete")
     @ResponseBody
-    public String deleteDept(@RequestParam("deptId") Long deptId) {
-        // 컨트롤러가 직접 DB를 건드리는 대신, 서비스의 메서드를 호출합니다.
-        return adminUserService.deleteDept(deptId);
+    public String deleteDept(@RequestParam("deptId") Long deptId, HttpSession session) {
+        AdminUserDTO admin = (AdminUserDTO) session.getAttribute("admin");
+        if (admin == null) return "fail";
+        return adminUserService.deleteDept(deptId, admin.getAdminId());
     }
 
+    // 6. 직급 삭제 (adminId 전달)
     @PostMapping("/rank/delete")
     @ResponseBody
-    public String deleteRank(@RequestParam("rankId") Long rankId) {
-        // 마찬가지로 서비스 호출
-        return adminUserService.deleteRank(rankId);
+    public String deleteRank(@RequestParam("rankId") Long rankId, HttpSession session) {
+        AdminUserDTO admin = (AdminUserDTO) session.getAttribute("admin");
+        if (admin == null) return "fail";
+        return adminUserService.deleteRank(rankId, admin.getAdminId());
     }
+
+
+     // 6. 관리자 목록 조회
+    @GetMapping("/manage/list")
+    public String adminManageList(HttpSession session, Model model) {
+        AdminUserDTO admin = (AdminUserDTO) session.getAttribute("admin");
+        if (admin == null) return "redirect:/login";
+
+        model.addAttribute("admin", admin); // 헤더용
+        model.addAttribute("admins", adminUserService.getAllAdmins()); // 관리자 리스트
+        return "members/admin_manage_list"; // 새로 만들 HTML 파일명
+    }
+
+
+     // 6. 활동 로그 조회
+    @GetMapping("/log/list")
+    public String adminLogList(HttpSession session, Model model) {
+        AdminUserDTO admin = (AdminUserDTO) session.getAttribute("admin");
+        if (admin == null) return "redirect:/login";
+
+        model.addAttribute("admin", admin); // 헤더용
+        model.addAttribute("logs", adminUserService.getAllLogs()); // 로그 리스트
+        return "members/admin_activity_log"; // 새로 만들 HTML 파일명
+    }
+
+
+     // 7. 관리자 상태 변경
+    @PostMapping("/manage/status")
+    @ResponseBody
+    public String changeAdminStatus(@RequestParam("targetId") Long targetId,
+                                    @RequestParam("status") String status,
+                                    HttpSession session) {
+        AdminUserDTO admin = (AdminUserDTO) session.getAttribute("admin");
+        if (admin == null) return "fail";
+
+        try {
+            // targetId가 본인인 경우 정지 못하게 하는 방어 로직 (선택사항)
+            if (targetId.equals(admin.getAdminId()) && "SUSPENDED".equals(status)) {
+                return "self_error";
+            }
+            adminUserService.changeAdminStatus(targetId, status, admin.getAdminId());
+            return "success";
+        } catch (Exception e) {
+            return "fail";
+        }
+    }
+
+
+
+
 }

@@ -17,23 +17,21 @@ public class LocalUserDetailsService implements UserDetailsService {
 
     private final UserMapper userMapper;
     private final AdminUserMapper adminUserMapper;
-
     //Spring Security가 ‘아이디 + 비밀번호 로그인’을 처리할 때
     //DB에서 사용자를 찾아 UserDetails로 변환
     // 일반 유저는 로그인id로 접근 ||  관리자는 이메일로 접근
     @Override
     public UserDetails loadUserByUsername(String loginInput) throws UsernameNotFoundException {
 
-        // 1. 관리자 먼저 찾아보기 (이메일 기준)
         AdminUserDTO admin = adminUserMapper.findByAdminEmail(loginInput);
         if (admin != null) {
-            return new CustomUserDetails(admin, "ROLE_ADMIN");
+            return new CustomUserDetails(admin);
         }
 
-        // 2. 관리자가 없으면 일반 유저 찾아보기 (로그인ID 기준)
+        // 2  일반 유저 찾아보기 (로그인ID 기준)
         UserDTO user = userMapper.findByLoginId(loginInput);
         if (user != null) {
-            return new CustomUserDetails(user, "ROLE_USER");
+            return new CustomUserDetails(user);
         }
 
         throw new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + loginInput);

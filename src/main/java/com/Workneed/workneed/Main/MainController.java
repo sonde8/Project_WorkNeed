@@ -16,6 +16,7 @@ public class MainController {
         model.addAttribute("pageTitle", "메인");
 
 
+
         return "Main/main";
     }
 

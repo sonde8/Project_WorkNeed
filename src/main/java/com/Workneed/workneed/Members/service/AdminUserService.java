@@ -26,9 +26,8 @@ public class AdminUserService {
     private final RankMapper rankMapper;
     private final MailService mailService;
 
-    // 1. 화면 데이터 가져오기
+    // 1. 화면 데이터 가져오기 (기존 동일)
     public List<UserDTO> getAllMembers(String userName, String userLoginId, Long deptId, Long rankId, String userStatus) {
-        // 컨트롤러에서 받은 userStatus를 매퍼의 파라미터로 그대로 던져줍니다.
         return adminUserMapper.findAllMembersForAdmin(userName, userLoginId, deptId, rankId, userStatus);
     }
 
@@ -40,83 +39,139 @@ public class AdminUserService {
         return rankMapper.findAll();
     }
 
-    // 사용자관리
-    public void updateMember(UserDTO userDto) {
+    // [수정] 사용자 정보 수정 (adminId 추가)
+    public void updateMember(UserDTO userDto, Long adminId) {
         adminUserMapper.updateMemberStatus(userDto);
+        // 로그 기록
+        saveLog(adminId, "UPDATE", "USER", userDto.getUserId(), "직원 정보 및 상태 수정");
     }
 
-    public void batchUpdateUserStatus(List<Long> userIds, String status) {
-        // 1. DB 상태 변경
-        userMapper.updateUsersStatus(userIds, status);
+    // [수정] 관리자 계정 생성 (adminId 추가)
+    public void createAdmin(AdminUserDTO adminDto, Long adminId) {
+        adminDto.setAdminPassword(passwordEncoder.encode(adminDto.getAdminPassword()));
+        adminDto.setAdminStatus("ACTIVE");
+        adminUserMapper.insertAdmin(adminDto);
+        // 로그 기록
+        saveLog(adminId, "CREATE", "ADMIN", adminDto.getAdminId(), "새 관리자 계정 생성: " + adminDto.getAdminEmail());
+    }
 
-        // 2. 승인(ACTIVE) 처리인 경우에만 이메일 발송
+    // 하나로 통합하고 명칭을 changeAdminStatus로 통일
+    @Transactional
+    public void changeAdminStatus(Long targetAdminId, String status, Long currentAdminId) {
+        adminUserMapper.updateAdminStatus(targetAdminId, status);
+
+        String action = status.equals("SUSPENDED") ? "SUSPEND_ADMIN" : "ACTIVATE_ADMIN";
+        String desc = String.format("관리자(ID:%d) 상태를 [%s]로 변경", targetAdminId, status);
+
+        saveLog(currentAdminId, action, "ADMIN", targetAdminId, desc);
+    }
+
+    // 로그인 시각 업데이트 기능 추가
+    @Transactional
+    public void updateLoginTime(Long adminId) {
+        adminUserMapper.updateLastLogin(adminId);
+    }
+
+
+
+    public List<AdminUserDTO> getAllAdmins() {
+        return adminUserMapper.findAllAdmins();
+    }
+
+    public List<AdminUserDTO> getAllLogs() {
+        return adminUserMapper.findAllActivityLogs();
+    }
+
+    // [수정] 부서 추가 (adminId 추가)
+    public void createDept(String deptName, Long adminId) {
+        DeptDTO dto = new DeptDTO();
+        dto.setDeptName(deptName);
+        deptMapper.insertDept(dto);
+        // 로그 기록 (id를 가져오기 위해 insert 후 호출)
+        saveLog(adminId, "CREATE", "DEPT", dto.getDeptId(), "부서 신설: " + deptName);
+    }
+
+    // [수정] 직급 추가 (adminId 추가)
+    public void createRank(String rankName, Long adminId) {
+        RankDTO dto = new RankDTO();
+        dto.setRankName(rankName);
+        rankMapper.insertRank(dto);
+        // 로그 기록
+        saveLog(adminId, "CREATE", "RANK", dto.getRankId(), "직급 신설: " + rankName);
+    }
+
+    // [수정] 부서 삭제 (adminId 추가)
+    @Transactional
+    public String deleteDept(Long deptId, Long adminId) {
+        if (deptId == 6) return "is_default";
+        try {
+            userMapper.updateUserDeptToDefault(deptId);
+            deptMapper.deleteDept(deptId);
+            // 로그 기록
+            saveLog(adminId, "DELETE", "DEPT", deptId, "부서 삭제");
+            return "success";
+        } catch (Exception e) {
+            return "fail";
+        }
+    }
+
+    @Transactional
+    public String deleteRank(Long rankId, Long adminId) {
+        if (rankId == 6) return "is_default";
+        try {
+            userMapper.updateUserRankToDefault(rankId);
+            rankMapper.deleteRank(rankId);
+            saveLog(adminId, "DELETE", "RANK", rankId, "직급 삭제");
+            return "success";
+        } catch (Exception e) {
+            // 이 부분을 추가해서 에러가 왜 나는지 콘솔에서 확인하세요!
+            e.printStackTrace();
+            return "fail";
+        }
+    }
+
+    // [기존 유지] 개별 상태 변경 로그용
+    @Transactional
+    public void updateMemberStatusWithLog(Long userId, String status, Long deptId, Long rankId, Long adminId) {
+        UserDTO userDto = new UserDTO();
+        userDto.setUserId(userId);
+        userDto.setUserStatus(status);
+        userDto.setDeptId(deptId);
+        userDto.setRankId(rankId);
+
+        adminUserMapper.updateMemberStatus(userDto);
+
+        String desc = String.format("직원(ID:%d) 상태를 [%s]로 변경", userId, status);
+        saveLog(adminId, "UPDATE_STATUS", "USER", userId, desc);
+
         if ("ACTIVE".equals(status)) {
-            for (Long id : userIds) {
-                UserDTO user = userMapper.findById(id); // 유저 정보 조회
-                if (user != null && user.getUserEmail() != null) {
-                    // 메일 서비스 호출
-                    mailService.sendApprovalEmail(user.getUserEmail(), user.getUserName());
-                }
+            UserDTO targetUser = userMapper.findById(userId);
+            if (targetUser != null && targetUser.getUserEmail() != null) {
+                mailService.sendApprovalEmail(targetUser.getUserEmail(), targetUser.getUserName());
             }
         }
     }
 
-    // 관리자 계정
-    public void createAdmin(AdminUserDTO adminDto) {
-        adminDto.setAdminPassword(
-                passwordEncoder.encode(adminDto.getAdminPassword())
-        );
-        adminDto.setAdminStatus("ACTIVE");
-        adminUserMapper.insertAdmin(adminDto);
-    }
-
-    // 직급 ,부서관리
-    public void createDept(String deptName) {
-        DeptDTO dto = new DeptDTO();
-        dto.setDeptName(deptName);
-        deptMapper.insertDept(dto);
-    }
-
-    public void createRank(String rankName) {
-        RankDTO dto = new RankDTO();
-        dto.setRankName(rankName);
-        rankMapper.insertRank(dto);
-    }
-
+    // [통합] 일괄 변경 (기존의 adminId 없는 메서드는 삭제하세요)
     @Transactional
-    public String deleteDept(Long deptId) {
-        // 1. 미배정(6) 삭제 방지
-        if (deptId == 6) return "is_default";
-
-        try {
-            // 2. 소속 인원을 먼저 6번으로 이동 (user 테이블 사용)
-            userMapper.updateUserDeptToDefault(deptId);
-
-            // 3. 부서 삭제 (DeptMapper 사용)
-            deptMapper.deleteDept(deptId);
-            return "success";
-        } catch (Exception e) {
-            return "fail";
+    public void batchUpdateUserStatus(List<Long> userIds, String status, Long adminId) {
+        for (Long id : userIds) {
+            UserDTO current = userMapper.findById(id);
+            if (current != null) {
+                updateMemberStatusWithLog(id, status, current.getDeptId(), current.getRankId(), adminId);
+            }
         }
     }
 
-    @Transactional
-    public String deleteRank(Long rankId) {
-        // 1. 신입(6) 삭제 방지
-        if (rankId == 6) return "is_default";
+    // 로그 저장용 (기존 유지)
+    private void saveLog(Long adminId, String action, String targetType, Long targetId, String desc) {
+        AdminUserDTO logDto = new AdminUserDTO();
+        logDto.setAdminId(adminId);
+        logDto.setLogActionType(action);
+        logDto.setLogTargetType(targetType);
+        logDto.setLogTargetId(targetId);
+        logDto.setLogDescription(desc);
 
-        try {
-            // 2. 해당 직급 인원을 먼저 6번으로 이동 (user 테이블 사용)
-            userMapper.updateUserRankToDefault(rankId);
-
-            // 3. 직급 삭제 (RankMapper 사용)
-            rankMapper.deleteRank(rankId);
-            return "success";
-        } catch (Exception e) {
-            return "fail";
-        }
+        adminUserMapper.insertActivityLog(logDto);
     }
-
-
-
 }

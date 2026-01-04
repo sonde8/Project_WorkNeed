@@ -5,7 +5,6 @@ import com.Workneed.workneed.Members.dto.UserDTO;
 import com.Workneed.workneed.Members.mapper.SocialAccountMapper;
 import com.Workneed.workneed.Members.mapper.UserMapper;
 import com.Workneed.workneed.Members.auth.principal.CustomUserDetails;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j; // 로그 사용을 위한 임포트
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -14,8 +13,7 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
+
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -28,12 +26,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     private final UserMapper userMapper;
     private final SocialAccountMapper socialAccountMapper;
 
-    @Override
     @Transactional
-    public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
-        // 1. 구글로부터 정보 로드
-        OAuth2User oAuth2User = super.loadUser(userRequest);
-        Map<String, Object> attributes = oAuth2User.getAttributes();
+    public OAuth2User process(Map<String, Object> attributes) {
 
         String email = (String) attributes.get("email");
         String googleId = (String) attributes.get("sub");
@@ -72,6 +66,9 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         // 현재 DB에 저장된 이미지 경로를 가져옵니다.
         String currentImg = userDto.getUserProfileImage();
 
+        System.out.println("🟢 email=" + email + ", googleId=" + googleId);
+        System.out.println("🟢 socialAccount=" + socialAccount);
+
         // [핵심 로직] 이미 내가 직접 업로드한 사진(/upload/...)이 있다면 구글 사진으로 덮어쓰지 않습니다.
         if (currentImg != null && currentImg.startsWith("/upload/")) {
             log.info("유저 [{}]는 직접 업로드한 프로필을 사용 중이므로 구글 사진으로 덮어쓰지 않습니다.", userDto.getUserName());
@@ -91,14 +88,13 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             log.info("유저 [{}]의 프로필 이미지를 소셜/기본 이미지로 업데이트했습니다: {}", userDto.getUserName(), finalPic);
         }
 
-        // 4. 세션 저장 (Thymeleaf 레이아웃 등에서 session.user로 접근하기 위함)
-        ServletRequestAttributes attr = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
-        if (attr != null) {
-            HttpSession session = attr.getRequest().getSession(true);
-            session.setAttribute("user", userDto);
-        }
-
+        log.info("OAuth SUCCESS: user={}, email={}",
+                userDto.getUserName(),
+                userDto.getUserEmail());
         // 5. 시큐리티 인증 객체 생성
+
+        System.out.println("🟢 return CustomUserDetails");
+
         return new CustomUserDetails(userDto, attributes);
     }
 }

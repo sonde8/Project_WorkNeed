@@ -1,24 +1,56 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
-<header th:fragment="header" class="header-container">
-    <div class="header-logo">
-        <a th:href="@{/main}">
-            <img th:src="@{/images/logo3.png}" alt="WORKNEED LOGO">
-        </a>
-    </div>
 
-    <div class="header-profile">
-        <div class="profile-info" th:if="${session.user != null}">
-            <span class="profile-name" th:text="${session.user.userName}">사용자명</span>
-            <div class="profile-img-wrapper">
-                <img th:src="@{/images/profile300.svg}" alt="프로필" class="profile">
+<header th:fragment="header" class="header-container">
+
+    <div class="header-container">
+        <div class="header-logo">
+            <a th:href="@{/main}"><img th:src="@{/images/logo3.png}"></a>
+        </div>
+
+        <div class="header-profile">
+            <div class="profile-info" th:if="${session.user != null}">
+                <span class="profile-name" th:text="${session.user?.userName}">사용자명</span>
+                <div class="profile-img-wrapper">
+                    <img th:src="${session.user?.userProfileImage != null ? session.user.userProfileImage : '/images/profile300.svg'}"
+                         class="profile">
+                </div>
             </div>
         </div>
 
-        <div class="profile-info" th:unless="${user != null}">
-            <a th:href="@{/login}" class="login-link">로그인</a>
+        <!--
+        헤더에 모달창으로 비밀번호 변경으로 밑에 pwModel과 넣었습니다 프로플 view 붙이려고대기
+        <div style="margin-top: 6px;">
+            <button id="openPwModal" type="button"
+                    style="font-size: 11px; padding: 2px 8px; cursor: pointer; border: 1px solid black; background: #fff; border-radius: 4px; font-weight: 700;">
+                비밀번호 변경
+            </button>
         </div>
+
+        <div id="pwModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:9999;">
+            <div style="background:#fff; margin:15% auto; padding:25px; width:350px; border-radius:12px; box-shadow: 0 10px 20px rgba(0,0,0,0.2);">
+                <h3 style="margin-top:0;">비밀번호 변경</h3>
+                <form th:action="@{/my/password/change}" method="post" id="pwChangeForm">
+                    <input type="password" name="currentPassword" placeholder="현재 비밀번호" required
+                           style="width:100%; margin-bottom:10px; padding:8px; box-sizing:border-box;">
+                    <input type="password" name="newPassword" id="newPassword" placeholder="새 비밀번호" required
+                           style="width:100%; margin-bottom:10px; padding:8px; box-sizing:border-box;">
+                    <input type="password" name="confirmPassword" id="confirmPassword" placeholder="새 비밀번호 확인" required
+                           style="width:100%; margin-bottom:15px; padding:8px; box-sizing:border-box;">
+                    <div style="text-align:right;">
+                        <button type="submit" style="padding:5px 15px; cursor:pointer;">확인</button>
+                        <button type="button" onclick="closePwModal()"
+                                style="padding:5px 15px; cursor:pointer; margin-left:5px;">취소
+                        </button>
+                    </div>
+                </form>
+                <p th:if="${passwordChangeError}" th:text="${passwordChangeError}"
+                   style="color:red; font-size:12px; margin-top:10px;"></p>
+            </div>
+        </div>
+        -->
+
     </div>
 </header>
 </body>

@@ -68,6 +68,20 @@
                     </span>
                 </a>
             </li>
+
+            <!--관리자만 보이게 추가했습니다-->
+            <li class="nav-item" th:if="${admin != null}">
+                <a th:href="@{/admin/member/list}">
+        <span class="icon">
+            <img th:src="@{/images/lock400.svg}" alt="관리자">
+        </span>
+                    <span class="text">
+            관리자
+        </span>
+                </a>
+            </li>
+
+
         </ul>
     </nav>
 </aside>
