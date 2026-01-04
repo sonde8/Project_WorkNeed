@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>근태 요청 관리</title>
+</head>
+<body>
+
+<h2>근태 수정 요청 (대기)</h2>
+
+<table border="1" cellpadding="6">
+    <thead>
+    <tr>
+        <th>요청 ID</th>
+        <th>사용자 ID</th>
+        <th>요청 내용</th>
+        <th>요청일</th>
+        <th>처리</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    <tr th:each="req : ${requests}">
+        <td th:text="${req.requestId}"></td>
+        <td th:text="${req.userId}"></td>
+
+        <!-- payload JSON 그대로 노출 (최소) -->
+        <td>
+            <pre th:text="${req.requestPayload}"></pre>
+        </td>
+
+        <td th:text="${#temporals.format(req.requestCreatedAt, 'yyyy-MM-dd HH:mm')}"></td>
+
+        <td>
+            <button type="button"
+                    th:attr="data-id=${req.requestId}"
+                    onclick="approve(this)">
+                승인
+            </button>
+
+            <button type="button"
+                    th:attr="data-id=${req.requestId}"
+                    onclick="reject(this)">
+                반려
+            </button>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<script src="/js/admin-attendance.js"></script>
+</body>
+</html>
