@@ -34,6 +34,8 @@ public class ScheduleController {
     private final ScheduleParticipantService scheduleParticipantService;
     private final ScheduleService scheduleService;
 
+    private final com.Workneed.workneed.Meetingroom.mapper.MeetingRoomMapper meetingRoomMapper;
+
 
     private Long getLoginUserId(HttpSession session) {
         Object u = session.getAttribute("user");
@@ -287,6 +289,10 @@ public class ScheduleController {
 
         ScheduleDTO schedule = scheduleMapper.selectById(scheduleId);
         if (schedule == null) return "redirect:/schedule/kanban";
+
+        //미팅룸 조회
+        String roomName = meetingRoomMapper.selectRoomNameByScheduleId(scheduleId);
+        model.addAttribute("roomName", roomName);
 
 
         //댓글 조회
