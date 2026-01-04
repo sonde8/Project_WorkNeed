@@ -35,9 +35,6 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
         HttpSession session = request.getSession(true);
         Object principal = authentication.getPrincipal();
 
-        // 0) 디버그 (문제 잡을 때만)
-        System.out.println("🔥 SUCCESS principal=" + principal.getClass());
-
         // 1)  커스텀 principal
         if (principal instanceof CustomUserDetails cud) {
             if (cud.getAdminDto() != null) {

@@ -41,6 +41,35 @@ public class SecurityConfig {
                                 "/oauth2/**", "/layout/**", "/favicon.ico"
                         ).permitAll()
 
+                        // 🔽 여기부터 권한
+                        .requestMatchers("/admin/dept/**")
+                        .hasAnyAuthority(
+                                "DEPT_ASSIGN",
+                                "DEPT_CREATE",
+                                "DEPT_UPDATE",
+                                "DEPT_DELETE"
+                        )
+
+                        .requestMatchers("/admin/rank/**")
+                        .hasAnyAuthority(
+                                "RANK_ASSIGN",
+                                "RANK_CREATE",
+                                "RANK_UPDATE",
+                                "RANK_DELETE"
+                        )
+
+                        .requestMatchers("/admin/leave/**")
+                        .hasAnyAuthority(
+                                "LEAVE_APPROVE",
+                                "LEAVE_REJECT"
+                        )
+
+                        .requestMatchers("/admin/attend/**")
+                        .hasAnyAuthority(
+                                "ATTEND_APPROVE",
+                                "ATTEND_REJECT"
+                        )
+
                         // ※ 관리자는 아직 세션 기반이므로 일단 permit
                         .requestMatchers("/admin/**").authenticated()
                         .requestMatchers("/main","/main/**").authenticated()
@@ -72,7 +101,7 @@ public class SecurityConfig {
                 .oauth2Login(oauth2 -> oauth2
                         .loginPage("/login")
                         .userInfoEndpoint(userInfo -> userInfo
-                                .oidcUserService(customOidcUserService) // ⭐ 핵심
+                                .oidcUserService(customOidcUserService)
                         )
                         .successHandler(loginSuccessHandler)
                 )

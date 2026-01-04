@@ -10,6 +10,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -17,6 +22,7 @@ public class LocalUserDetailsService implements UserDetailsService {
 
     private final UserMapper userMapper;
     private final AdminUserMapper adminUserMapper;
+
     //Spring Security가 ‘아이디 + 비밀번호 로그인’을 처리할 때
     //DB에서 사용자를 찾아 UserDetails로 변환
     // 일반 유저는 로그인id로 접근 ||  관리자는 이메일로 접근
@@ -25,7 +31,18 @@ public class LocalUserDetailsService implements UserDetailsService {
 
         AdminUserDTO admin = adminUserMapper.findByAdminEmail(loginInput);
         if (admin != null) {
-            return new CustomUserDetails(admin);
+
+            // 1️⃣ role_id로 permission 코드 조회
+            List<String> permissions =
+                    adminUserMapper.findPermissionsByRoleId(admin.getRoleId());
+
+            // 2️⃣ permission → GrantedAuthority 변환
+            List<GrantedAuthority> authorities = permissions.stream()
+                    .map(SimpleGrantedAuthority::new)
+                    .collect(Collectors.toList());
+
+            // 3️⃣ CustomUserDetails에 권한까지 태워서 반환
+            return new CustomUserDetails(admin, authorities);
         }
 
         // 2  일반 유저 찾아보기 (로그인ID 기준)
