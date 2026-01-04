@@ -64,14 +64,17 @@ a{
     border-radius: 99.9rem;
     background: rgba(0,0,0,.08);
 }
-#detail .location{
+#detail .location,
+#detail .meeting-room{
     grid-column: 2;
     justify-self: end;
     font-size: 1.1rem;
     padding: .6rem 1rem;
+    margin: 0.2rem 0;
     border-radius: 99.9rem;
     background: rgba(0,0,0,.08);
 }
+
 #detail .description{
     grid-column: 1 / -1;
     margin-top:5rem;
@@ -418,24 +421,14 @@ canvas{
 }
 
 .member-list{
-    display: none;
-    position: absolute;
     list-style: none;
     font-size: 1rem;
-    top: 12rem;
-    right: 10rem;
-
 
     background: #fff;
-    border: 1px solid #ddd;
     border-radius: 0.8rem;
     padding: 0.6rem 0.8rem;
-    min-width: 16rem;
+    min-width: 20rem;
     box-shadow: 0 8px 24px rgba(0,0,0,0.2);
-    z-index: 1010;
-}
-.member-img:hover + .member-list {
-    display: block;
 }
 #btn-start-chat{
     display: block;

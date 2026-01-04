@@ -162,7 +162,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         memberBox.innerHTML = `
           <div class="member-title"></div>
-          <span class="member-img"><img src="/images/team2_300.svg"> </span>
           <ul class="member-list">${items}</ul>
         `;
     }
