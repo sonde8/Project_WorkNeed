@@ -49,6 +49,11 @@ public interface AdminUserMapper {
     // 9 마지막 로그인 시간
     void updateLastLogin(@Param("adminId") Long adminId);
 
+    // 10 역할 ID로 권한 코드(String) 목록 가져오기
+    List<String> findPermissionsByRoleId(@Param("roleId") Long roleId);
+
+
+
 
 
 

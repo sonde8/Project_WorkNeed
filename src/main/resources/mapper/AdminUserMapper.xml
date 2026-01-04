@@ -72,6 +72,12 @@
         ORDER BY l.log_created_at DESC
     </select>
 
+    <select id="findPermissionsByRoleId" resultType="string">
+        SELECT permission_code
+        FROM AdminPermission
+        WHERE role_id = #{roleId}
+    </select>
+
 
 
     <insert id="insertAdmin" parameterType="com.Workneed.workneed.Members.dto.AdminUserDTO"

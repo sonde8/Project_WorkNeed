@@ -39,6 +39,10 @@ public class AdminUserService {
         return rankMapper.findAll();
     }
 
+    public List<String> getPermissionsByRoleId(Long roleId) {
+        return adminUserMapper.findPermissionsByRoleId(roleId);
+    }
+
     // [수정] 사용자 정보 수정 (adminId 추가)
     public void updateMember(UserDTO userDto, Long adminId) {
         adminUserMapper.updateMemberStatus(userDto);

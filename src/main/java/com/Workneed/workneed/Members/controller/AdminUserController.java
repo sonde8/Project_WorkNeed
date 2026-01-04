@@ -32,6 +32,12 @@ public class AdminUserController {
         AdminUserDTO admin = (AdminUserDTO) session.getAttribute("admin");
         if (admin == null) return "redirect:/login";
 
+        if (session.getAttribute("permissions") == null) {
+            List<String> permissions = adminUserService.getPermissionsByRoleId(admin.getRoleId());
+            session.setAttribute("permissions", permissions);
+            System.out.println("로그인 관리자 [" + admin.getAdminName() + "] 권한 로드: " + permissions);
+        }
+
         List<UserDTO> memberList = adminUserService.getAllMembers(userName, userLoginId, deptId, rankId, userStatus);
 
         model.addAttribute("admin", admin);
@@ -208,8 +214,4 @@ public class AdminUserController {
             return "fail";
         }
     }
-
-
-
-
 }
