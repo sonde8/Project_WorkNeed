@@ -32,17 +32,25 @@
                  th:text="${today != null ? today : '날짜'}"> 날짜 </div>
 
             <!-- 프로필 -->
-            <div class = "profile">
+            <div class = "profile-card">
 
-                <div class = "profileImg"> 이미지 </div>
+                <div class="profileImg">
+                    <img th:if="${user.userProfileImage != null}"
+                         th:src="@{/uploads/profiles/} + ${user.userProfileImage}"
+                         alt="프로필 이미지">
+
+                    <img th:unless="${user.userProfileImage != null}"
+                         th:src="@{/images/default-profile.svg}"
+                         alt="기본 이미지">
+                </div>
 
                 <div class="profileText">
-                    <div class="name">이름</div>
+                    <div class="name" th:text="${user.userName}">사용자명</div>
 
                     <div class="profileMeta">
-                        <span class="dept">부서이름</span>
+                        <span class="dept" th:text="${user.deptName}">부서명</span>
                         <span class="bar">|</span>
-                        <span class="rank">직급</span>
+                        <span class="rank" th:text="${user.rankName}">직급</span>
                     </div>
                 </div>
 
@@ -63,7 +71,10 @@
 
         <!-- 오른쪽-->
         <section class = "rightPage">
-
+            <div class="borad">게시판</div>
+            <div class="mini-calendar">미니 캘린더</div>
+            <div class="mini-kanban">칸반보드</div>
+            <div class="mini-meetingroom">회의실</div>
         </section>
     </div>
 

@@ -10,61 +10,72 @@
         <ul>
             <li class="nav-item">
                 <a th:href="@{/main}">
-                    <span class="icon">
+                    <span class="side-icon">
                         <img th:src="@{/images/home300.svg}" alt="홈">
                     </span>
-                    <span class="text">
+                    <span class="side-text">
                         홈
                     </span>
                 </a>
             </li>
             <li class="nav-item">
                 <a th:href="@{/chat/rooms}">
-                    <span class="icon">
+                    <span class="side-icon">
                     <img th:src="@{/images/chat300.svg}" alt="채팅">
                 </span>
-                    <span class="text">
+                    <span class="side-text">
                         채팅
                 </span>
                 </a>
             </li>
             <li class="nav-item">
                 <a th:href="@{/schedule/kanban}">
-                    <span class="icon">
+                    <span class="side-icon">
                         <img th:src="@{/images/work300.svg}" alt="업무">
                     </span>
-                    <span class="text">
+                    <span class="side-text">
                         업무
                     </span>
                 </a>
             </li>
             <li class="nav-item">
                 <a th:href="@{/calendar}">
-                    <span class="icon">
+                    <span class="side-icon">
                         <img th:src="@{/images/calendar300.svg}" alt="캘린더">
                     </span>
-                    <span class="text">
+                    <span class="side-text">
                         캘린더
                     </span>
                 </a>
             </li>
             <li class="nav-item">
                 <a th:href="@{/main}">
-                    <span class="icon">
+                    <span class="side-icon">
                         <img th:src="@{/images/approval300.svg}" alt="결재">
                     </span>
-                    <span class="text">
+                    <span class="side-text">
                         결재
                     </span>
                 </a>
             </li>
             <li class="nav-item">
-                <a th:href="@{/main}">
-                    <span class="icon">
+                <a th:href="@{/attendance}">
+                    <span class="side-icon">
                         <img th:src="@{/images/timeclock.svg}" alt="근태관리">
                     </span>
-                    <span class="text">
+                    <span class="side-text">
                         근태관리
+                    </span>
+                </a>
+            </li>
+            <!-- 나중에 관리자 기능까지 들어오면 관리자에게만 나오게 설정할 예정 -->
+            <li class="nav-item">
+                <a th:href="@{/}">
+                    <span class="side-icon">
+                        <img th:src="@{/images/rank300.svg}" alt="직급설정">
+                    </span>
+                    <span class="side-text">
+                        직급설정
                     </span>
                 </a>
             </li>
