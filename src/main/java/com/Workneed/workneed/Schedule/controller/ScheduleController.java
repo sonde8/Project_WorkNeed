@@ -99,17 +99,17 @@ public class ScheduleController {
         scheduleParticipantMapper.inviteOwner(scheduleId, loginUserId);
 
         if ("PERSONAL".equalsIgnoreCase(type)) {
-            return "redirect:/schedule/kanban";
+            return "redirect:/Schedule/kanban";
         }
         if ("TEAM".equalsIgnoreCase(type)) {
-            return "redirect:/schedule/invite?scheduleId=" + scheduleId;
+            return "redirect:/Schedule/invite?scheduleId=" + scheduleId;
         }
         if ("COMPANY".equalsIgnoreCase(type)) {
             scheduleParticipantMapper.inviteCompany(scheduleId, loginUserId);
-            return "redirect:/schedule/kanban";
+            return "redirect:/Schedule/kanban";
         }
 
-        return "redirect:/schedule/kanban";
+        return "redirect:/Schedule/kanban";
     }
 ////테스크 삭제
     @PostMapping("/delete")
@@ -157,11 +157,11 @@ public class ScheduleController {
 
         // schedule 존재 확인
         ScheduleDTO schedule = scheduleMapper.selectById(scheduleId);
-        if (schedule == null) return "redirect:/schedule/kanban";
+        if (schedule == null) return "redirect:/Schedule/kanban";
 
         model.addAttribute("scheduleId", scheduleId);
         model.addAttribute("schedule", schedule);
-        return "schedule/invite";
+        return "Schedule/invite";
     }
 
     @PostMapping("/invite")
@@ -174,7 +174,7 @@ public class ScheduleController {
         if (loginUserId == null) return "redirect:/login";
 
         if (userIds == null || userIds.isEmpty()) {
-            return "redirect:/schedule/kanban";
+            return "redirect:/Schedule/kanban";
         }
 
         // 본인(OWNER) 체크  방지
@@ -183,7 +183,7 @@ public class ScheduleController {
         // MEMBER 등록
         scheduleParticipantMapper.inviteTeam(scheduleId, userIds);
 
-        return "redirect:/schedule/kanban";
+        return "redirect:/Schedule/kanban";
     }
 
 ////invite Ajax
@@ -288,7 +288,7 @@ public class ScheduleController {
         if (loginUserId == null) return "redirect:/login";
 
         ScheduleDTO schedule = scheduleMapper.selectById(scheduleId);
-        if (schedule == null) return "redirect:/schedule/kanban";
+        if (schedule == null) return "redirect:/Schedule/kanban";
 
         //미팅룸 조회
         String roomName = meetingRoomMapper.selectRoomNameByScheduleId(scheduleId);
@@ -301,7 +301,7 @@ public class ScheduleController {
         model.addAttribute("schedule", schedule);
         model.addAttribute("commentList", commentList);
 
-        return "schedule/task";
+        return "Schedule/task";
     }
 
     /* Git 수정 */
@@ -313,7 +313,7 @@ public class ScheduleController {
         if (loginUserId == null) return "redirect:/login";
 
         scheduleService.updateGitUrl(id, gitUrl);
-        return "redirect:/schedule/task?scheduleId=" + id;
+        return "redirect:/Schedule/task?scheduleId=" + id;
     }
 
     /* Git 삭제 */
@@ -323,7 +323,7 @@ public class ScheduleController {
         if (loginUserId == null) return "redirect:/login";
 
         scheduleService.deleteGitUrl(id);
-        return "redirect:/schedule/task?scheduleId=" + id;
+        return "redirect:/Schedule/task?scheduleId=" + id;
     }
 
     /* File Storage 수정 */
@@ -335,7 +335,7 @@ public class ScheduleController {
         if (loginUserId == null) return "redirect:/login";
 
         scheduleService.updateFileStorageUrl(id, fileStorageUrl);
-        return "redirect:/schedule/task?scheduleId=" + id;
+        return "redirect:/Schedule/task?scheduleId=" + id;
     }
 
     /* File Storage 삭제 */
@@ -347,7 +347,7 @@ public class ScheduleController {
         if (loginUserId == null) return "redirect:/login";
 
         scheduleService.deleteFileStorageUrl(id);
-        return "redirect:/schedule/task?scheduleId=" + id;
+        return "redirect:/Schedule/task?scheduleId=" + id;
     }
 
 
