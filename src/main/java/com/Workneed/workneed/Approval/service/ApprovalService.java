@@ -21,7 +21,7 @@ public class ApprovalService {
     private final DocMapper mapper;
 
     // ✅ application.properties 값 주입
-    @Value("${file.upload.dir}")
+    @Value("${file.upload-dir}")
     private String uploadDir;
 
     public ApprovalService(DocMapper mapper) {
