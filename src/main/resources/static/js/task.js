@@ -162,7 +162,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         memberBox.innerHTML = `
           <div class="member-title"></div>
-          <span class="member-img"><img src="/images/team2_300.svg"> </span>
           <ul class="member-list">${items}</ul>
         `;
     }
@@ -213,17 +212,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // 6) Start Chat 클릭 → “방 생성”에 보낼 payload 준비
     startChatBtn?.addEventListener("click", () => {
-        const scheduleId = modal.dataset.scheduleId;
-        const ownerId = startChatBtn.dataset.ownerId;
-        const memberIds = startChatBtn.dataset.memberIds
-            ? startChatBtn.dataset.memberIds.split(",").filter(Boolean)
-            : [];
+        const ownerId = startChatBtn.dataset.ownerId; // 소유자 ID
+        const memberIds = startChatBtn.dataset.memberIds ? startChatBtn.dataset.memberIds.split(",") : [];
+        // 방 제목을 넘겨받기 위한 변수 선언
+        const titleElement = document.querySelector("#detail .title");
+        const taskTitle = titleElement ? titleElement.innerText.trim() : "새 채팅방";
 
-        // 여기서 다음 단계: chat 파트 담당 쪽으로 넘길 payload
-        console.log("Start Chat payload:", { scheduleId, ownerId, memberIds });
+        // 1. 모든 관련 인원을 합침
+        const allParticipants = [ownerId, ...memberIds].filter(Boolean);
 
-        // TODO: 방 생성 API POST로 넘기기 (다음 단계에서 연결)
-        // fetch("/chat/rooms", { method:"POST", body: JSON.stringify({scheduleId, ownerId, memberIds}) ... })
+        // 2. 중요: '나(현재 로그인 유저)'를 제외한 인원만 추출
+        // ※ currentUserId가 선언되어 있어야 합니다 (예: 전역변수나 jsp에서 할당)
+        const inviteList = allParticipants.filter(id => Number(id) !== Number(currentUserId));
+
+        // 3. 중복 제거 후 채팅 페이지로 이동 (파라미터 전달)
+        const uniqueInvites = [...new Set(inviteList)];
+        window.location.href = `/chat/rooms?invite=${uniqueInvites.join(",")}&roomName=${encodeURIComponent(taskTitle)}`;
     });
 
 });
@@ -527,7 +531,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             new Sortable(el, {
                 group: "memberTasks",
-                animation: 150,
+                animation: 300,
                 draggable: ".task-item",
                 filter: ".tasks-section-title",
                 ghostClass: "drag-ghost",

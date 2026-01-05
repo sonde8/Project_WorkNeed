@@ -96,4 +96,29 @@
                  )
     </insert>
 
+    <!-- ===============================
+     일정(schedule)로 회의실 이름 조회
+=============================== -->
+    <select id="selectRoomNameByScheduleId" parameterType="long" resultType="string">
+        SELECT mr.room_name
+        FROM meeting_reservation r
+                 JOIN meeting_room mr ON mr.room_id = r.room_id
+        WHERE r.schedule_id = #{scheduleId}
+          AND r.status = 'RESERVED'
+        ORDER BY r.reservation_id DESC
+            LIMIT 1
+    </select>
+
+    <!-- ===============================
+     일정 삭제 시 예약 먼저 삭제
+=============================== -->
+    <delete id="deleteReservationsByScheduleIds">
+        DELETE FROM meeting_reservation
+        WHERE schedule_id IN
+        <foreach collection="scheduleIds" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </delete>
+
+
 </mapper>

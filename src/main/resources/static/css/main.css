@@ -20,7 +20,7 @@
     font-weight: 800;
 }
 
-.profile {
+.profile-card {
     border: 1px solid black;
     border-radius: 16px;
     box-shadow: 0 6px 20px rgba(31, 41, 55, 0.08);
@@ -47,9 +47,27 @@
     font-weight: 700;
     color: #6b7280;
     grid-row: 1 / 5;
+
+    /* 이미지가 넘치지 않게 방지 */
+    overflow: hidden;
 }
 
+/* 프로필 이미지가 있을 때 적용될 스타일 */
+.profileImg img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* 가로세로 비율 유지하며 영역 꽉 채움 */
+    display: block;
+}
 
+.name {
+    font-size: 20px;
+}
+
+.profileMeta {
+    font-size: 15px;
+    margin-top: 5px;
+}
 
 .attendancePage{
     display: flex;
@@ -117,7 +135,6 @@
     align-items: center;
     justify-content: center;
 }
-
 
 /* attendanceLeft에서 제거 영역 */
 .pageMain .state-wrap { display:none; }

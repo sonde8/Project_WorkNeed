@@ -52,11 +52,18 @@
             <button class="kanban-addTask">+ Add Task</button>
         </div>
         <div class="kanban-done">
-            <div class="kanban-header">DONE</div>
+            <div class="kanban-header">
+                DONE
+                <button type="button" class="done-delete-btn" disabled>
+                    Delete <span id="doneSelectedCount">[ 0 ]</span>
+                </button>
+            </div>
             <div class="kanban-cards" data-status="DONE">
                 <div class="kanban-card" th:each="item : ${doneList}"
                                          th:attr="data-id=${item.scheduleId}">
-                    <button type="button" class="card-delete-btn" aria-label="삭제"> delete </button>
+                    <label class="done-check">
+                        <input type="checkbox" class="done-select">
+                    </label>
                     <div class="title-event-type">
                         <div class="title" th:text="${item.title}">Title</div>
                         <div class="event-type" th:text="${item.eventType}">Event Type</div>

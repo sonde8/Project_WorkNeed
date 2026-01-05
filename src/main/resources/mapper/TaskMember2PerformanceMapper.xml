@@ -45,4 +45,12 @@
         AND user_id = #{userId}
     </update>
 
+    <delete id="deleteByScheduleIds">
+        DELETE FROM my_task
+        WHERE schedule_id IN
+        <foreach collection="scheduleIds" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </delete>
+
 </mapper>

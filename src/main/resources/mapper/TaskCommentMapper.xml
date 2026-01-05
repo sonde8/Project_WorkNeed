@@ -42,4 +42,12 @@
         AND writer_id = #{writerId}
     </delete>
 
+    <delete id="deleteByScheduleIds">
+        DELETE FROM schedule_comment
+        WHERE schedule_id IN
+        <foreach collection="scheduleIds" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </delete>
+
 </mapper>
