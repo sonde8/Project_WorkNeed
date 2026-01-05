@@ -1,0 +1,67 @@
+package com.Workneed.workneed.Approval.controller;
+
+import com.Workneed.workneed.Approval.dto.LeaveRequestDTO;
+import com.Workneed.workneed.Approval.service.LeaveService;
+import com.Workneed.workneed.Members.dto.UserDTO;
+import jakarta.servlet.http.HttpSession;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+
+@Controller
+@RequestMapping("/approval")
+public class LeaveController {
+
+    private final LeaveService leaveService;
+
+    public LeaveController(LeaveService leaveService) {
+        this.leaveService = leaveService;
+    }
+
+     /* ==========================================================
+       공통 세션 유틸 (유저 파트 기준)
+       ========================================================== */
+
+    private UserDTO getLoginUser(HttpSession session) {
+        return (UserDTO) session.getAttribute("user"); // ✅ UserDTO
+    }
+
+    private Long getLoginUserId(HttpSession session) {
+        UserDTO user = getLoginUser(session);
+        return (user == null) ? null : user.getUserId();
+    }
+
+    private String redirectLogin() {
+        // ✅ 성욱님 프로젝트는 /login 쓰고 있으니 통일
+        return "redirect:/login";
+    }
+
+
+    // ✅ 휴가 신청 폼 화면
+    @GetMapping("/leave")
+    public String leaveForm(Model model, HttpSession session) {
+        Long userId = getLoginUserId(session);
+        if (userId == null) return "redirect:/login"; // ✅ 실제 로그인 매핑으로
+
+        model.addAttribute("dto", new LeaveRequestDTO());
+        return "Approval/approval.leave";
+    }
+
+    // ✅ 휴가 신청 제출
+    @PostMapping("/leave/request")
+    public String request(@ModelAttribute("dto") LeaveRequestDTO dto, HttpSession session) {
+        Long userId = getLoginUserId(session);
+        if (userId == null) return "redirect:/login";
+
+        Long docId = leaveService.submitLeave(dto, userId);
+        return "redirect:/approval/leave/" + docId;
+    }
+
+    private void debugSession(HttpSession session, String where) {
+        System.out.println("==== " + where + " ====");
+        System.out.println("sessionId = " + session.getId());
+        System.out.println("user attr = " + session.getAttribute("user"));
+        System.out.println("userId attr = " + session.getAttribute("userId"));
+    }
+
+}

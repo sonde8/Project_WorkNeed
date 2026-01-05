@@ -1,48 +1,123 @@
 package com.Workneed.workneed.Approval.controller;
 
+import com.Workneed.workneed.Approval.dto.ApprovalDocListItemDTO;
+import com.Workneed.workneed.Approval.dto.ApprovalSidebarCountDTO;
 import com.Workneed.workneed.Approval.dto.ApprovalTypeDTO;
 import com.Workneed.workneed.Approval.dto.DocDTO;
+import com.Workneed.workneed.Approval.dto.DocFileDTO;
 import com.Workneed.workneed.Approval.entity.ApprovalDoc;
+import com.Workneed.workneed.Approval.mapper.DocMapper;
 import com.Workneed.workneed.Approval.service.ApprovalService;
+import com.Workneed.workneed.Members.dto.UserDTO;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Controller
 @RequestMapping("/approval")
 public class ApprovalController {
 
-    private ApprovalService service;
-    //생성자 주입
-    public ApprovalController(ApprovalService service) {
+    private final ApprovalService service;
+
+    // ✅ 파일 메타 조회/삭제는 Mapper로 직접 처리 (서비스 수정 없이 최소 기능)
+    private final DocMapper docMapper;
+
+    // ✅ 업로드 디렉토리 (application.yml/properties의 file.upload-dir 사용)
+    @Value("${file.upload-dir}")
+    private String uploadDir;
+
+    public ApprovalController(ApprovalService service, DocMapper docMapper) {
         this.service = service;
+        this.docMapper = docMapper;
     }
 
+    /* ==========================================================
+       공통 세션 유틸 (유저 파트 기준)
+       ========================================================== */
 
+    private UserDTO getLoginUser(HttpSession session) {
+        return (UserDTO) session.getAttribute("user"); // ✅ UserDTO
+    }
 
-    //생성
+    private Long getLoginUserId(HttpSession session) {
+        UserDTO user = getLoginUser(session);
+        return (user == null) ? null : user.getUserId();
+    }
+
+    private String redirectLogin() {
+        // ✅ 성욱님 프로젝트는 /login 쓰고 있으니 통일
+        return "redirect:/login";
+    }
+
+    /* ==========================================================
+       전자결재 진입 (관문)
+       ========================================================== */
+
+    // ✅ /approval 들어오면 기본: 처리 대기함으로 이동
+    @GetMapping("")
+    public String entry(HttpSession session) {
+        Long userId = getLoginUserId(session);
+        if (userId == null) return redirectLogin();
+
+        return "redirect:/approval/inbox/waiting";
+    }
+
+    /* ==========================================================
+       ✅ 사이드바 카운트 공통 주입
+       ========================================================== */
+
+    @ModelAttribute("counts")
+    public ApprovalSidebarCountDTO counts(HttpSession session) {
+        Long userId = getLoginUserId(session); // ✅ userId 키 말고 UserDTO에서 꺼냄
+        if (userId == null) {
+            return new ApprovalSidebarCountDTO(); // 세션 없으면 0
+        }
+        return service.getCounts(userId);
+    }
+
+    /* ==========================================================
+       문서 생성 화면
+       ========================================================== */
+
     @GetMapping("/create")
     public String createForm(Model model, HttpSession session) {
-        Long userId = (Long) session.getAttribute("userId");
-        if (userId == null) return "redirect:/approval/login";
 
+        Long userId = getLoginUserId(session);
+        if (userId == null) return redirectLogin();
+
+        // 문서 유형 리스트
         List<ApprovalTypeDTO> types = service.getTypes();
         model.addAttribute("types", types);
-        model.addAttribute("approverCandidates", service.getApproverCandidates());
+
+        model.addAttribute("approvers", service.getApproverCandidates());
 
         return "Approval/approval.create";
     }
 
-    //저장
+    /* ==========================================================
+       임시저장
+       ========================================================== */
 
     @PostMapping("/save")
-    public String save(@ModelAttribute DocDTO dto, HttpSession session){
-        Long writerId = (Long) session.getAttribute("userId");
-        if (writerId == null) return "redirect:/approval/login";
+    public String save(@ModelAttribute DocDTO dto, HttpSession session) {
+
+        Long writerId = getLoginUserId(session);
+        if (writerId == null) return redirectLogin();
 
         dto.setWriterId(writerId);
         Long docId = service.save(dto);
@@ -50,18 +125,28 @@ public class ApprovalController {
         return "redirect:/approval/detail/" + docId;
     }
 
+    /* ==========================================================
+       상세 페이지
+       ========================================================== */
+
     @GetMapping("/detail/{docId}")
     public String detail(@PathVariable Long docId,
                          Model model,
                          HttpSession session) {
 
         ApprovalDoc doc = service.findById(docId);
+        if (doc == null) {
+            model.addAttribute("doc", null);
+            model.addAttribute("lines", List.of());
+            model.addAttribute("files", List.of());
+            return "Approval/approval.detail";
+        }
+
         model.addAttribute("doc", doc);
-
         model.addAttribute("lines", service.findLinesByDocId(docId));
-        model.addAttribute("files", service.getFilesByDocId(docId)); // 파일추가
+        model.addAttribute("files", service.getFilesByDocId(docId)); // ✅ 파일 목록은 기존 service 그대로 사용
 
-        Long loginUserId = (Long) session.getAttribute("userId");
+        Long loginUserId = getLoginUserId(session);
 
         boolean isWriter = (loginUserId != null && loginUserId.equals(doc.getWriterId()));
         model.addAttribute("isWriter", isWriter);
@@ -72,20 +157,23 @@ public class ApprovalController {
         return "Approval/approval.detail";
     }
 
-
-
-
-    //제출
+    /* ==========================================================
+       상신 (문서 저장 + 파일 업로드 + 결재선 생성)
+       ========================================================== */
 
     @PostMapping("/submit")
     public String submit(@ModelAttribute DocDTO dto,
+                         HttpServletRequest request,
                          @RequestParam(required = false) List<MultipartFile> files,
-                         @RequestParam("approverIds") List<Long> approverIds,
-                         @RequestParam("orderNums") List<Integer> orderNums,
+                         @RequestParam(required = false, name = "approverIds") List<Long> approverIds,
+                         @RequestParam(required = false, name = "orderNums") List<Integer> orderNums,
                          HttpSession session) throws Exception {
 
-        Long writerId = (Long) session.getAttribute("userId");
-        if (writerId == null) return "redirect:/approval/login";
+        System.out.println("REQ typeId=" + request.getParameter("typeId"));
+        System.out.println("DTO typeId=" + dto.getTypeId());
+
+        Long writerId = getLoginUserId(session);
+        if (writerId == null) return redirectLogin();
 
         if (approverIds == null || approverIds.isEmpty()) {
             throw new IllegalStateException("결재자를 1명 이상 선택해야 합니다.");
@@ -94,71 +182,213 @@ public class ApprovalController {
             throw new IllegalStateException("결재 차수 데이터가 올바르지 않습니다.");
         }
 
-        // ✅ 1. docId 먼저 확보
+        // 문서 저장(없으면 생성)
         Long docId = dto.getDocId();
         if (docId == null) {
             dto.setWriterId(writerId);
-            docId = service.save(dto);   // DRAFT 저장
+            docId = service.save(dto);
         }
 
-        // 그 다음 파일 저장
+        // ✅ 파일 저장(업로드) - 기존 로직 유지
         if (files != null && !files.isEmpty()) {
             service.saveFile(docId, files);
         }
 
-
-
-        // ✅ 3. 결재 흐름 시작
+        // 결재 흐름 시작
         service.submit(docId, approverIds, orderNums);
-
-        System.out.println("SUBMIT sessionId=" + session.getId() + ", userId=" + session.getAttribute("userId"));
 
         return "redirect:/approval/detail/" + docId;
     }
 
+    /* ==========================================================
+       파일: 다운로드 / 삭제 (✅ 최소 기능, 서비스 수정 없음)
+       - 다운로드: GET  /approval/file/{fileId}/download
+       - 삭제    : POST /approval/file/{fileId}/delete
+       ========================================================== */
 
+    @GetMapping("/file/{fileId}/download")
+    public ResponseEntity<Resource> downloadFile(@PathVariable Long fileId,
+                                                 HttpSession session) throws Exception {
 
-    // 버튼
-
-
-    @PostMapping("/reject")
-    public String reject(@RequestParam("docId") Long docId,
-                         @RequestParam("comment") String comment,
-                         HttpSession session) {
-
-        Long loginUserId = (Long) session.getAttribute("userId");
+        Long loginUserId = getLoginUserId(session);
         if (loginUserId == null) {
-            throw new IllegalStateException("로그인이 필요합니다.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        service.reject(docId, loginUserId, comment);
+        // 1) 파일 메타 조회 (mapper 직접)
+        DocFileDTO file = docMapper.selectFileById(fileId);
+        if (file == null) {
+            return ResponseEntity.notFound().build();
+        }
 
+        // 2) 권한 체크(기본: 작성자만)
+        ApprovalDoc doc = service.findById(file.getDocId());
+        if (doc == null) {
+            return ResponseEntity.notFound().build();
+        }
+        if (!loginUserId.equals(doc.getWriterId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        // 3) 디스크 파일 로드
+        Resource resource = new FileSystemResource(new File(uploadDir, file.getSavedName()));
+        if (resource == null || !resource.exists()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        String encoded = URLEncoder.encode(file.getOriginalName(), StandardCharsets.UTF_8)
+                .replaceAll("\\+", "%20");
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename*=UTF-8''" + encoded)
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(resource);
+    }
+
+    @PostMapping("/file/{fileId}/delete")
+    public String deleteFile(@PathVariable Long fileId,
+                             HttpSession session) {
+
+        Long loginUserId = getLoginUserId(session);
+        if (loginUserId == null) return redirectLogin();
+
+        // 1) 파일 메타 조회
+        DocFileDTO file = docMapper.selectFileById(fileId);
+        if (file == null) {
+            // 이미 삭제된 경우 등: 안전하게 대기함으로
+            return "redirect:/approval/inbox/waiting";
+        }
+
+        // 2) 권한 체크(기본: 작성자만)
+        ApprovalDoc doc = service.findById(file.getDocId());
+        if (doc == null) {
+            return "redirect:/approval/inbox/waiting";
+        }
+        if (!loginUserId.equals(doc.getWriterId())) {
+            throw new IllegalStateException("파일 삭제 권한이 없습니다.");
+        }
+
+        // 3) DB 메타 삭제
+        docMapper.deleteFileById(fileId);
+
+        // 4) 디스크 파일 삭제 (실패해도 흐름은 유지)
+        try {
+            File disk = new File(uploadDir, file.getSavedName());
+            if (disk.exists()) disk.delete();
+        } catch (Exception ignored) { }
+
+        return "redirect:/approval/detail/" + file.getDocId();
+    }
+
+    /* ==========================================================
+       결재 처리
+       ========================================================== */
+
+    @PostMapping("/reject")
+    public String reject(@RequestParam Long docId,
+                         @RequestParam String comment,
+                         HttpSession session) {
+
+        Long loginUserId = getLoginUserId(session);
+        if (loginUserId == null) return redirectLogin();
+
+        service.reject(docId, loginUserId, comment);
         return "redirect:/approval/detail/" + docId;
     }
 
     @PostMapping("/approve")
-    public String approve(@RequestParam("docId") Long docId, HttpSession session) {
+    public String approve(@RequestParam Long docId,
+                          HttpSession session) {
 
-        Long loginUserId = (Long) session.getAttribute("userId");
-        if (loginUserId == null) {
-            throw new IllegalStateException("로그인이 필요합니다.");
-        }
+        Long loginUserId = getLoginUserId(session);
+        if (loginUserId == null) return redirectLogin();
 
         service.approve(docId, loginUserId);
-
         return "redirect:/approval/detail/" + docId;
     }
 
+    /* ==========================================================
+       수신함 (공통 템플릿 approval.inbox)
+       ========================================================== */
 
-/*
-    @PostMapping("/recall")
-    public String recall(@RequestParam("docId") Long docId){
-        service.recall(docId); // 나중에 구현
-        return "redirect:/approval/detail/" + docId;
+    @GetMapping("/inbox/waiting")
+    public String inboxWaiting(HttpSession session, Model model) {
+        Long userId = getLoginUserId(session);
+        if (userId == null) return redirectLogin();
+
+        model.addAttribute("title", "처리 대기");
+        model.addAttribute("active", "inboxWaiting");
+        model.addAttribute("list", service.getWaitingInbox(userId));
+        return "Approval/approval.inbox";
     }
-    */
 
+    @GetMapping("/inbox/done")
+    public String inboxDone(HttpSession session, Model model) {
+        Long userId = getLoginUserId(session);
+        if (userId == null) return redirectLogin();
 
+        model.addAttribute("title", "처리 완료");
+        model.addAttribute("active", "inboxDone");
+        model.addAttribute("list", service.getDoneInbox(userId));
+        return "Approval/approval.inbox";
+    }
 
+    /* ==========================================================
+       내 문서함 (공통 템플릿 approval.inbox)
+       ========================================================== */
 
+    @GetMapping("/my/all")
+    public String myAll(HttpSession session, Model model) {
+        Long userId = getLoginUserId(session);
+        if (userId == null) return redirectLogin();
+
+        model.addAttribute("title", "전체");
+        model.addAttribute("active", "myAll");
+        model.addAttribute("list", service.getMyAllList(userId));
+        return "Approval/approval.inbox";
+    }
+
+    @GetMapping("/my/drafts")
+    public String myDrafts(HttpSession session, Model model) {
+        Long userId = getLoginUserId(session);
+        if (userId == null) return redirectLogin();
+
+        model.addAttribute("title", "임시저장");
+        model.addAttribute("active", "myDrafts");
+        model.addAttribute("list", service.getMyDraftList(userId));
+        return "Approval/approval.inbox";
+    }
+
+    @GetMapping("/my/in-progress")
+    public String myInProgress(HttpSession session, Model model) {
+        Long userId = getLoginUserId(session);
+        if (userId == null) return redirectLogin();
+
+        model.addAttribute("title", "진행중");
+        model.addAttribute("active", "myInProgress");
+        model.addAttribute("list", service.getMyInProgressList(userId));
+        return "Approval/approval.inbox";
+    }
+
+    @GetMapping("/my/approved")
+    public String myApproved(HttpSession session, Model model) {
+        Long userId = getLoginUserId(session);
+        if (userId == null) return redirectLogin();
+
+        model.addAttribute("title", "승인됨");
+        model.addAttribute("active", "myApproved");
+        model.addAttribute("list", service.getMyApprovedList(userId));
+        return "Approval/approval.inbox";
+    }
+
+    @GetMapping("/my/rejected")
+    public String myRejected(HttpSession session, Model model) {
+        Long userId = getLoginUserId(session);
+        if (userId == null) return redirectLogin();
+
+        model.addAttribute("title", "반려됨");
+        model.addAttribute("active", "myRejected");
+        model.addAttribute("list", service.getMyRejectedList(userId));
+        return "Approval/approval.inbox";
+    }
 }
