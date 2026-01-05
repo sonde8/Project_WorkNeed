@@ -32,4 +32,9 @@ public interface ScheduleMapper {
     int updateFileStorageUrl(@Param("scheduleId") Long scheduleId,
                              @Param("fileStorageUrl") String fileStorageUrl);
     int deleteFileStorageUrl(Long scheduleId);
+
+    List<ScheduleDTO> selectByStatusForMain(
+            @Param("userId") Long userId,
+            @Param("status") String status
+    );
 }

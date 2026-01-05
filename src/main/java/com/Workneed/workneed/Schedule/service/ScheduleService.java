@@ -1,5 +1,6 @@
 package com.Workneed.workneed.Schedule.service;
 
+import com.Workneed.workneed.Meetingroom.mapper.MeetingRoomMapper;
 import com.Workneed.workneed.Schedule.mapper.ScheduleMapper;
 import com.Workneed.workneed.Schedule.mapper.ScheduleParticipantMapper;
 import com.Workneed.workneed.Schedule.mapper.TaskCommentMapper;
@@ -19,6 +20,7 @@ public class ScheduleService {
     private final ScheduleParticipantMapper scheduleParticipantMapper;
     private final TaskCommentMapper taskCommentMapper;
     private final TaskMember2PerformanceMapper taskMember2PerformanceMapper;
+    private final MeetingRoomMapper meetingRoomMapper;
 
     public Map<String, Object> getLinks(Long scheduleId) {
         return scheduleMapper.selectScheduleLinks(scheduleId);
@@ -36,6 +38,7 @@ public class ScheduleService {
         //자식 삭제
         taskCommentMapper.deleteByScheduleIds(scheduleIds);
         taskMember2PerformanceMapper.deleteByScheduleIds(scheduleIds);
+        meetingRoomMapper.deleteReservationsByScheduleIds(scheduleIds);
         scheduleParticipantMapper.deleteByScheduleIds(scheduleIds);
         //부모 삭제
         scheduleMapper.deleteByScheduleIds(scheduleIds);

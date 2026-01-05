@@ -37,8 +37,7 @@ public class BoardServiceImpl implements BoardService {
     @Override
     @Transactional
     public boolean registerPost(BoardPostDTO postDTO) {
-        int result = boardMapper.insertPost(postDTO);
-        return result > 0;
+        return boardMapper.insertPost(postDTO) == 1;
     }
 
 }

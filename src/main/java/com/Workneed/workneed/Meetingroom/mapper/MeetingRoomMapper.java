@@ -27,6 +27,9 @@ public interface MeetingRoomMapper {
     // 3. 예약 저장
     int insertReservation(MeetingReservationDTO dto);
 
-    //4. task에 회의실 내용 조회
+    //4. task에서 회의실 내용 조회
     String selectRoomNameByScheduleId(@Param("scheduleId") Long scheduleId);
+
+    //5. task에서 회의실 내용 삭제
+    int deleteReservationsByScheduleIds(@Param("scheduleIds") List<Long> scheduleIds);
 }

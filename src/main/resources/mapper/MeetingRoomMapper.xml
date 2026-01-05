@@ -109,4 +109,16 @@
             LIMIT 1
     </select>
 
+    <!-- ===============================
+     일정 삭제 시 예약 먼저 삭제
+=============================== -->
+    <delete id="deleteReservationsByScheduleIds">
+        DELETE FROM meeting_reservation
+        WHERE schedule_id IN
+        <foreach collection="scheduleIds" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </delete>
+
+
 </mapper>
