@@ -24,7 +24,8 @@
         WHERE dept_id = #{deptId}
     </select>
 
-    <insert id="insertDept" parameterType="com.Workneed.workneed.Members.dto.DeptDTO">
+    <insert id="insertDept" parameterType="com.Workneed.workneed.Members.dto.DeptDTO"
+            useGeneratedKeys="true" keyProperty="deptId">
         INSERT INTO dept (dept_name)
         VALUES (#{deptName})
     </insert>

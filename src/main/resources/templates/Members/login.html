@@ -20,7 +20,6 @@
             <div th:if="${loginError}" class="error-msg" th:text="${loginError}"></div>
 
             <form th:action="@{/login-user}" method="post">
-                <input type="hidden" name="userType" value="USER">
                 <div class="input-group">
                     <img th:src="@{/images/person300.svg}" class="input-icon" alt="아이디 아이콘">
                     <input type="text" name="loginId" placeholder="아이디" autocomplete="off" required>
@@ -58,6 +57,7 @@
                 <i class="fa-solid fa-user-lock"></i>
                 관리자 로그인
             </a>
+
         </div>
     </div>
 </main>

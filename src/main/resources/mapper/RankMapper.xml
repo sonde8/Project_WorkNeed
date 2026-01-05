@@ -27,12 +27,12 @@
         WHERE rank_id = #{value}
     </select>
 
-    <insert id="insertRank">
+    <insert id="insertRank" useGeneratedKeys="true" keyProperty="rankId">
         INSERT INTO ranks (rank_name, rank_level)
         VALUES (
-                   #{rankName},
-                   (SELECT COALESCE(MAX(rank_level), 0) + 1 FROM ranks r)
-               )
+        #{rankName},
+        (SELECT COALESCE(MAX(rank_level), 0) + 1 FROM ranks r)
+        )
     </insert>
 
     <update id="updateRank" parameterType="com.Workneed.workneed.Members.dto.RankDTO">

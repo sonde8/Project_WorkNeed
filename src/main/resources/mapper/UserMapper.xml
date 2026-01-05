@@ -137,4 +137,16 @@
         WHERE user_id = #{userId}
     </update>
 
+    <update id="updateUserRankToDefault" parameterType="long">
+        UPDATE user
+        SET rank_id = 6
+        WHERE rank_id = #{rankId}
+    </update>
+
+    <update id="updateUserDeptToDefault" parameterType="long">
+        UPDATE user
+        SET dept_id = 6
+        WHERE dept_id = #{deptId}
+    </update>
+
 </mapper>

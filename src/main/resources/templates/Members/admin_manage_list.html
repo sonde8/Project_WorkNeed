@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>관리자 설정</title>
+    <link rel="stylesheet" th:href="@{/css/admin_user_list.css}">
+    <style>
+        .status-active { color: #3182ce; font-weight: bold; }
+        .status-suspended { color: #e53e3e; font-weight: bold; }
+        .btn-tab { padding: 10px 20px; text-decoration: none; color: #666; border-bottom: 3px solid transparent; }
+        .btn-tab.active { color: #3182ce; border-bottom: 3px solid #3182ce; font-weight: bold; }
+        /* 권한 배지 스타일 */
+        .role-badge { background: #e2e8f0; color: #4a5568; padding: 3px 8px; border-radius: 6px; font-size: 0.85em; font-weight: 600; }
+    </style>
+</head>
+<body>
+
+<div th:replace="~{members/admin_user_list :: .admin-header}"></div>
+
+<div style="padding: 20px;">
+    <div style="display: flex; gap: 20px; border-bottom: 1px solid #ddd; margin-bottom: 20px;">
+        <a th:href="@{/admin/member/list}" class="btn-tab">직원 관리</a>
+        <a th:href="@{/admin/manage/list}" class="btn-tab active">관리자 설정</a>
+        <a th:href="@{/admin/log/list}" class="btn-tab">활동 로그</a>
+    </div>
+
+    <h2>👤 시스템 관리자 목록</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>관리자 이름</th>
+            <th>권한(Role)</th>
+            <th>권한 설명</th>
+            <th>이메일(아이디)</th>
+            <th>마지막 접속 시간</th>
+            <th>상태</th>
+            <th>계정 제어</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="a : ${admins}">
+            <td><strong th:text="${a.adminName}">관리자이름</strong></td>
+
+            <td>
+                <span class="role-badge" th:text="${a.roleName}">SUPER_ADMIN</span>
+            </td>
+
+            <td>
+                <span th:text="${a.roleDescription}" style="color: #718096; font-size: 0.9em;">설명 내용</span>
+            </td>
+
+            <td th:text="${a.adminEmail}">admin@workneed.com</td>
+            <td th:text="${a.adminLastLoginAt != null ? #temporals.format(a.adminLastLoginAt, 'yyyy-MM-dd HH:mm:ss') : '미접속'}"></td>
+            <td>
+                <span th:text="${a.adminStatus}"
+                      th:class="${a.adminStatus == 'ACTIVE' ? 'status-active' : 'status-suspended'}">
+                </span>
+            </td>
+            <td>
+                <button th:if="${a.adminId != admin.adminId}"
+                        th:class="${a.adminStatus == 'ACTIVE' ? 'btn-secondary' : 'btn-primary'}"
+                        th:onclick="changeAdminStatus([[${a.adminId}]], [[${a.adminStatus}]])"
+                        th:text="${a.adminStatus == 'ACTIVE' ? '계정 정지' : '정지 해제'}">
+                </button>
+                <span th:if="${a.adminId == admin.adminId}" style="color: #999; font-size: 0.85em;">(본인)</span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<script>
+    function changeAdminStatus(targetId, currentStatus) {
+        const nextStatus = (currentStatus === 'ACTIVE') ? 'SUSPENDED' : 'ACTIVE';
+        if(!confirm(`관리자 상태를 ${nextStatus}로 변경하시겠습니까?`)) return;
+
+        fetch('/admin/manage/status', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ targetId: targetId, status: nextStatus })
+        }).then(res => res.text()).then(result => {
+            if(result === "success") location.reload();
+            else if(result === "self_error") alert("본인 계정은 정지할 수 없습니다.");
+            else alert("오류가 발생했습니다.");
+        });
+    }
+</script>
+</body>
+</html>

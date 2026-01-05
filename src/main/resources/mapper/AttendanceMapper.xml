@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.Workneed.workneed.Members.mapper.AttendanceMapper">
+
+    <!-- 1️⃣ 특정 직원 + 날짜 Attendance 조회 -->
+    <select id="findByUserAndDate"
+            resultType="com.Workneed.workneed.Members.dto.AttendanceDTO">
+        SELECT
+        attendance_id   AS attendanceId,
+        emp_id          AS empId,
+        work_date       AS workDate,
+        check_in_time   AS checkInTime,
+        check_out_time  AS checkOutTime,
+        work_minutes    AS workMinutes,
+        overtime_minutes AS overtimeMinutes,
+        status_code     AS statusCode
+        FROM Attendance
+        WHERE emp_id = #{userId}
+        AND work_date = #{workDate}
+    </select>
+
+    <!-- 2️⃣ 기존 Attendance가 있을 때 연장근무 수정 -->
+    <update id="updateOvertime">
+        UPDATE Attendance
+        SET
+        overtime_minutes = #{minutes},
+        status_code = 'CORRECTED',
+        updated_at = NOW()
+        WHERE attendance_id = #{attendanceId}
+    </update>
+
+    <!-- 3️⃣ Attendance가 없을 때 신규 생성 (연장근무 승인) -->
+    <insert id="insertOvertime">
+        INSERT INTO Attendance (
+        emp_id,
+        work_date,
+        overtime_minutes,
+        status_code,
+        created_at,
+        updated_at
+        ) VALUES (
+        #{userId},
+        #{workDate},
+        #{minutes},
+        'CORRECTED',
+        NOW(),
+        NOW()
+        )
+    </insert>
+
+</mapper>
