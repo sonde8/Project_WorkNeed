@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>활동 로그</title>
+    <link rel="stylesheet" th:href="@{/css/admin_user_list.css}">
+    <style>
+        .btn-tab { padding: 10px 20px; text-decoration: none; color: #666; border-bottom: 3px solid transparent; }
+        .btn-tab.active { color: #3182ce; border-bottom: 3px solid #3182ce; font-weight: bold; }
+        /* 작업 구분 배지 스타일 */
+        .action-badge { background: #f7fafc; border: 1px solid #cbd5e0; padding: 2px 6px; border-radius: 4px; font-size: 0.85em; }
+        /* 권한 배지 스타일 */
+        .role-tag { font-size: 0.75em; color: #718096; background: #edf2f7; padding: 2px 5px; border-radius: 4px; margin-left: 5px; }
+    </style>
+</head>
+<body>
+
+<div th:replace="~{members/admin_user_list :: .admin-header}"></div>
+
+<div style="padding: 20px;">
+    <div style="display: flex; gap: 20px; border-bottom: 1px solid #ddd; margin-bottom: 20px;">
+        <a th:href="@{/admin/member/list}" class="btn-tab">직원 관리</a>
+        <a th:href="@{/admin/manage/list}" class="btn-tab">관리자 설정</a>
+        <a th:href="@{/admin/log/list}" class="btn-tab active">활동 로그</a>
+    </div>
+
+    <h2>📜 시스템 활동 기록</h2>
+    <p style="color: #718096; font-size: 0.9em; margin-bottom: 15px;">* 모든 관리 활동은 보안을 위해 기록되며 수정 및 삭제가 불가능합니다.</p>
+
+    <table>
+        <thead>
+        <tr>
+            <th style="width: 180px;">발생 시각</th>
+            <th style="width: 200px;">수행 관리자(권한)</th>
+            <th style="width: 120px;">작업 구분</th>
+            <th>상세 내용</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:if="${#lists.isEmpty(logs)}">
+            <td colspan="4" style="text-align: center; padding: 30px; color: #a0aec0;">기록된 활동 로그가 없습니다.</td>
+        </tr>
+        <tr th:each="log : ${logs}">
+            <td th:text="${#temporals.format(log.logCreatedAt, 'yyyy-MM-dd HH:mm:ss')}" style="color: #4a5568;">
+                2026-01-05 14:00:00
+            </td>
+            <td>
+                <b th:text="${log.adminName}">관리자명</b>
+                <span class="role-tag" th:text="${log.roleName}">SUPER_ADMIN</span>
+            </td>
+            <td>
+                <span class="action-badge">
+                    <b th:text="${log.logActionType}">UPDATE</b>
+                </span>
+            </td>
+            <td th:text="${log.logDescription}" style="line-height: 1.5;">상세 내용이 여기에 표시됩니다.</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>
