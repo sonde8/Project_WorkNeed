@@ -13,7 +13,7 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 
 <div class="main-layout">
 
-    <aside class="sidebar" th:replace="layout/sidebar :: sidebar"></aside>
+    <aside class="sidebar" th:replace="~{layout/sidebar :: sidebar}"></aside>
 
     <header class="header">
         <div th:replace="~{layout/header :: header}"></div>
