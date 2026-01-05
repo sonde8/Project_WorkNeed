@@ -13,6 +13,6 @@ public interface DeptMapper {
     DeptDTO findById(Long deptId);
     void insertDept(DeptDTO deptDto);
 
-    // 여기도 @Param을 추가합니다.
+
     void deleteDept(@Param("deptId") Long deptId);
 }

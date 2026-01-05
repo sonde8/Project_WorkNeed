@@ -13,6 +13,6 @@ public interface RankMapper {
     RankDTO findById(Long rankId);
     void insertRank(RankDTO rankDto);
 
-    // @Param을 붙여서 XML의 #{rankId}와 이름을 강제로 연결합니다.
+
     void deleteRank(@Param("rankId") Long rankId);
 }
