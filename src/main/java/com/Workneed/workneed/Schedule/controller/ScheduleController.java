@@ -57,7 +57,7 @@ public class ScheduleController {
         model.addAttribute("doingList", doingList);
         model.addAttribute("doneList", doneList);
 
-        return "schedule/kanban";
+        return "Schedule/kanban";
     }
 
 ////테스크 생성
