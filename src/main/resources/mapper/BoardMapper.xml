@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.Workneed.workneed.Board.mapper.BoardMapper">
+
+    <select id="selectCategoryList" resultType="com.Workneed.workneed.Board.dto.BoardCategoryDTO">
+        SELECT
+            category_id   AS categoryId,
+            category_name AS categoryName
+        FROM board_category
+        ORDER BY category_id ASC
+    </select>
+
+    <select id="selectPostList" resultType="com.Workneed.workneed.Board.dto.BoardPostDTO">
+        SELECT
+            p.post_id        AS postId,
+            p.category_id    AS categoryId,
+            c.category_name  AS categoryName,
+            p.writer_id      AS writerId,
+            u.user_name      AS writerName,
+            p.title          AS title,
+            p.created_at     AS createdAt
+        FROM board_post p
+                 JOIN board_category c ON p.category_id = c.category_id
+                 LEFT JOIN user u ON p.writer_id = u.user_id
+        ORDER BY p.post_id DESC
+    </select>
+
+    <select id="selectPostById" resultType="com.Workneed.workneed.Board.dto.BoardPostDTO">
+        SELECT
+            p.post_id        AS postId,
+            p.category_id    AS categoryId,
+            c.category_name  AS categoryName,
+            p.writer_id      AS writerId,
+            u.user_name      AS userName,
+            p.title          AS title,
+            p.content        AS content,
+            p.created_at     AS createAt
+        FROM board_post p
+                 JOIN board_category c ON p.category_id = c.category_id
+                 LEFT JOIN user u ON p.writer_id = u.user_id
+        WHERE p.post_id = #{postId}
+    </select>
+
+    <insert id="insertPost"
+            parameterType="com.Workneed.workneed.Board.dto.BoardPostDTO"
+            useGeneratedKeys="true" keyProperty="postId">
+        INSERT INTO board_post (
+            category_id,
+            writer_id,
+            title,
+            content,
+            created_at
+        ) VALUES (
+                     #{categoryId},
+                     #{writerId},
+                     #{title},
+                     #{content},
+                     CURRENT_TIMESTAMP
+                 )
+    </insert>
+
+</mapper>

@@ -11,12 +11,23 @@
     <div class="header-profile">
         <div class="profile-info" th:if="${session.user != null}">
             <span class="profile-name" th:text="${session.user.userName}">사용자명</span>
+
             <div class="profile-img-wrapper">
-                <img th:src="@{/images/profile300.svg}" alt="프로필" class="profile">
+                <img th:if="${session.user.userProfileImage != null}"
+                     th:src="@{/uploads/profiles/} + ${session.user.userProfileImage}"
+                     alt="프로필" class="profile">
+
+                <img th:unless="${session.user.userProfileImage != null}"
+                     th:src="@{/images/default-profile.svg}"
+                     alt="기본프로필" class="profile">
             </div>
+
+            <form th:action="@{/logout}" method="post" style="margin-left: 10px;">
+                <button type="submit" class="logout-btn">로그아웃</button>
+            </form>
         </div>
 
-        <div class="profile-info" th:unless="${user != null}">
+        <div class="profile-info" th:unless="${session.user != null}">
             <a th:href="@{/login}" class="login-link">로그인</a>
         </div>
     </div>

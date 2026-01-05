@@ -4,9 +4,27 @@
 
     <select id="findAllMembersForAdmin" resultType="com.Workneed.workneed.Members.dto.UserDTO">
         SELECT u.*, r.rank_name AS rankname, d.dept_name AS deptname
-        FROM User u
-        LEFT JOIN Ranks r ON u.rank_id = r.rank_id
-        LEFT JOIN Dept d ON u.dept_id = d.dept_id
+        FROM user u
+        LEFT JOIN ranks r ON u.rank_id = r.rank_id
+        LEFT JOIN dept d ON u.dept_id = d.dept_id
+        <where>
+            <if test="userName != null and userName != ''">
+                AND u.user_name LIKE CONCAT('%', #{userName}, '%')
+            </if>
+            <if test="userLoginId != null and userLoginId != ''">
+                AND u.user_login_id LIKE CONCAT('%', #{userLoginId}, '%')
+            </if>
+            <if test="deptId != null">
+                AND u.dept_id = #{deptId}
+            </if>
+            <if test="rankId != null">
+                AND u.rank_id = #{rankId}
+            </if>
+            <if test="userStatus != null and userStatus != ''">
+                AND u.user_status = #{userStatus}
+            </if>
+        </where>
+        ORDER BY u.user_id DESC
     </select>
 
     <select id="findByAdminEmail" resultType="com.Workneed.workneed.Members.dto.AdminUserDTO">
@@ -19,33 +37,79 @@
         admin_status AS adminStatus,
         admin_last_login_at AS adminLastLoginAt,
         admin_created_at AS adminCreatedAt
-        FROM AdminUser
+        FROM adminuser
         WHERE admin_email = #{adminEmail}
     </select>
 
+    <select id="findAllAdmins" resultType="com.Workneed.workneed.Members.dto.AdminUserDTO">
+        SELECT
+        a.admin_id AS adminId,
+        a.admin_email AS adminEmail,
+        a.admin_name AS adminName,
+        a.admin_status AS adminStatus,
+        a.admin_last_login_at AS adminLastLoginAt,
+        a.admin_created_at AS adminCreatedAt,
+        r.role_name AS roleName,
+        r.role_description AS roleDescription
+        FROM AdminUser a
+        /* 테이블명을 Role에서 AdminRole로 수정 */
+        LEFT JOIN AdminRole r ON a.role_id = r.role_id
+        ORDER BY a.admin_created_at DESC
+    </select>
 
-    <insert id="insertAdmin" parameterType="com.Workneed.workneed.Members.dto.AdminUserDTO">
+    <select id="findAllActivityLogs" resultType="com.Workneed.workneed.Members.dto.AdminUserDTO">
+        SELECT
+        l.log_id AS logId,
+        a.admin_name AS adminName,
+        r.role_name AS roleName,
+        l.log_action_type AS logActionType,
+        l.log_description AS logDescription,
+        l.log_created_at AS logCreatedAt
+        FROM AdminActivityLog l
+        JOIN AdminUser a ON l.admin_id = a.admin_id
+        /* 여기도 Role에서 AdminRole로 수정 */
+        LEFT JOIN AdminRole r ON a.role_id = r.role_id
+        ORDER BY l.log_created_at DESC
+    </select>
+
+    <select id="findPermissionsByRoleId" resultType="string">
+        SELECT permission_code
+        FROM AdminPermission
+        WHERE role_id = #{roleId}
+    </select>
+
+
+
+    <insert id="insertAdmin" parameterType="com.Workneed.workneed.Members.dto.AdminUserDTO"
+            useGeneratedKeys="true" keyProperty="adminId">
         INSERT INTO AdminUser (
-        admin_email,
-        admin_password,
-        admin_name,
-        role_id,
-        admin_status,
-        admin_created_at
-        )
-        VALUES (
-        #{adminEmail},
-        #{adminPassword},
+        admin_email,    admin_password, admin_name,     role_id,        admin_status    ) VALUES (
+        #{adminEmail},   #{adminPassword},
         #{adminName},
-        #{roleId},
-        #{adminStatus},
-        NOW()
+        #{roleId},      #{adminStatus}
         )
     </insert>
 
 
+    <insert id="insertActivityLog" parameterType="com.Workneed.workneed.Members.dto.AdminUserDTO">
+        INSERT INTO AdminActivityLog (
+        admin_id,
+        log_action_type,
+        log_target_type,
+        log_target_id,
+        log_description
+        )
+        VALUES (
+        #{adminId},
+        #{logActionType},
+        #{logTargetType},
+        #{logTargetId},
+        #{logDescription}
+        )
+    </insert>
+
     <update id="updateMemberStatus">
-        UPDATE User
+        UPDATE user
         <set>
             rank_id = #{rankId},
             dept_id = #{deptId},
@@ -57,11 +121,23 @@
     </update>
 
     <update id="processRequest">
-        UPDATE Request
+        UPDATE request
         SET status = #{status},
         admin_id = #{adminId},
         request_updated_at = NOW()
         WHERE request_id = #{requestId}
+    </update>
+
+    <update id="updateAdminStatus">
+        UPDATE AdminUser
+        SET admin_status = #{status}
+        WHERE admin_id = #{adminId}
+    </update>
+
+    <update id="updateLastLogin">
+        UPDATE adminuser
+        SET admin_last_login_at = NOW()
+        WHERE admin_id = #{adminId}
     </update>
 
 </mapper>

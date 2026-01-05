@@ -5,19 +5,31 @@
 <mapper namespace="com.Workneed.workneed.Chat.mapper.FileLogMapper">
 
     <insert id="insertFileLog" parameterType="com.Workneed.workneed.Chat.dto.FileLogDTO" useGeneratedKeys="true" keyProperty="fileLogId">
-        INSERT INTO FileLog (
+        INSERT INTO filelog (
             room_id, origin_name, stored_name, file_path, file_size, file_type
         ) VALUES (
-            #{roomId}, #{fileName}, #{storedName}, #{filePath}, #{fileSize}, #{fileType}
-        )
+                     #{roomId}, #{fileName}, #{storedName}, #{filePath}, #{fileSize}, #{fileType}
+                 )
     </insert>
 
     <update id="updateMessageId">
-        UPDATE FileLog SET message_id = #{messageId} WHERE file_log_id = #{fileLogId}
+        UPDATE filelog
+        SET message_id = #{messageId}
+        WHERE file_log_id = #{fileLogId}
     </update>
 
-    <select id="findFilesByRoomId" parameterType="long">
-        SELECT * FROM FileLog
+    <select id="findFilesByRoomId" parameterType="long" resultType="com.Workneed.workneed.Chat.dto.FileLogDTO">
+        SELECT
+            file_log_id AS fileLogId,
+            message_id AS messageId,
+            room_id AS roomId,
+            origin_name AS originName,
+            stored_name AS storedName,
+            file_path AS filePath,
+            file_size AS fileSize,
+            file_type AS fileType,
+            created_at AS createdAt
+        FROM filelog
         WHERE room_id = #{roomId}
         ORDER BY file_log_id DESC
     </select>

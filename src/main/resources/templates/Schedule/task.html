@@ -12,7 +12,7 @@
 <body th:data-schedule-id="${schedule.scheduleId}">
 <main layout:fragment="content">
 
-    <a th:href="@{/schedule/kanban}">← Back to Kanban</a>
+    <a th:href="@{/schedule/kanban}" class="back">← Back to Kanban</a>
 
     <div class="frame">
         <div class="block" id="detail">
@@ -26,7 +26,15 @@
                 <div class="end-at" th:text="${#temporals.format(schedule.endAt, 'yyyy-MM-dd HH:mm')}"> End At</div>
             </div>
 
-            <div class="location" th:text="${schedule.location}">Location</div>
+            <div class="location"
+                 th:if="${!#strings.isEmpty(schedule.location)}"
+                 th:text="${schedule.location}">
+            </div>
+
+            <div class="meeting-room"
+                 th:if="${!#strings.isEmpty(roomName)}"
+                 th:text="${roomName}">
+            </div>
             <div class="description" th:text="${schedule.description}">Description</div>
         </div>
 
@@ -109,7 +117,11 @@
                     <div class="etc-label">File 저장소</div>
 
                     <a class="etc-url" th:if="${schedule.fileStorageUrl != null}"
-                       th:href="${schedule.fileStorageUrl}" target="_blank" th:text="${schedule.fileStorageUrl}"></a>
+                       th:href="${#strings.startsWith(schedule.fileStorageUrl,'http://') or #strings.startsWith(schedule.fileStorageUrl,'https://')
+                        ? schedule.fileStorageUrl : 'https://' + schedule.fileStorageUrl}"
+                       target="_blank"
+                       th:text="${schedule.fileStorageUrl}">
+                    </a>
 
                     <span class="no-url" th:if="${schedule.fileStorageUrl == null }">등록된 File 저장소가 없습니다</span>
                     <button type="button" class="btn-etc-edit">Edit</button>
@@ -137,7 +149,11 @@
                     <div class="etc-label">Git 저장소</div>
 
                     <a class="etc-url" th:if="${schedule.gitUrl != null}"
-                       th:href="${schedule.gitUrl}" target="_blank" th:text="${schedule.gitUrl}"></a>
+                       th:href="${#strings.startsWith(schedule.gitUrl,'http://') or #strings.startsWith(schedule.gitUrl,'https://')
+                                ? schedule.gitUrl : 'https://' + schedule.gitUrl}"
+                       target="_blank"
+                       th:text="${schedule.gitUrl}">
+                    </a>
                     <span class="no-url" th:if="${schedule.gitUrl == null}">등록된 Git 저장소가 없습니다</span>
                     <button type="button" class="btn-etc-edit">Edit</button>
 

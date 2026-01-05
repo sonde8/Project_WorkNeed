@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface CalendarService {
 
-    List<CalendarDTO> getAll();
+    List<CalendarDTO> getAll(Long userId);
 
     CalendarDTO get(Long calendarId);
 

@@ -26,4 +26,23 @@
         WHERE u.user_status = 'ACTIVE'
         AND u.user_id != #{ownerId}
     </insert>
+
+    <select id="countParticipantSchedules" resultType="int">
+        SELECT COUNT(DISTINCT schedule_id)
+        FROM schedule_participant
+        WHERE user_id = #{userId}
+        AND schedule_id IN
+        <foreach collection="scheduleIds" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </select>
+
+    <delete id="deleteByScheduleIds">
+        DELETE FROM schedule_participant
+        WHERE schedule_id IN
+        <foreach collection="scheduleIds" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </delete>
+
 </mapper>

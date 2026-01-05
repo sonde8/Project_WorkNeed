@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+
+<head>
+    <title th:text="${pageTitle}">근태관리</title>
+
+    <!-- 페이지 전용 CSS -->
+    <th:block layout:fragment="head">
+        <link rel="stylesheet" th:href="@{/css/attendanceLeft.css}">
+        <link rel="stylesheet" th:href="@{/css/attendanceMain.css}">
+        <link rel="stylesheet" th:href="@{/css/attendanceBook.css}">
+        <link rel="stylesheet" th:href="@{/css/attendanceLeave.css}">
+    </th:block>
+
+    <th:block layout:fragment="script">
+        <script th:src="@{/js/attendanceLeft.js}"></script>
+        <script th:src="@{/js/attendanceMain.js}"></script>
+        <script th:src="@{/js/attendanceBook.js}"></script>
+        <script th:src="@{/js/attendanceLeave.js}"></script>
+    </th:block>
+</head>
+
+<body>
+
+<main layout:fragment="content">
+
+    <div class="att-pg">
+
+        <!-- 왼쪽 -->
+        <section th:replace="~{Attendance/attendanceLeft :: attendanceLeft}"></section>
+
+        <!-- 오른쪽 -->
+        <section class="right">
+
+            <div class = "day" id = "yearMonth"> 날짜 </div>
+
+            <div class = "week-box">
+                <div class = "week-header">
+                    <span> 주 간 근 무 실 적 상 황 </span>
+                    <span class = "total"> 총 <b id = "weekTotal"> 0h 0m </b></span>
+                </div>
+
+                <div class = "week-bar">
+
+                    <div class = "bar-chart" id = barTrack>
+
+                        <div class = "seg segNormal"></div>
+                        <div class = "seg segOt"></div>
+
+                        <div class = "week-fill" id = "weekFill"></div>
+
+                        <div class = "markStart" id = "mark52"></div>
+                        <div class = "markEnd" id = "mark70"></div>
+
+                        <div class = "bar-dot" id = "barDot"></div>
+
+                        <div class = "bar-label l52"> 52시간 </div>
+                        <div class = "bar-label l70"> 70시간 </div>
+                    </div>
+
+                </div>
+
+                <div class = "week-info">
+                    <div> 남은 근무 시간 : <b id = "remainWork"> 52h 0m</b> </div>
+                    <div> 남은 연장 시간 : <b id = "remainOt"> 18h 0m </b> </div>
+                    <div> 휴일 근무 시간 : <b id = "holidayWork"> 0h 0m </b></div>
+                </div>
+            </div>
+
+            <div class="squ-row">
+                <div class = "squ"> 근태현황 </div>
+                <div class = "squ"> 잔여연차 </div>
+                <div class = "squ"> 연간근무 </div>
+            </div>
+
+        </section>
+    </div>
+</main>
+
+
+</body>
+</html>
+
+
+

@@ -1,8 +1,9 @@
 .kanban{
     max-width: 1340px;
     width: 100%;
+    height: 96%;
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, 33%);
 
 }
 .kanban-todo, .kanban-doing, .kanban-done{
@@ -16,21 +17,32 @@
     font-weight: 700;
 }
 .kanban-cards{
-    height: 40rem;
+    height: 66vh;
     margin: 2rem 1.5rem;
     overflow: auto;
 }
 .kanban-card{
     display: grid;
     grid-template-columns: 2fr 1fr;
-    height: 15rem;
-    margin:0.8rem;
+    height: 16rem;
+    margin: 1rem 0.8rem;
     padding: 1.2rem;
     background: rgba(0,0,0,.06);
     border-radius: 0.5rem;
+    position: relative;
+}
+.kanban-done .kanban-card {
+    background: rgba(0, 0, 0, 0.5);
+}
+.kanban-done .kanban-card .title,
+.kanban-done .kanban-card .card-desc,
+.kanban-done .kanban-card .date-time,
+.kanban-done .kanban-card .event-type {
+    opacity: 0.6;
 }
 .kanban-card .title-event-type{
-
+    display: flex;
+    flex-direction: column;
 }
 .kanban-card .title{
     display: inline-block;
@@ -39,7 +51,7 @@
 }
 .kanban-card .event-type{
     display: inline-block;
-    margin-left: 2rem;
+    margin: 2rem auto 2rem 0;
     font-size: 1rem;
     font-weight: 700;
     padding: .6rem 1rem;
@@ -61,12 +73,11 @@
     border-radius: 99.9rem;
     background: rgba(0,0,0,.05);
 }
-
-.kanban-card .description{
+.kanban-card .description {
     grid-column: 1 / -1;
-    margin-top:5rem;
-    background: rgba(255,255,255,.6);
-    border: .1rem solid rgba(0,0,0,.08);
+    margin-top: 5rem;
+    background: rgba(255, 255, 255, .6);
+    border: .1rem solid rgba(0, 0, 0, .08);
     border-radius: 1rem;
     padding: 1.6rem;
     min-height: 14rem;
@@ -83,6 +94,36 @@
     background-color: transparent;
     cursor: pointer;
 }
+.kanban-done .kanban-header{
+    display: flex;
+    justify-content: space-between;
+}
+.kanban-done .done-delete-btn {
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    padding: 0 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+}
+.kanban-done .kanban-card{
+    position: relative;
+}
+.kanban-done .done-check{
+     position: absolute;
+     top: 0;
+     right: 0;
+     padding: 1rem 1rem 3rem 3rem;
+     z-index: 1000;
+ }
+.kanban-done .done-select:checked {
+    accent-color: #222;
+}
+.done-check input[type="checkbox"] {
+    transform: scale(1.5);
+    cursor: pointer;
+}
+
 
 
 /*Add Task Modal*/
@@ -109,8 +150,8 @@
 
 /* ===== Panel ===== */
 .modal-panel{
-    width: 50vw;
-    height: 90vh;
+    width: 75rem;
+    height: 85vh;
     padding: 2rem;
     background: #fff;
     border-radius: 0.5rem;
@@ -142,11 +183,11 @@
 /* ===== Form sheet ===== */
 .modal-sheet{
     padding:3rem;
-    margin:2rem;
+    margin:1rem;
     display: grid;
     background: rgba(0,0,0,.05);
     border-radius: 0.5rem;
-    gap: 3rem;
+    gap: 1.7rem;
 }
 .modal-sheet .field{
     width: 100%;
@@ -155,7 +196,7 @@
 #titleR input,
 #locationR input{
     width: 100%;
-    height: 4.4rem;
+    height: 3.6rem;
     padding: 0 1.2rem;
     border: .1rem solid rgba(0,0,0,.15);
     border-radius: 1rem;
@@ -173,7 +214,7 @@
 }
 #dateTimeR input{
     width: 100%;
-    height: 4.4rem;
+    height: 3.6rem;
     padding: 0 1.2rem;
     border: .1rem solid rgba(0,0,0,.15);
     border-radius: 1rem;
@@ -205,7 +246,7 @@
 .typeGroup{
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 1rem;
+    gap: 1.5rem;
 }
 .scope-btn{
     display: flex;
@@ -277,10 +318,10 @@
     display: flex;
     justify-content: center;
     gap: 2rem;
-    padding: 0 2.2rem 2.2rem;
+    padding:2rem;
 }
 .modal-btns .btn{
-    height: 5rem;
+    height: 4rem;
     padding: 0 1.4rem;
     border-radius: 1rem;
     border: .1rem solid rgba(0,0,0,.16);

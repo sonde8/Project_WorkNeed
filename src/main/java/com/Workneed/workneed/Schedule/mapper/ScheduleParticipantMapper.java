@@ -16,4 +16,12 @@ public interface ScheduleParticipantMapper {
 
     int inviteCompany(@Param("scheduleId") Long scheduleId,
                       @Param("ownerId") Long ownerId);
+
+    int countParticipantSchedules(
+            @Param("scheduleIds") List<Long> scheduleIds,
+            @Param("userId") Long userId
+    );
+
+    int deleteByScheduleIds(@Param("scheduleIds") List<Long> scheduleIds);
+
 }

@@ -1,70 +1,31 @@
 package com.Workneed.workneed.Members.service;
 
-import com.Workneed.workneed.Members.dto.AdminUserDTO;
 import com.Workneed.workneed.Members.dto.SocialAccountDTO;
 import com.Workneed.workneed.Members.dto.UserDTO;
-import com.Workneed.workneed.Members.mapper.AdminUserMapper;
 import com.Workneed.workneed.Members.mapper.SocialAccountMapper;
 import com.Workneed.workneed.Members.mapper.UserMapper;
-import com.Workneed.workneed.config.CustomUserDetails;
-import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+
 import java.util.List;
+import java.util.UUID;
 
 @Slf4j
+@RequiredArgsConstructor
 @Service
-public class UserService implements UserDetailsService {
+public class UserService {
 
     private final UserMapper userMapper;
-    private final PasswordEncoder passwordEncoder;
-    private final AdminUserMapper adminUserMapper;
-    private final HttpServletRequest request;
+    private final BCryptPasswordEncoder passwordEncoder; // 분리된 PasswordConfig의 빈 주입
     private final SocialAccountMapper socialAccountMapper;
 
-    public UserService(UserMapper userMapper,
-                       AdminUserMapper adminUserMapper,
-                       @Lazy PasswordEncoder passwordEncoder,
-                       HttpServletRequest request, SocialAccountMapper socialAccountMapper) {
-        this.userMapper = userMapper;
-        this.adminUserMapper = adminUserMapper;
-        this.passwordEncoder = passwordEncoder;
-        this.request = request;
-        this.socialAccountMapper = socialAccountMapper;
-    }
+    private static final Long DEFAULT_DEPT_ID = 6L; // 부서 미지정
+    private static final Long DEFAULT_RANK_ID = 6L; // 직급 신입
 
-    @Override
-    public UserDetails loadUserByUsername(String loginId) throws UsernameNotFoundException {
-        // HTML의 hidden 필드에서 userType("ADMIN" 또는 "USER")을 가져옴
-        String userType = request.getParameter("userType");
-        log.info("로그인 시도 - 타입: {}, ID: {}", userType, loginId);
-
-        // 1. 관리자 테이블 조회 (userType이 ADMIN인 경우)
-        if ("ADMIN".equals(userType)) {
-            AdminUserDTO admin = adminUserMapper.findByAdminEmail(loginId);
-            if (admin == null) {
-                log.error("관리자 계정 없음: {}", loginId);
-                throw new UsernameNotFoundException("등록되지 않은 관리자 계정입니다.");
-            }
-            return new CustomUserDetails(admin, "ROLE_ADMIN");
-        }
-
-        // 2. 일반 유저 테이블 조회 (기본값)
-        UserDTO user = userMapper.findByLoginId(loginId);
-        if (user == null) {
-            log.error("일반 사용자 계정 없음: {}", loginId);
-            throw new UsernameNotFoundException("존재하지 않는 사용자입니다: " + loginId);
-        }
-        return new CustomUserDetails(user, "ROLE_USER");
-    }
 
     @Transactional
     public void updateProfileImage(Long userId, String profileImage) {
@@ -74,44 +35,42 @@ public class UserService implements UserDetailsService {
 
 
 
-    // --- 기존 유지 메서드들 (수정 없음) ---
-
     public void register(UserDTO user) {
         if (user.getUserPassword() != null) {
             user.setUserPassword(passwordEncoder.encode(user.getUserPassword()));
         }
-        user.setUserStatus("ACTIVE");
-        user.setRankId(1L);
-        user.setDeptId(5L);
+        user.setUserStatus("INACTIVE"); // 회원가입시 비활성
+        user.setDeptId(DEFAULT_DEPT_ID); // 부서 미지정
+        user.setRankId(DEFAULT_RANK_ID); // 직급 신입
         userMapper.insertUser(user);
     }
 
+    //비밀번호 재설정 암호하
     public void changePassword(Long userId, String currentPassword, String newPassword, String confirmPassword) {
-        if (!newPassword.equals(confirmPassword)) throw new IllegalArgumentException("비밀번호 불일치");
+        // 1 일치 여부 확인
+        if (!newPassword.equals(confirmPassword)) {
+            throw new IllegalArgumentException("새 비밀번호가 서로 일치하지 않습니다.");
+        }
+
+        // 2 8자리 이상 영문/숫자/특수문자 조합 검사 (정규식)
+        String pwPattern =  "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[$!%*#?&])[A-Za-z\\d$!%*#?&]{8,}$";
+        if (!newPassword.matches(pwPattern)) {
+            throw new IllegalArgumentException("비밀번호는 8자 이상의 영문, 숫자, 특수문자(@ 제외) 조합이어야 합니다.");
+        }
+
+        // 3 현재 비밀번호 확인 및 변경
         UserDTO user = userMapper.findById(userId);
-        if (!passwordEncoder.matches(currentPassword, user.getUserPassword()))
-            throw new IllegalArgumentException("현재 비번 틀림");
+        if (!passwordEncoder.matches(currentPassword, user.getUserPassword())) {
+            throw new IllegalArgumentException("현재 비밀번호가 틀립니다.");
+        }
+
+        // 4 이전 비밀번호와 동일한지 체크
+        if (passwordEncoder.matches(newPassword, user.getUserPassword())) {
+            throw new IllegalArgumentException("기존 비밀번호와 동일한 비밀번호는 사용할 수 없습니다.");
+        }
+
+        // 5 검사 통과시 업뎃
         userMapper.updatePassword(userId, passwordEncoder.encode(newPassword));
-    }
-
-    public void saveRememberToken(Long userId, String token) {
-        userMapper.updateRememberToken(userId, token, LocalDateTime.now().plusYears(1));
-    }
-
-    public void clearRememberToken(Long userId) {
-        userMapper.clearRememberToken(userId);
-    }
-
-    public UserDTO findByRememberToken(String token) {
-        return userMapper.findByRememberToken(token);
-    }
-
-    public UserDTO findByLoginId(String loginId) {
-        return userMapper.findByLoginId(loginId);
-    }
-
-    public UserDTO findByEmail(String email) {
-        return userMapper.findByEmail(email);
     }
 
     public UserDTO findById(Long userId) {
@@ -122,16 +81,21 @@ public class UserService implements UserDetailsService {
         return userMapper.findAll();
     }
 
+    // 아이디 중복 확인
+    public boolean isLoginIdExists(String loginId) {
+        return userMapper.existsByLoginId(loginId);
+    }
 
-
+    // 이메일 중복 확인
+    public boolean isEmailExists(String email) {
+        return userMapper.existsByEmail(email);
+    }
 
     @Transactional
     public void linkSocialAccount(Long userId, String provider, String providerId, String email, String pic) {
-        // 1. 이미 연동되어 있는지 체크
         if (socialAccountMapper.findByUserAndProvider(userId, provider) != null) {
             log.info("이미 연동된 계정입니다. (UserID: {})", userId);
         } else {
-            // 2. 소셜 연동 정보 저장
             SocialAccountDTO dto = new SocialAccountDTO();
             dto.setUserId(userId);
             dto.setSocialProvider(provider);
@@ -141,11 +105,48 @@ public class UserService implements UserDetailsService {
             log.info("소셜 연동 테이블 저장 완료");
         }
 
-        // 3. 연동 여부와 상관없이 사진 정보가 있으면 무조건 업데이트
         if (pic != null) {
             userMapper.updateProfileImage(userId, pic);
             log.info("유저 프로필 이미지 업데이트 완료: {}", pic);
         }
+    }
+
+    // 이름과 이메일로 아이디 찾기
+    public String findId(String userName, String userEmail) {
+        String foundId = userMapper.findLoginIdByNameAndEmail(userName, userEmail);
+
+        if (foundId == null) {
+            return null; // 일치하는 정보 없음
+        }
+
+        // 마스킹 처리: 앞 2자만 보여주고 나머지는 * 처리 (예: admin -> ad***)
+        if (foundId.length() > 2) {
+            return foundId.substring(0, 2) + "*".repeat(foundId.length() - 2);
+        }
+
+        return foundId;
+    }
+
+    @Transactional
+    public String createTempPassword(String loginId, String email) {
+        UserDTO user = userMapper.findByLoginId(loginId);
+
+        // 유저가 아예 없거나 이메일 정보가 없는 경우 안전하게 차단
+        if (user == null || user.getUserEmail() == null) {
+            return null;
+        }
+
+        // [중요] 입력받은 email을 먼저 써서 비교하면 null 에러를 방지
+        if (!email.equals(user.getUserEmail())) {
+            return null;
+        }
+
+        String tempPw = UUID.randomUUID().toString().substring(0, 8);
+        String encodedPw = passwordEncoder.encode(tempPw);
+
+        userMapper.updatePassword(user.getUserId(), encodedPw);
+
+        return tempPw;
     }
 
 }

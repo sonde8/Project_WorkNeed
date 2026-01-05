@@ -8,40 +8,42 @@
     <select id="findAll"
             resultType="com.Workneed.workneed.Members.dto.RankDTO">
         SELECT
-        rank_id,
-        rank_name,
-        rank_level,
-        rank_created_at
-        FROM Ranks
+            rank_id,
+            rank_name,
+            rank_level,
+            rank_created_at
+        FROM ranks
     </select>
 
     <select id="findById"
             parameterType="long"
             resultType="com.Workneed.workneed.Members.dto.RankDTO">
         SELECT
-        rank_id,
-        rank_name,
-        rank_level,
-        rank_created_at
-        FROM Ranks
+            rank_id,
+            rank_name,
+            rank_level,
+            rank_created_at
+        FROM ranks
         WHERE rank_id = #{value}
     </select>
 
-    <insert id="insertRank">
-        INSERT INTO Ranks (rank_name, rank_level)
+    <insert id="insertRank" useGeneratedKeys="true" keyProperty="rankId">
+        INSERT INTO ranks (rank_name, rank_level)
         VALUES (
         #{rankName},
-        (SELECT COALESCE(MAX(rank_level), 0) + 1 FROM Ranks r)
+        (SELECT COALESCE(MAX(rank_level), 0) + 1 FROM ranks r)
         )
     </insert>
 
     <update id="updateRank" parameterType="com.Workneed.workneed.Members.dto.RankDTO">
-        UPDATE Ranks SET rank_name = #{rankName} WHERE rank_id = #{rankId}
+        UPDATE ranks
+        SET rank_name = #{rankName}
+        WHERE rank_id = #{rankId}
     </update>
 
     <delete id="deleteRank"
             parameterType="long">
-        DELETE FROM Ranks
+        DELETE FROM ranks
         WHERE rank_id = #{rankId}
     </delete>
 
