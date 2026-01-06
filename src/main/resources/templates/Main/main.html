@@ -13,12 +13,12 @@
         <link rel="stylesheet" th:href="@{/css/main-kanban.css}">
         <link rel="stylesheet" th:href="@{/css/main-board.css}">
     </th:block>
+    <!-- 로그인 정보 JS 주입 -->
+    <script th:inline="javascript">
+        window.LOGIN_USER_ID = /*[[${session.user != null ? session.user.userId : null}]]*/ null;
+        window.IS_ADMIN = /*[[${session.admin != null}]]*/ false;
+    </script>
 
-    <th:block layout:fragment="script">
-        <script th:src="@{/js/main.js}"></script>
-        <script th:src="@{/js/board.js}"></script>
-        <script th:src="@{/js/attendanceLeft.js}"></script>
-    </th:block>
 
 
 
@@ -102,6 +102,7 @@
                             <span id="detailDate"></span>
                         </div>
                         <div class="modal-content" id="detailContent"></div>
+                        <button type="button" id="detailDeleteBtn" style="display:none;">삭제</button>
                     </div>
                 </div>
 
@@ -139,6 +140,12 @@
 
 
 </div>
+
+<th:block layout:fragment="script">
+    <script th:src="@{/js/main.js}"></script>
+    <script th:src="@{/js/board.js}"></script>
+    <script th:src="@{/js/attendanceLeft.js}"></script>
+</th:block>
 
 </body>
 </html>

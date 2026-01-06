@@ -60,4 +60,10 @@
                  )
     </insert>
 
+    <delete id="deletePostById" parameterType="long">
+        DELETE FROM board_post
+        WHERE post_id = #{postId}
+    </delete>
+
+
 </mapper>

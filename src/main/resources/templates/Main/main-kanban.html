@@ -17,8 +17,12 @@
                 <div class="mk-card" th:each="item : ${mainTodo}">
                     <div class="mk-card-title" th:text="${item.title}">제목</div>
                     <div class="mk-card-meta">
-                        <span th:text="${item.eventType}">PROJECT</span>
-                        <span th:text="${#temporals.format(item.startAt,'MM-dd HH:mm')}">01-05 10:00</span>
+                        <span th:text="${item.eventType}">type</span>
+                        <div>
+                            <span th:text="${#temporals.format(item.startAt, 'MM-dd')}">start date</span>
+                            <span> - </span>
+                            <span th:text="${#temporals.format(item.endAt, 'MM-dd')}">end date</span>
+                        </div>
                     </div>
                 </div>
 
@@ -30,10 +34,14 @@
             <div class="mk-col-head">DOING</div>
             <div class="mk-list">
                 <div class="mk-card" th:each="item : ${mainDoing}">
-                    <div class="mk-card-title" th:text="${item.title}">제목</div>
+                    <div class="mk-card-title" th:text="${item.title}">title</div>
                     <div class="mk-card-meta">
-                        <span th:text="${item.eventType}">MEETING</span>
-                        <span th:text="${#temporals.format(item.startAt,'MM-dd HH:mm')}">01-05 14:00</span>
+                        <span th:text="${item.eventType}">type</span>
+                        <div>
+                            <span th:text="${#temporals.format(item.startAt, 'MM-dd')}">start date</span>
+                            <span> - </span>
+                            <span th:text="${#temporals.format(item.endAt, 'MM-dd')}">end date</span>
+                        </div>
                     </div>
                 </div>
 
