@@ -45,18 +45,25 @@
             <div class = "toDay" id="todayStart"
                  th:text="${today != null ? today : '날짜'}"> 날짜 </div>
 
-            <!-- 프로필 -->
-            <div class = "profile">
+            <div class = "profile-card">
 
-                <div class = "profileImg"> 이미지 </div>
+                <div class="profileImg">
+                    <img th:if="${user.userProfileImage != null}"
+                         th:src="@{/uploads/profiles/} + ${user.userProfileImage}"
+                         alt="프로필 이미지">
+
+                    <img th:unless="${user.userProfileImage != null}"
+                         th:src="@{/images/default-profile.svg}"
+                         alt="기본 이미지">
+                </div>
 
                 <div class="profileText">
-                    <div class="name">이름</div>
+                    <div class="name" th:text="${user.userName}">사용자명</div>
 
                     <div class="profileMeta">
-                        <span class="dept">부서이름</span>
+                        <span class="dept" th:text="${user.deptName}">부서명</span>
                         <span class="bar">|</span>
-                        <span class="rank">직급</span>
+                        <span class="rank" th:text="${user.rankName}">직급</span>
                     </div>
                 </div>
 
@@ -128,7 +135,12 @@
                 </div>
             </div>
 
-            <div class="mini-calendar">미니 캘린더</div>
+            <!-- 미니캘린더 -->
+            <div class="mini-calendar">
+                <div id="miniCalendar" class="mini-calendar-wrapper"></div>
+                <div id="miniCalendarTooltip"></div>
+            </div>
+
 
             <div class="mini-kanban">
                 <div th:replace="~{Main/main-kanban :: miniKanban}"></div>
@@ -193,7 +205,8 @@
     <script th:src="@{/js/attendanceLeft.js}"></script>
 
     <script th:inline="javascript">
-        window.GOOGLE_CALENDAR_API_KEY =  '';
+        // 서버(Controller)에서 보낸 googleCalendarApiKey 값을 여기에 주입합니다.
+        window.GOOGLE_CALENDAR_API_KEY = /*[[${googleCalendarApiKey}]]*/ '';
     </script>
 
     <script th:src="@{/js/board.js}"></script>
@@ -208,9 +221,5 @@
     <script th:src="@{/js/meetingroom-status.js}"></script>
     <script th:src="@{/js/meetingroom-reservation.js}"></script>
 </th:block>
-<th:block layout:fragment="script">
-
-</th:block>
-
 </body>
 </html>

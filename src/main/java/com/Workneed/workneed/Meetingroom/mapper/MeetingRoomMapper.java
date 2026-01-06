@@ -29,4 +29,10 @@ public interface MeetingRoomMapper {
 
     // 4. 예약 취소 (삭제) - 추가됨
     int deleteReservation(@Param("reservationId") Long reservationId);
+
+    //5. task에서 회의실 내용 조회
+    String selectRoomNameByScheduleId(@Param("scheduleId") Long scheduleId);
+
+    //6. task에서 회의실 내용 삭제
+    int deleteReservationsByScheduleIds(@Param("scheduleIds") List<Long> scheduleIds);
 }
