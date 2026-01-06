@@ -9,7 +9,7 @@
 
     <insert id="insertLeaveRequest"
             parameterType="com.Workneed.workneed.Approval.dto.LeaveRequestDTO">
-        INSERT INTO test.LEAVE_REQUEST
+        INSERT INTO leave_request
         (approval_doc_id, user_id, leave_type, start_date, end_date, reason, created_at)
         VALUES
         (#{docId}, #{userId}, #{leaveType}, #{startDate}, #{endDate}, #{reason}, NOW())
@@ -18,21 +18,21 @@
     <!-- 1) 작성자 부서 -->
     <select id="selectDeptIdByUserId" resultType="long">
         SELECT dept_id
-        FROM test.user
+        FROM user
         WHERE user_id = #{userId}
     </select>
 
     <select id="findTeamLeaderId" resultType="long">
         SELECT u.user_id
-        FROM test.user u
-        JOIN test.Ranks r ON r.rank_id = u.rank_id
+        FROM user u
+        JOIN ranks r ON r.rank_id = u.rank_id
         WHERE u.dept_id = #{deptId}
         AND r.rank_name = '차장'
         LIMIT 1
     </select>
 
     <insert id="insertApprovedLine">
-        INSERT INTO test.approval_line (
+        INSERT INTO approval_line (
         approval_doc_id,
         approver_id,
         order_num,

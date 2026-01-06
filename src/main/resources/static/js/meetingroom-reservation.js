@@ -1,5 +1,5 @@
-let startPicker;
-let endPicker;
+var startPicker;
+var endPicker;
 
 document.addEventListener("DOMContentLoaded", () => {
     initPickers();
@@ -61,10 +61,10 @@ function initPickers() {
 /* ======================
    모달 제어
 ====================== */
-function openReservationModal() {
+function openReservationModal(targetRoomId = null) {
     resetReservationForm();
-    loadRoomSelect();
-    loadScheduleSelect(); // ★ 내 업무 리스트 가져오기
+    loadRoomSelect(targetRoomId);
+    loadScheduleSelect();
     document.getElementById("reservationModal").classList.remove("hidden");
 }
 
@@ -75,9 +75,7 @@ function closeReservationModal() {
 /* ======================
    회의실 목록 불러오기
 ====================== */
-function loadRoomSelect() {
-    // 오늘 날짜 기준 현황을 가져오되, 여기선 단순 목록용으로만 활용
-    // (만약 회의실 목록만 주는 별도 API가 있다면 그걸 쓰는 게 더 좋음)
+function loadRoomSelect(targetRoomId) {
     const today = new Date().toISOString().slice(0, 10);
 
     fetch(`/api/meeting-rooms/status?date=${today}`)
@@ -92,6 +90,10 @@ function loadRoomSelect() {
                 opt.textContent = room.roomName;
                 select.appendChild(opt);
             });
+
+            if (targetRoomId) {
+                select.value = targetRoomId;
+            }
         })
         .catch(err => console.error("회의실 목록 로드 실패:", err));
 }
@@ -100,7 +102,6 @@ function loadRoomSelect() {
    내 업무 목록 불러오기 (수정됨)
 ====================== */
 function loadScheduleSelect() {
-    // ★ 캘린더 작업 때 만들어둔 "내 업무 조회" API 재사용
     fetch("/api/calendar/schedules")
         .then(res => {
             if (!res.ok) throw new Error("업무 목록을 불러오지 못했습니다.");
@@ -110,7 +111,7 @@ function loadScheduleSelect() {
             const select = document.getElementById("scheduleSelect");
 
             // 초기화
-            select.innerHTML = '<option value="">(선택 안함 - 단순 회의)</option>';
+            select.innerHTML = '<option value="">(*업무 선택 안함*)</option>';
 
             schedules.forEach(sch => {
                 const opt = document.createElement("option");
@@ -177,12 +178,7 @@ function submitReservation(e) {
         roomId: Number(roomId),
         scheduleId: scheduleId,
 
-        // ★ reserverId는 보내지 않음 (Controller가 세션에서 처리)
-
-        title: form.title.value,
-        description: form.description.value || null,
-
-        // LocalDateTime 형식 (YYYY-MM-DDTHH:mm:00)
+        // LocalDateTime 형식
         startAt: `${dateVal}T${startTime}:00`,
         endAt: `${dateVal}T${endTime}:00`
     };
@@ -195,16 +191,21 @@ function submitReservation(e) {
     })
         .then(res => {
             if (!res.ok) {
-                // 서버에서 에러 메시지를 줄 경우 처리
                 return res.text().then(text => { throw new Error(text || "예약에 실패했습니다."); });
             }
             alert("예약되었습니다.");
             closeReservationModal();
-            location.reload(); // 현황판 갱신
+
+            // 현황판 새로고침 (함수가 있으면 호출, 없으면 페이지 리로드)
+            if (typeof loadMeetingRoomStatus === 'function') {
+                loadMeetingRoomStatus();
+            } else {
+                location.reload();
+            }
         })
         .catch(err => {
             console.error(err);
-            alert(err.message); // "이미 예약된 시간입니다" 등
+            alert(err.message);
         });
 }
 
