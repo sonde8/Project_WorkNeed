@@ -31,7 +31,7 @@ public class TaskCommentController {
 
         taskCommentMapper.insertComment(dto);
 
-        return "redirect:/schedule/task?scheduleId=" + scheduleId;
+        return "redirect:/Schedule/task?scheduleId=" + scheduleId;
     }
 
     @PostMapping("/update")
@@ -40,7 +40,7 @@ public class TaskCommentController {
                          @RequestParam String content) {
 
         if (content == null || content.trim().isEmpty()) {
-            return "redirect:/schedule/task?scheduleId=" + scheduleId;
+            return "redirect:/Schedule/task?scheduleId=" + scheduleId;
         }
 
         // 임시: 로그인 전까지 고정
@@ -48,7 +48,7 @@ public class TaskCommentController {
 
         taskCommentMapper.updateComment(commentId, writerId, content.trim());
 
-        return "redirect:/schedule/task?scheduleId=" + scheduleId;
+        return "redirect:/Schedule/task?scheduleId=" + scheduleId;
     }
 
     @PostMapping("/delete")
@@ -60,6 +60,6 @@ public class TaskCommentController {
 
         taskCommentMapper.deleteComment(commentId, writerId);
 
-        return "redirect:/schedule/task?scheduleId=" + scheduleId;
+        return "redirect:/Schedule/task?scheduleId=" + scheduleId;
     }
 }
