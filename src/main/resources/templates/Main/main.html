@@ -10,44 +10,27 @@
     <th:block layout:fragment="head">
         <link rel="stylesheet" th:href="@{/css/Main.css}">
         <link rel="stylesheet" th:href="@{/css/attendanceLeft.css}">
-
-        <!-- 미니캘린더 -->
-        <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet"/>
-        <link rel="stylesheet" th:href="@{/css/mini-calendar.css}">
-
-        <!-- 회의실 -->
-        <link rel="stylesheet" th:href="@{/css/meetingroom.css}">
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-
     </th:block>
+    <!-- 로그인 정보 JS 주입 -->
+    <script th:inline="javascript">
+        window.LOGIN_USER_ID = /*[[${session.user != null ? session.user.userId : null}]]*/ null;
+        window.IS_ADMIN = /*[[${session.admin != null}]]*/ false;
+    </script>
+
+
+<!--kanban css-->
+    <link rel="stylesheet" th:href="@{/css/main-kanban.css}">
+<!--board css -->
+    <link rel="stylesheet" th:href="@{/css/main-board.css}">
 </head>
 
 <body>
-
-    <th:block layout:fragment="script">
-        <script th:src="@{/js/Main.js}"></script>
-        <script th:src="@{/js/attendanceLeft.js}"></script>
-
-        <script th:inline="javascript">
-            window.GOOGLE_CALENDAR_API_KEY =  '';
-        </script>
-
-        <!-- 미니캘린더 -->
-        <script th:src="@{/js/mini-calendar.js}"></script>
-        <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/google-calendar@6.1.11/index.global.min.js"></script>
-
-        <!-- 회의실 -->
-        <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-        <script th:src="@{/js/meetingroom-status.js}"></script>
-        <script th:src="@{/js/meetingroom-reservation.js}"></script>
-    </th:block>
 
 <div layout:fragment="content" class = "pageMain">
 
     <div class="mainPage">
 
-        <!-- 왼쪽 컨텐츠 -->
+        <!-- 왼쪽 -->
         <section class = "leftPage">
 
             <!-- 오늘 날짜 -->
@@ -55,17 +38,25 @@
                  th:text="${today != null ? today : '날짜'}"> 날짜 </div>
 
             <!-- 프로필 -->
-            <div class = "profile">
+            <div class = "profile-card">
 
-                <div class = "profileImg"> 이미지 </div>
+                <div class="profileImg">
+                    <img th:if="${user.userProfileImage != null}"
+                         th:src="@{/uploads/profiles/} + ${user.userProfileImage}"
+                         alt="프로필 이미지">
+
+                    <img th:unless="${user.userProfileImage != null}"
+                         th:src="@{/images/default-profile.svg}"
+                         alt="기본 이미지">
+                </div>
 
                 <div class="profileText">
-                    <div class="name">이름</div>
+                    <div class="name" th:text="${user.userName}">사용자명</div>
 
                     <div class="profileMeta">
-                        <span class="dept">부서이름</span>
+                        <span class="dept" th:text="${user.deptName}">부서명</span>
                         <span class="bar">|</span>
-                        <span class="rank">직급</span>
+                        <span class="rank" th:text="${user.rankName}">직급</span>
                     </div>
                 </div>
 
@@ -84,76 +75,77 @@
 
         </section>
 
-        <!-- 오른쪽 컨텐츠 -->
-        <section class="rightPage">
+        <!-- 오른쪽-->
+        <section class = "rightPage">
+            <!--게시판           -->
+            <div class="main-borad">
+                <div class="mini-borad">
+                    <div class="mb-header">
+                        <h3 class="mb-head">게시판</h3>
+                        <button class="mb-write-btn" id="boardWriteBtn">+ 작성</button>
+                    </div>
 
-            <div class="board">게시판</div>
+                    <ul class="mb-list" id="boardList">
+                        <!-- JS로 게시글 렌더링 -->
+                    </ul>
+                </div>
 
-            <!-- 미니캘린더 -->
-            <div class="mini-calendar">
-                <div id="miniCalendar" class="mini-calendar-wrapper"></div>
-                <div id="miniCalendarTooltip"></div>
-            </div>
-
-            <div class="mini-kanban">칸반보드</div>
-
-            <!-- 회의실 -->
-            <div class="mini-meetingroom">
-
-                <input type="hidden" id="currentUserId" th:value="${user.userId}">
-
-                <div class="meetingroom-header">
-                    <h3>회의실 예약</h3>
-                    <div class="header-filters">
-                        <div class="picker-wrapper">
-                            <input type="text" id="statusDatePicker" class="picker-input date-picker">
+                <!-- 게시글 모달 -->
+                <div class="modal" id="boardDetailModal" style="display:none;">
+                    <div class="modal-panel">
+                        <div class="modal-header">
+                            <h4 id="detailTitle"></h4>
+                            <button class="modal-close" data-close="detail">×</button>
                         </div>
-                        <div class="picker-wrapper">
-                            <input type="text" id="statusTimePicker" class="picker-input time-picker">
+                        <div class="modal-meta">
+                            <span id="detailWriter"></span>
+                            <span id="detailDate"></span>
                         </div>
+                        <div class="modal-content" id="detailContent"></div>
+                        <button type="button" id="detailDeleteBtn" style="display:none;">삭제</button>
                     </div>
                 </div>
 
-                <div id="meeting-room-list" class="room-list-container">
+                <!-- 게시글 작성 모달 -->
+                <div class="modal" id="boardWriteModal" style="display:none;">
+                    <div class="modal-panel">
+                        <div class="modal-header">
+                            <h4>게시글 작성</h4>
+                            <button class="modal-close" data-close="write">×</button>
+                        </div>
+
+                        <div class="modal-sheet">
+                            <select id="writeCategory"><!-- 카테고리 JS 로딩 --> </select>
+
+                            <input type="text" id="writeTitle" placeholder="Title">
+
+                            <textarea id="writeContent" placeholder="Content"></textarea>
+                        </div>
+                        <div class="modal-actions">
+                            <button id="writeSubmitBtn">등록</button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
+            <div class="mini-calendar">미니 캘린더</div>
+
+            <div class="mini-kanban">
+                <div th:replace="main/main-kanban :: miniKanban"></div>
+            </div>
+
+            <div class="mini-meetingroom">회의실</div>
         </section>
-    </div>
-
-    <div id="reservationModal" class="modal hidden">
-        <div class="modal-content">
-            <h3>회의실 예약</h3>
-            <form id="reservationForm">
-                <label>업무 (선택사항)</label>
-                <select id="scheduleSelect" name="scheduleId">
-                    <option value="">업무 선택 안 함</option>
-                </select>
-
-                <label>회의실</label>
-                <select id="roomSelect" name="roomId" required></select>
-
-                <label>날짜</label>
-                <input type="text" id="reserveDate" name="date" required readonly>
-
-                <label>시작 시간</label>
-                <input type="text" id="startTime" name="startTime" required readonly>
-
-                <label>종료 시간</label>
-                <input type="text" id="endTime" name="endTime" required readonly>
-
-                <div class="modal-actions">
-                    <button type="submit">예약</button>
-                    <button type="button" id="closeModalBtn">취소</button>
-                </div>
-            </form>
-        </div>
     </div>
 
 
 </div>
+
+<th:block layout:fragment="script">
+    <script th:src="@{/js/main.js}"></script>
+    <script th:src="@{/js/board.js}"></script>
+    <script th:src="@{/js/attendanceLeft.js}"></script>
+</th:block>
+
 </body>
 </html>
-
-
-

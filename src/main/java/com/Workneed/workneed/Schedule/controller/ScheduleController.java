@@ -280,6 +280,7 @@ public class ScheduleController {
         scheduleMapper.updateStatus(scheduleId, status);
         return "OK";
     }
+
 ////TASK DETAIL
     @GetMapping("/task")
     public String task(@RequestParam Long scheduleId, HttpSession session, Model model) {
