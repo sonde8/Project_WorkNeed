@@ -34,6 +34,8 @@ public class ScheduleController {
     private final ScheduleParticipantService scheduleParticipantService;
     private final ScheduleService scheduleService;
 
+    private final com.Workneed.workneed.Meetingroom.mapper.MeetingRoomMapper meetingRoomMapper;
+
 
     private Long getLoginUserId(HttpSession session) {
         Object u = session.getAttribute("user");
@@ -55,7 +57,7 @@ public class ScheduleController {
         model.addAttribute("doingList", doingList);
         model.addAttribute("doneList", doneList);
 
-        return "schedule/kanban";
+        return "Schedule/kanban";
     }
 
 ////테스크 생성
@@ -159,7 +161,7 @@ public class ScheduleController {
 
         model.addAttribute("scheduleId", scheduleId);
         model.addAttribute("schedule", schedule);
-        return "schedule/invite";
+        return "Schedule/invite";
     }
 
     @PostMapping("/invite")
@@ -278,6 +280,7 @@ public class ScheduleController {
         scheduleMapper.updateStatus(scheduleId, status);
         return "OK";
     }
+
 ////TASK DETAIL
     @GetMapping("/task")
     public String task(@RequestParam Long scheduleId, HttpSession session, Model model) {
@@ -288,6 +291,10 @@ public class ScheduleController {
         ScheduleDTO schedule = scheduleMapper.selectById(scheduleId);
         if (schedule == null) return "redirect:/schedule/kanban";
 
+        //미팅룸 조회
+//        String roomName = meetingRoomMapper.selectRoomNameByScheduleId(scheduleId);
+//        model.addAttribute("roomName", roomName);
+
 
         //댓글 조회
         List<TaskCommentDTO> commentList = taskCommentMapper.selectByScheduleId(scheduleId);
@@ -295,7 +302,7 @@ public class ScheduleController {
         model.addAttribute("schedule", schedule);
         model.addAttribute("commentList", commentList);
 
-        return "schedule/task";
+        return "Schedule/task";
     }
 
     /* Git 수정 */

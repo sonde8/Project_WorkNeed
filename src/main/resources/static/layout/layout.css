@@ -71,13 +71,13 @@ html {
 /*}*/
 
 /* 아이콘 스타일 */
-.icon {
+.side-icon {
     font-size: 24px;
     margin-bottom: 5px;
 }
 
 /* 텍스트 스타일 */
-.text {
+.side-text {
     font-size: 12px;
     font-weight: bold;
     color: #333;
@@ -100,7 +100,7 @@ html {
 /*}*/
 
 /* 이미지 크기 조정 (이미지가 너무 크다면) */
-.icon img {
+.side-icon img {
     width: 24px;  /* 적절한 크기로 조절 */
     height: 24px;
 }

@@ -1,0 +1,162 @@
+.mini-borad {
+    height:100%;
+    width: 100%;
+    border: 1px solid rgba(0,0,0,0.12);
+    padding: 2rem;
+    background: #fff;
+    overflow-y: scroll;
+    overflow-x: auto;
+}
+
+.mb-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.mb-head{
+    padding: 1rem 0;
+    font-size: 1.5rem;
+    font-weight: 800;
+    opacity: .7
+}
+.mb-write-btn{
+    padding: 0.4rem 0.6rem;
+    border: none;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #222;
+    cursor: pointer;
+}
+.mb-list {
+    font-weight: 500;
+    font-size: 1.1rem;
+    padding: 1rem 0;
+    list-style: none;
+}
+.board-item {
+    padding: 0.8rem;
+    margin: 0.5rem;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    background: #fbfbfc;
+    cursor: pointer;
+}
+
+.board-item:hover {
+    background: rgba(0,0,0,0.2);
+}
+
+.modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-panel {
+    width: 50rem;
+    min-height: 30rem;
+    transform: translateY(-6rem);
+    border-radius: 0.5rem;
+    padding: 2rem;
+    background: #fff;
+    box-shadow: 0 1.8rem 5rem rgba(0, 0, 0, .25);
+    position: relative;
+}
+.modal-header h4{
+    padding: 1.8rem;
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+.modal-meta{
+    display: flex;
+    justify-content: space-between;
+    padding: 1.5rem 1.8rem;
+    font-weight: 700;
+}
+.modal-close {
+    position: absolute;
+    font-weight: 700;
+    top: 2rem;
+    right: 1rem;
+    width: 4rem;
+    height: 4rem;
+    background-color: transparent;
+    border: 0;
+    border-radius: 1rem;
+    cursor: pointer;
+}
+.modal-sheet{
+    padding: 2rem;
+    margin: 1rem;
+    display: grid;
+    background: rgba(0, 0, 0, .05);
+    border-radius: 0.5rem;
+    gap: 1.7rem;
+}
+#writeCategory{
+    width: 30%;
+    height: 3rem;
+    padding: 0 1.2rem;
+    border: .1rem solid rgba(0, 0, 0, .15);
+    outline: none;
+    font-size: 1.4rem;
+}
+#writeTitle{
+    width: 100%;
+    height: 3.6rem;
+    padding: 1rem;
+    border: .1rem solid rgba(0, 0, 0, .15);
+    border-radius: 0.5rem;
+    outline: none;
+    font-size: 1.4rem;
+}
+#writeContent{
+    width: 100%;
+    height: 7rem;
+    padding: 1rem;
+    border: .1rem solid rgba(0, 0, 0, .15);
+    border-radius: 0.5rem;
+    outline: none;
+    font-size: 1.4rem;
+}
+.modal-actions{
+    display: flex;
+    justify-content: flex-end;
+}
+#writeSubmitBtn{
+    padding: 0.5rem 0.8rem;
+    margin: 0.5rem 1rem 0;
+    border: .1rem solid rgba(0, 0, 0, .16);
+    background: rgba(0, 0, 0, .03);
+    cursor: pointer;
+    font-size: 1.3rem;
+    font-weight: 500;
+}
+
+#detailTitle{
+    padding: 1.8rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+.modal-content{
+    padding: 1.8rem;
+    font-size: 1.3rem;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 0.5rem;
+    margin-top: 1rem;
+}
+#detailDeleteBtn{
+    position: absolute;
+    bottom: 1rem;
+    right: 1rem;
+    opacity: 0.5;
+    padding: 0.2rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+#detailDeleteBtn :hover{
+    opacity: 1;
+}
