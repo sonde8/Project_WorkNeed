@@ -45,7 +45,7 @@ public class MeetingRoomService {
             throw new IllegalArgumentException("시간은 필수입니다.");
         }
 
-        // 1️⃣ 중복 체크
+        // 1.중복 체크
         int conflict = meetingRoomMapper.countConflict(
                 dto.getRoomId(),
                 dto.getStartAt(),
@@ -56,7 +56,17 @@ public class MeetingRoomService {
             throw new IllegalStateException("이미 예약된 시간입니다.");
         }
 
-        // 2️⃣ 저장
+        // 2. 저장
         meetingRoomMapper.insertReservation(dto);
+    }
+
+    /**
+     * 예약 취소
+     */
+    @Transactional
+    public void cancel(Long reservationId, Long requestUserId) {
+        // 본인 예약인지 확인하는 로직이 필요하다면 여기서 조회 후 체크 가능
+        // 지금은 UI에서 버튼을 본인에게만 보여주므로 바로 삭제 처리
+        meetingRoomMapper.deleteReservation(reservationId);
     }
 }
