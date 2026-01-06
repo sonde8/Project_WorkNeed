@@ -1,0 +1,245 @@
+@charset "UTF-8";
+
+/* =========================================
+   [1. 캘린더 전체 레이아웃]
+   ========================================= */
+.mini-calendar {
+    width: 100%;
+    height: 100%;
+    padding: 20px;
+    background-color: #ffffff !important;
+    border-radius: 16px;
+    border: 1px solid #f0f0f0;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    box-sizing: border-box;
+    display: block !important;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.mini-calendar-wrapper {
+    flex: 1;
+    width: 100%;
+    overflow: hidden !important;
+    display: flex;
+    flex-direction: column;
+}
+
+.mini-calendar-wrapper .fc-scroller {
+    overflow: hidden !important;
+    height: auto !important;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+.mini-calendar-wrapper .fc-scroller::-webkit-scrollbar {
+    display: none;
+}
+
+/* =========================================
+   [2. 상단 툴바 & 헤더]
+   ========================================= */
+.mini-calendar-wrapper .fc-header-toolbar {
+    margin-bottom: 10px !important;
+    padding: 0;
+    background: transparent !important;
+}
+
+.mini-calendar-wrapper .fc-toolbar-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #333;
+    margin-left: 4px;
+}
+
+.mini-calendar-wrapper .fc-button {
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    background: transparent !important;
+    border: none !important;
+    color: #999;
+    box-shadow: none !important;
+}
+.mini-calendar-wrapper .fc-button:hover {
+    color: #333;
+    background-color: transparent !important;
+}
+
+/* 테이블 격자 및 보더 제거 */
+.mini-calendar-wrapper .fc-theme-standard td,
+.mini-calendar-wrapper .fc-theme-standard th,
+.mini-calendar-wrapper .fc-theme-standard .fc-scrollgrid {
+    border: none !important;
+}
+.mini-calendar-wrapper table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+/* 요일 헤더 */
+.mini-calendar-wrapper .fc-col-header-cell-cushion {
+    font-size: 0.85rem;
+    color: #888;
+    padding-bottom: 5px;
+    text-decoration: none;
+    width: 100%;
+    text-align: center;
+}
+
+/* =========================================
+   [3. 날짜 셀 & 정렬]
+   ========================================= */
+.mini-calendar-wrapper .fc-daygrid-day-frame {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    min-height: 100% !important;
+    padding-top: 4px;
+}
+
+/* 날짜 숫자 영역 wrapper */
+.mini-calendar-wrapper .fc-daygrid-day-top {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    flex-direction: row !important;
+    width: 100%;
+    margin-bottom: 2px;
+}
+
+/* 날짜 숫자 텍스트 */
+.mini-calendar-wrapper .fc-daygrid-day-number {
+    font-size: 0.9rem;
+    color: #444;
+    text-decoration: none;
+    width: auto;
+    padding: 4px;
+    z-index: 2;
+    cursor: pointer;
+}
+
+.mini-calendar-wrapper .fc-daygrid-day-number:hover {
+    background-color: transparent !important;
+    font-weight: bold;
+    color: #111;
+}
+
+/* 지난달/다음달 날짜 흐리게 */
+.mini-calendar-wrapper .fc-day-other .fc-daygrid-day-number {
+    color: #ccc;
+}
+
+/* 오늘 날짜 배경 */
+.mini-calendar-wrapper .fc-day-today {
+    background-color: #fff9db !important;
+    border-radius: 8px;
+}
+
+/* 오늘 날짜 숫자 스타일 */
+.mini-calendar-wrapper .fc-day-today .fc-daygrid-day-number {
+    background-color: transparent !important;
+    color: #333 !important;
+    font-weight: 800;
+}
+
+/* =========================================
+   [4. 공휴일 & 기념일 색상
+   ========================================= */
+/* 식목일 등 (초록색) */
+.observance-text,
+.mini-calendar-wrapper .observance-text {
+    color: #10b981 !important;
+    font-weight: bold;
+    text-decoration: none !important;
+}
+
+/* 설날 등 (빨간색) */
+.holiday-text,
+.mini-calendar-wrapper .holiday-text {
+    color: #e03131 !important;
+    font-weight: bold;
+    text-decoration: none !important;
+}
+
+/* 일요일 (빨간색) */
+.mini-calendar-wrapper .fc-day-sun .fc-daygrid-day-number {
+    color: #e03131 !important;
+    text-decoration: none !important;
+}
+
+/* =========================================
+   [5. 일정 점(Dot) 스타일]
+   ========================================= */
+/* 점 컨테이너 */
+.mini-calendar-wrapper .fc-daygrid-event-harness {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 2px;
+}
+
+/* 이벤트 컨테이너 */
+.mini-calendar-wrapper .fc-daygrid-day-events {
+    position: static !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    min-height: 10px;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    pointer-events: none;
+}
+
+/* 점 디자인 */
+.mini-custom-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    display: block;
+    margin: 0 !important;
+    flex-shrink: 0;
+}
+
+/* =========================================
+   [6. 툴팁 스타일]
+   ========================================= */
+#miniCalendarTooltip {
+    position: fixed;
+    z-index: 9999;
+    min-width: 140px;
+    padding: 12px 14px;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    display: none;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 12px;
+    color: #333;
+    pointer-events: none;
+}
+
+.tooltip-date {
+    font-weight: 700;
+    margin-bottom: 6px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid #f3f4f6;
+    color: #111;
+}
+
+.tooltip-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.tooltip-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    margin-right: 6px;
+    flex-shrink: 0;
+}

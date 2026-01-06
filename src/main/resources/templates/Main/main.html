@@ -10,11 +10,34 @@
     <th:block layout:fragment="head">
         <link rel="stylesheet" th:href="@{/css/Main.css}">
         <link rel="stylesheet" th:href="@{/css/attendanceLeft.css}">
+
+        <!-- 미니캘린더 -->
+        <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet"/>
+        <link rel="stylesheet" th:href="@{/css/mini-calendar.css}">
+
+        <!-- 회의실 -->
+        <link rel="stylesheet" th:href="@{/css/meetingroom.css}">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
     </th:block>
 
     <th:block layout:fragment="script">
         <script th:src="@{/js/Main.js}"></script>
         <script th:src="@{/js/attendanceLeft.js}"></script>
+
+        <script th:inline="javascript">
+            window.GOOGLE_CALENDAR_API_KEY =  '';
+        </script>
+
+        <!-- 미니캘린더 -->
+        <script th:src="@{/js/mini-calendar.js}"></script>
+        <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/google-calendar@6.1.11/index.global.min.js"></script>
+
+        <!-- 회의실 -->
+        <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+        <script th:src="@{/js/meetingroom-status.js}"></script>
+        <script th:src="@{/js/meetingroom-reservation.js}"></script>
     </th:block>
 </head>
 
@@ -24,7 +47,7 @@
 
     <div class="mainPage">
 
-        <!-- 왼쪽 -->
+        <!-- 왼쪽 컨텐츠 -->
         <section class = "leftPage">
 
             <!-- 오늘 날짜 -->
@@ -61,15 +84,73 @@
 
         </section>
 
-        <!-- 오른쪽-->
-        <section class = "rightPage">
+        <!-- 오른쪽 컨텐츠 -->
+        <section class="rightPage">
+
+            <div class="board">게시판</div>
+
+            <!-- 미니캘린더 -->
+            <div class="mini-calendar">
+                <div id="miniCalendar" class="mini-calendar-wrapper"></div>
+                <div id="miniCalendarTooltip"></div>
+            </div>
+
+            <div class="mini-kanban">칸반보드</div>
+
+            <!-- 회의실 -->
+            <div class="mini-meetingroom">
+
+                <input type="hidden" id="currentUserId" th:value="${user.userId}">
+
+                <div class="meetingroom-header">
+                    <h3>회의실 예약</h3>
+                    <div class="header-filters">
+                        <div class="picker-wrapper">
+                            <input type="text" id="statusDatePicker" class="picker-input date-picker">
+                        </div>
+                        <div class="picker-wrapper">
+                            <input type="text" id="statusTimePicker" class="picker-input time-picker">
+                        </div>
+                    </div>
+                </div>
+
+                <div id="meeting-room-list" class="room-list-container">
+                </div>
+            </div>
 
         </section>
     </div>
 
+    <div id="reservationModal" class="modal hidden">
+        <div class="modal-content">
+            <h3>회의실 예약</h3>
+            <form id="reservationForm">
+                <label>업무 (선택사항)</label>
+                <select id="scheduleSelect" name="scheduleId">
+                    <option value="">업무 선택 안 함</option>
+                </select>
+
+                <label>회의실</label>
+                <select id="roomSelect" name="roomId" required></select>
+
+                <label>날짜</label>
+                <input type="text" id="reserveDate" name="date" required readonly>
+
+                <label>시작 시간</label>
+                <input type="text" id="startTime" name="startTime" required readonly>
+
+                <label>종료 시간</label>
+                <input type="text" id="endTime" name="endTime" required readonly>
+
+                <div class="modal-actions">
+                    <button type="submit">예약</button>
+                    <button type="button" id="closeModalBtn">취소</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
 
 </div>
-
-
 </body>
 </html>

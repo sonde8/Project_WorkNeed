@@ -26,4 +26,7 @@ public interface MeetingRoomMapper {
 
     // 3. 예약 저장
     int insertReservation(MeetingReservationDTO dto);
+
+    // 4. 예약 취소 (삭제) - 추가됨
+    int deleteReservation(@Param("reservationId") Long reservationId);
 }
