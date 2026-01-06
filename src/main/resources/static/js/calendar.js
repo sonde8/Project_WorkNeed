@@ -91,31 +91,45 @@
     }
 
     function getEventColor(dto) {
+        const type = (dto?.type || "").toString().toUpperCase();
+        const source = getSource(dto); // CALENDAR | SCHEDULE
 
-            // 사용자가 직접 지정한 색상이 있다면 최우선 적용
-            if (dto?.color) return dto.color;
-
-            const type = (dto?.type || "").toString().toUpperCase();
-            const source = getSource(dto);
-
-            // 1. [업무] (스케줄 소스) -> 빨간색 계열 통일
-            if (source === "SCHEDULE") {
-                return "#ef4444";
+        // =========================================================
+        // 1. [SCHEDULE] 업무 일정 (스케줄 연동)
+        //    - 업무는 DB가 다르므로 커스텀 색상(dto.color)보다 타입별 지정 색상이 우선됨
+        // =========================================================
+        if (source === "SCHEDULE") {
+            if (type === "PERSONAL") {
+                return "#3b82f6"; // 업무-개인 (기본 파랑)
             }
-
-            // 2. [회사] (관리자 등록) -> 보라색 계열 통일
-            if (type === "COMPANY") {
-                return "#8b5cf6";
-            }
-
-            // 3. [팀] -> 초록색 (필요시 업무 색상인 #ef4444로 변경 가능)
             if (type === "TEAM") {
-                return "#22c55e";
+                return "#22c55e"; // 업무-팀 (초록)
             }
-
-            // 4. [개인] (기본) -> 파란색 계열 통일
+            if (type === "COMPANY") {
+                return "#ef4444"; // 업무-회사 (빨강)
+            }
+            // 예외(타입 없는 경우) 처리: 업무 기본색(여기선 파랑으로 둠)
             return "#3b82f6";
         }
+
+        // =========================================================
+        // 2. [CALENDAR] 캘린더 일정 (내장 기능)
+        // =========================================================
+
+        // 2-1. 관리자가 등록한 회사 전체 일정 (보라색 고정)
+        if (type === "COMPANY") {
+            return "#8b5cf6";
+        }
+
+        // 2-2. 내 개인 일정
+        // 사용자가 등록/수정 시 직접 지정한 색상(dto.color)이 있으면 최우선
+        if (dto?.color) {
+            return dto.color;
+        }
+
+        // 지정 안 했으면 기본 파랑
+        return "#3b82f6";
+    }
 
     function getTypeEmoji(dto) {
         const type = (dto?.type || "").toUpperCase();
@@ -142,18 +156,28 @@
         const type = (dto?.type || "").toUpperCase();
         const source = getSource(dto);
 
-        // 1. 회사 (연한 보라 배경 + 진한 보라 글씨)
-        if (source === "CALENDAR" && type === "COMPANY") {
-            return { text: "회사", bg: "#f3e8ff", color: "#7e22ce" };
-        }
-
-        // 2. 업무 (연한 빨강 배경 + 진한 빨강 글씨)
+        // 1. [SCHEDULE] 업무 연동 (타입별 색상 매칭)
         if (source === "SCHEDULE") {
-            return { text: "업무", bg: "#fee2e2", color: "#b91c1c" };
+            if (type === "COMPANY") {
+                // 업무-회사: 빨강 계열
+                return { text: "업무(전사)", bg: "#fee2e2", color: "#b91c1c" };
+            }
+            if (type === "TEAM") {
+                // 업무-팀: 초록 계열
+                return { text: "업무(팀)", bg: "#dcfce7", color: "#15803d" };
+            }
+            // 업무-개인: 파랑 계열 (텍스트로 '업무'임을 명시)
+            return { text: "업무(개인)", bg: "#dbeafe", color: "#1d4ed8" };
         }
 
-        // 3. 개인 (연한 파랑 배경 + 진한 파랑 글씨)
-        return { text: "개인", bg: "#dbeafe", color: "#1d4ed8" };
+        // 2. [CALENDAR] 내장 캘린더
+        // 회사 (관리자 공지 등): 보라 계열
+        if (type === "COMPANY") {
+            return { text: "사내공지", bg: "#f3e8ff", color: "#7e22ce" };
+        }
+
+        // 개인 (기본): 파랑 계열
+        return { text: "개인", bg: "#eff6ff", color: "#1e40af" };
     }
 
     function getDtoId(dto) {
@@ -379,7 +403,7 @@
         calendar = new FullCalendar.Calendar(el, {
             locale: "ko",
             initialView: "dayGridMonth",
-            googleCalendarApiKey: 'AIzaSyBM_oNQ8dkUcn_lK-EmAn2iwXgVGz_cp_s',
+            googleCalendarApiKey: window.GOOGLE_CALENDAR_API_KEY,
 
             /* ================= 레이아웃 설정 ================= */
             height: '100%',
@@ -422,6 +446,14 @@
             moreLinkClick: function(info) {
                 openDailyListModal(info.date);
                 return "void";
+            },
+            dayCellDidMount: function(info) {
+                if (info.date.getDay() === 0) { // 0은 일요일
+                    const numberEl = info.el.querySelector('.fc-daygrid-day-number');
+                    if (numberEl) {
+                        numberEl.style.color = '#e03131';
+                    }
+                }
             },
 
             selectable: true,

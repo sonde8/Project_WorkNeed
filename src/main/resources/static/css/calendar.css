@@ -239,11 +239,10 @@ body {
     border: none !important;
     font-size: 12px !important;
     font-weight: 500 !important;
-    cursor: grab; /* 드래그 가능 커서 */
-    transition: transform 0.1s, box-shadow 0.1s; /* 호버 애니메이션 */
+    cursor: grab;
+    transition: transform 0.1s, box-shadow 0.1s;
 }
 
-/* [중요] 호버 효과 복구 (드래그 인지용) */
 .fc-event:hover {
     transform: scale(1.02);
     box-shadow: 0 2px 5px rgba(0,0,0,0.2) !important;
@@ -267,41 +266,41 @@ body {
 .daily-list-simple-ul li { padding: 12px; border-bottom: 1px solid #f5f5f5; cursor: pointer; display: flex; align-items: center; gap: 12px; transition: background-color 0.1s; }
 .daily-list-simple-ul li:hover { background-color: #f8fbff; }
 
-/* 일정 리스트 전체 폰트 사이즈 키우기 (가독성 개선) */
 .fc-popover-body ul li,
-.todays-schedule-list li { /* 클래스명은 실제 코드에 맞춰 수정해주세요 */
-    font-size: 15px; /* 기존보다 조금 키움 */
-    margin-bottom: 8px; /* 리스트 간 간격 확보 */
-    display: flex; /* 아이콘, 라벨, 제목을 가로로 정렬 */
+.todays-schedule-list li {
+    font-size: 15px;
+    margin-bottom: 8px;
+    display: flex;
     align-items: center;
 }
 
 /* 카테고리 라벨 공통 스타일 */
 .category-label {
-    font-size: 0.9em; /* 본문보다 살짝 작게 */
+    font-size: 0.9em;
     font-weight: bold;
-    margin-left: 6px; /* 아이콘과 라벨 사이 간격 */
-    margin-right: 4px; /* 라벨과 제목 사이 간격 */
+    margin-left: 6px;
+    margin-right: 4px;
 }
 
-/* [업무] - 붉은 계열 (Week Preview와 통일) */
+/* [업무] */
 .category-label.work {
     color: #d63384;
 }
 
-/* [개인] - 푸른 계열 (Week Preview와 통일) */
+/* [개인] */
 .category-label.personal {
     color: #4f46e5;
 }
+
 /* 카테고리 뱃지 공통 스타일 */
 .category-badge {
-    display: inline-block;       /* 글자 크기에 맞춰 박스 형성 */
-    padding: 3px 6px;            /* 텍스트 주변 여백 (상하 3px, 좌우 6px) */
-    border-radius: 4px;          /* 모서리를 살짝 둥글게 (완전 네모보다 훨씬 세련됨) */
-    font-size: 11px;             /* 본문보다 작게 */
-    font-weight: 700;            /* 굵게 */
-    margin-right: 6px;           /* 옆 요소와의 간격 */
-    vertical-align: middle;      /* 수직 정렬 보정 */
-    line-height: 1;              /* 높이 들뜨지 않게 */
+    display: inline-block;
+    padding: 3px 6px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    margin-right: 6px;
+    vertical-align: middle;
+    line-height: 1;
     box-shadow: none;
 }

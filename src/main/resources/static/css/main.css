@@ -101,13 +101,13 @@
     grid-template-columns: 2fr 2fr 1.5fr;
 
     /* 위 / 아래 */
-    grid-template-rows: 260px 1fr;
+    grid-template-rows: 400px 1fr;
 
     gap: 16px;
     box-sizing: border-box;
 }
 
-.borad {
+.board {
     grid-column: 1 / 2;
     grid-row: 1 / 2;
 }
@@ -130,10 +130,6 @@
 .rightPage > div {
     border: 1px dashed #999;
     background: whitesmoke;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }
 
 /* attendanceLeft에서 제거 영역 */
