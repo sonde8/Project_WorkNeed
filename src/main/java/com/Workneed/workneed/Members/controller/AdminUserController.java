@@ -51,7 +51,7 @@ public class AdminUserController {
         model.addAttribute("selectedRankId", rankId);
         model.addAttribute("selectedStatus", userStatus);
 
-        return "members/admin_user_list";
+        return "Members/admin_user_list";
     }
 
     // 1. 정보 수정
@@ -178,7 +178,7 @@ public class AdminUserController {
 
         model.addAttribute("admin", admin); // 헤더용
         model.addAttribute("admins", adminUserService.getAllAdmins()); // 관리자 리스트
-        return "members/admin_manage_list"; // 새로 만들 HTML 파일명
+        return "Members/admin_manage_list"; // 새로 만들 HTML 파일명
     }
 
 
@@ -190,7 +190,7 @@ public class AdminUserController {
 
         model.addAttribute("admin", admin); // 헤더용
         model.addAttribute("logs", adminUserService.getAllLogs()); // 로그 리스트
-        return "members/admin_activity_log"; // 새로 만들 HTML 파일명
+        return "Members/admin_activity_log"; // 새로 만들 HTML 파일명
     }
 
 
