@@ -1,5 +1,8 @@
 package com.Workneed.workneed.Members.auth.principal;
 
+
+import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
+import org.springframework.security.web.savedrequest.RequestCache;
 import com.Workneed.workneed.Members.dto.AdminUserDTO;
 import com.Workneed.workneed.Members.dto.UserDTO;
 import com.Workneed.workneed.Members.mapper.AdminUserMapper;
@@ -32,6 +35,9 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
             Authentication authentication
     ) throws IOException {
 
+        RequestCache requestCache = new HttpSessionRequestCache();
+        requestCache.removeRequest(request, response);
+
         HttpSession session = request.getSession(true);
         Object principal = authentication.getPrincipal();
 
@@ -48,11 +54,23 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
             }
 
             UserDTO user = cud.getUserDto();
-            if (user == null || !"ACTIVE".equals(user.getUserStatus())) {
-                SecurityContextHolder.clearContext();
-                session.invalidate();
-                response.sendRedirect("/login?needApproval=true");
-                return;
+            switch (user.getUserStatus()) {
+                case "ACTIVE":
+                    session.setAttribute("user", user);
+                    response.sendRedirect("/main");
+                    return;
+
+                case "INACTIVE":
+                    response.sendRedirect("/login?reason=inactive");
+                    return;
+
+                case "SUSPENDED":
+                    response.sendRedirect("/login?reason=suspended");
+                    return;
+
+                case "BANNED":
+                    response.sendRedirect("/login?reason=banned");
+                    return;
             }
 
             session.setAttribute("user", user);
@@ -135,6 +153,8 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 
             session.setAttribute("user", user);
             session.removeAttribute("admin");
+            response.sendRedirect("/main");
+            return;
         }
     }
 }

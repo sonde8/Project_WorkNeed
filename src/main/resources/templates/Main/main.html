@@ -18,9 +18,9 @@
         <script th:src="@{/js/attendanceLeft.js}"></script>
     </th:block>
 
-<!--kanban css-->
+    <!--kanban css-->
     <link rel="stylesheet" th:href="@{/css/main-kanban.css}">
-<!--board css -->
+    <!--board css -->
     <link rel="stylesheet" th:href="@{/css/main-board.css}">
 </head>
 
@@ -42,7 +42,7 @@
 
                 <div class="profileImg">
                     <img th:if="${user.userProfileImage != null}"
-                         th:src="@{/uploads/profiles/} + ${user.userProfileImage}"
+                         th:src="${user.userProfileImage}"
                          alt="프로필 이미지">
 
                     <img th:unless="${user.userProfileImage != null}"

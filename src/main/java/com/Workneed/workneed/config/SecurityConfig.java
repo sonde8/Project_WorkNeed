@@ -1,5 +1,6 @@
 package com.Workneed.workneed.config;
 
+import com.Workneed.workneed.Members.auth.principal.LoginFailureHandler;
 import com.Workneed.workneed.Members.auth.principal.LoginSuccessHandler;
 import com.Workneed.workneed.Members.service.CustomOidcUserService;
 import com.Workneed.workneed.Members.service.CustomOAuth2UserService;
@@ -20,6 +21,7 @@ public class SecurityConfig {
     private final LocalUserDetailsService totalAuthService;
     private final LoginSuccessHandler loginSuccessHandler;
     private final CustomOidcUserService customOidcUserService;
+    private final LoginFailureHandler loginFailureHandler;
 
 
     @Bean
@@ -85,15 +87,16 @@ public class SecurityConfig {
                 )
 
 
-        // 일반 로그인 (HTML 구조에 맞춤)
+                 // 일반 로그인 (HTML 구조에 맞춤)
                 .formLogin(form -> form
                 .loginPage("/login")
                 .loginProcessingUrl("/login-user")
                 .usernameParameter("loginId")
                 .passwordParameter("password")
                 .successHandler(loginSuccessHandler)
-                .failureUrl("/login?error")
-        )
+                .failureHandler(loginFailureHandler)
+                .defaultSuccessUrl("/main", true)
+                )
 
 
                 // 자동 로그인 (remember-me) — 핵심 5줄

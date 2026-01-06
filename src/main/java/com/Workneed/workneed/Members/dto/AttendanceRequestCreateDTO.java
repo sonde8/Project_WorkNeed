@@ -12,4 +12,5 @@ public class AttendanceRequestCreateDTO {
     LocalTime fromTime;
     LocalTime toTime;
     String reason;
+    String rejectReason;
 }

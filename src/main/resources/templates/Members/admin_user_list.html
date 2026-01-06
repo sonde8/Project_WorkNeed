@@ -20,13 +20,13 @@
 <div class="admin-header" th:if="${admin != null}"
      style="padding: 15px; background: #fff; border-bottom: 1px solid #ddd; margin-bottom: 20px;">
     <span> 관리자: <b th:text="${admin.adminName}">관리자</b></span>
-    <span style="margin-left:10px;"> | 권한: <b th:text="${admin.roleName}">권한</b></span>
     <form th:action="@{/logout}" method="post" style="display:inline; float: right;">
         <button type="submit" class="btn-secondary" style="padding: 5px 12px; cursor: pointer;">로그아웃</button>
     </form>
 </div>
 
 <div style="padding: 0 20px;">
+
 
     <div style="display: flex; gap: 20px; border-bottom: 1px solid #ddd; margin-bottom: 20px;">
         <a th:href="@{/admin/member/list}" style="padding: 10px 20px; text-decoration: none; color: #3182ce; border-bottom: 3px solid #3182ce; font-weight: bold;">직원 관리</a>

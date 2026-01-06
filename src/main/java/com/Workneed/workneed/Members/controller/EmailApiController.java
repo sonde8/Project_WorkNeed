@@ -61,24 +61,17 @@ public class EmailApiController {
     @PostMapping("/find-pw")
     public ResponseEntity<?> findPw(@RequestParam("loginId") String loginId,
                                     @RequestParam("email") String email,
-                                    HttpSession session) { // 1. HttpSession 파라미터 추가
+                                    HttpSession session) {
 
+        // 1. 서비스 호출 (내부에서 DB 업데이트 및 이쁜 템플릿 메일 발송 완료됨)
         String tempPw = userService.createTempPassword(loginId, email);
 
         if (tempPw == null) {
             return ResponseEntity.badRequest().body("일치하는 회원 정보가 없습니다.");
         }
 
-        try {
-            String content = "회원님의 임시 비밀번호는 [" + tempPw + "] 입니다. 로그인 후 반드시 변경하세요.";
-            mailService.sendEmail(email, content);
-
-            // 2. 세션에 마킹 (이 세션에서 로그인하면 알람이 뜨게 함)
-            session.setAttribute("isTempLogin", true);
-
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("메일 발송 중 오류가 발생했습니다.");
-        }
+        // 2. 컨트롤러에서의 추가 발송 코드는 삭제하고 세션 설정만 유지
+        session.setAttribute("isTempLogin", true);
 
         return ResponseEntity.ok("입력하신 이메일로 임시 비밀번호를 발송했습니다.");
     }
