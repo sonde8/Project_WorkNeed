@@ -57,7 +57,7 @@ public class ScheduleController {
         model.addAttribute("doingList", doingList);
         model.addAttribute("doneList", doneList);
 
-        return "schedule/kanban";
+        return "Schedule/kanban";
     }
 
 ////테스크 생성
@@ -161,7 +161,7 @@ public class ScheduleController {
 
         model.addAttribute("scheduleId", scheduleId);
         model.addAttribute("schedule", schedule);
-        return "schedule/invite";
+        return "Schedule/invite";
     }
 
     @PostMapping("/invite")
@@ -292,8 +292,8 @@ public class ScheduleController {
         if (schedule == null) return "redirect:/schedule/kanban";
 
         //미팅룸 조회
-        String roomName = meetingRoomMapper.selectRoomNameByScheduleId(scheduleId);
-        model.addAttribute("roomName", roomName);
+//        String roomName = meetingRoomMapper.selectRoomNameByScheduleId(scheduleId);
+//        model.addAttribute("roomName", roomName);
 
 
         //댓글 조회
@@ -302,7 +302,7 @@ public class ScheduleController {
         model.addAttribute("schedule", schedule);
         model.addAttribute("commentList", commentList);
 
-        return "schedule/task";
+        return "Schedule/task";
     }
 
     /* Git 수정 */

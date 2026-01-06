@@ -14,9 +14,8 @@ public class LoginController {
 
     private final UserService userService;
 
-    /**
-     * 로그인 페이지 이동
-     */
+
+    //로그인 페이지 이동
     @GetMapping("/login")
     public String loginForm(HttpSession session,
                             @RequestParam(required = false) String error, // 시큐리티 로그인 실패 시 넘어옴

@@ -26,9 +26,8 @@ public class UserController {
     @Value("${file.upload-dir}")
     private String uploadDir;
 
-    /**
-     * 프로필 이미지 업로드 처리
-     */
+
+     // 프로필 이미지 업로드 처리
     @PostMapping("/user/uploadProfile")
     public String uploadProfile(@RequestParam("profileFile") MultipartFile file,
                                 HttpSession session) {

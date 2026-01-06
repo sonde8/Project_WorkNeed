@@ -69,7 +69,7 @@
             useGeneratedKeys="true"
             keyProperty="userId"
             keyColumn="user_id">
-        INSERT INTO User (
+        INSERT INTO user (
         user_login_id,
         user_email,
         user_password,
@@ -126,7 +126,7 @@
     </update>
 
     <update id="updatePassword">
-        UPDATE User
+        UPDATE user
         SET user_password = #{userPassword}
         WHERE user_id = #{userId}
     </update>
@@ -135,6 +135,18 @@
         UPDATE user
         SET user_profile_image = #{profileImage}
         WHERE user_id = #{userId}
+    </update>
+
+    <update id="updateUserRankToDefault" parameterType="long">
+        UPDATE user
+        SET rank_id = 6
+        WHERE rank_id = #{rankId}
+    </update>
+
+    <update id="updateUserDeptToDefault" parameterType="long">
+        UPDATE user
+        SET dept_id = 6
+        WHERE dept_id = #{deptId}
     </update>
 
 </mapper>

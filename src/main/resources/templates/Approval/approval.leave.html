@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+
+<head>
+    <title>휴가 신청</title>
+
+    <th:block layout:fragment="head">
+        <link rel="stylesheet" th:href="@{/css/approve.css}">
+    </th:block>
+</head>
+
+<body>
+
+<section layout:fragment="content">
+
+    <h2>휴가 신청</h2>
+
+    <form th:action="@{/approval/leave/request}"
+          method="post"
+          th:object="${dto}">
+
+        <div>
+            <label>휴가 종류</label>
+            <select th:field="*{leaveType}" required>
+                <option value="">선택</option>
+                <option value="ANNUAL">연차</option>
+                <option value="HALF_AM">반차(오전)</option>
+                <option value="HALF_PM">반차(오후)</option>
+            </select>
+        </div>
+
+        <div>
+            <label>시작일</label>
+            <input type="date" th:field="*{startDate}" required>
+        </div>
+
+        <div>
+            <label>종료일</label>
+            <input type="date" th:field="*{endDate}" required>
+        </div>
+
+        <div>
+            <label>사유</label>
+            <textarea th:field="*{reason}" rows="4" required></textarea>
+        </div>
+
+        <div style="margin-top:20px;">
+            <button type="submit">신청</button>
+            <a th:href="@{/approval/inbox}">취소</a>
+        </div>
+
+    </form>
+
+</section>
+
+<th:block layout:fragment="script">
+    <script th:src="@{/js/approval.js}"></script>
+</th:block>
+
+</body>
+</html>

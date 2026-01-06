@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 @RequiredArgsConstructor
@@ -38,6 +39,14 @@ public class MainController {
         model.addAttribute("mainDoing", scheduleMapper.selectByStatusForMain(userId, "DOING"));
 
         return "Main/main";
+    }
+
+    @GetMapping("/debug")
+    @ResponseBody
+    public String debug(HttpSession session) {
+        return session.getAttribute("user") == null
+                ? "NO USER IN SESSION"
+                : "USER IN SESSION";
     }
 
 }

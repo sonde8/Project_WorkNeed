@@ -8,8 +8,10 @@
 
     <!-- 페이지 전용 CSS -->
     <th:block layout:fragment="head">
-        <link rel="stylesheet" th:href="@{/css/Main.css}">
+        <link rel="stylesheet" th:href="@{/css/main.css}">
         <link rel="stylesheet" th:href="@{/css/attendanceLeft.css}">
+        <link rel="stylesheet" th:href="@{/css/main-kanban.css}">
+        <link rel="stylesheet" th:href="@{/css/main-board.css}">
     </th:block>
     <!-- 로그인 정보 JS 주입 -->
     <script th:inline="javascript">
@@ -18,10 +20,8 @@
     </script>
 
 
-<!--kanban css-->
-    <link rel="stylesheet" th:href="@{/css/main-kanban.css}">
-<!--board css -->
-    <link rel="stylesheet" th:href="@{/css/main-board.css}">
+
+
 </head>
 
 <body>
@@ -131,7 +131,7 @@
             <div class="mini-calendar">미니 캘린더</div>
 
             <div class="mini-kanban">
-                <div th:replace="main/main-kanban :: miniKanban"></div>
+                <div th:replace="~{Main/main-kanban :: miniKanban}"></div>
             </div>
 
             <div class="mini-meetingroom">회의실</div>
