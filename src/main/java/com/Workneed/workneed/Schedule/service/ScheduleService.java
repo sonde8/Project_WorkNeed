@@ -20,7 +20,7 @@ public class ScheduleService {
     private final ScheduleParticipantMapper scheduleParticipantMapper;
     private final TaskCommentMapper taskCommentMapper;
     private final TaskMember2PerformanceMapper taskMember2PerformanceMapper;
-    private final MeetingRoomMapper meetingRoomMapper;
+    private  final MeetingRoomMapper meetingRoomMapper;
 
     public Map<String, Object> getLinks(Long scheduleId) {
         return scheduleMapper.selectScheduleLinks(scheduleId);
@@ -29,7 +29,7 @@ public class ScheduleService {
     @Transactional
     public void deleteSchedules(List<Long> scheduleIds, Long loginUserId) {
 
-        // 참여자인지 체크(OWNER/MEMBER 상관없이)
+        // 참여자인지 체크(OWNER/MEMBER 상관없이)  private final MeetingRoomMapper meetingRoomMapper;
         int cnt = scheduleParticipantMapper.countParticipantSchedules(scheduleIds, loginUserId);
         if (cnt != scheduleIds.size()) {
             throw new RuntimeException("DELETE_PERMISSION_DENIED");
