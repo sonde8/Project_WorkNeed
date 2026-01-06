@@ -32,4 +32,6 @@ public class UserDTO implements Serializable {
 
     private String deptName;
     private String rankName;
+
+    private String tempPwYn;
 }
