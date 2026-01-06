@@ -21,7 +21,12 @@
     position: relative;
 }
 
+.password-group input {
+    padding-right: 45px;
+}
+
 .toggle-password {
+    all: unset;
     position: absolute;
     right: 14px;
     top: 50%;
@@ -29,11 +34,13 @@
     cursor: pointer;
     color: #999;
     font-size: 16px;
+    z-index: 2;
 }
 
 .toggle-password:hover {
     color: #333;
 }
+
 
 .login-container h2 {
     margin-bottom: 30px;
@@ -132,3 +139,99 @@
 /* 5. 알림 메시지 스타일 (에러, 성공) */
 .error-msg { color: red; margin-bottom: 15px; font-weight: bold; }
 .info-msg { color: green; margin-bottom: 15px; font-weight: bold; }
+
+/* 6. 계정 정보 찾기 모달 */
+/* ==========================================================
+   6. 계정 정보 찾기 모달 (단독 노출형 최종본)
+   ========================================================== */
+
+/* 1. 모달 전체 배경: 기존 화면을 완벽하게 덮어버림 */
+.modal {
+    display: none;        /* 초기 상태 숨김 */
+    position: fixed;      /* 브라우저 화면에 박제 (스크롤 해도 따라옴) */
+    top: 0;
+    left: 0;
+    width: 100vw;         /* 화면 가로 전체 */
+    height: 100vh;        /* 화면 세로 전체 */
+    background-color: rgba(0, 0, 0, 0.85) !important; /* 배경을 더 어둡게 해서 뒤를 완전히 가림 */
+    z-index: 999999 !important; /* 그 어떤 요소보다 위에 뜨도록 함 */
+    justify-content: center;
+    align-items: center;
+}
+
+/* JS에서 display: flex를 줄 때 강제 적용 */
+.modal[style*="display: flex"] {
+    display: flex !important;
+}
+
+/* 2. 모달 상자: 원하시던 회색 일체형 박스 */
+.modal-content {
+    background-color: #d9d9d9 !important; /* 원하셨던 그 회색 */
+    border: 1px solid #000 !important;
+    border-radius: 5px !important;       /* 로그인창과 동일한 느낌 */
+    width: 450px !important;             /* 가로 크기 고정 */
+    padding: 50px 40px !important;
+    position: relative;                  /* 내부 요소 정렬 기준 */
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5); /* 입체감 부여 */
+    box-sizing: border-box;
+    text-align: center;
+}
+
+/* 3. 상단 탭 (아이디 찾기 | 비밀번호 찾기) */
+.modal-tabs {
+    margin-bottom: 30px;
+    font-size: 20px;
+    font-weight: bold;
+    color: #888;
+}
+.modal-tabs span { cursor: pointer; padding: 0 10px; }
+.modal-tabs span.active {
+    color: #000;
+    border-bottom: 2px solid #000;
+}
+
+/* 4. 안내 문구 (이미지 텍스트 반영) */
+.guide-text { text-align: left; margin-bottom: 20px; }
+.guide-text b { font-size: 20px; display: block; margin-bottom: 5px; color: #000; }
+.guide-text p { font-size: 14px; color: #333; margin: 0; }
+
+/* 5. 입력창 & 버튼 (시원한 55px 높이 통합) */
+.modal-input, .modal-btn, .result-box {
+    width: 100% !important;
+    height: 55px !important;
+    border: 1px solid #000 !important;
+    border-radius: 15px !important; /* 이미지와 동일한 둥근 모양 */
+    box-sizing: border-box !important;
+    font-size: 16px !important;
+    margin-bottom: 12px;
+}
+
+.modal-input {
+    background-color: #f8f9fa !important;
+    padding: 0 20px !important;
+}
+
+.modal-btn {
+    background-color: #e0e0e0 !important;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.result-box {
+    display: none;
+    margin: 15px 0;
+    padding: 12px;
+    background-color: #f0fdf4;
+    border: 1px solid #22c55e;
+    border-radius: 8px;
+    color: #15803d;
+    font-weight: bold;
+    text-align: center;
+    font-size: 0.95rem;
+}
+
+.result-box b {
+    color: #166534;
+    margin: 0 3px;
+}

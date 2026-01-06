@@ -19,8 +19,6 @@ public interface UserMapper {
 
     UserDTO findById(Long userId);
 
-    List<UserDTO> findAllWithRememberToken();
-
 
     void insertUser(UserDTO user);
 
@@ -36,7 +34,7 @@ public interface UserMapper {
 
 
     String findLoginIdByNameAndEmail(@Param("userName") String userName, @Param("email") String email);
-
+    Long findIdByLoginIdAndEmail(@Param("loginId") String loginId, @Param("email") String email);
 
 
     void updateUsersStatus(@Param("userIds") List<Long> userIds,

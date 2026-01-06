@@ -53,12 +53,10 @@ public class CustomUserDetails implements UserDetails, OAuth2User {
         return authorities;
     }
 
+    // 기술적 계정 차단 탈퇴 계정
     @Override
     public boolean isEnabled() {
-        if (adminDto != null) {
-            return "ACTIVE".equals(adminDto.getAdminStatus());
-        }
-        return "ACTIVE".equals(userDto.getUserStatus());
+        return true;
     }
 
     @Override

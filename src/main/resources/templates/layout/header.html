@@ -12,10 +12,11 @@
         <div class="profile-info" th:if="${session.user != null}">
             <span class="profile-name" th:text="${session.user.userName}">사용자명</span>
 
+            <!--기준이 user.user이고  uploadsx구조-->
             <div class="profile-img-wrapper">
-                <img th:if="${session.user.userProfileImage != null}"
-                     th:src="@{/uploads/profiles/} + ${session.user.userProfileImage}"
-                     alt="프로필" class="profile">
+                <img th:if="${user.userProfileImage != null}"
+                     th:src="${user.userProfileImage}"
+                     alt="프로필 이미지">
 
                 <img th:unless="${session.user.userProfileImage != null}"
                      th:src="@{/images/default-profile.svg}"

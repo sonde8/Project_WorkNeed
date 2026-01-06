@@ -21,16 +21,20 @@
 
     <select id="findByLoginId" resultType="com.Workneed.workneed.Members.dto.UserDTO">
         SELECT
-            u.user_id AS userId,
-            u.user_login_id AS userLoginId,
-            u.user_password AS userPassword,
-            u.user_status AS userStatus,
-            u.user_name AS userName,
-            u.user_profile_image AS userProfileImage,
-            u.dept_id AS deptId,
-            u.rank_id AS rankId,
-            d.dept_name AS deptName,  r.rank_name AS rankName   FROM user u
-                                                                         LEFT JOIN dept d ON u.dept_id = d.dept_id   LEFT JOIN ranks r ON u.rank_id = r.rank_id  WHERE u.user_login_id = #{loginId}
+        u.user_id AS userId,
+        u.user_login_id AS userLoginId,
+        u.user_email AS userEmail,  u.user_password AS userPassword,
+        u.user_status AS userStatus,
+        u.user_name AS userName,
+        u.user_profile_image AS userProfileImage,
+        u.dept_id AS deptId,
+        u.rank_id AS rankId,
+        d.dept_name AS deptName,
+        r.rank_name AS rankName
+        FROM user u
+        LEFT JOIN dept d ON u.dept_id = d.dept_id
+        LEFT JOIN ranks r ON u.rank_id = r.rank_id
+        WHERE u.user_login_id = #{loginId}
     </select>
 
     <select id="findById" parameterType="long" resultType="com.Workneed.workneed.Members.dto.UserDTO">
@@ -45,6 +49,20 @@
         <include refid="allColumns"/>
         FROM user
         WHERE user_email = #{email}
+    </select>
+
+    <select id="findLoginIdByNameAndEmail" resultType="string">
+        SELECT user_login_id
+        FROM user
+        WHERE user_name = #{userName}
+        AND user_email = #{email}
+    </select>
+
+    <select id="findIdByLoginIdAndEmail" resultType="long">
+        SELECT user_id
+        FROM user
+        WHERE user_login_id = #{loginId}
+        AND user_email = #{email}
     </select>
 
     <select id="findAllWithDetails" resultType="com.Workneed.workneed.Members.dto.UserDTO">

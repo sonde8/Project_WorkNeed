@@ -28,10 +28,9 @@ public interface AdminUserMapper {
     // 3. 별도의 신규 관리자 계정 생성 (계정 발급용)
     void insertAdmin(AdminUserDTO adminDto);
 
-    // 4. 휴가/결재 요청 처리 (미처리)
-    void processRequest(@Param("requestId") Long requestId,
-                        @Param("status") String status,
-                        @Param("adminId") Long adminId);
+
+
+    AdminUserDTO findByAdminId(@Param("adminId") Long adminId);
 
     // 5 관리자로그
     void insertActivityLog(AdminUserDTO logDto);
@@ -49,7 +48,7 @@ public interface AdminUserMapper {
     // 9 마지막 로그인 시간
     void updateLastLogin(@Param("adminId") Long adminId);
 
-    // 10 역할 ID로 권한 코드(String) 목록 가져오기
+    // 10
     List<String> findPermissionsByRoleId(@Param("roleId") Long roleId);
 
 

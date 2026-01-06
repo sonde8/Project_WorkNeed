@@ -87,113 +87,87 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     /* ===============================
-       6. 아이디 찾기 (Fetch)
+       6 & 7. 아이디 / 비밀번호 찾기 (간결 버전)
     =============================== */
     const modalBtns = modal.querySelectorAll(".modal-btn");
-
-    const nameInput = modal.querySelectorAll(".modal-input")[0];
-    const emailInput = modal.querySelectorAll(".modal-input")[1];
     const idResultBox = modal.querySelectorAll(".result-box")[0];
+    const pwResultBox = modal.querySelectorAll(".result-box")[1];
 
+    // [아이디 찾기]
     modalBtns[0].addEventListener("click", () => {
-        const name = nameInput.value.trim();
-        const email = emailInput.value.trim();
+        const name = modal.querySelectorAll(".modal-input")[0].value.trim();
+        const email = modal.querySelectorAll(".modal-input")[1].value.trim();
 
-        if (!name || !email) {
-            alert("이름과 이메일을 모두 입력해주세요.");
-            return;
-        }
+        if (!name || !email) return alert("이름과 이메일을 입력해주세요.");
 
         modalBtns[0].disabled = true;
-        modalBtns[0].innerText = "찾는 중...";
-
-        const params = new URLSearchParams();
-        params.append("userName", name);
-        params.append("email", email);
+        modalBtns[0].innerText = "조회 중...";
 
         fetch("/api/mail/find-id", {
             method: "POST",
             headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: params
+            body: new URLSearchParams({ userName: name, email: email })
         })
         .then(async res => {
             const text = await res.text();
             idResultBox.style.display = "block";
-
-            if (res.ok) {
-                idResultBox.innerHTML = `회원님의 아이디는 <b>${text}</b> 입니다.`;
-            } else {
-                idResultBox.innerHTML = text;
-            }
+            idResultBox.style.color = res.ok ? "#16a34a" : "#ef4444";
+            idResultBox.innerHTML = res.ok ? `아이디: <b>${text}</b>` : "정보가 일치하지 않습니다.";
         })
-        .catch(() => alert("서버 통신 오류"))
         .finally(() => {
             modalBtns[0].disabled = false;
             modalBtns[0].innerText = "아이디 찾기";
         });
     });
 
-    /* ===============================
-       7. 비밀번호 찾기 (Fetch)
-    =============================== */
-    const pwIdInput = modal.querySelectorAll(".modal-input")[2];
-    const pwEmailInput = modal.querySelectorAll(".modal-input")[3];
-    const pwResultBox = modal.querySelectorAll(".result-box")[1];
+    // [비밀번호 찾기]
+    modalBtns[1].addEventListener("click", (e) => {
+        e.preventDefault();
+        const id = modal.querySelectorAll(".modal-input")[2].value.trim();
+        const email = modal.querySelectorAll(".modal-input")[3].value.trim();
 
-    modalBtns[1].addEventListener("click", () => {
-        const id = pwIdInput.value.trim();
-        const email = pwEmailInput.value.trim();
-
-        if (!id || !email) {
-            alert("아이디와 이메일을 모두 입력해주세요.");
-            return;
-        }
+        if (!id || !email) return alert("아이디와 이메일을 입력해주세요.");
 
         modalBtns[1].disabled = true;
-        modalBtns[1].innerText = "발송 중...";
-
-        const params = new URLSearchParams();
-        params.append("loginId", id);
-        params.append("email", email);
+        modalBtns[1].innerText = "메일 발송 중...";
 
         fetch("/api/mail/find-pw", {
             method: "POST",
             headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: params
+            body: new URLSearchParams({ loginId: id, email: email })
         })
         .then(async res => {
             const msg = await res.text();
             pwResultBox.style.display = "block";
+            pwResultBox.style.color = res.ok ? "#16a34a" : "#ef4444";
             pwResultBox.innerHTML = msg;
         })
-        .catch(() => alert("서버 통신 오류"))
         .finally(() => {
             modalBtns[1].disabled = false;
             modalBtns[1].innerText = "비밀번호 찾기";
         });
     });
 
-});
 
     /* ===============================
-       8. 비밀번호 보기 (눈 아이콘)
-    =============================== */
-    document.querySelectorAll(".toggle-password").forEach(icon => {
-        icon.addEventListener("click", () => {
-            const targetId = icon.getAttribute("data-target");
-            const input = document.getElementById(targetId);
+           8. 비밀번호 보기 (눈 아이콘)
+        =============================== */
+        document.querySelectorAll(".toggle-password").forEach(icon => {
+            icon.addEventListener("click", () => {
+                const targetId = icon.getAttribute("data-target");
+                const input = document.getElementById(targetId);
 
-            if (!input) return;
+                if (!input) return;
 
-            if (input.type === "password") {
-                input.type = "text";
-                icon.classList.remove("fa-eye");
-                icon.classList.add("fa-eye-slash");
-            } else {
-                input.type = "password";
-                icon.classList.remove("fa-eye-slash");
-                icon.classList.add("fa-eye");
-            }
+                if (input.type === "password") {
+                    input.type = "text";
+                    icon.classList.remove("fa-eye");
+                    icon.classList.add("fa-eye-slash");
+                } else {
+                    input.type = "password";
+                    icon.classList.remove("fa-eye-slash");
+                    icon.classList.add("fa-eye");
+                }
+            });
         });
-    });
-
+});
