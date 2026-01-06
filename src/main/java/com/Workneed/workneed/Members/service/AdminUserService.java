@@ -9,7 +9,7 @@ import com.Workneed.workneed.Members.mapper.DeptMapper;
 import com.Workneed.workneed.Members.mapper.RankMapper;
 import com.Workneed.workneed.Members.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
-//import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
