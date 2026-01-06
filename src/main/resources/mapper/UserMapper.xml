@@ -9,15 +9,14 @@
         user_email AS userEmail,
         user_password AS userPassword,
         user_name AS userName,
+        user_phone AS userPhone,
         user_profile_image AS userProfileImage,
         user_status AS userStatus,
         user_birthday AS userBirthday,
         rank_id AS rankId,
         dept_id AS deptId,
         user_created_at AS userCreatedAt,
-        user_updated_at AS userUpdatedAt,
-        remember_token AS rememberToken,
-        remember_token_expired AS rememberTokenExpired
+        user_updated_at AS userUpdatedAt
     </sql>
 
     <select id="findByLoginId" resultType="com.Workneed.workneed.Members.dto.UserDTO">
@@ -64,6 +63,23 @@
         ORDER BY u.user_id DESC
     </select>
 
+    <select id="existsByLoginId"
+            parameterType="string"
+            resultType="boolean">
+        SELECT COUNT(*) > 0
+        FROM user
+        WHERE user_login_id = #{loginId}
+    </select>
+
+    <select id="existsByEmail"
+            parameterType="string"
+            resultType="boolean">
+        SELECT COUNT(*) > 0
+        FROM user
+        WHERE user_email = #{email}
+    </select>
+
+
     <insert id="insertUser"
             parameterType="com.Workneed.workneed.Members.dto.UserDTO"
             useGeneratedKeys="true"
@@ -74,6 +90,7 @@
         user_email,
         user_password,
         user_name,
+        user_phone,
         user_profile_image,
         user_status,
         user_birthday,
@@ -84,6 +101,7 @@
         #{userEmail},
         #{userPassword},
         #{userName},
+        #{userPhone},
         #{userProfileImage},
         #{userStatus},
         #{userBirthday},
@@ -92,19 +110,6 @@
         )
     </insert>
 
-    <update id="updateRememberToken">
-        UPDATE user
-        SET remember_token = #{token},
-        remember_token_expired = #{expiredAt}
-        WHERE user_id = #{userId}
-    </update>
-
-    <update id="clearRememberToken" parameterType="long">
-        UPDATE user
-        SET remember_token = NULL,
-        remember_token_expired = NULL
-        WHERE user_id = #{userId}
-    </update>
 
     <update id="updateUser" parameterType="com.Workneed.workneed.Members.dto.UserDTO">
         UPDATE user
