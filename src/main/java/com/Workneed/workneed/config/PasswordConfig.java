@@ -1,3 +1,4 @@
+/*
 package com.Workneed.workneed.config;
 
 import org.springframework.context.annotation.Bean;
@@ -12,3 +13,4 @@ public class PasswordConfig {
         return new BCryptPasswordEncoder();
     }
 }
+*/

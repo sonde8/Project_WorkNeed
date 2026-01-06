@@ -1,4 +1,6 @@
+/*
 package com.Workneed.workneed.Members.service;
+
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -82,3 +84,5 @@ public class MailService {
     }
 
 }
+
+ */

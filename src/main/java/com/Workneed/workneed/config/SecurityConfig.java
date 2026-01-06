@@ -1,26 +1,35 @@
 package com.Workneed.workneed.config;
 
 import com.Workneed.workneed.Members.auth.principal.LoginSuccessHandler;
+/*
 import com.Workneed.workneed.Members.service.CustomOidcUserService;
 import com.Workneed.workneed.Members.service.CustomOAuth2UserService;
 import com.Workneed.workneed.Members.service.LocalUserDetailsService;
+
+ */
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+/*
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 
-@Configuration
 @EnableWebSecurity
+ */
+
+@Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+    /*
     private final CustomOAuth2UserService customOAuth2UserService;
     private final LocalUserDetailsService totalAuthService;
-    private final LoginSuccessHandler loginSuccessHandler;
     private final CustomOidcUserService customOidcUserService;
 
+     */
+
+    private final LoginSuccessHandler loginSuccessHandler;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -29,7 +38,7 @@ public class SecurityConfig {
                 // CSRF / frame
                 .csrf(csrf -> csrf.disable())
                 .headers(headers -> headers.frameOptions(frame -> frame.disable()))
-
+                /*
                 // 접근 권한
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
@@ -83,7 +92,7 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
                 )
 
-
+                */
         // 일반 로그인 (HTML 구조에 맞춤)
                 .formLogin(form -> form
                 .loginPage("/login")
@@ -92,9 +101,9 @@ public class SecurityConfig {
                 .passwordParameter("password")
                 .successHandler(loginSuccessHandler)
                 .failureUrl("/login?error")
-        )
-
-
+                .permitAll()
+        );
+                /*
                 // 자동 로그인 (remember-me) — 핵심 5줄
                 .rememberMe(r -> r
                         .key("workneed-secret-key")
@@ -111,7 +120,9 @@ public class SecurityConfig {
                         .successHandler(loginSuccessHandler)
                 )
 
+                 */
 
+                /*
                 // 로그아웃
                 .logout(logout -> logout
                         .logoutUrl("/logout")
@@ -119,6 +130,8 @@ public class SecurityConfig {
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID", "remember-me")
                 );
+
+                 */
 
         return http.build();
     }

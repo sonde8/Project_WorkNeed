@@ -1,3 +1,4 @@
+/*
 package com.Workneed.workneed.config;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,3 +24,6 @@ public class OAuth2LoginSuccessHandler
         response.sendRedirect("/main");
     }
 }
+
+
+ */

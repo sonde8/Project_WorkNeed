@@ -9,7 +9,7 @@ import com.Workneed.workneed.Members.mapper.DeptMapper;
 import com.Workneed.workneed.Members.mapper.RankMapper;
 import com.Workneed.workneed.Members.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
+//import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,11 +20,11 @@ import java.util.List;
 public class AdminUserService {
 
     private final AdminUserMapper adminUserMapper;
-    private final PasswordEncoder passwordEncoder;
+   private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
     private final DeptMapper deptMapper;
     private final RankMapper rankMapper;
-    private final MailService mailService;
+  private final MailService mailService;
 
     // 1. 화면 데이터 가져오기 (기존 동일)
     public List<UserDTO> getAllMembers(String userName, String userLoginId, Long deptId, Long rankId, String userStatus) {
@@ -50,6 +50,7 @@ public class AdminUserService {
         saveLog(adminId, "UPDATE", "USER", userDto.getUserId(), "직원 정보 및 상태 수정");
     }
 
+
     // [수정] 관리자 계정 생성 (adminId 추가)
     public void createAdmin(AdminUserDTO adminDto, Long adminId) {
         adminDto.setAdminPassword(passwordEncoder.encode(adminDto.getAdminPassword()));
@@ -58,6 +59,8 @@ public class AdminUserService {
         // 로그 기록
         saveLog(adminId, "CREATE", "ADMIN", adminDto.getAdminId(), "새 관리자 계정 생성: " + adminDto.getAdminEmail());
     }
+
+
 
     // 하나로 통합하고 명칭을 changeAdminStatus로 통일
     @Transactional
@@ -154,6 +157,8 @@ public class AdminUserService {
                 mailService.sendApprovalEmail(targetUser.getUserEmail(), targetUser.getUserName());
             }
         }
+
+
     }
 
     // [통합] 일괄 변경 (기존의 adminId 없는 메서드는 삭제하세요)
