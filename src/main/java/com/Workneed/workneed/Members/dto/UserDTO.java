@@ -19,6 +19,7 @@ public class UserDTO implements Serializable {
     private String userName;
     private String userProfileImage;
     private String userStatus;
+    private String userPhone;
 
     private LocalDateTime userCreatedAt;
     private LocalDateTime userUpdatedAt;

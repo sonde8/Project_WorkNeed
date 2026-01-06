@@ -51,6 +51,24 @@
     background-color: #f8f9fa;
 }
 
+/* 비밀번호 입력값 일치검증메시지 */
+.password-msg {
+    font-size: 12px;
+    margin-left: 20px; /* 아이콘 정렬 맞추기 */
+    text-align: center;
+    display: flex;
+    justify-content: flex-start;
+}
+
+.password-msg.success {
+    color: #2e7d32; /* 초록 */
+}
+
+.password-msg.error {
+    color: #d32f2f; /* 빨강 */
+}
+
+
 /* 날짜 선택(date) 입력창 특화 스타일 */
 input[type="date"] {
     font-family: inherit;

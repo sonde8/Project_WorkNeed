@@ -47,6 +47,7 @@ public class MailService {
             helper.setText(body, true);
 
             mailSender.send(message);
+            log.info("메일 발송 시도 완료 → {}", toEmail);
 
         } catch (MessagingException | UnsupportedEncodingException e) {
             log.error("메일 발송 실패: {}", toEmail, e);

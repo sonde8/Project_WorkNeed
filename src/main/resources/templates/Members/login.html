@@ -34,19 +34,13 @@
                            oncopy="return false" onpaste="return false" oncut="return false" required>
                 </div>
 
-                <div class="options-row">
-                    <label class="checkbox-container">
-                        <input type="checkbox" name="remember-me">
-                        <span class="checkmark"></span> 로그인 상태 유지
-                    </label>
-                </div>
 
                 <button type="submit" class="btn-submit">로그인</button>
             </form>
 
             <div class="links">
-                <a href="#">비밀번호 찾기</a> |
-                <a href="#">아이디 찾기</a> |
+                <a href="#findAccountModal">비밀번호 찾기</a> |
+                <a href="#findAccountModal">아이디 찾기</a> |
                 <a th:href="@{/register}">회원가입</a>
             </div>
 
@@ -60,7 +54,6 @@
                 <i class="fa-solid fa-user-lock"></i>
                 관리자 로그인
             </a>
-
         </div>
     </div>
 </main>

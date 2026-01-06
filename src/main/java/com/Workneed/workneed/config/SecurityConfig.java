@@ -36,6 +36,7 @@ public class SecurityConfig {
                                 "/",
                                 "/login", "/login-user",
                                 "/register/**",
+                                "/api/mail/**",
 
 
                                 "/oauth2/authorization/**",
