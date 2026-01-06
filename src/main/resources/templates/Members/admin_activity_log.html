@@ -4,18 +4,10 @@
     <meta charset="UTF-8">
     <title>활동 로그</title>
     <link rel="stylesheet" th:href="@{/css/admin_user_list.css}">
-    <style>
-        .btn-tab { padding: 10px 20px; text-decoration: none; color: #666; border-bottom: 3px solid transparent; }
-        .btn-tab.active { color: #3182ce; border-bottom: 3px solid #3182ce; font-weight: bold; }
-        /* 작업 구분 배지 스타일 */
-        .action-badge { background: #f7fafc; border: 1px solid #cbd5e0; padding: 2px 6px; border-radius: 4px; font-size: 0.85em; }
-        /* 권한 배지 스타일 */
-        .role-tag { font-size: 0.75em; color: #718096; background: #edf2f7; padding: 2px 5px; border-radius: 4px; margin-left: 5px; }
-    </style>
 </head>
 <body>
 
-<div th:replace="~{members/admin_user_list :: .admin-header}"></div>
+<div th:replace="~{Members/admin_user_list :: .admin-header}"></div>
 
 <div style="padding: 20px;">
     <div style="display: flex; gap: 20px; border-bottom: 1px solid #ddd; margin-bottom: 20px;">
