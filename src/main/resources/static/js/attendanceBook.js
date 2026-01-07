@@ -90,7 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const type = rec.type ?? '';
             const normType = String(type).replace(/\s+/g, '');
 
-            const isLeave = ['연차', '휴가', '병가', '오전반차', '오후반차', '반차'].includes(normType);
+            const isLeave = ['연차', '휴가', '병가'].includes(normType);
 
             const leaveRowClass = isLeave ? 'leave-row' : '';
 
