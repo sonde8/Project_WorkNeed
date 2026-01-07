@@ -47,15 +47,14 @@ public class EmailApiController {
     public ResponseEntity<?> findId(@RequestParam("userName") String userName,
                                     @RequestParam("email") String email) {
 
-        // UserService에 우리가 아까 만든 findId 메서드를 호출
-        String maskedId = userService.findId(userName, email);
 
-        if (maskedId == null) {
+        String loginId = userService.findId(userName, email);
+
+        if (loginId == null) {
             return ResponseEntity.badRequest().body("일치하는 정보가 없습니다.");
         }
 
-        // 찾은 마스킹 아이디(예: ad***)를 반환
-        return ResponseEntity.ok(maskedId);
+        return ResponseEntity.ok(loginId);
     }
 
     @PostMapping("/find-pw")
