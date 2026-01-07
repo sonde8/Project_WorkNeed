@@ -12,6 +12,7 @@ import com.Workneed.workneed.Schedule.service.ScheduleService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -41,6 +42,17 @@ public class ScheduleController {
         Object u = session.getAttribute("user");
         if (!(u instanceof UserDTO)) return null;
         return ((UserDTO) u).getUserId();
+    }
+
+    /**
+     * JS에서 fetch("/schedule/api/detail/" + id) 형태로 호출하게 됩니다.
+     */
+    @GetMapping("/api/detail/{scheduleId}")
+    @ResponseBody
+    public ResponseEntity<ScheduleDTO> getScheduleDetail(@PathVariable Long scheduleId) {
+        ScheduleDTO schedule = scheduleMapper.selectById(scheduleId);
+        if (schedule == null) return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(schedule);
     }
 
 ////칸반
@@ -281,7 +293,7 @@ public class ScheduleController {
         return "OK";
     }
 
-////TASK DETAIL
+    ////TASK DETAIL
     @GetMapping("/task")
     public String task(@RequestParam Long scheduleId, HttpSession session, Model model) {
 
@@ -291,9 +303,9 @@ public class ScheduleController {
         ScheduleDTO schedule = scheduleMapper.selectById(scheduleId);
         if (schedule == null) return "redirect:/schedule/kanban";
 
-        //미팅룸 조회
-//        String roomName = meetingRoomMapper.selectRoomNameByScheduleId(scheduleId);
-//        model.addAttribute("roomName", roomName);
+
+        String roomName = meetingRoomMapper.selectRoomNameByScheduleId(scheduleId);
+        model.addAttribute("roomName", roomName);
 
 
         //댓글 조회

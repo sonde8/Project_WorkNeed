@@ -53,7 +53,7 @@
     </select>
 
     <insert id="insertReservation" parameterType="com.Workneed.workneed.Meetingroom.dto.MeetingReservationDTO">
-        INSERT INTO MEETING_RESERVATION (
+        INSERT INTO meeting_reservation (
             room_id,
             schedule_id,
             reserver_id,
@@ -69,7 +69,7 @@
     </insert>
 
     <delete id="deleteReservation">
-        DELETE FROM MEETING_RESERVATION
+        DELETE FROM meeting_reservation
         WHERE reservation_id = #{reservationId}
     </delete>
 
@@ -81,7 +81,6 @@
         FROM meeting_reservation r
                  JOIN meeting_room mr ON mr.room_id = r.room_id
         WHERE r.schedule_id = #{scheduleId}
-          AND r.status = 'RESERVED'
         ORDER BY r.reservation_id DESC
             LIMIT 1
     </select>
@@ -96,6 +95,14 @@
             #{id}
         </foreach>
     </delete>
+
+    <select id="countScheduleConflict" resultType="int">
+        SELECT COUNT(*)
+        FROM meeting_reservation
+        WHERE schedule_id = #{scheduleId}
+          AND start_at &lt; #{endAt}
+          AND end_at   &gt; #{startAt}
+    </select>
 
 
 </mapper>
