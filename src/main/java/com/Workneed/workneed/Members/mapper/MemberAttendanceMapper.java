@@ -1,15 +1,15 @@
 package com.Workneed.workneed.Members.mapper;
 
-import com.Workneed.workneed.Members.dto.AttendanceDTO;
+import com.Workneed.workneed.Members.dto.MemberAttendanceDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.time.LocalDate;
 
 @Mapper
-public interface AttendanceMapper {
+public interface MemberAttendanceMapper {
 
-    AttendanceDTO findByUserAndDate(
+    MemberAttendanceDTO findByUserAndDate(
             @Param("userId") Long userId,
             @Param("workDate") LocalDate workDate
     );

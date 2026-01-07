@@ -1,7 +1,7 @@
 package com.Workneed.workneed.Approval.controller;
 
 import com.Workneed.workneed.Approval.dto.LeaveRequestDTO;
-import com.Workneed.workneed.Approval.service.LeaveService;
+import com.Workneed.workneed.Approval.service.ApprovalLeaveService;
 import com.Workneed.workneed.Members.dto.UserDTO;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
@@ -12,10 +12,10 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/approval")
 public class LeaveController {
 
-    private final LeaveService leaveService;
+    private final ApprovalLeaveService approvalLeaveService;
 
-    public LeaveController(LeaveService leaveService) {
-        this.leaveService = leaveService;
+    public LeaveController(ApprovalLeaveService approvalLeaveService) {
+        this.approvalLeaveService = approvalLeaveService;
     }
 
      /* ==========================================================
@@ -55,7 +55,7 @@ public class LeaveController {
         Long userId = getLoginUserId(session);
         if (userId == null) return "redirect:/login";
 
-        Long docId = leaveService.submitLeave(dto, userId);
+        Long docId = approvalLeaveService.submitLeave(dto, userId);
         return "redirect:/approval/leave/" + docId;
     }
 

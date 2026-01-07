@@ -1,7 +1,6 @@
 package com.Workneed.workneed.Approval.service;
 
 import com.Workneed.workneed.Approval.DocStatus;
-import com.Workneed.workneed.Approval.dto.DocDTO;
 import com.Workneed.workneed.Approval.dto.LeaveRequestDTO;
 import com.Workneed.workneed.Approval.entity.ApprovalDoc;
 import com.Workneed.workneed.Approval.mapper.DocMapper;
@@ -12,12 +11,12 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 
 @Service
-public class LeaveService {
+public class ApprovalLeaveService {
 
     private final DocMapper docMapper;
     private final LeaveApprovalMapper leaveApprovalMapper;
 
-    public LeaveService(DocMapper docMapper, LeaveApprovalMapper leaveApprovalMapper) {
+    public ApprovalLeaveService(DocMapper docMapper, LeaveApprovalMapper leaveApprovalMapper) {
         this.docMapper = docMapper;
         this.leaveApprovalMapper = leaveApprovalMapper;
     }
