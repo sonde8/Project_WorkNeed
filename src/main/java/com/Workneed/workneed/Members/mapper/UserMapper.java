@@ -19,44 +19,38 @@ public interface UserMapper {
 
     UserDTO findById(Long userId);
 
-    UserDTO findByRememberToken(String token); // 자동로그인 토큰저장
+    List<UserDTO> findAllWithRememberToken();
+
 
     void insertUser(UserDTO user);
 
-    void updateUser(UserDTO user);
+    // 특정 부서원들을 미배정(6)으로 변경
+    void updateUserDeptToDefault(@Param("deptId") Long deptId);
 
-    void deleteUser(Long userId);
+    // 특정 직급 인원들을 신입(6)으로 변경
+    void updateUserRankToDefault(@Param("rankId") Long rankId);
+
+    boolean existsByLoginId(String loginId);
+
+    boolean existsByEmail(String email);
+
+
+    String findLoginIdByNameAndEmail(@Param("userName") String userName, @Param("email") String email);
+
+
+
+    void updateUsersStatus(@Param("userIds") List<Long> userIds,
+                           @Param("status") String status);
+
 
     void updatePassword(
             @Param("userId") Long userId,
             @Param("userPassword") String userPassword
     );
 
-    void updateUsersStatus(@Param("userIds") List<Long> userIds,
-                           @Param("status") String status);
-
-    void updateRememberToken( //토큰 정보 업데이트
-                              @Param("userId") Long userId,
-                              @Param("token") String token,
-                              @Param("expiredAt") LocalDateTime expiredAt
-    );
-
-
     //프로필이미지 업데이트
     void updateProfileImage(
             @Param("userId") Long userId,
             @Param("profileImage") String profileImage
     );
-
-    UserDTO findByNameAndEmail(
-
-            @Param("name") String name,
-            @Param("email") String email
-    );
-
-    List<UserDTO> findAllWithDetails();
-
-    void clearRememberToken(@Param("userId") Long userId); //토큰정보삭제-로그아웃시 같이됨
-
-
 }

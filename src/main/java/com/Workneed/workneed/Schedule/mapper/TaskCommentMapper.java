@@ -18,5 +18,7 @@ public interface TaskCommentMapper {
 
     int deleteComment(@Param("commentId") Long commentId,
                       @Param("writerId") Long writerId);
+
+    int deleteByScheduleIds(@Param("scheduleIds") List<Long> scheduleIds);
 }
 

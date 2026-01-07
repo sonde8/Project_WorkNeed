@@ -3,19 +3,19 @@
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.Workneed.workneed.Schedule.mapper.TaskCommentMapper">
 
-    <select id="selectByScheduleId"
+    <select id="selectByScheduleId" parameterType="long"
             resultType="com.Workneed.workneed.Schedule.dto.TaskCommentDTO">
         SELECT
-        comment_id AS commentId,
-        schedule_id AS scheduleId,
-        writer_id AS writerId,
-        writer_name AS writerName,
-        content,
-        created_at AS createdAt,
-        updated_at AS updatedAt
-        FROM schedule_comment
-        WHERE schedule_id = #{scheduleId}
-        ORDER BY comment_id DESC
+        c.comment_id   AS commentId,
+        c.schedule_id  AS scheduleId,
+        c.writer_id    AS writerId,
+        u.user_name    AS writerName,
+        c.content      AS content,
+        c.created_at   AS createdAt
+        FROM schedule_comment c
+        LEFT JOIN user u ON c.writer_id = u.user_id
+        WHERE c.schedule_id = #{scheduleId}
+        ORDER BY c.comment_id DESC
     </select>
 
     <insert id="insertComment"
@@ -23,9 +23,9 @@
             useGeneratedKeys="true"
             keyProperty="commentId">
         INSERT INTO schedule_comment
-        (schedule_id, writer_id, writer_name, content)
+        (schedule_id, writer_id, content)
         VALUES
-        (#{scheduleId}, #{writerId}, #{writerName}, #{content})
+        (#{scheduleId}, #{writerId}, #{content})
     </insert>
 
     <update id="updateComment">
@@ -40,6 +40,14 @@
         DELETE FROM schedule_comment
         WHERE comment_id = #{commentId}
         AND writer_id = #{writerId}
+    </delete>
+
+    <delete id="deleteByScheduleIds">
+        DELETE FROM schedule_comment
+        WHERE schedule_id IN
+        <foreach collection="scheduleIds" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
     </delete>
 
 </mapper>

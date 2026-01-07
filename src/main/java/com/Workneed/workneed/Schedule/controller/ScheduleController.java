@@ -1,10 +1,7 @@
 package com.Workneed.workneed.Schedule.controller;
 
 import com.Workneed.workneed.Members.dto.UserDTO;
-import com.Workneed.workneed.Schedule.dto.ScheduleDTO;
-import com.Workneed.workneed.Schedule.dto.ScheduleInvitedDTO;
-import com.Workneed.workneed.Schedule.dto.ScheduleParticipantDTO;
-import com.Workneed.workneed.Schedule.dto.TaskCommentDTO;
+import com.Workneed.workneed.Schedule.dto.*;
 import com.Workneed.workneed.Schedule.mapper.ScheduleInvitedMapper;
 import com.Workneed.workneed.Schedule.mapper.ScheduleMapper;
 import com.Workneed.workneed.Schedule.mapper.ScheduleParticipantMapper;
@@ -37,8 +34,9 @@ public class ScheduleController {
     private final ScheduleParticipantService scheduleParticipantService;
     private final ScheduleService scheduleService;
 
+    private final com.Workneed.workneed.Meetingroom.mapper.MeetingRoomMapper meetingRoomMapper;
 
-//    세션에서 로그인 user ID 가져오기
+
     private Long getLoginUserId(HttpSession session) {
         Object u = session.getAttribute("user");
         if (!(u instanceof UserDTO)) return null;
@@ -59,7 +57,7 @@ public class ScheduleController {
         model.addAttribute("doingList", doingList);
         model.addAttribute("doneList", doneList);
 
-        return "schedule/kanban";
+        return "Schedule/kanban";
     }
 
 ////테스크 생성
@@ -113,6 +111,43 @@ public class ScheduleController {
 
         return "redirect:/schedule/kanban";
     }
+////테스크 삭제
+    @PostMapping("/delete")
+    @ResponseBody
+    public Map<String, Object> deleteSchedules(
+            @RequestBody ScheduleDeleteDTO dto,
+            HttpSession session
+    ) {
+        Map<String, Object> r = new HashMap<>();
+
+        Long loginUserId = getLoginUserId(session);
+        if (loginUserId == null){
+            r.put("ok", false);
+            r.put("message", "NO_LOGIN");
+            return r;
+        }
+        List<Long> ids = dto.getScheduleIds();
+        if (ids == null || ids.isEmpty()) {
+            r.put("ok", false);
+            r.put("message", "NO_IDS");
+            return r;
+        }
+
+        try {
+            // 옵션 A: 참여자 체크 + 진짜 삭제
+            scheduleService.deleteSchedules(ids, loginUserId);
+
+            r.put("ok", true);
+            r.put("deletedIds", ids);
+            return r;
+
+        } catch (RuntimeException ex) {
+            r.put("ok", false);
+            r.put("message", ex.getMessage()); // DELETE_PERMISSION_DENIED 등
+            return r;
+        }
+
+    }
 
 ////팀원 초대
     @GetMapping("/invite")
@@ -126,7 +161,7 @@ public class ScheduleController {
 
         model.addAttribute("scheduleId", scheduleId);
         model.addAttribute("schedule", schedule);
-        return "schedule/invite";
+        return "Schedule/invite";
     }
 
     @PostMapping("/invite")
@@ -245,6 +280,7 @@ public class ScheduleController {
         scheduleMapper.updateStatus(scheduleId, status);
         return "OK";
     }
+
 ////TASK DETAIL
     @GetMapping("/task")
     public String task(@RequestParam Long scheduleId, HttpSession session, Model model) {
@@ -255,6 +291,10 @@ public class ScheduleController {
         ScheduleDTO schedule = scheduleMapper.selectById(scheduleId);
         if (schedule == null) return "redirect:/schedule/kanban";
 
+        //미팅룸 조회
+//        String roomName = meetingRoomMapper.selectRoomNameByScheduleId(scheduleId);
+//        model.addAttribute("roomName", roomName);
+
 
         //댓글 조회
         List<TaskCommentDTO> commentList = taskCommentMapper.selectByScheduleId(scheduleId);
@@ -262,7 +302,7 @@ public class ScheduleController {
         model.addAttribute("schedule", schedule);
         model.addAttribute("commentList", commentList);
 
-        return "schedule/task";
+        return "Schedule/task";
     }
 
     /* Git 수정 */

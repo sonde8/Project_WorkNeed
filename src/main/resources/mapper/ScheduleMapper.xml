@@ -109,6 +109,14 @@
         WHERE schedule_id = #{scheduleId}
     </update>
 
+    <delete id="deleteByScheduleIds">
+        DELETE FROM schedule
+        WHERE schedule_id IN
+        <foreach collection="scheduleIds" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </delete>
+
 <!-- git url/ file stroage url-->
     <select id="selectScheduleLinks" parameterType="long" resultType="map">
         SELECT
@@ -141,4 +149,26 @@
         SET file_storage_url = NULL
         WHERE schedule_id = #{scheduleId}
     </update>
+<!--main page mini kanban-->
+    <select id="selectByStatusForMain"
+            resultType="com.Workneed.workneed.Schedule.dto.ScheduleDTO">
+        SELECT
+        s.schedule_id AS scheduleId,
+        s.status,
+        s.title,
+        s.description,
+        s.event_type AS eventType,
+        s.start_at AS startAt,
+        s.end_at AS endAt,
+        s.location,
+        s.type,
+        s.created_by AS createdBy,
+        s.created_at AS createdAt
+        FROM schedule s
+        JOIN schedule_participant sp
+        ON sp.schedule_id = s.schedule_id
+        WHERE sp.user_id = #{userId}
+        AND s.status = #{status}
+        ORDER BY s.start_at ASC, s.schedule_id DESC
+    </select>
 </mapper>

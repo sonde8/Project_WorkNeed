@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class ApprovalTypeDTO {
-    private Long approvalTypeId;
+    private Long typeId;
     private String typeName;
 }

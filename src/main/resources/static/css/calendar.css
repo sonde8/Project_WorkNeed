@@ -8,23 +8,27 @@ body {
     font-family: 'Noto Sans KR', sans-serif;
     height: 100vh;
     overflow: hidden;
-    display: flex;
+    display: flex; /* 중앙 정렬 복구 */
     justify-content: center;
     align-items: center;
     background-color: #fff;
 }
 
 /* ============================
-   메인 레이아웃 구조 (전체 1340px)
+   메인 레이아웃 (1340px 고정)
    ============================ */
 .calendar-container {
     width: 1340px;
-    height: 100vh;
+    height: 95vh;
     display: flex;
     margin: 0 auto;
 
-    border: 1px solid black;
+    /* 깔끔한 외관을 위한 스타일 */
     background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    overflow: hidden;
 }
 
 /* --- 왼쪽 사이드바 (420px) --- */
@@ -32,7 +36,9 @@ body {
     width: 420px;
     height: 100%;
 
-    border: 1px solid black;
+    border-right: 1px solid #ddd;
+    background-color: #fff;
+
     padding: 20px;
     display: flex;
     flex-direction: column;
@@ -47,101 +53,141 @@ body {
     font-size: 16px;
     font-weight: bold;
     cursor: pointer;
-    background-color: #f0f0f0;
-    border: 1px solid black;
+    background-color: #f8f9fa;
+    border: 1px solid #ddd;
+    border-radius: 6px;
     text-align: center;
-    transition: background-color 0.2s;
+    transition: all 0.2s;
+    color: #333;
 }
-.schedule-add-btn:hover {
-    background-color: #e0e0e0;
-}
+.schedule-add-btn:hover { background-color: #e9ecef; }
 
-/* 왼쪽 박스 공통 스타일 */
+/* 왼쪽 박스 공통 */
 .left-box {
-    border: 1px solid black;
+    border: 1px solid #eee;
     padding: 15px;
-    border-radius: 4px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
 }
-
 .left-title {
     font-size: 18px;
-    font-weight: bold;
-    margin-bottom: 10px;
-    border-bottom: 1px solid #ddd;
-    padding-bottom: 5px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    border-bottom: 1px solid #f0f0f0;
+    padding-bottom: 8px;
+    color: #333;
 }
 
 /* Today List */
 .today-list {
     list-style: none;
-    min-height: 50px;
+    min-height: 0;
+    max-height: 250px;
+    overflow-y: auto;
 }
+.today-list::-webkit-scrollbar { width: 4px; }
+.today-list::-webkit-scrollbar-thumb { background-color: #ddd; border-radius: 2px; }
+
 .today-list li {
     cursor: pointer;
-    padding: 5px 0;
-    border-bottom: 1px dotted #ccc;
-    font-size: 14px;
-}
-.today-list li:hover {
-    background-color: #f3f4f6;
-}
-
-/* Weekly Progress */
-.weekly-progress-item {
-    margin-bottom: 10px;
-}
-.weekly-progress-item .label {
-    display: block;
-    font-size: 14px;
-    margin-bottom: 5px;
-}
-.progress {
-    width: 100%;
-    height: 10px;
-    background-color: #eee;
-    border: 1px solid #000;
-    border-radius: 5px;
-    overflow: hidden;
-}
-.progress-bar {
-    height: 100%;
-    background-color: #333;
-    width: 0%;
-}
-.progress-text {
-    font-size: 12px;
-    float: right;
-    margin-top: 2px;
-}
-
-/* Filter Radio */
-.filter-radio-group {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-.filter-radio {
-    cursor: pointer;
+    padding: 10px 5px;
+    border-bottom: 1px dashed #eee;
     font-size: 14px;
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 8px;
+    color: #444;
+}
+.today-list li:hover { background-color: #f8fbff; font-weight: 500; }
+
+.today-empty-msg { text-align: center; color: #aaa; font-size: 13px; padding: 20px 0; }
+
+
+/* Week Preview 스타일 */
+.preview-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding-top: 5px;
 }
 
-/* --- 중앙 갭 간격 (20px) --- */
+.preview-group-title {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    display: inline-block;
+}
+
+/* 색상 구분 */
+.work-color { color: #d63384; /* 예: 핑크/보라 계열 */ }
+.personal-color { color: #4f46e5; /* 예: 인디고/블루 계열 */ }
+
+.preview-list {
+    list-style: none;
+    padding-left: 5px;
+}
+
+.preview-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    font-size: 14px;
+    color: #444;
+}
+
+.preview-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.preview-label::before {
+    content: '•';
+    color: #ccc;
+    font-size: 1.2em;
+    line-height: 0;
+}
+
+.preview-right {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.preview-count {
+    font-weight: 600;
+    color: #222;
+}
+
+.warning-icon {
+    font-size: 12px;
+    animation: blink 2s infinite;
+    cursor: help;
+}
+.warning-icon.hidden { display: none; }
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.filter-radio-group { display: flex; flex-direction: column; gap: 8px; }
+.filter-radio { cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 6px; color: #444; }
+
+/* --- 중앙 갭 (20px) 복구 --- */
 .calendar-gap {
     width: 20px;
     height: 100%;
-    background-color: #fff;
+    background-color: #fff; /* 또는 투명 */
+    border-left: 1px solid #eee; /* 구분선 */
+    border-right: 1px solid #eee;
 }
-
 
 /* --- 오른쪽 메인 캘린더 (900px) --- */
 .calendar-right {
     width: 900px;
     height: 100%;
-
-    border: 1px solid black;
+    /* 내부 여백 */
     padding: 20px;
     display: flex;
     flex-direction: column;
@@ -150,53 +196,111 @@ body {
 .calendar-inner {
     flex: 1;
     position: relative;
-    border: 1px solid black;
-    padding: 10px;
+    border: none;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
 
-/* FullCalendar 스타일 */
 #calendar {
     width: 100%;
     height: 100%;
 }
 
-/* 툴바 (년/월 이동 버튼 등) */
-.fc-toolbar-title {
-    font-size: 24px !important;
-    font-weight: bold;
-}
+/* =========================================
+   FullCalendar Custom Styling
+   ========================================= */
+
+/* 1. 툴바 */
+.fc-header-toolbar { margin-bottom: 1em !important; }
+.fc-toolbar-title { font-size: 1.5rem !important; font-weight: 800; color: #222; }
 .fc-button {
     background-color: #333 !important;
     border-color: #333 !important;
+    font-size: 13px !important;
     border-radius: 4px !important;
-    font-size: 14px !important;
 }
-.fc-button:hover {
-    background-color: #555 !important;
-}
+.fc-button:hover { background-color: #555 !important; }
 
-.fc-scroller {
-    overflow: hidden !important;
-}
-
-/* 날짜 셀 스타일 */
+/* 2. 그리드 셀 */
 .fc-daygrid-day-frame {
-    min-height: 100% !important;
-}
-
-.fc-daygrid-more-link {
-    font-size: 12px;
-    color: #555;
-    font-weight: bold;
-    text-decoration: none;
+    height: 100% !important;
+    padding: 2px;
     cursor: pointer;
 }
+.fc-daygrid-day-top { flex-direction: row; }
+.fc-daygrid-day-number { color: #444; font-weight: 500; padding: 4px 8px !important; }
 
+/* 3. 이벤트 바 (Block 스타일 통일) */
 .fc-event {
-    cursor: pointer;
-}
-.fc-event:hover {
-    opacity: 0.85;
+    margin-top: 2px !important;
+    padding: 2px 4px !important;
+    border-radius: 3px !important;
+    border: none !important;
+    font-size: 12px !important;
+    font-weight: 500 !important;
+    cursor: grab;
+    transition: transform 0.1s, box-shadow 0.1s;
 }
 
+.fc-event:hover {
+    transform: scale(1.02);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2) !important;
+    opacity: 0.9 !important;
+    z-index: 10;
+}
+
+/* 4. +more 링크 */
+.fc-daygrid-more-link {
+    font-size: 11px !important;
+    color: #666 !important;
+    font-weight: 600;
+    margin-top: 2px;
+    padding-left: 4px;
+    text-decoration: none !important;
+}
+.fc-daygrid-more-link:hover { color: #111 !important; background-color: #eee; border-radius: 3px; }
+
+/* 모달 리스트 스타일 */
+.daily-list-simple-ul { list-style: none; padding: 0; margin: 0; }
+.daily-list-simple-ul li { padding: 12px; border-bottom: 1px solid #f5f5f5; cursor: pointer; display: flex; align-items: center; gap: 12px; transition: background-color 0.1s; }
+.daily-list-simple-ul li:hover { background-color: #f8fbff; }
+
+.fc-popover-body ul li,
+.todays-schedule-list li {
+    font-size: 15px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+}
+
+/* 카테고리 라벨 공통 스타일 */
+.category-label {
+    font-size: 0.9em;
+    font-weight: bold;
+    margin-left: 6px;
+    margin-right: 4px;
+}
+
+/* [업무] */
+.category-label.work {
+    color: #d63384;
+}
+
+/* [개인] */
+.category-label.personal {
+    color: #4f46e5;
+}
+
+/* 카테고리 뱃지 공통 스타일 */
+.category-badge {
+    display: inline-block;
+    padding: 3px 6px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    margin-right: 6px;
+    vertical-align: middle;
+    line-height: 1;
+    box-shadow: none;
+}

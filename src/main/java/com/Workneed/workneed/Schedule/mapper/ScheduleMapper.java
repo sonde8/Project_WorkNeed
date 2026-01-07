@@ -20,9 +20,10 @@ public interface ScheduleMapper {
 
     ScheduleDTO selectById(Long scheduleId);
 
-    List<ScheduleDTO> selectAll();
 
     Map<String, Object> selectScheduleLinks(Long scheduleId);
+
+    int deleteByScheduleIds(@Param("scheduleIds") List<Long> scheduleIds);
 
     int updateGitUrl(@Param("scheduleId") Long scheduleId,
                      @Param("gitUrl") String gitUrl);
@@ -31,4 +32,9 @@ public interface ScheduleMapper {
     int updateFileStorageUrl(@Param("scheduleId") Long scheduleId,
                              @Param("fileStorageUrl") String fileStorageUrl);
     int deleteFileStorageUrl(Long scheduleId);
+
+    List<ScheduleDTO> selectByStatusForMain(
+            @Param("userId") Long userId,
+            @Param("status") String status
+    );
 }

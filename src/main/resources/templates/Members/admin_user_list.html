@@ -2,162 +2,250 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>관리자 - 직원관리</title>
-    <style>
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { border: 1px solid #444; padding: 8px; text-align: left; }
-        th { background-color: #f4f4f4; }
-        .admin-controls { background: #f9f9f9; padding: 15px; border: 1px solid #ddd; margin-bottom: 20px; }
-        .flex-container { display: flex; gap: 30px; align-items: center; }
-
-        #editModal {
-            display:none;
-            position:fixed;
-            top:50%;
-            left:50%;
-            transform: translate(-50%, -50%);
-            background:white;
-            border:2px solid #000;
-            padding:20px;
-            z-index:100;
-            box-shadow: 0 0 10px rgba(0,0,0,0.5);
-            min-width: 300px;
-        }
-    </style>
+    <title>관리자 - 직원관리 (통합본)</title>
+    <link rel="stylesheet" th:href="@{/css/admin_user_list.css}">
 </head>
 <body>
 
-<h2>직원 관리 시스템</h2>
+<div class="admin-header" th:if="${admin != null}"
+     style="padding: 15px; background: #fff; border-bottom: 1px solid #ddd; margin-bottom: 20px;">
+    <span> 관리자: <b th:text="${admin.adminName}">관리자</b></span>
+    <span style="margin-left:10px;"> | 권한: <b th:text="${admin.roleName}">권한</b></span>
+    <form th:action="@{/logout}" method="post" style="display:inline; float: right;">
+        <button type="submit" class="btn-secondary" style="padding: 5px 12px; cursor: pointer;">로그아웃</button>
+    </form>
+</div>
 
-<div class="admin-controls">
-    <div class="flex-container">
+<div style="padding: 0 20px;">
+
+    <div style="display: flex; gap: 20px; border-bottom: 1px solid #ddd; margin-bottom: 20px;">
+        <a th:href="@{/admin/member/list}" style="padding: 10px 20px; text-decoration: none; color: #3182ce; border-bottom: 3px solid #3182ce; font-weight: bold;">직원 관리</a>
+        <a th:href="@{/admin/manage/list}" style="padding: 10px 20px; text-decoration: none; color: #666;">관리자 설정</a>
+        <a th:href="@{/admin/log/list}" style="padding: 10px 20px; text-decoration: none; color: #666;">활동 로그</a>
+    </div>
+
+
+    <h2> 직원 관리 시스템</h2>
+
+    <div class="admin-controls">
+        <form th:action="@{/admin/member/list}" method="get">
+            <div class="flex-container">
+                <div>
+                    <strong>🔍 검색:</strong>
+                    <input type="text" name="userLoginId" th:value="${param.userLoginId}" placeholder="아이디"
+                           style="padding:6px;">
+                    <input type="text" name="userName" th:value="${param.userName}" placeholder="이름"
+                           style="padding:6px;">
+                </div>
+                <div>
+                    <strong> 부서:</strong>
+                    <select name="deptId" style="padding:6px;">
+                        <option value="">전체</option>
+                        <option th:each="d : ${dept}" th:value="${d.deptId}" th:text="${d.deptName}"
+                                th:selected="${#strings.equals(param.deptId, d.deptId)}"></option>
+                    </select>
+                </div>
+                <div>
+                    <strong> 상태:</strong>
+                    <select name="userStatus" style="padding:6px;">
+                        <option value="">전체</option>
+                        <option value="ACTIVE" th:selected="${param.userStatus == 'ACTIVE'}">활성</option>
+                        <option value="INACTIVE" th:selected="${param.userStatus == 'INACTIVE'}">비활성</option>
+                        <option value="SUSPENDED" th:selected="${param.userStatus == 'SUSPENDED'}">정지</option>
+                        <option value="BANNED" th:selected="${param.userStatus == 'BANNED'}">차단</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-primary"
+                        style="background:#3182ce; color:white; border:none; padding:7px 20px; border-radius:4px; cursor:pointer;">
+                    조회
+                </button>
+                <a th:href="@{/admin/member/list}" style="font-size:12px; color:#666; text-decoration:none;">초기화</a>
+            </div>
+        </form>
+    </div>
+
+    <table>
+        <thead>
+        <tr>
+            <th><input type="checkbox" id="checkAll" onclick="toggleAll(this)"></th>
+            <th>아이디</th>
+            <th>이름</th>
+            <th>부서</th>
+            <th>직급</th>
+            <th>상태</th>
+            <th>수정</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="u : ${user}">
+            <td><input type="checkbox" name="userCheck" th:value="${u.userId}"></td>
+            <td th:text="${u.userLoginId}">아이디</td>
+            <td th:text="${u.userName}">이름</td>
+            <td th:text="${u.deptName}">부서</td>
+            <td th:text="${u.rankName}">직급</td>
+            <td th:text="${u.userStatus}">상태</td>
+            <td>
+                <button class="btn-secondary"
+                        th:onclick="openEditModal([[${u.userId}]], [[${u.deptId}]], [[${u.rankId}]], [[${u.userStatus}]])">
+                    정보 변경
+                </button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div style="display: flex; justify-content: space-between; margin-top: 20px; align-items: center;">
         <div>
-            <strong>🏢 부서 등록:</strong>
-            <input type="text" id="newDeptName" placeholder="새 부서명">
-            <button type="button" onclick="fnAddDept()">추가</button>
+            <strong>✅ 선택 회원 상태 변경:</strong>
+            <select id="batchStatus" style="padding:6px;">
+                <option value="ACTIVE">활성(ACTIVE)</option>
+                <option value="INACTIVE">비활성(INACTIVE)</option>
+                <option value="SUSPENDED">정지(SUSPENDED)</option>
+                <option value="BANNED">차단(BANNED)</option>
+            </select>
+            <button type="button" onclick="fnBatchUpdate()" class="btn-primary"
+                    style="padding:7px 15px; cursor:pointer;">일괄 적용
+            </button>
         </div>
-        <div>
-            <strong>🎖️ 직급 등록:</strong>
-            <input type="text" id="newRankName" placeholder="새 직급명">
-            <button type="button" onclick="fnAddRank()">추가</button>
+
+        <div style="display: flex; gap: 8px;">
+            <button onclick="openModal('deptAddModal')"
+                    style="background:#2d3748; color:white; border:none; padding:8px 15px; border-radius:4px; cursor:pointer;">
+                + 부서 관리
+            </button>
+            <button onclick="openModal('rankAddModal')"
+                    style="background:#2d3748; color:white; border:none; padding:8px 15px; border-radius:4px; cursor:pointer;">
+                + 직급 관리
+            </button>
+            <button onclick="openModal('adminAddModal')"
+                    style="background:#38a169; color:white; border:none; padding:8px 15px; border-radius:4px; cursor:pointer;">
+                + 관리자 생성
+            </button>
         </div>
     </div>
 </div>
 
-<div style="margin-bottom: 10px;">
-    <strong>상태 변경:</strong>
-    <select id="batchStatus">
-        <option value="ACTIVE">활성(ACTIVE)</option>
-        <option value="INACTIVE">비활성(INACTIVE)</option>
-        <option value="SUSPENDED">정지(SUSPENDED)</option>
-        <option value="BANNED">차단(BANNED)</option>
-    </select>
-    <button type="button" onclick="fnBatchUpdate()">일괄 적용</button>
-</div>
-
-<table>
-    <thead>
-    <tr>
-        <th><input type="checkbox" id="checkAll" onclick="toggleAll(this)"></th>
-        <th>아이디</th>
-        <th>이름</th>
-        <th>부서</th>
-        <th>직급</th>
-        <th>상태</th>
-        <th>수정</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="u : ${user}">
-        <td><input type="checkbox" name="userCheck" th:value="${u.userId}"></td>
-        <td th:text="${u.userLoginId}">아이디</td>
-        <td th:text="${u.userName}">이름</td>
-        <td th:text="${u.deptName}">부서</td>
-        <td th:text="${u.rankName}">직급</td>
-        <td th:text="${u.userStatus}">상태</td>
-        <td>
-            <button th:onclick="openModal([[${u.userId}]], [[${u.deptId}]], [[${u.rankId}]], [[${u.userStatus}]])">정보
-                변경
-            </button>
-        </td>
-    </tr>
-    </tbody>
-</table>
-
-<div id="editModal">
-    <h3>정보 수정</h3>
-    <input type="hidden" id="targetUserId">
-
-    <p><label>부서:</label>
-        <select id="modalDept">
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        <h3> 정보 수정</h3>
+        <input type="hidden" id="targetUserId">
+        <p><label>부서:</label> <select id="modalDept" style="width:100%; padding:8px;">
             <option th:each="d : ${dept}" th:value="${d.deptId}" th:text="${d.deptName}"></option>
         </select></p>
-
-    <p><label>직급:</label>
-        <select id="modalRank">
+        <p><label>직급:</label> <select id="modalRank" style="width:100%; padding:8px;">
             <option th:each="r : ${rank}" th:value="${r.rankId}" th:text="${r.rankName}"></option>
         </select></p>
-
-    <p><label>상태:</label>
-        <select id="modalStatus">
+        <p><label>상태:</label> <select id="modalStatus" style="width:100%; padding:8px;">
             <option value="ACTIVE">ACTIVE (정상)</option>
             <option value="INACTIVE">INACTIVE (비활성)</option>
             <option value="SUSPENDED">SUSPENDED (정지)</option>
             <option value="BANNED">BANNED (차단)</option>
         </select></p>
+        <div style="text-align: right; margin-top:20px;">
+            <button onclick="saveChanges()" class="btn-primary" style="padding:8px 15px; cursor:pointer;">저장</button>
+            <button onclick="closeModal('editModal')" class="btn-secondary" style="padding:8px 15px; cursor:pointer;">
+                취소
+            </button>
+        </div>
+    </div>
+</div>
 
-    <br>
-    <button onclick="saveChanges()">저장</button>
-    <button onclick="closeModal()">취소</button>
+<div id="deptAddModal" class="modal">
+    <div class="modal-content">
+        <h3> 부서 관리</h3>
+        <div style="margin-bottom:15px; padding-bottom:10px; border-bottom:1px solid #eee;">
+            <input type="text" id="newDeptName" placeholder="새 부서명" style="width:70%; padding:8px;">
+            <button onclick="fnAddDept()" class="btn-primary" style="padding:8px 12px; cursor:pointer;">추가</button>
+        </div>
+        <div style="max-height: 200px; overflow-y: auto;">
+            <p th:each="d : ${dept}"
+               style="display:flex; justify-content:space-between; align-items:center; margin:5px 0;">
+                <span th:text="${d.deptName}">부서명</span>
+                <button th:if="${d.deptId != 6}" class="btn-delete-small" th:onclick="fnDeleteDept([[${d.deptId}]])">
+                    삭제
+                </button>
+            </p>
+        </div>
+        <div style="text-align: right; margin-top:15px;">
+            <button onclick="closeModal('deptAddModal')" class="btn-secondary">닫기</button>
+        </div>
+    </div>
+</div>
+
+<div id="rankAddModal" class="modal">
+    <div class="modal-content">
+        <h3> 직급 관리</h3>
+        <div style="margin-bottom:15px; padding-bottom:10px; border-bottom:1px solid #eee;">
+            <input type="text" id="newRankName" placeholder="새 직급명" style="width:70%; padding:8px;">
+            <button onclick="fnAddRank()" class="btn-primary" style="padding:8px 12px; cursor:pointer;">추가</button>
+        </div>
+        <div style="max-height: 200px; overflow-y: auto;">
+            <p th:each="r : ${rank}"
+               style="display:flex; justify-content:space-between; align-items:center; margin:5px 0;">
+                <span th:text="${r.rankName}">직급명</span>
+                <button th:if="${r.rankId != 6}" class="btn-delete-small" th:onclick="fnDeleteRank([[${r.rankId}]])">
+                    삭제
+                </button>
+            </p>
+        </div>
+        <div style="text-align: right; margin-top:15px;">
+            <button onclick="closeModal('rankAddModal')" class="btn-secondary">닫기</button>
+        </div>
+    </div>
+</div>
+
+<div id="adminAddModal" class="modal">
+    <div class="modal-content">
+        <h3 style="margin-top:0;">👤 신규 관리자 생성</h3>
+        <div style="text-align:left;">
+            <label>이름</label>
+            <input type="text" id="newAdminName"
+                   style="width:100%; padding:8px; margin-bottom:10px; box-sizing:border-box;">
+            <label>이메일(아이디)</label>
+            <input type="email" id="newAdminEmail"
+                   style="width:100%; padding:8px; margin-bottom:10px; box-sizing:border-box;">
+            <label>비밀번호</label>
+            <div style="position:relative; margin-bottom:5px;">
+                <input type="password" id="newAdminPassword" placeholder="8자리 이상, 특수문자 포함"
+                       style="width:100%; padding:8px; padding-right:40px; box-sizing:border-box;">
+                <span id="togglePw" onclick="togglePasswordVisibility()"
+                      style="position:absolute; right:10px; top:50%; transform:translateY(-50%); cursor:pointer; font-size:18px;">👁️</span>
+            </div>
+            <p id="pwGuide" style="font-size:11px; color:#666; margin-bottom:15px;">* 8자 이상, 영문/숫자/특수문자(@제외) 포함</p>
+            <label>관리자 권한 설정</label>
+            <select id="newAdminRoleId" style="width:100%; padding:8px; margin-bottom:15px;">
+                <option value="">권한 선택</option>
+                <option value="2">인사 관리자 (HR_MANAGER)</option>
+                <option value="3">인사 담당자 (HR_STAFF)</option>
+            </select>
+        </div>
+        <div style="text-align: right;">
+            <button class="btn-primary" onclick="saveNewAdmin()"
+                    style="background-color: #38a169; color:white; border:none; padding:8px 15px; border-radius:4px; cursor:pointer;">
+                계정 생성
+            </button>
+            <button class="btn-secondary" onclick="closeModal('adminAddModal')"
+                    style="padding:8px 15px; cursor:pointer; margin-left:5px;">취소
+            </button>
+        </div>
+    </div>
 </div>
 
 <script th:inline="javascript">
-    // 전체 선택 체크박스
-    function toggleAll(source) {
-        const checkboxes = document.querySelectorAll('input[name="userCheck"]');
-        checkboxes.forEach(cb => cb.checked = source.checked);
-    }
+    /* 1. 공통 모달 및 체크박스 제어 */
+    function openModal(id) { document.getElementById(id).style.display = 'block'; }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+    function toggleAll(source) { document.querySelectorAll('input[name="userCheck"]').forEach(cb => cb.checked = source.checked); }
 
-    // 모달 제어
-    function openModal(id, deptId, rankId, status) {
+    /* 2. 유저 정보 수정 */
+    function openEditModal(id, deptId, rankId, status) {
         document.getElementById('targetUserId').value = id;
         document.getElementById('modalDept').value = deptId;
         document.getElementById('modalRank').value = rankId;
         document.getElementById('modalStatus').value = status;
-        document.getElementById('editModal').style.display = 'block';
+        openModal('editModal');
     }
 
-    function closeModal() {
-        document.getElementById('editModal').style.display = 'none';
-    }
-
-    // [기능 1] 부서 추가
-    function fnAddDept() {
-        const name = document.getElementById('newDeptName').value;
-        if(!name) return alert("부서명을 입력하세요.");
-        fetch('/admin/dept/add', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: new URLSearchParams({ deptName: name })
-        }).then(res => res.text()).then(result => {
-            if(result === "success") { alert("부서 추가 완료"); location.reload(); }
-        });
-    }
-
-    // [기능 2] 직급 추가
-    function fnAddRank() {
-        const name = document.getElementById('newRankName').value;
-        if(!name) return alert("직급명을 입력하세요.");
-        fetch('/admin/rank/add', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: new URLSearchParams({ rankName: name })
-        }).then(res => res.text()).then(result => {
-            if(result === "success") { alert("직급 추가 완료"); location.reload(); }
-        });
-    }
-
-    // [기능 3] 개별 정보 저장
     function saveChanges() {
         const data = {
             userId: document.getElementById('targetUserId').value,
@@ -171,17 +259,14 @@
             body: JSON.stringify(data)
         }).then(res => res.text()).then(result => {
             if (result === "success") { alert('저장되었습니다.'); location.reload(); }
+            else alert('오류가 발생했습니다.');
         });
     }
 
-    // [기능 4] 일괄 상태 변경
+    /* 3. 일괄 상태 변경 */
     function fnBatchUpdate() {
-        const selectedIds = [];
-        document.querySelectorAll('input[name="userCheck"]:checked').forEach(cb => {
-            selectedIds.push(cb.value);
-        });
+        const selectedIds = Array.from(document.querySelectorAll('input[name="userCheck"]:checked')).map(cb => cb.value);
         if (selectedIds.length === 0) return alert("유저를 선택해주세요.");
-
         const status = document.getElementById('batchStatus').value;
         const params = new URLSearchParams();
         selectedIds.forEach(id => params.append('userIds', id));
@@ -195,7 +280,104 @@
             if (result === "success") { alert('일괄 변경 완료'); location.reload(); }
         });
     }
-</script>
 
+    /* 4. 부서 추가 및 삭제 */
+    function fnAddDept() {
+        const name = document.getElementById('newDeptName').value;
+        if(!name) return alert("부서명을 입력하세요.");
+        fetch('/admin/dept/add', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ deptName: name })
+        }).then(res => res.text()).then(result => { if(result === "success") location.reload(); });
+    }
+
+    function fnDeleteDept(id) {
+        if(!confirm("해당 부서를 삭제하시겠습니까? 소속 인원은 '미배정'으로 이동됩니다.")) return;
+        fetch('/admin/dept/delete', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ deptId: id })
+        }).then(res => res.text()).then(result => {
+            if(result === "success") location.reload();
+            else if(result === "is_default") alert("기본 부서는 삭제할 수 없습니다.");
+            else alert("삭제 실패");
+        });
+    }
+
+    /* 5. 직급 추가 및 삭제 */
+    function fnAddRank() {
+        const name = document.getElementById('newRankName').value;
+        if(!name) return alert("직급명을 입력하세요.");
+        fetch('/admin/rank/add', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ rankName: name })
+        }).then(res => res.text()).then(result => { if(result === "success") location.reload(); });
+    }
+
+    function fnDeleteRank(id) {
+        if(!confirm("해당 직급을 삭제하시겠습니까? 해당 인원은 '신입'으로 이동됩니다.")) return;
+        fetch('/admin/rank/delete', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ rankId: id })
+        }).then(res => res.text()).then(result => {
+            if(result === "success") location.reload();
+            else if(result === "is_default") alert("기본 직급은 삭제할 수 없습니다.");
+            else alert("삭제 실패");
+        });
+    }
+
+    /* 6. 관리자 생성 관련 */
+    function togglePasswordVisibility() {
+        const pwInput = document.getElementById('newAdminPassword');
+        const toggleIcon = document.getElementById('togglePw');
+        if (pwInput.type === 'password') { pwInput.type = 'text'; toggleIcon.innerText = '🔒'; }
+        else { pwInput.type = 'password'; toggleIcon.innerText = '👁️'; }
+    }
+
+    function saveNewAdmin() {
+        const pwd = document.getElementById('newAdminPassword').value;
+        const name = document.getElementById('newAdminName').value;
+        const email = document.getElementById('newAdminEmail').value;
+        const roleId = document.getElementById('newAdminRoleId').value;
+        const pwReg = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!#$%^&*()_+|~={}\[\]:";'<>?,.\/]).{8,}$/;
+
+        if(!name || !email || !roleId) return alert("모든 정보를 입력해주세요.");
+        if (!pwReg.test(pwd)) return alert("비밀번호 규정을 확인하세요.");
+
+        fetch('/admin/member/add-admin', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ adminName: name, adminEmail: email, adminPassword: pwd, roleId: roleId })
+        }).then(res => res.text()).then(result => {
+            if(result === "success") { alert("관리자 생성 완료"); location.reload(); }
+            else alert("생성 실패");
+        });
+
+        function changeAdminStatus(targetId, currentStatus) {
+    const nextStatus = (currentStatus === 'ACTIVE') ? 'SUSPENDED' : 'ACTIVE';
+    const msg = nextStatus === 'SUSPENDED' ? "해당 관리자를 정지시키겠습니까?" : "정지를 해제하시겠습니까?";
+
+    if(!confirm(msg)) return;
+
+    fetch('/admin/member/admin-status', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ targetId: targetId, status: nextStatus })
+    }).then(res => res.text()).then(result => {
+        if(result === "success") {
+            alert("상태가 변경되었습니다.");
+            location.reload();
+        }
+    });
+}
+
+
+
+
+    }
+</script>
 </body>
 </html>
