@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+
+<head>
+    <title th:text="${pageTitle}"> 메인 </title>
+
+    <!-- 페이지 전용 CSS -->
+    <th:block layout:fragment="head">
+        <link rel="stylesheet" th:href="@{/css/Main.css}">
+        <link rel="stylesheet" th:href="@{/css/attendanceLeft.css}">
+    </th:block>
+</head>
+
+<body>
+
+    <th:block layout:fragment="script">
+        <script th:src="@{/js/Main.js}"></script>
+        <script th:src="@{/js/attendanceLeft.js}"></script>
+    </th:block>
+
+<div layout:fragment="content" class = "pageMain">
+
+    <div class="mainPage">
+
+        <!-- 왼쪽 -->
+        <section class = "leftPage">
+
+            <!-- 오늘 날짜 -->
+            <div class = "toDay" id="todayStart"
+                 th:text="${today != null ? today : '날짜'}"> 날짜 </div>
+
+            <!-- 프로필 -->
+            <div class = "profile">
+
+                <div class = "profileImg"> 이미지 </div>
+
+                <div class="profileText">
+                    <div class="name">이름</div>
+
+                    <div class="profileMeta">
+                        <span class="dept">부서이름</span>
+                        <span class="bar">|</span>
+                        <span class="rank">직급</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- 근태관리 -->
+            <a class="attendancePage" th:href="@{/attendance}"> 근 태 관 리 👉 </a>
+
+            <!-- 출 퇴근 -->
+            <div class = "attendWidget">
+                <section th:replace="~{Attendance/attendanceLeft :: attendanceLeft}"></section>
+            </div>
+
+            <!-- 결제 -->
+            <div class = "pay"> 결제 </div>
+
+        </section>
+
+        <!-- 오른쪽-->
+        <section class = "rightPage">
+
+        </section>
+    </div>
+
+
+</div>
+
+
+</body>
+</html>
+
+
+
