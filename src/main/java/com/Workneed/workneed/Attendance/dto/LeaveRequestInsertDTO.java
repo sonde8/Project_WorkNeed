@@ -1,7 +1,11 @@
 package com.Workneed.workneed.Attendance.dto;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 @Data
 public class LeaveRequestInsertDTO {
 

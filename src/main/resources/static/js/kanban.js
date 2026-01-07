@@ -141,6 +141,7 @@ document.addEventListener("DOMContentLoaded", () => {
             minuteIncrement: STEP_MIN,
 
             dateFormat: "Y-m-d\\TH:i",
+
             altInput: true,
             altFormat: "Y-m-d H:i",
 
