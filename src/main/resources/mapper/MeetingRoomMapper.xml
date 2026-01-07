@@ -96,5 +96,13 @@
         </foreach>
     </delete>
 
+    <select id="countScheduleConflict" resultType="int">
+        SELECT COUNT(*)
+        FROM meeting_reservation
+        WHERE schedule_id = #{scheduleId}
+          AND start_at &lt; #{endAt}
+          AND end_at   &gt; #{startAt}
+    </select>
+
 
 </mapper>
