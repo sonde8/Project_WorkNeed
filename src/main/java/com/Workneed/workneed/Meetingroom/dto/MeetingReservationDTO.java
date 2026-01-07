@@ -11,6 +11,8 @@ public class MeetingReservationDTO {
     private Long scheduleId;
     private Long reserverId;
 
+    private String roomName;
+
     private LocalDateTime startAt;
     private LocalDateTime endAt;
 }
