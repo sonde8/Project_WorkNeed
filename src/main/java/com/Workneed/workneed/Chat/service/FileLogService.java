@@ -38,4 +38,9 @@ public class FileLogService {
         fileLogMapper.insertFileLog(fileLog);
         return fileLog;
     }
+
+    // 다운로드를 위한 단건 조회 로직 추가
+    public FileLogDTO getFileById(Long fileLogId) {
+        return fileLogMapper.selectFileLogById(fileLogId);
+    }
 }
