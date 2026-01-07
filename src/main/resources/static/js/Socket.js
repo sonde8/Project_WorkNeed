@@ -327,6 +327,10 @@ function sendMessage(event) {
  */
 function onMessageReceived(payload) {
     var message = JSON.parse(payload.body);
+
+    console.log("수신된 메시지 전체 데이터:", message);
+    console.log("추출된 fileLogId:", message.fileLogId);
+
     // 현재 보고 있는 방의 메시지가 아니라면 무시 (전역 채널에서 이미 토스트로 처리함)
     if (String(message.roomId) !== String(window.roomId)) return;
 
