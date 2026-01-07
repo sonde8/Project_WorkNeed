@@ -19,27 +19,23 @@ public class FileLogService {
         // 원본 파일명 가져오기
         String originalFilename = file.getOriginalFilename();
 
-        // 1. 물리적 저장 실행 (LocalStorageService.store 호출)
-        // 저장된 후 UUID가 포함된 storedName을 반환 받음
-        String storedName = storageService.store(file);
+        // 1. S3 저장 실행 (이제 전체 URL이 반환됨)
+        String fileUrl = storageService.store(file);
 
-        // 2. 파일 타입 변환 (단순 확장자 체크)
         String contentType = file.getContentType();
         String fileType = (contentType != null && contentType.startsWith("image")) ? "IMAGE" : "FILE";
 
-        // 3. DB에 저장할 DTO
+        // 3. DB 저장 데이터 구성
         FileLogDTO fileLog = FileLogDTO.builder()
                 .roomId(roomId)
-                .fileName(originalFilename)             // 원본이름
-                .storedName(storedName)                 // 저장된 이름
-                .filePath("/uploads/" + storedName)     // 웹 접근 경로
-                .fileSize(file.getSize())               // 파일 용량
+                .fileName(originalFilename)
+                .storedName(fileUrl.substring(fileUrl.lastIndexOf("/") + 1)) // URL에서 파일명만 추출
+                .filePath(fileUrl) // ★ 중요: "/uploads/"를 붙이지 않고 S3 URL을 그대로 저장
+                .fileSize(file.getSize())
                 .fileType(fileType)
                 .build();
 
-        // 4. FileLog 테이블에 INSERT
         fileLogMapper.insertFileLog(fileLog);
-
         return fileLog;
     }
 }
