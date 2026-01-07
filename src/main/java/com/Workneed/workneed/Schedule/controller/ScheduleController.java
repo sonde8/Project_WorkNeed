@@ -291,9 +291,9 @@ public class ScheduleController {
         ScheduleDTO schedule = scheduleMapper.selectById(scheduleId);
         if (schedule == null) return "redirect:/schedule/kanban";
 
-        //미팅룸 조회
-//        String roomName = meetingRoomMapper.selectRoomNameByScheduleId(scheduleId);
-//        model.addAttribute("roomName", roomName);
+
+        String roomName = meetingRoomMapper.selectRoomNameByScheduleId(scheduleId);
+        model.addAttribute("roomName", roomName);
 
 
         //댓글 조회

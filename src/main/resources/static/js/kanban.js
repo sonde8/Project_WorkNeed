@@ -23,6 +23,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const typeGroup = document.getElementById("typeGroup");
     const typeInput = document.getElementById("type");
 
+    const startInput = document.getElementById("startAt");
+    const endInput   = document.getElementById("endAt");
+
     /* ======================================================
      * Helpers
      * ====================================================== */
@@ -47,6 +50,7 @@ document.addEventListener("DOMContentLoaded", () => {
         taskModal.hidden = false;
         lockScroll(true);
         syncActiveFromHidden();
+        initTaskPickersOnce();
     }
 
     function closeTaskModal() {
@@ -90,6 +94,69 @@ document.addEventListener("DOMContentLoaded", () => {
             if (btn) setActive(typeGroup, ".scope-btn", btn);
         }
     }
+
+/* ======================================================
+* Flatpickr
+* ====================================================== */
+    let startPicker, endPicker;
+
+    function initTaskPickersOnce() {
+        if (startPicker || endPicker) return;
+        if (typeof flatpickr !== "function") return;
+        if (!startInput || !endInput) return;
+
+        const STEP_MIN = 30;
+
+        startPicker = flatpickr(startInput, {
+            disableMobile: true,
+            enableTime: true,
+            time_24hr: true,
+            minuteIncrement: STEP_MIN,
+            // 서버로 보내는 값
+            dateFormat: "Y-m-d\\TH:i",
+
+            // 화면에 보이는 값
+            altInput: true,
+            altFormat: "Y-m-d H:i",
+
+            allowInput: false,
+
+            onChange(selectedDates) {
+                if (!selectedDates.length) return;
+
+                const start = selectedDates[0];
+
+                endPicker.set("minDate", start);
+
+                const end = endPicker.selectedDates?.[0];
+                if (end && end < start) {endPicker.setDate(start, true);}
+            }
+        });
+
+
+        endPicker = flatpickr(endInput, {
+            disableMobile: true,
+            enableTime: true,
+            time_24hr: true,
+            minuteIncrement: STEP_MIN,
+
+            dateFormat: "Y-m-d\\TH:i",
+            altInput: true,
+            altFormat: "Y-m-d H:i",
+
+            allowInput: false,
+
+            onChange(selectedDates) {
+                if (!selectedDates.length) return;
+
+                const end = selectedDates[0];
+                const start = startPicker.selectedDates?.[0];
+
+                if (start && end < start) {endPicker.setDate(start, true); }
+            }
+        });
+    }
+
 
     /* ======================================================
      * Add Task
