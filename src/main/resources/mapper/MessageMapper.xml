@@ -9,7 +9,7 @@
         <result property="content" column="content"/>
         <result property="messageType" column="message_type"/>
         <result property="createdAt" column="created_at"/>
-
+        <result property="fileLogId" column="file_log_id"/>
         <result property="senderName" column="sender_name"/>
     </resultMap>
 
@@ -27,7 +27,7 @@
             m.message_type,
             m.created_at,
             cu.user_name AS sender_name,
-            (
+            fl.file_log_id,  (
                 SELECT COUNT(*)
                 FROM roomparticipant rp
                 WHERE rp.room_id = m.room_id
@@ -42,6 +42,7 @@
             ) AS unread_count
         FROM message m
             JOIN user cu ON m.sender_id = cu.user_id
+            LEFT JOIN filelog fl ON m.message_id = fl.message_id
         WHERE m.room_id = #{roomId}
         ORDER BY m.message_id ASC
     </select>
