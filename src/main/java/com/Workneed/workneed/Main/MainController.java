@@ -1,5 +1,6 @@
 package com.Workneed.workneed.Main;
 
+import com.Workneed.workneed.Approval.service.ApprovalService;
 import com.Workneed.workneed.Members.dto.UserDTO;
 import com.Workneed.workneed.Schedule.mapper.ScheduleMapper;
 import jakarta.servlet.http.HttpSession;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @RequiredArgsConstructor
 public class MainController {
 
+    private final ApprovalService approvalService;
     private final ScheduleMapper scheduleMapper;
 
     // application.properties의 값을 주입받음
@@ -39,6 +41,9 @@ public class MainController {
 // mini kanban
 
         Long userId = user.getUserId();
+
+
+        model.addAttribute("counts", approvalService.getCounts(userId)); //
 
         model.addAttribute("mainTodo",  scheduleMapper.selectByStatusForMain(userId, "TODO"));
         model.addAttribute("mainDoing", scheduleMapper.selectByStatusForMain(userId, "DOING"));

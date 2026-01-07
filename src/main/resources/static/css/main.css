@@ -168,3 +168,63 @@ body {
 .pageMain .clock,
 .pageMain .click,
 .pageMain .rowMonth { display: none; }
+
+/* ==========================================================
+   MAIN KPI - 결재 미니 위젯 (대시보드 스타일)
+   - 과한 카드/그림자 없음
+   - 숫자 중심 / 라벨 보조
+   - scope: .main-kpi-approval 내부만 적용
+   ========================================================== */
+
+.main-kpi-approval {
+    display: flex;
+    justify-content: space-around;
+}
+/* 버튼(타일) */
+.main-kpi-approval .kpi{
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 16%;
+    gap: 6px;
+    height: 58px;
+    text-decoration: none;
+    color: #222;
+    border: 1px solid #d9d9d9;
+    border-radius: 10px;
+    background: #f3f3f3;
+}
+
+/* 숫자 */
+.main-kpi-approval .kpi-num{
+    font-size: 18px;
+    font-weight: 900;
+    line-height: 1;
+}
+
+/* 라벨 */
+.main-kpi-approval .kpi-label{
+    font-size: 12px;
+    font-weight: 800;
+    color: #666;
+    line-height: 1;
+}
+
+/* hover: 과하지 않게 */
+.main-kpi-approval .kpi:hover{
+    background: #ededed;
+    border-color: #cfcfcf;
+}
+
+/* 반려만 살짝 구분 (색 과하지 않게) */
+.main-kpi-approval .kpi--danger .kpi-num{
+    color: #b00020;
+}
+
+/* 6개라서 마지막 2개는 다음 줄로 자연스럽게 */
+@media (max-width: 520px){
+    .main-kpi-approval{
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
