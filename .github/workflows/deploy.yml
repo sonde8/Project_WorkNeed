@@ -47,9 +47,4 @@ jobs:
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/workneed-app
             sudo docker stop workneed-container || true
             sudo docker rm workneed-container || true
-            # -e TZ=Asia/Seoul 설정을 추가하여 서버 시간을 한국으로 맞춥니다.
-            sudo docker run -d \
-              --name workneed-container \
-              -e TZ=Asia/Seoul \
-              -p 8080:8080 \
-              ${{ secrets.DOCKER_USERNAME }}/workneed-appapp
+            sudo docker run -d --name workneed-container -e TZ=Asia/Seoul -p 8080:8080 ${{ secrets.DOCKER_USERNAME }}/workneed-appapp
