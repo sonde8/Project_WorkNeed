@@ -33,4 +33,22 @@ public class AttendanceController {
 
         return "Attendance/attendanceLeave";
     }
+
+    // 근태관리 -> 부서근태현황
+    @GetMapping("/attendance/teamAttend")
+    public String attendanceTeamAttend(Model model){
+
+        model.addAttribute("pageTitle", "부서근태관리");
+
+        return "Attendance/attendanceTeamAttend";
+    }
+
+    // 근태관리 -> 부서연차현황
+    @GetMapping("/attendance/teamLeave")
+    public String attendanceTeamLeave(Model model){
+
+        model.addAttribute("pageTitle", "부서연차관리");
+
+        return "Attendance/attendanceTeamLeave";
+    }
 }
