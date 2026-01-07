@@ -41,13 +41,14 @@
             <div class = "profile-card">
 
                 <div class="profileImg">
-                    <img th:if="${user.userProfileImage != null}"
-                         th:src="${user.userProfileImage}"
+                    <img th:if="${session.user.userProfileImage != null}"
+                         th:src="${session.user.userProfileImage}"
                          alt="프로필 이미지">
 
-                    <img th:unless="${user.userProfileImage != null}"
+                    <img th:unless="${session.user.userProfileImage != null}"
                          th:src="@{/images/default-profile.svg}"
-                         alt="기본 이미지">
+                         alt="기본프로필"
+                         class="profile">
                 </div>
 
                 <div class="profileText">

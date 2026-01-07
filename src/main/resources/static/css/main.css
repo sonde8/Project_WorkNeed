@@ -20,6 +20,83 @@
     font-weight: 800;
 }
 
+.profile-img-wrapper {
+    position: relative !important;
+}
+
+/* 모달 본체 위치 직접 조정 */
+.profile-modal-content {
+    display: none;
+   position: fixed !important;
+
+    top: 48px !important;
+    right: 500px !important;
+
+    width: 260px !important;
+    background-color: #ffffff !important;
+    border: 1px solid #000000 !important;
+    border-radius: 12px !important;
+    padding: 20px !important;
+    text-align: center;
+
+    /* 레이어 최상단 고정 */
+    z-index: 99999 !important;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15) !important;
+}
+
+/* 모달 클래스 붙었을 때만 표시 */
+.profile-modal-content.active {
+    display: block !important;
+}
+
+.modal-profile-circle {
+    width: 90px !important;
+    height: 90px !important;
+    border-radius: 50% !important;
+    background: #f2f4ff !important;
+    border: 1px solid #f2f4ff !important;
+    margin: 0 auto 15px auto; /* 중앙 정렬 및 아래 여백 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden; /* 이미지가 원형 밖으로 나가지 않게 함 */
+}
+
+/* 모달 프로필 이미지 태그 */
+.modal-profile-circle img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* 비율 유지하며 꽉 채움 */
+    display: block;
+}
+/* 모달버튼 이름 */
+.modal-user-name {
+    font-weight: 700 !important; /* Bold 처리 */
+    font-size: 14px !important;   /* 버튼(18px) 대비 4px 작게 설정 */
+    color: #333;
+    margin-bottom: 20px;
+    display: block;
+}
+
+/* 모달버튼 디자인 */
+.modal-btn {
+    display: block;
+    margin-bottom: 8px;
+    padding: 10px;
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+/* 모달버튼 비밀번호  디자인 */
+.pw-btn {
+    background-color: #f2f4ff;
+    color: #4e73df;
+    font-weight: bold;
+}
+
+
+
 .profile-card {
     border: 1px solid black;
     border-radius: 16px;

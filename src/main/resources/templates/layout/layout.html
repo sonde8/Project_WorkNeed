@@ -13,7 +13,8 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 
 <div class="main-layout">
 
-    <aside class="sidebar" th:replace="layout/sidebar :: sidebar"></aside>
+    <!--자꾸오류나서 버전바꿈 원버전 <aside class="sidebar" th:replace="layout/sidebar :: sidebar"></aside> -->
+    <aside class="sidebar" th:replace="~{layout/sidebar :: sidebar}"></aside>
 
     <header class="header">
         <div th:replace="~{layout/header :: header}"></div>
@@ -36,6 +37,8 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 </script>
 
 <script th:src="@{/js/Socket.js}"></script>
+
+<script th:src="@{/js/profileModal.js}"></script>
 
 <th:block layout:fragment="script"></th:block>
 

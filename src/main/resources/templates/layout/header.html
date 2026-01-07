@@ -12,16 +12,30 @@
         <div class="profile-info" th:if="${session.user != null}">
             <span class="profile-name" th:text="${session.user.userName}">사용자명</span>
 
-            <!--기준이 user.user이고  uploadsx구조-->
-            <div class="profile-img-wrapper">
-                <img th:if="${user.userProfileImage != null}"
-                     th:src="${user.userProfileImage}"
-                     alt="프로필 이미지">
-
+            <!--기준이 user.user이고  uploadsx구조 , 헤더에 모달추가-->
+            <div class="profile-img-wrapper" id="profileTrigger" style="cursor:pointer; position: relative;">
+                <img th:if="${session.user.userProfileImage != null}"
+                     th:src="${session.user.userProfileImage}" alt="프로필">
                 <img th:unless="${session.user.userProfileImage != null}"
-                     th:src="@{/images/default-profile.svg}"
-                     alt="기본프로필" class="profile">
+                     th:src="@{/images/default-profile.svg}" alt="기본프로필" class="profile">
+
+                <div id="profileModal" class="profile-modal-content">
+                    <div class="modal-profile-circle">
+                        <img th:src="${session.user.userProfileImage != null
+                        ? session.user.userProfileImage
+                        : '/images/default-profile.svg'}" alt="모달 프로필">
+                    </div>
+
+                    <div class="modal-user-name" th:text="${session.user.userName}">사용자명</div>
+
+                    <div class="modal-action-buttons">
+                        <a href="/profile/edit" class="modal-btn edit-btn">프로필 사진 변경</a>
+                        <a href="/password/change" class="modal-btn pw-btn">비밀번호 변경</a>
+                    </div>
+                </div>
             </div>
+
+
 
             <form th:action="@{/logout}" method="post" style="margin-left: 10px;">
                 <button type="submit" class="logout-btn">로그아웃</button>
