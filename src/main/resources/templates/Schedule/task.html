@@ -31,10 +31,20 @@
                  th:text="${schedule.location}">
             </div>
 
-            <div class="meeting-room"
-                 th:if="${!#strings.isEmpty(roomName)}"
-                 th:text="${roomName}">
+            <div class="meeting-room" th:if="${!#lists.isEmpty(reservations)}">
+                회의실 [[${#lists.size(reservations)}]]건
+
+                <div class="meeting-tooltip">
+                    <div th:each="r : ${reservations}" class="meeting-row">
+                        <strong th:text="${r.roomName}"></strong><br/>
+                        <span th:text="${#temporals.format(r.startAt,'MM-dd HH:mm')}"></span>
+                         ~
+                        <span th:text="${#temporals.format(r.endAt,'HH:mm')}"></span>
+                    </div>
+                </div>
             </div>
+
+
             <div class="description" th:text="${schedule.description}">Description</div>
         </div>
 

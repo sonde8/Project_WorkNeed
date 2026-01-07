@@ -74,6 +74,32 @@ main{
     border-radius: 99.9rem;
     background: rgba(0,0,0,.08);
 }
+.meeting-room {
+    position: relative; /* tooltip의 기준점 */
+    display: inline-block;
+    cursor: default;
+}
+.meeting-tooltip {
+    display: none;
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+
+    min-width: 20rem;
+    padding: 1.5rem;
+    border: 1px solid #ddd;
+    background: #fff;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+    border-radius: 0.8rem;
+
+    z-index: 9999; /* 다른 요소 위로 */
+}
+.meeting-room:hover .meeting-tooltip {
+    display: block;
+}
+.meeting-row{
+    padding: 0.4rem;
+}
 
 #detail .description{
     grid-column: 1 / -1;
