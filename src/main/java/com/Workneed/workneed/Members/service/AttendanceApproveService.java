@@ -1,11 +1,11 @@
 package com.Workneed.workneed.Members.service;
 
 import com.Workneed.workneed.Members.dto.AdminUserDTO;
-import com.Workneed.workneed.Members.dto.AttendanceDTO;
+import com.Workneed.workneed.Members.dto.MemberAttendanceDTO;
 import com.Workneed.workneed.Members.dto.AttendancePayload;
 import com.Workneed.workneed.Members.dto.RequestDTO;
 import com.Workneed.workneed.Members.mapper.AdminUserMapper;
-import com.Workneed.workneed.Members.mapper.AttendanceMapper;
+import com.Workneed.workneed.Members.mapper.MemberAttendanceMapper;
 import com.Workneed.workneed.Members.mapper.RequestMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +20,7 @@ import java.util.Map;
 public class AttendanceApproveService {
 
     private final RequestMapper requestMapper;
-    private final AttendanceMapper attendanceMapper;
+    private final MemberAttendanceMapper memberAttendanceMapper;
     private final AdminUserMapper adminUserMapper;
     private final ObjectMapper objectMapper;
 
@@ -36,8 +36,8 @@ public class AttendanceApproveService {
                     objectMapper.readValue(
                             req.getRequestPayload(), AttendancePayload.class);
 
-            AttendanceDTO attendance =
-                    attendanceMapper.findByUserAndDate(
+            MemberAttendanceDTO attendance =
+                    memberAttendanceMapper.findByUserAndDate(
                             req.getUserId(), payload.getWorkDate());
 
             int minutes = (int)
@@ -46,13 +46,13 @@ public class AttendanceApproveService {
                     ).toMinutes();
 
             if (attendance == null) {
-                attendanceMapper.insertOvertime(
+                memberAttendanceMapper.insertOvertime(
                         req.getUserId(),
                         payload.getWorkDate(),
                         minutes
                 );
             } else {
-                attendanceMapper.updateOvertime(
+                memberAttendanceMapper.updateOvertime(
                         attendance.getAttendanceId(),
                         minutes
                 );

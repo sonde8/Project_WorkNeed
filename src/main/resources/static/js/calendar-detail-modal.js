@@ -196,4 +196,18 @@
 
     closeBtn.addEventListener("click", closeModal);
 
+    // ESC 키로 상세 모달 닫기
+    document.addEventListener("keydown", (e) => {
+        // 모달이 hidden이 아닐 때(열려 있을 때)만 작동
+        if (e.key === "Escape" && !overlay.classList.contains("hidden")) {
+            closeModal();
+        }
+    });
+
+    // 배경 클릭 시 상세 모달 닫기
+    overlay.addEventListener("click", (e) => {
+        if (e.target === overlay) {
+            closeModal();
+        }
+    });
 })();

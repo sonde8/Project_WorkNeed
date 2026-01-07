@@ -30,7 +30,7 @@ public class AdminAttendanceController {
                 attendanceAdminService.getPendingRequests();
 
         model.addAttribute("requests", requests);
-        return "members/admin_attendance_list";
+        return "Members/admin_attendance_list";
     }
 
     // 🔹 승인

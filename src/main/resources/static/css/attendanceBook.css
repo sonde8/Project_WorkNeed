@@ -3,9 +3,13 @@
     gap: 20px;
 }
 
+.pageBook{
+    margin: 0;
+}
+
 /* 오른쪽 */
 .right_1{
-    width: 870px;
+    width: 900px;
     height: 845px;
     border: 1px solid black;
     box-sizing: border-box;
@@ -83,4 +87,24 @@
     font-size: 15px;
     border-radius: 6px;
     cursor: pointer;
+}
+
+/* 지각 글씨 */
+.bookTable td.type-late {
+    color: red;
+}
+
+/* 출근부 토요일 배경 */
+.bookTable tr.sat-row {
+    background-color: #e3f2fd;
+}
+
+/* 출근부 일요일 배경 */
+.bookTable tr.sun-row {
+    background-color: #fdecea;
+}
+
+/* 연차일 때 회색 */
+.leave-row td{
+    background: #f1f1f1;
 }

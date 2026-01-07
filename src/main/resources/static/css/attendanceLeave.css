@@ -3,9 +3,13 @@
     gap: 20px;
 }
 
+.pageLeave{
+    margin: 0;
+}
+
 /* 오른쪽 */
 .right_2{
-    width: 870px;
+    width: 900px;
     height: 845px;
     border: 1px solid black;
     box-sizing: border-box;
@@ -80,6 +84,7 @@
 
 .leaveWrap{
     flex: 1 1 auto;
+    min-height: 0;
     overflow-y: auto;
     border: 2px solid black;
 }
@@ -108,14 +113,16 @@
 /* 테이블 */
 .leaveTable{
     width: 100%;
-    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 0;
     table-layout: fixed;
 }
 
 .leaveTable thead th{
     position: sticky;
     top: 0;
-    z-index: 2;
+    z-index: 10;
+    background: #fff;
 }
 
 .leaveTable th,
@@ -125,4 +132,105 @@
     text-align: center;
     font-size: 18px;
 }
+
+
+/*  연차 모달  */
+.lv-modal[hidden] { display: none; }
+
+.lv-modal{
+    position: fixed;
+    inset: 0;
+    z-index: 999999;
+}
+
+.lv-modal_back{
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 0;
+}
+
+/* 모달 */
+.lv-modal_panel{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    width: 420px;
+    background: #fff;
+    border: 1px solid #111;
+    border-radius: 16px;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.35);
+    padding: 18px;
+    box-sizing: border-box;
+    z-index: 1;
+}
+
+.lv-modal_title{
+    font-size: 20px;
+    font-weight: 800;
+    text-align: center;
+    margin-bottom: 14px;
+}
+
+.lv-form{
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.lv-label{
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 14px;
+    font-weight: 700;
+    text-align: left;
+}
+
+.lv-label select,
+.lv-label input,
+.lv-label textarea{
+    border: 1px solid #111;
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+.lv-row2{
+    display: flex;
+    gap: 10px;
+}
+
+.lv-row2 .lv-label{
+    flex: 1;
+}
+
+.lv-actions{
+    display: flex;
+    gap: 10px;
+    margin-top: 6px;
+}
+
+.lv-btn{
+    flex: 1;
+    padding: 10px 0;
+    border-radius: 10px;
+    border: 1px solid #111;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.lv-btn.ghost{
+    background: #fff;
+}
+
+.lv-btn.primary{
+    background: #111;
+    color: #fff;
+}
+
 

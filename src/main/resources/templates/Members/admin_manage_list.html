@@ -4,18 +4,10 @@
     <meta charset="UTF-8">
     <title>관리자 설정</title>
     <link rel="stylesheet" th:href="@{/css/admin_user_list.css}">
-    <style>
-        .status-active { color: #3182ce; font-weight: bold; }
-        .status-suspended { color: #e53e3e; font-weight: bold; }
-        .btn-tab { padding: 10px 20px; text-decoration: none; color: #666; border-bottom: 3px solid transparent; }
-        .btn-tab.active { color: #3182ce; border-bottom: 3px solid #3182ce; font-weight: bold; }
-        /* 권한 배지 스타일 */
-        .role-badge { background: #e2e8f0; color: #4a5568; padding: 3px 8px; border-radius: 6px; font-size: 0.85em; font-weight: 600; }
-    </style>
 </head>
 <body>
 
-<div th:replace="~{members/admin_user_list :: .admin-header}"></div>
+<div th:replace="~{Members/admin_user_list :: .admin-header}"></div>
 
 <div style="padding: 20px;">
     <div style="display: flex; gap: 20px; border-bottom: 1px solid #ddd; margin-bottom: 20px;">

@@ -12,19 +12,21 @@
         <link rel="stylesheet" th:href="@{/css/attendanceMain.css}">
         <link rel="stylesheet" th:href="@{/css/attendanceBook.css}">
         <link rel="stylesheet" th:href="@{/css/attendanceLeave.css}">
+        <link rel="stylesheet" th:href="@{/css/attendanceTeamAttend.css}">
     </th:block>
+</head>
+
+<body>
 
     <th:block layout:fragment="script">
         <script th:src="@{/js/attendanceLeft.js}"></script>
         <script th:src="@{/js/attendanceMain.js}"></script>
         <script th:src="@{/js/attendanceBook.js}"></script>
         <script th:src="@{/js/attendanceLeave.js}"></script>
+        <script th:src="@{/js/attendanceTeamAttend.js}"></script>
     </th:block>
-</head>
 
-<body>
-
-<main layout:fragment="content">
+<main layout:fragment="content" class = "pageBook">
 
     <div class="att-bk">
 

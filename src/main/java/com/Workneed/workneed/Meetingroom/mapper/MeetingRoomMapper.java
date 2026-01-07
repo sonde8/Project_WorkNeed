@@ -38,7 +38,7 @@ public interface MeetingRoomMapper {
     int deleteReservation(@Param("reservationId") Long reservationId);
 
     // 6. task에서 회의실 이름 조회
-    String selectRoomNameByScheduleId(@Param("scheduleId") Long scheduleId);
+    List<MeetingReservationDTO> selectReservationsByScheduleId(@Param("scheduleId") Long scheduleId);
 
     // 7. task에서 회의실 예약 삭제
     int deleteReservationsByScheduleIds(@Param("scheduleIds") List<Long> scheduleIds);
