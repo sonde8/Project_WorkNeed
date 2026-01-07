@@ -24,8 +24,9 @@
         <td th:text="${req.requestId}"></td>
         <td th:text="${req.userId}"></td>
 
-        <td>
-            <pre th:text="${req.requestPayload}"></pre>
+        <td class="payload-cell">
+            <span class="raw-json" style="display:none;" th:text="${req.requestPayload}"></span>
+            <div class="parsed-display"></div>
         </td>
 
         <td th:text="${#temporals.format(req.requestCreatedAt, 'yyyy-MM-dd HH:mm')}"></td>

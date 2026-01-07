@@ -34,11 +34,6 @@ public class PasswordController {
         return "layout/passwordchange"; // templates/password/change.html
     }
 
-    @GetMapping("/profile/edit")
-    public String editProfilePage() {
-        return "redirect:/main";
-    }
-
     @PostMapping("/my/password/change")
     public String changePassword(HttpSession session, String currentPassword,
                                  String newPassword, String confirmPassword, Model model) {

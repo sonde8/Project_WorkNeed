@@ -48,7 +48,8 @@ public class SecurityConfig {
                                 "/js/**",
                                 "/images/**",
                                 "/layout/**",
-                                "/favicon.ico"
+                                "/favicon.ico",
+                                "/upload/**"
                         ).permitAll()
 
                 // 🔽 여기부터 권한

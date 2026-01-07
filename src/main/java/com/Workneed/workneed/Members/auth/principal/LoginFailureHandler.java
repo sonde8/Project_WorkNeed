@@ -21,7 +21,7 @@ public class LoginFailureHandler implements AuthenticationFailureHandler {
 
         String reason = "error";
 
-        // 1️⃣ 직접 DisabledException인 경우
+        //  직접 DisabledException인 경우
         if (exception instanceof DisabledException) {
             reason = exception.getMessage();
         }

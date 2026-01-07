@@ -118,18 +118,8 @@ public class UserService {
 
     // 이름과 이메일로 아이디 찾기
     public String findId(String userName, String userEmail) {
-        String foundId = userMapper.findLoginIdByNameAndEmail(userName, userEmail);
 
-        if (foundId == null) {
-            return null; // 일치하는 정보 없음
-        }
-
-        // 마스킹 처리: 앞 2자만 보여주고 나머지는 * 처리 (예: admin -> ad***)
-        if (foundId.length() > 2) {
-            return foundId.substring(0, 2) + "*".repeat(foundId.length() - 2);
-        }
-
-        return foundId;
+        return userMapper.findLoginIdByNameAndEmail(userName, userEmail);
     }
 
     @Transactional
