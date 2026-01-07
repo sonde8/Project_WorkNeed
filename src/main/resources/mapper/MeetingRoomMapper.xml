@@ -76,13 +76,21 @@
     <!-- ===============================
      일정(schedule)로 회의실 이름 조회
 =============================== -->
-    <select id="selectRoomNameByScheduleId" parameterType="long" resultType="string">
-        SELECT mr.room_name
+    <select id="selectReservationsByScheduleId"
+            parameterType="long"
+            resultType="com.Workneed.workneed.Meetingroom.dto.MeetingReservationDTO">
+        SELECT
+            r.reservation_id AS reservationId,
+            r.room_id        AS roomId,
+            r.schedule_id    AS scheduleId,
+            r.reserver_id    AS reserverId,
+            r.start_at       AS startAt,
+            r.end_at         AS endAt,
+            mr.room_name     AS roomName
         FROM meeting_reservation r
                  JOIN meeting_room mr ON mr.room_id = r.room_id
         WHERE r.schedule_id = #{scheduleId}
-        ORDER BY r.reservation_id DESC
-            LIMIT 1
+        ORDER BY r.start_at
     </select>
 
     <!-- ===============================
@@ -95,6 +103,14 @@
             #{id}
         </foreach>
     </delete>
+
+    <select id="countScheduleConflict" resultType="int">
+        SELECT COUNT(*)
+        FROM meeting_reservation
+        WHERE schedule_id = #{scheduleId}
+          AND start_at &lt; #{endAt}
+          AND end_at   &gt; #{startAt}
+    </select>
 
 
 </mapper>

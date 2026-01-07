@@ -1,5 +1,6 @@
 package com.Workneed.workneed.Schedule.controller;
 
+import com.Workneed.workneed.Meetingroom.dto.MeetingReservationDTO;
 import com.Workneed.workneed.Members.dto.UserDTO;
 import com.Workneed.workneed.Schedule.dto.*;
 import com.Workneed.workneed.Schedule.mapper.ScheduleInvitedMapper;
@@ -12,6 +13,7 @@ import com.Workneed.workneed.Schedule.service.ScheduleService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -43,7 +45,19 @@ public class ScheduleController {
         return ((UserDTO) u).getUserId();
     }
 
-////칸반
+    /**
+     * [추가] 회의실 예약 시 업무 기간 제한을 위한 단건 조회 API
+     * JS에서 fetch("/schedule/api/detail/" + id) 형태로 호출하게 됩니다.
+     */
+    @GetMapping("/api/detail/{scheduleId}")
+    @ResponseBody
+    public ResponseEntity<ScheduleDTO> getScheduleDetail(@PathVariable Long scheduleId) {
+        ScheduleDTO schedule = scheduleMapper.selectById(scheduleId);
+        if (schedule == null) return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(schedule);
+    }
+
+    ////칸반
     @GetMapping("/kanban")
     public String kanban(HttpSession session, Model model) {
         Long loginUserId = getLoginUserId(session);
@@ -60,7 +74,7 @@ public class ScheduleController {
         return "Schedule/kanban";
     }
 
-////테스크 생성
+    ////테스크 생성
     @PostMapping("/create")
     public String create(
             @RequestParam String title,
@@ -111,7 +125,7 @@ public class ScheduleController {
 
         return "redirect:/schedule/kanban";
     }
-////테스크 삭제
+    ////테스크 삭제
     @PostMapping("/delete")
     @ResponseBody
     public Map<String, Object> deleteSchedules(
@@ -149,7 +163,7 @@ public class ScheduleController {
 
     }
 
-////팀원 초대
+    ////팀원 초대
     @GetMapping("/invite")
     public String invitePage(@RequestParam Long scheduleId,HttpSession session, Model model) {
         Long loginUserId = getLoginUserId(session);
@@ -186,7 +200,7 @@ public class ScheduleController {
         return "redirect:/schedule/kanban";
     }
 
-////invite Ajax
+    ////invite Ajax
     @PostMapping("/inviteAjax")
     @ResponseBody
     public String inviteAjax(
@@ -206,7 +220,7 @@ public class ScheduleController {
         scheduleParticipantMapper.inviteTeam(scheduleId, userIds);
         return "OK";
     }
-////create Ajax
+    ////create Ajax
     @PostMapping("/createAjax")
     @ResponseBody
     public java.util.Map<String, Object> createAjax(
@@ -259,7 +273,7 @@ public class ScheduleController {
         result.put("type", type);
         return result;
     }
-////ACTIVE USERS
+    ////ACTIVE USERS
     @GetMapping("/active-users")
     @ResponseBody
     public List<ScheduleInvitedDTO> activeUsers(@RequestParam Long scheduleId,HttpSession session) {
@@ -268,7 +282,7 @@ public class ScheduleController {
         return scheduleInvitedMapper.selectActiveUsersExcludeOwner(scheduleId);
     }
 
-////STATUS UPDATE
+    ////STATUS UPDATE
     @PostMapping("/status")
     @ResponseBody
     public String updateStatus(@RequestParam Long scheduleId,
@@ -281,7 +295,7 @@ public class ScheduleController {
         return "OK";
     }
 
-////TASK DETAIL
+    ////TASK DETAIL
     @GetMapping("/task")
     public String task(@RequestParam Long scheduleId, HttpSession session, Model model) {
 
@@ -292,8 +306,18 @@ public class ScheduleController {
         if (schedule == null) return "redirect:/schedule/kanban";
 
 
-        String roomName = meetingRoomMapper.selectRoomNameByScheduleId(scheduleId);
-        model.addAttribute("roomName", roomName);
+
+        // 1) 회의실 예약 리스트 조회
+        List<MeetingReservationDTO> reservations =
+                meetingRoomMapper.selectReservationsByScheduleId(scheduleId);
+
+        // 2) endAt이 현재시간보다 지난 예약은 화면에서 제외
+        LocalDateTime now = LocalDateTime.now();
+        List<MeetingReservationDTO> activeReservations = reservations.stream()
+                .filter(r -> r.getEndAt() != null && !r.getEndAt().isBefore(now))
+                .toList();
+
+        model.addAttribute("reservations", activeReservations);
 
 
         //댓글 조회
