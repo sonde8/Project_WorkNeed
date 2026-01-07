@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AttendanceDTO {
+public class MemberAttendanceDTO {
     Long attendanceId;
     Long empId;
     LocalDate workDate;
