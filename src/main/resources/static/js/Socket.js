@@ -360,6 +360,11 @@ function onMessageReceived(payload) {
     var messageElement = document.createElement('li');
     messageElement.setAttribute('data-msg-id', message.messageId); // ID 저장
 
+    // [핵심 추가] 이미지/파일 메시지인 경우, 모달에서 참조할 수 있도록 fileLogId를 저장합니다.
+    if (message.fileLogId) {
+        messageElement.setAttribute('data-file-log-id', message.fileLogId);
+    }
+
     if ((msgType === 'ENTER' || msgType === "LEAVE") && String(message.senderId) === String(currentUserId) && !message.content.includes("초대")) {
         return;
     }
@@ -389,13 +394,21 @@ function onMessageReceived(payload) {
             var img = document.createElement('img');
             img.src = message.content;
             img.style.maxWidth = '250px'; img.style.borderRadius = '8px'; img.style.display = 'block';
+
+            // 이미지 클릭 시 모달 열기
             img.onclick = function () {openImageModal(this.src)};
+
             bubble.appendChild(img);
         } else if (msgType === 'FILE') {
             var fileLink = document.createElement('a');
-            fileLink.href = message.content; fileLink.download = ""; fileLink.className = 'file-link';
+            // 다운로드 API 경로로 설정
+            fileLink.href = "/api/chat/files/download/" + message.fileLogId;
+
+            fileLink.className = 'file-link';
+
             var fileName = message.content.split('/').pop();
             if(fileName.includes('_')) fileName = fileName.substring(fileName.indexOf('_') + 1);
+
             fileLink.textContent = "📎 " + fileName;
             bubble.appendChild(fileLink);
         } else {
@@ -421,7 +434,6 @@ function onMessageReceived(payload) {
         bubbleRow.appendChild(msgInfo);
         msgUnit.appendChild(bubbleRow);
         messageElement.appendChild(msgUnit);
-
 
         const sidebar = document.getElementById('mediaSidebar');
         if (sidebar && sidebar.classList.contains('active')) {
@@ -544,8 +556,13 @@ function updateSidebarMedia() {
     const allFiles = document.querySelectorAll('#messageLog .file-link');
     allFiles.forEach(file => {
         const fileItem = document.createElement('a');
-        fileItem.href = file.href; fileItem.className = 'sidebar-file-item';
-        fileItem.download = ""; fileItem.innerHTML = `📎 <span>${file.textContent.replace('📎 ', '')}</span>`;
+
+        // [수정 핵심] 원본 링크(file.href)를 그대로 가져오면
+        // 이미 위에서 수정한 API 주소(/api/chat/files/download/...)가 그대로 적용됩니다.
+        fileItem.href = file.href;
+
+        fileItem.className = 'sidebar-file-item';
+        fileItem.innerHTML = `📎 <span>${file.textContent.replace('📎 ', '')}</span>`;
         fileContainer.appendChild(fileItem);
     });
 }
@@ -599,7 +616,7 @@ function openImageModal(clickedSrc) {
     const modal = document.getElementById('imageModal');
     if (!modal) return;
 
-    // 모든 이미지 메시지 단위를 가져옵니다.
+    // 이미지 메시지를 포함하는 li 요소를 모두 가져옵니다.
     const allMsgUnits = document.querySelectorAll('.msg-unit:has(.bubble img)');
 
     currentImageList = Array.from(allMsgUnits).map(unit => {
@@ -607,25 +624,17 @@ function openImageModal(clickedSrc) {
         const sender = unit.querySelector('.sender')?.textContent || "나";
         const time = unit.querySelector('.msg-time')?.textContent || "";
 
-        // 해당 메시지(li)에서 위로 가장 가까운 날짜 구분선(.date-divider) 찾기
+        // [수정 핵심] 부모 li 요소에서 아까 저장해둔 messageId나
+        // 혹은 해당 이미지 메시지의 식별값(fileLogId)을 가져와야 합니다.
+        // 만약 li에 직접 data 속성으로 넣어두지 않았다면, 메시지 수신 시점에 넣어주는 로직이 필요합니다.
         const parentLi = unit.closest('li');
-        let dateText = "";
-        let prevElement = parentLi.previousElementSibling;
-
-        while (prevElement) {
-            if (prevElement.classList.contains('date-divider')) {
-                // 시스템 내부 텍스트(예: 2025년 12월 27일 토요일) 추출
-                dateText = prevElement.querySelector('.system-inner')?.textContent || "";
-                break;
-            }
-            prevElement = prevElement.previousElementSibling;
-        }
+        const fileLogId = parentLi.getAttribute('data-file-log-id'); // 아래 onMessageReceived 수정 필요
 
         return {
             src: img.src,
             sender: sender,
-            // 날짜와 시간을 합쳐서 저장 (예: 2025년 12월 27일 토요일 오후 2:30)
-            fullDate: dateText ? `${dateText} ${time}` : time
+            fullDate: time,
+            fileLogId: fileLogId // ID 추가
         };
     });
 
@@ -640,20 +649,15 @@ function updateFullImage() {
 
     document.getElementById('fullImage').src = item.src;
     document.getElementById('modalSenderName').textContent = item.sender;
-
-    // 날짜가 포함된 fullDate 적용
     document.getElementById('modalSendDate').textContent = item.fullDate;
 
     const downloadBtn = document.getElementById('imageDownloadBtn');
-    downloadBtn.href = item.src;
 
-    const fileName = item.src.split('/').pop();
-    downloadBtn.setAttribute('download', fileName.includes('_') ? fileName.substring(fileName.indexOf('_') + 1) : fileName);
-
-    // 만약 HTML에 imageCaption 요소가 없다면 에러가 날 수 있으니 체크 후 삽입
-    const caption = document.getElementById('imageCaption');
-    if(caption) {
-        caption.textContent = `${currentImageIndex + 1} / ${currentImageList.length}`;
+    // [수정 핵심] S3 URL 대신 백엔드 다운로드 API 호출
+    if (item.fileLogId) {
+        downloadBtn.href = "/api/chat/files/download/" + item.fileLogId;
+    } else {
+        downloadBtn.href = item.src; // 방어 코드
     }
 }
 
