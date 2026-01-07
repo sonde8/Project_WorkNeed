@@ -422,6 +422,7 @@ function onMessageReceived(payload) {
         msgUnit.appendChild(bubbleRow);
         messageElement.appendChild(msgUnit);
 
+
         const sidebar = document.getElementById('mediaSidebar');
         if (sidebar && sidebar.classList.contains('active')) {
             if (msgType === 'IMAGE' || msgType === 'FILE') updateSidebarMedia();
