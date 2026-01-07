@@ -7,6 +7,7 @@
     <title>Title</title>
     <th:block layout:fragment="head">
         <link rel="stylesheet" th:href="@{/css/kanban.css}">
+        <link rel="stylesheet" th:href="@{https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css}">
     </th:block>
 </head>
 
@@ -98,10 +99,10 @@
 
                     <div class="field" id="dateTimeR">
                         <div class="start">
-                            <input id="startAt" name="startAt" type="datetime-local" aria-label="Start date/time" title="Start date/time" required />
+                            <input id="startAt" name="startAt" type="text"  placeholder="Start At"  aria-label="Start date/time" title="Start date/time" required />
                         </div>
                         <div class="end">
-                            <input id="endAt" name="endAt" type="datetime-local"  aria-label="End date/time" title="End date/time" required />
+                            <input id="endAt" name="endAt" type="text" placeholder="End At"  aria-label="End date/time" title="End date/time" required />
                         </div>
                     </div>
 
@@ -112,7 +113,7 @@
                     <div class="field" id="eventTypeR">
                         <div class="eventTypeGroup" id="eventTypeGroup">
                             <button type="button" class="eventBtn" data-value="PROJECT">Project</button>
-                            <button type="button" class="eventBtn" data-value="Task">Task</button>
+                            <button type="button" class="eventBtn" data-value="TASK">Task</button>
                             <button type="button" class="eventBtn" data-value="MEETING">Meeting</button>
                             <button type="button" class="eventBtn" data-value="REVIEW">Review</button>
                             <button type="button" class="eventBtn" data-value="EVENT">Event</button>
@@ -145,11 +146,6 @@
                         <textarea id="description" name="description" rows="8" placeholder="Task description" aria-label="Task description"></textarea>
                     </div>
 
-                    <div class="field" id="fileR">
-                        <label class="file-btn" for="file">+ Add File</label>
-                        <input id="file" name="file" type="file" hidden />
-                        <span class="file-name" id="fileName"></span>
-                    </div>
                 </div>
 
                 <div class="modal-btns">
@@ -191,6 +187,8 @@
 <th:block layout:fragment="script">
     <!-- 드래그 이동 JS -->
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
+    <!-- 시간 JS    -->
+    <script th:src="@{https://cdn.jsdelivr.net/npm/flatpickr}"></script>
     <script th:src="@{/js/kanban.js}"></script>
 </th:block>
 
