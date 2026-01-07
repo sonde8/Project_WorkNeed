@@ -5,6 +5,7 @@ import com.Workneed.workneed.Members.dto.UserDTO;
 import com.Workneed.workneed.Schedule.mapper.ScheduleMapper;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,11 +15,16 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @RequiredArgsConstructor
 public class MainController {
 
-    private final ScheduleMapper scheduleMapper;
     private final ApprovalService approvalService;
+    private final ScheduleMapper scheduleMapper;
+
+    // application.properties의 값을 주입받음
+    @Value("${google.calendar.api-key}")
+    private String googleCalendarApiKey;
 
     @GetMapping("/main")
     public String main(HttpSession session, Model model) {
+
 
         if (session.getAttribute("admin") != null) {
             return "redirect:/admin/member/list";
@@ -36,9 +42,13 @@ public class MainController {
 
         Long userId = user.getUserId();
 
-        model.addAttribute("counts", approvalService.getCounts(userId)); // ✅ 이 줄
+
+        model.addAttribute("counts", approvalService.getCounts(userId)); //
+
         model.addAttribute("mainTodo",  scheduleMapper.selectByStatusForMain(userId, "TODO"));
         model.addAttribute("mainDoing", scheduleMapper.selectByStatusForMain(userId, "DOING"));
+
+        model.addAttribute("googleCalendarApiKey", googleCalendarApiKey);
 
         return "Main/main";
     }
@@ -50,7 +60,5 @@ public class MainController {
                 ? "NO USER IN SESSION"
                 : "USER IN SESSION";
     }
-
-
 
 }
