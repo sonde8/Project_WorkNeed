@@ -1,7 +1,6 @@
 'use strict';
 
 /**
- * [수정 및 통합 완료]
  * 1. layout.html의 전역 변수(window.currentUserId, window.roomId)를 참조합니다.
  * 2. 모든 페이지에서 실행되므로 채팅방 전용 요소(messageForm 등)는 존재할 때만 작동하도록 null 체크를 강화했습니다.
  * 3. '채팅방 밖'일 때를 위한 커스텀 토스트 알림 기능이 추가되었습니다.
@@ -56,9 +55,16 @@ function onConnected() {
         console.log("개인 채널 알림 수신 성공:", messageData)
         console.log("실시간 목록 업데이트 신호 수신:", messageData);
 
-        // [추가 로직] 내가 현재 '이 메시지가 온 방'에 들어가 있지 않을 때만 상단 토스트 알림 표시
+        // [수정된 알림 조건]
+        // 1. 내가 현재 '이 메시지가 온 방'에 들어가 있지 않아야 함
         const isCurrentRoom = (window.roomId && String(messageData.roomId) === String(window.roomId));
-        if (!isCurrentRoom) {
+
+        // 2. 실제 메시지 내용이 있고, 타입이 채팅 메시지(TALK, IMAGE, FILE)인 경우에만 알림 표시
+        // 이를 통해 방 생성 시 발생하는 'undefined' 알림을 방지합니다.
+        const hasContent = messageData.content && messageData.content.trim() !== "";
+        const isChatMsg = ['TALK', 'IMAGE', 'FILE'].includes(messageData.messageType);
+
+        if (!isCurrentRoom && hasContent && isChatMsg) {
             showToastNotification(messageData);
         }
 
@@ -107,7 +113,7 @@ function onConnected() {
 }
 
 /**
- * [신규] 브라우저 상단 커스텀 토스트 알림 함수
+ * 브라우저 상단 커스텀 토스트 알림 함수
  * 웹 알림 허용 팝업 없이 브라우저 내부 UI로 실시간 알림을 구현합니다.
  */
 function showToastNotification(data) {
@@ -600,7 +606,7 @@ function openImageModal(clickedSrc) {
         const sender = unit.querySelector('.sender')?.textContent || "나";
         const time = unit.querySelector('.msg-time')?.textContent || "";
 
-        // [추가] 해당 메시지(li)에서 위로 가장 가까운 날짜 구분선(.date-divider) 찾기
+        // 해당 메시지(li)에서 위로 가장 가까운 날짜 구분선(.date-divider) 찾기
         const parentLi = unit.closest('li');
         let dateText = "";
         let prevElement = parentLi.previousElementSibling;
@@ -634,7 +640,7 @@ function updateFullImage() {
     document.getElementById('fullImage').src = item.src;
     document.getElementById('modalSenderName').textContent = item.sender;
 
-    // [수정] 날짜가 포함된 fullDate 적용
+    // 날짜가 포함된 fullDate 적용
     document.getElementById('modalSendDate').textContent = item.fullDate;
 
     const downloadBtn = document.getElementById('imageDownloadBtn');
@@ -694,7 +700,7 @@ window.onload = function() {
         }
     }
 
-    // [신규 추가] 3. URL 파라미터를 통한 채팅방 생성 모달 자동 제어
+    // 3. URL 파라미터를 통한 채팅방 생성 모달 자동 제어
     const urlParams = new URLSearchParams(window.location.search);
     const inviteIdsStr = urlParams.get('invite');
     const roomNameParam = urlParams.get('roomName'); // 업무(Task) 제목

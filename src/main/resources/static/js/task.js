@@ -129,6 +129,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
     closeBtn?.addEventListener("click", closeModal);
 
+    // ESC 키로 모달 닫기
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && modal.classList.contains("is-open")) {
+            closeModal();
+        }
+    });
+
+    // 배경 클릭 시 닫기 (이벤트 전파 방지 적용)
+    modal.addEventListener("mousedown", (e) => {
+        // e.target이 modal 본체가 아닌 '배경'일 때만 닫기
+        if (e.target === modal) {
+            closeModal();
+        }
+    });
+
     //렌더링 함수(Owner / Members)
     function renderOwner(owner) {
         if (!ownerBox) return;
@@ -270,6 +285,21 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     closeBtn?.addEventListener("click", closePerformanceModal);
+
+    // ESC 키로 모달 닫기
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && perfModal.classList.contains("is-open")) {
+            closePerformanceModal();
+        }
+    });
+
+    // 배경 클릭 시 닫기 (이벤트 전파 방지 적용)
+    perfModal.addEventListener("mousedown", (e) => {
+        // e.target이 modal 본체가 아닌 '배경'일 때만 닫기
+        if (e.target === perfModal) {
+            closePerformanceModal();
+        }
+    });
 
     document.addEventListener("click", (e) => {
         const btn = e.target.closest(".btn-member-performance-modal");
@@ -454,6 +484,21 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     memberTasksCloseBtn?.addEventListener("click", closeMemberTasksModal);
+
+    // ESC 키로 모달 닫기
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && memberTasksModal.classList.contains("is-open")) {
+            closeMemberTasksModal();
+        }
+    });
+
+    // 배경 클릭 시 닫기 (이벤트 전파 방지 적용)
+    memberTasksModal.addEventListener("mousedown", (e) => {
+        // e.target이 modal 본체가 아닌 '배경'일 때만 닫기
+        if (e.target === memberTasksModal) {
+            closeMemberTasksModal();
+        }
+    });
 
     function renderTaskItem(t) {
         const taskId = t.taskId ?? "";

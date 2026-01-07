@@ -119,7 +119,7 @@ html {
 
 /* 로고 이미지 크기 조절 */
 .header-logo img {
-    height: 60px;
+    height: 80px;
     display: block;
     width: auto;
     image-rendering: crisp-edges;

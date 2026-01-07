@@ -390,6 +390,24 @@
         };
 
         overlay.classList.remove("hidden");
+        /* openDailyListModal 함수 내부 하단부 */
+
+        // ESC 키 감지 (익명 함수로 추가)
+        const handleEsc = (e) => {
+            if (e.key === "Escape") {
+                overlay.classList.add("hidden");
+                document.removeEventListener("keydown", handleEsc); // 메모리 누수 방지
+            }
+        };
+        document.addEventListener("keydown", handleEsc);
+
+        // 배경 클릭 시 닫기
+        overlay.onclick = (e) => {
+            if (e.target === overlay) {
+                overlay.classList.add("hidden");
+                document.removeEventListener("keydown", handleEsc);
+            }
+        };
     }
     /* ================= Calendar Init ================= */
 
