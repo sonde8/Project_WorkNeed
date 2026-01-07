@@ -17,6 +17,20 @@ function bindEvents() {
     // 예약 폼 제출
     document.getElementById("reservationForm")
         .addEventListener("submit", submitReservation);
+
+    // ESC 키로 모달 닫기
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") closeReservationModal();
+    });
+
+    // 모달 바깥 영역 클릭 시 모달 닫기
+    const modal = document.getElementById("reservationModal");
+    modal.addEventListener("click", (e) => {
+        // e.target이 modal(배경) 자체일 때만 닫기 (콘텐츠 박스 클릭 시엔 무시)
+        if (e.target === modal) {
+            closeReservationModal();
+        }
+    });
 }
 
 /* ======================

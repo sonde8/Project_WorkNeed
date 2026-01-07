@@ -170,3 +170,24 @@ function closeModal(type) {
         type === "detail" ? "boardDetailModal" : "boardWriteModal"
     ).style.display = "none";
 }
+
+// 1. ESC 키 누르면 모달이 닫히는 로직
+document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+        closeModal("detail");
+        closeModal("write");
+    }
+});
+
+// 2. 배경을 클릭하면 모달이 닫힘
+window.addEventListener("click", (e) => {
+    const detailModal = document.getElementById("boardDetailModal");
+    const writeModal = document.getElementById("boardWriteModal");
+
+    if (e.target === detailModal) {
+        closeModal("detail");
+    }
+    if (e.target === writeModal) {
+        closeModal("write");
+    }
+});

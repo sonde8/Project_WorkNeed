@@ -1,6 +1,6 @@
 /* 왼쪽 공통 패널 영역만 */
 .att-left{
-    width: 470px;
+    width: 420px;
     height: 845px;
     border: 1px solid black;
     box-sizing: border-box;
@@ -110,5 +110,70 @@
     color: inherit;
     border: 1px solid #111;
     border-radius: 10px;
+}
 
+/* 업무 변경 모달 */
+.state-modal[hidden]{
+    display: none;
+}
+
+.state-modal{
+    position: fixed;
+    inset: 0;
+    z-index: 999999;
+    display: block;
+}
+
+.state-modal_back{
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+}
+
+
+.state-modal_panel{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    width: 320px;
+    padding: 16px;
+    border: 1px solid #111;
+    border-radius: 14px;
+
+    background: #fff;
+    color: #111;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+}
+
+.state-modal_title{
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    text-align: center;
+}
+
+.state-modal_list{
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.state-item{
+    padding: 10px 12px;
+    border: 1px solid black;
+    border-radius: 10px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    text-align: center;
+}
+
+.state-modal_close{
+    width: 100%;
+    margin-top: 10px;
+    padding: 10px 0;
+    border-radius: 10px;
+    border: 1px solid black;
+    cursor: pointer;
 }

@@ -5,7 +5,7 @@
 
 /* 오른쪽 */
 .right{
-    width: 870px;
+    width: 900px;
     height: 845px;
     border: 1px solid black;
     box-sizing: border-box;
@@ -39,12 +39,12 @@
 
 .total{
     font-size: 18px;
-    margin-top: 10px;
 }
 
 /* 게이지 */
 .week-bar{
-    border: 1px solid black;
+    width: 100%;
+    box-sizing: border-box;
     border-radius: 20px;
     padding: 18px;
     margin: 30px 0 20px 0;
@@ -52,27 +52,18 @@
 
 .bar-chart{
     position: relative;
-    width: 100px;
-    height: 60px;
-    border-radius: 800px;
-    overflow: hidden;
-    border: 1px solid black;
+    width: 100%;
+    height: 65px;
+    border-radius: 999px;
+    overflow: visible;
+    background: #EEEEEE;
 }
 
-.seg{
+.bar-clip{
     position: absolute;
-    top: 0;
-    bottom: 0;
-}
-
-.segNormal{
-    left: 0;
-    width:calc(52 / 70 * 100%);
-}
-
-.segOt{
-    left: calc(52 / 70 * 100%);
-    width: calc((70 - 52) / 70 * 100%);
+    inset: 0;
+    border-radius: 999px;
+    overflow: hidden;
 }
 
 .week-fill{
@@ -81,67 +72,109 @@
     top: 0;
     bottom: 0;
     width: 0;
-    transition: width .2s ease;
+    border-radius: 999px;
+    transition: width .25s ease;
 }
 
-.markStart{
+.week-fill.base{
+    background: violet;
+    z-index: 1;
+}
+
+.week-fill.ot{
+    left: calc(52/70 * 100%);
+    background: orange;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    z-index: 2;
+}
+
+.week-fill.holiday{
+    background: darkgreen;
+    z-index: 3;
+}
+
+.mark{
     position: absolute;
-    top: 0;
-    bottom: 0;
-    width: 2px;
+    top: -38px;
+    width: 0;
+    z-index: 6;
 }
 
-.markEnd{
-    right: 0;
+#mark52{
+    left: calc(52/70 * 100%);
 }
+
+#mark70{
+    left: 100%
+}
+
+.mark::after{
+    content: "";
+    position: absolute;
+    top: 30px;
+    left: -2px;
+    width: 0;
+    height: 84px;
+    background: #dddddd;
+    border-radius: 4px;
+    border-left: 2px dashed #dddddd;
+}
+
+.mark-text{
+    position: absolute;
+    left: -18px;
+    top: 0;
+    font-size: 18px;
+    font-weight: 800;
+    white-space: nowrap;
+    color: grey;
+}
+
+#mark70 .mark-text{
+    left: -28px;
+}
+
+.week-bottom{
+    display: grid;
+    grid-template-columns: 1fr 135px;
+    gap: 24px;
+    margin-top: 16px;
+    align-items: start;
+}
+
 
 .week-info{
-    border: 1px solid black;
     font-size: 18px;
+    line-height: 2.1;
+}
+
+.week-legend{
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 14px;
+    align-items: flex-start;
 }
 
-.bar-dot{
-    position: absolute;
-    top: 50%;
-    width: 10px;
-    height: 10px;
-    border-radius: 800px;
-    transform: translate(-50%, -50%);
-    background: #2f6bff;
-    border: 2px solid black;
-    transition: left .2s ease, background .2s ease;
+.lg-item{
+    display:flex;
+    align-items:center;
+    gap: 14px;
+    font-size: 18px;
+    font-weight: 500;
 }
 
-/* 52시간 초과시 경고 */
-.bar-chart.over52 .bar-dot{ background: #ff7a00; }
-.bar-chart.over52 .week-fill{ background: rgba(255,122,0,0.25); }
-
-/* 70시간 도달 */
-.bar-chart.over70 .bar-dot{ background: #e00000; }
-.bar-chart.over70 .week-fill{ background: rgba(224,0,0,0.25); }
-
-.bar-label{
-    position: absolute;
-    bottom: 6px;
-    transform: translateX(-50%);
-    font-size: 12px;
-    padding: 2px 6px;
-    border-radius: 800px;
+.lg-dot{
+    width: 26px;
+    height: 26px;
+    border-radius: 999px;
+    display:inline-block;
 }
 
-.bar-label.l70{
-    right: 8px;
-    transform: translateX(0);
-}
+.lg-dot.normal{ background: violet; }
+.lg-dot.ot{ background: orange; }
+.lg-dot.holiday{ background: darkgreen; }
 
-.bar-text{
-    margin-top: 10px;
-    text-align: center;
-    font-size: 14px;
-}
 
 /* 밑에 3개의 현황*/
 .squ-row{
