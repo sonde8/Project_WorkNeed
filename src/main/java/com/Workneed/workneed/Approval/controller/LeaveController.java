@@ -75,7 +75,7 @@ public class LeaveController {
         Long userId = getLoginUserId(session);
         if (userId == null) return redirectLogin();
 
-        LeaveRequestDTO leave = leaveService.getLeaveDetail(docId, userId);
+        LeaveRequestDTO leave = approvalLeaveService.getLeaveDetail(docId, userId);
         if (leave == null) return "redirect:/approval/leave";
 
         model.addAttribute("leave", leave);

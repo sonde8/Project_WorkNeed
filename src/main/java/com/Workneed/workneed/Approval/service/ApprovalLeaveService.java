@@ -52,9 +52,9 @@ public class ApprovalLeaveService {
         // 사유
         doc.setContent(dto.getReason());
         //시작일
-        doc.setLeaveStartDate(dto.getLeaveStartDate());
+        doc.setLeaveStartDate(dto.getStartDate());
         //마감일
-        doc.setLeaveEndDate(dto.getLeaveEndDate());
+        doc.setLeaveEndDate(dto.getEndDate());
         //
         doc.setStatus(DocStatus.APPROVED); // 또는 WAITING
 
