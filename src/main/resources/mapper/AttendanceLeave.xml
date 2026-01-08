@@ -49,4 +49,43 @@
           AND end_date   &gt;= #{startDate}
     </select>
 
+
+    <select id="selectDeptIdByUserId" resultType="long">
+        SELECT dept_id
+        FROM user
+        WHERE user_id = #{userId}
+    </select>
+
+    <select id="selectDeptLeaveUsage"
+            resultType="com.Workneed.workneed.Attendance.dto.LeaveTeamUseDTO">
+        SELECT
+        lu.leave_id   AS leaveId,
+        lu.request_id AS requestId,
+        lu.user_id    AS userId,
+
+        u.user_name   AS userName,
+        r.rank_name   AS rankName,
+
+        lu.leave_type AS leaveType,
+        lu.start_date AS startDate,
+        lu.end_date   AS endDate,
+        lu.days       AS days,
+        lu.reason     AS reason,
+
+        req.status    AS status,
+        lu.created_at AS createdAt
+        FROM leave_usage lu
+        JOIN user u ON u.user_id = lu.user_id
+        JOIN ranks r ON r.rank_id = u.rank_id
+        JOIN request req ON req.request_id = lu.request_id
+        WHERE u.dept_id = #{deptId}
+        AND lu.start_date &lt; #{end}
+        AND lu.end_date   &gt;= #{start}
+        <if test="name != null and name != ''">
+            AND u.user_name LIKE CONCAT('%', #{name}, '%')
+        </if>
+        ORDER BY lu.start_date ASC, u.user_name ASC
+    </select>
+
+
 </mapper>

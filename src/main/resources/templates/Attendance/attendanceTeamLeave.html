@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+
+<head>
+    <title th:text="${pageTitle}"> 부서연차관리 </title>
+
+    <!-- 페이지 전용 CSS -->
+    <th:block layout:fragment="head">
+        <link rel="stylesheet" th:href="@{/css/attendanceLeft.css}">
+        <link rel="stylesheet" th:href="@{/css/attendanceMain.css}">
+        <link rel="stylesheet" th:href="@{/css/attendanceBook.css}">
+        <link rel="stylesheet" th:href="@{/css/attendanceLeave.css}">
+        <link rel="stylesheet" th:href="@{/css/attendanceTeamAttend.css}">
+        <link rel="stylesheet" th:href="@{/css/attendanceTeamLeave.css}">
+    </th:block>
+
+</head>
+
+<body>
+
+<th:block layout:fragment="script">
+    <script th:src="@{/js/attendanceLeft.js}"></script>
+    <script th:src="@{/js/attendanceMain.js}"></script>
+    <script th:src="@{/js/attendanceBook.js}"></script>
+    <script th:src="@{/js/attendanceLeave.js}"></script>
+    <script th:src="@{/js/attendanceTeamAttend.js}"></script>
+    <script th:src="@{/js/attendanceTeamLeave.js}"></script>
+</th:block>
+
+<main layout:fragment="content" class = "teamLeave">
+
+    <div class="teLe">
+
+        <!-- 왼쪽 -->
+        <section th:replace="~{Attendance/attendanceLeft :: attendanceLeft}"></section>
+
+        <!-- 오른쪽 -->
+        <section class="right4">
+
+            <!-- 연도 -->
+            <div class="teamYearHead">
+                <button type="button" class="teamYearBtn" id="yearPrev"> &lt; </button>
+                <div class="yearTitle" id="teamYearTitle"></div>
+                <button type="button" class="teamYearBtn" id="yearNext"> &gt; </button>
+            </div>
+
+            <!-- 검색바 -->
+            <form class = "teamLeaveSearch">
+                <input type="text" id="nameSearch" class="nameSearchInput" placeholder="이름을 검색하세요">
+                <button type="button" id="searchBtn" class="searchBtn"> 검색 </button>
+            </form>
+
+            <!-- 표 -->
+            <div class="teamLeaveTableWrap">
+
+                <table class="teamLeaveTable">
+                    <thead>
+                    <tr>
+                        <td> 일자 </td>
+                        <td> 이름 </td>
+                        <td> 신청 구분 </td>
+                        <td> 시작 시간 </td>
+                        <td> 종료 시간 </td>
+                        <td> 사유 </td>
+                        <td> 상태 </td>
+                    </tr>
+                    </thead>
+
+                    <tbody id="teamLeaveTbody"></tbody>
+                </table>
+            </div>
+
+
+        </section>
+    </div>
+</main>
+
+
+</body>
+</html>
+
+
+

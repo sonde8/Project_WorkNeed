@@ -45,7 +45,7 @@ public class ApprovalLeaveService {
         leaveApprovalMapper.insertLeaveRequest(dto);
 
         // 3) 팀장 찾기 + 결재라인 APPROVED INSERT
-        Long deptId = leaveApprovalMapper.selectDeptIdByUserId(dto.getUserId());
+        Long deptId = leaveApprovalMapper.selectDeptIdByUserId(userId);
         Long teamLeadId = leaveApprovalMapper.findTeamLeaderId(deptId);
 
         if (teamLeadId == null) {

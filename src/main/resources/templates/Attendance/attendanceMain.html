@@ -79,9 +79,97 @@
             </div>
 
             <div class="squ-row">
-                <div class = "squ"> 근태현황 </div>
-                <div class = "squ"> 잔여연차 </div>
-                <div class = "squ"> 연간근무 </div>
+
+                <div class = "squ card" id="attendCard">
+
+                    <div class="headCard">
+                        <span class="headTitle"> 근태 현황 </span>
+                        <span class="baseBadge" id="attBadge"></span>
+                    </div>
+
+                    <div class="cardBody">
+
+                        <div class="metric">
+                            <span class="metricLabel"> 출근일수 </span>
+                            <span class="metricValue"><b id="attWorkDays">0</b> / <span id="attWeekdays">0</span>일</span>
+                        </div>
+
+                        <div class="metric">
+                            <span class="metricLabel">지각</span>
+                            <span class="metricValue"><b id="attLate">0</b>회</span>
+                        </div>
+
+                        <div class="metric">
+                            <span class="metricLabel">조퇴</span>
+                            <span class="metricValue"><b id="attEarly">0</b>회</span>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class = "squ card" id="leaveCard">
+
+                    <div class="headCard">
+
+                        <span class="headTitle"> 잔여 연차 </span>
+                        <span class="sub" id="leaveRateText"> 0% </span>
+
+                    </div>
+
+                    <div class="cardBody">
+
+                        <div class="metric">
+                            <span class="metricLabel"> 총 연차 </span>
+                            <span class="metricValue"><b id="leaveTotal">0</b></span>
+                        </div>
+
+                        <div class="metric">
+                            <span class="metricLabel"> 사용 연차 </span>
+                            <span class="metricValue"><b id="leaveUsed">0</b></span>
+                        </div>
+
+                        <div class="metric">
+                            <span class="metricLabel"> 잔여 연차 </span>
+                            <span class="metricBig"><b id="leaveRemain">0</b></span>
+                        </div>
+
+                        <div class="progress">
+                            <div class="progress-bar" id="leaveRateBar" style="width:0"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class = "squ card" id="yearCard">
+
+                    <div class="headCard">
+                        <span class="headTitle"> 연간 근무 </span>
+                    </div>
+
+                    <div class="cardBody">
+
+                        <div class="metric">
+                            <span class="metricLabel"> 누적 근무 </span>
+                            <span class="metricValue"><b id="yearWork">0</b>h</span>
+                        </div>
+
+                        <div class="metric">
+                            <span class="metricLabel"> 연장 근무 </span>
+                            <span class="metricValue"><b id="yearOtt">0</b>h</span>
+                        </div>
+
+                        <div class="metric">
+                            <span class="metricLabel"> 휴일 근무 </span>
+                            <span class="metricBig"><b id="yearHoliday">0</b>h</span>
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+
+
+
             </div>
 
         </section>

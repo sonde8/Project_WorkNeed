@@ -177,22 +177,117 @@
 
 
 /* 밑에 3개의 현황*/
-.squ-row{
-    border: 1px solid black;
+.squ-row{   /* 전체 */
     display: flex;
     gap: 30px;
     margin-top: 40px;
-    text-align: center;
-    align-content: center;
-    justify-content: center;
 }
 
 .squ{
-    border: 1px solid black;
-    width: 230px;
-    height: 220px;
-    font-size: 20px;
+    flex: 1;
+    border: 1px dashed #cfcfcf;
+    border-radius: 16px;
+    background: #fff;
+    padding: 16px 18px;
+    box-sizing: border-box;
 }
+/* 근태현황, 잔여연차, 연차근무 글씨 */
+.headCard{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.headTitle{
+    font-size: 22px;
+    font-weight: 800;
+    color: #111;
+}
+
+.baseBadge{
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: inline-block;
+    border: 1px solid #cfcfcf;
+    background: #e5e5e5;
+}
+
+/* 색상 */
+.badge-ok{
+    background: #22c55e;
+}
+
+.badge-warn{
+    background: #facc15;
+}
+
+.badge-danger{
+    background: #ef4444;
+}
+
+/* 항목 */
+.cardBody .metric{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 10px 0;
+}
+
+.metricLabel{
+    font-size: 15px;
+    color: #666;
+}
+
+.metricValue{
+    font-size: 15px;
+    font-weight: 800;
+    color: #111;
+}
+
+.metricBig{
+    font-size: 15px;
+    font-weight: 800;
+    color: #111;
+}
+
+/* 잔여연차 사용률 */
+.sub{
+    font-size: 15px;
+    font-weight: 800;
+    color: #111;
+    opacity: .8;
+}
+
+/* 잔여연차 밑 */
+.progress{
+    margin-top: 25px;
+    height: 13px;
+    border: 1px solid #ddd;
+    border-radius: 999px;
+    overflow: hidden;
+    background: #f6f6f6;
+}
+
+.progress-bar{
+    height: 100%;
+    width: 0;
+    background: aquamarine;
+    border-radius: 999px;
+    transition: width .25s ease;
+}
+
+#attendCard{
+    margin-left: 10px;
+}
+
+#yearCard{
+    margin-right: 10px;
+}
+
+
+
 
 
 
