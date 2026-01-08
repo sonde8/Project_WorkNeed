@@ -2,10 +2,14 @@ package com.Workneed.workneed.Chat.service;
 
 import com.Workneed.workneed.Chat.dto.FileLogDTO;
 import com.Workneed.workneed.Chat.mapper.FileLogMapper;
+import com.Workneed.workneed.Schedule.dto.ScheduleFileDTO;
+import com.Workneed.workneed.Schedule.mapper.ScheduleFileMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -13,24 +17,24 @@ public class FileLogService {
 
     private final StorageService storageService;
     private final FileLogMapper fileLogMapper;
+    private final ScheduleFileMapper scheduleFileMapper;
 
+    /**
+     * [채팅방] 파일 저장
+     */
     @Transactional
     public FileLogDTO saveFile(MultipartFile file, Long roomId) {
-        // 원본 파일명 가져오기
         String originalFilename = file.getOriginalFilename();
-
-        // 1. S3 저장 실행 (이제 전체 URL이 반환됨)
         String fileUrl = storageService.store(file);
 
         String contentType = file.getContentType();
         String fileType = (contentType != null && contentType.startsWith("image")) ? "IMAGE" : "FILE";
 
-        // 3. DB 저장 데이터 구성
         FileLogDTO fileLog = FileLogDTO.builder()
                 .roomId(roomId)
                 .fileName(originalFilename)
-                .storedName(fileUrl.substring(fileUrl.lastIndexOf("/") + 1)) // URL에서 파일명만 추출
-                .filePath(fileUrl) // ★ 중요: "/uploads/"를 붙이지 않고 S3 URL을 그대로 저장
+                .storedName(fileUrl.substring(fileUrl.lastIndexOf("/") + 1))
+                .filePath(fileUrl)
                 .fileSize(file.getSize())
                 .fileType(fileType)
                 .build();
@@ -39,8 +43,46 @@ public class FileLogService {
         return fileLog;
     }
 
-    // 다운로드를 위한 단건 조회 로직 추가
+    /**
+     * [업무/태스크] 파일 저장
+     */
+    @Transactional
+    public ScheduleFileDTO saveScheduleFile(MultipartFile file, Long scheduleId, Long userId) {
+        // S3 업로드 로직 재사용
+        String fileUrl = storageService.store(file);
+
+        ScheduleFileDTO dto = ScheduleFileDTO.builder()
+                .scheduleId(scheduleId)
+                .originalName(file.getOriginalFilename())
+                .storedName(fileUrl.substring(fileUrl.lastIndexOf("/") + 1))
+                .filePath(fileUrl)
+                .fileSize(file.getSize())
+                .contentType(file.getContentType())
+                .uploadedBy(userId)
+                .build();
+
+        scheduleFileMapper.insertScheduleFile(dto);
+        return dto;
+    }
+
+    /**
+     * [업무/태스크] 특정 업무의 전체 파일 목록 조회
+     */
+    public List<ScheduleFileDTO> getFilesByScheduleId(Long scheduleId) {
+        return scheduleFileMapper.findFilesByScheduleId(scheduleId);
+    }
+
+    /**
+     * [채팅방] 다운로드용 단건 조회
+     */
     public FileLogDTO getFileById(Long fileLogId) {
         return fileLogMapper.selectFileLogById(fileLogId);
+    }
+
+    /**
+     * [업무/태스크] 다운로드용 단건 조회 (TaskFileController 필수 메서드)
+     */
+    public ScheduleFileDTO getScheduleFileById(Long fileId) {
+        return scheduleFileMapper.findFileById(fileId);
     }
 }
