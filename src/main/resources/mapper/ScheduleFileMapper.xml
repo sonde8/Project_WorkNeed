@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.Workneed.workneed.Schedule.mapper.ScheduleFileMapper">
+
+    <insert id="insertScheduleFile" parameterType="com.Workneed.workneed.Schedule.dto.ScheduleFileDTO" useGeneratedKeys="true" keyProperty="fileId">
+        INSERT INTO schedule_file (
+            schedule_id, stored_name, original_name, file_path, file_size, content_type, uploaded_by
+        ) VALUES (
+                     #{scheduleId}, #{storedName}, #{originalName}, #{filePath}, #{fileSize}, #{contentType}, #{uploadedBy}
+                 )
+    </insert>
+
+    <select id="findFilesByScheduleId" parameterType="Long" resultType="com.Workneed.workneed.Schedule.dto.ScheduleFileDTO">
+        SELECT
+            file_id AS fileId,
+            schedule_id AS scheduleId,
+            stored_name AS storedName,
+            original_name AS originalName,
+            file_path AS filePath,
+            file_size AS fileSize,
+            content_type AS contentType,
+            uploaded_by AS uploadedBy,
+            uploaded_at AS uploadedAt
+        FROM schedule_file
+        WHERE schedule_id = #{scheduleId}
+        ORDER BY uploaded_at DESC
+    </select>
+
+    <select id="findFileById" parameterType="Long" resultType="com.Workneed.workneed.Schedule.dto.ScheduleFileDTO">
+        SELECT
+            file_id AS fileId,
+            schedule_id AS scheduleId,
+            stored_name AS storedName,
+            original_name AS originalName,
+            file_path AS filePath,
+            file_size AS fileSize,
+            content_type AS contentType,
+            uploaded_by AS uploadedBy,
+            uploaded_at AS uploadedAt
+        FROM schedule_file
+        WHERE file_id = #{fileId}
+    </select>
+
+    <delete id="deleteScheduleFile" parameterType="Long">
+        DELETE FROM schedule_file WHERE file_id = #{fileId}
+    </delete>
+
+</mapper>

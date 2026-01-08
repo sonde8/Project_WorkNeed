@@ -405,15 +405,23 @@ function onMessageReceived(payload) {
             bubble.appendChild(img);
         } else if (msgType === 'FILE') {
             var fileLink = document.createElement('a');
-            // 다운로드 API 경로로 설정
-            fileLink.href = "/api/chat/files/download/" + message.fileLogId;
 
+            // 다운로드 링크 설정
+            fileLink.href = message.fileLogId ? "/api/chat/files/download/" + message.fileLogId : message.content;
             fileLink.className = 'file-link';
 
-            var fileName = message.content.split('/').pop();
-            if(fileName.includes('_')) fileName = fileName.substring(fileName.indexOf('_') + 1);
+            // [파일명 출력 로직 핵심]
+            // 1. 서버에서 보낸 fileName이 있다면 최우선 사용
+            // 2. 없다면 URL에서 추출하고 decodeURIComponent로 한글 복구
+            var displayName = message.fileName;
 
-            fileLink.textContent = "📎 " + fileName;
+            if (!displayName) {
+                var rawName = message.content.split('/').pop();
+                if (rawName.includes('_')) rawName = rawName.substring(rawName.indexOf('_') + 1);
+                displayName = decodeURIComponent(rawName);
+            }
+
+            fileLink.textContent = "📎" + displayName;
             bubble.appendChild(fileLink);
         } else {
             var textPara = document.createElement('p');
@@ -620,25 +628,21 @@ function openImageModal(clickedSrc) {
     const modal = document.getElementById('imageModal');
     if (!modal) return;
 
-    // 이미지 메시지를 포함하는 li 요소를 모두 가져옵니다.
-    const allMsgUnits = document.querySelectorAll('.msg-unit:has(.bubble img)');
+    // 모든 이미지와 파일 링크를 포함하는 li들을 탐색
+    const allImages = document.querySelectorAll('#messageLog .bubble img');
 
-    currentImageList = Array.from(allMsgUnits).map(unit => {
-        const img = unit.querySelector('.bubble img');
-        const sender = unit.querySelector('.sender')?.textContent || "나";
-        const time = unit.querySelector('.msg-time')?.textContent || "";
+    currentImageList = Array.from(allImages).map(img => {
+        const parentLi = img.closest('li');
+        const msgUnit = img.closest('.msg-unit');
 
-        // [수정 핵심] 부모 li 요소에서 아까 저장해둔 messageId나
-        // 혹은 해당 이미지 메시지의 식별값(fileLogId)을 가져와야 합니다.
-        // 만약 li에 직접 data 속성으로 넣어두지 않았다면, 메시지 수신 시점에 넣어주는 로직이 필요합니다.
-        const parentLi = unit.closest('li');
-        const fileLogId = parentLi.getAttribute('data-file-log-id'); // 아래 onMessageReceived 수정 필요
+        // 새로고침 후에도 HTML에 박혀있는 data-file-log-id를 읽음
+        const fileLogId = parentLi ? parentLi.getAttribute('data-file-log-id') : null;
 
         return {
             src: img.src,
-            sender: sender,
-            fullDate: time,
-            fileLogId: fileLogId // ID 추가
+            sender: msgUnit?.querySelector('.sender')?.textContent || "나",
+            fullDate: msgUnit?.querySelector('.msg-time')?.textContent || "",
+            fileLogId: fileLogId
         };
     });
 

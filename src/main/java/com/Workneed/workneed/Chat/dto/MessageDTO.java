@@ -28,4 +28,7 @@ public class MessageDTO {
 
     // 클라이언트 화면에 표시할 수 있도록 포맷팅된 전송 시간 (오후 3:31)
     private String displayTime;
+
+    // 파일 원본명
+    private String fileName;
 }

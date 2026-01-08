@@ -121,35 +121,22 @@
                 </button>
             </div>
 
-            <div class="etc-block"id="etc-file">
-
+            <div class="etc-block" id="etc-file">
                 <div class="file-view etc-view">
-                    <div class="etc-label">File 저장소</div>
+                    <div class="etc-label">File 보관함</div>
 
-                    <a class="etc-url" th:if="${schedule.fileStorageUrl != null}"
-                       th:href="${#strings.startsWith(schedule.fileStorageUrl,'http://') or #strings.startsWith(schedule.fileStorageUrl,'https://')
-                        ? schedule.fileStorageUrl : 'https://' + schedule.fileStorageUrl}"
-                       target="_blank"
-                       th:text="${schedule.fileStorageUrl}">
-                    </a>
+                    <div id="taskFileList" class="task-file-list">
+                        <th:block th:each="f : ${fileList}">
+                            <div class="file-item">
+                                <a th:href="@{/api/task/files/download/{id}(id=${f.fileId})}" class="file-link">📎<span th:text="${f.originalName}"></span></a>
+                            </div>
+                        </th:block>
+                    </div>
 
-                    <span class="no-url" th:if="${schedule.fileStorageUrl == null }">등록된 File 저장소가 없습니다</span>
-                    <button type="button" class="btn-etc-edit">Edit</button>
+                    <span class="no-url" th:if="${#lists.isEmpty(fileList)}">등록된 파일이 없습니다.</span>
 
-                    <form th:if="${schedule.fileStorageUrl != null}"
-                          th:action="@{/schedule/{id}/file/delete(id=${schedule.scheduleId})}"
-                          method="post" class="etc-delete-form">
-                        <button type="submit" class="btn-etc-delete"> X </button>
-                    </form>
-                </div>
-                <div class="file-edit etc-edit">
-                    <form th:action="@{/schedule/{id}/file/update(id=${schedule.scheduleId})}" method="post">
-                        <input type="text" name="fileStorageUrl" placeholder="File URL"
-                               th:value="${schedule.fileStorageUrl}"
-                               th:attr="data-original=${schedule.fileStorageUrl}" />
-                        <button type="submit" class="btn-etc-save">Save</button>
-                        <button type="button" class="btn-etc-cancel">Cancel</button>
-                    </form>
+                    <input type="file" id="taskFileInput" style="display:none;" onchange="handleTaskFileUpload(this)">
+                    <button type="button" class="btn-etc-edit" onclick="document.getElementById('taskFileInput').click()">Upload</button>
                 </div>
             </div>
 

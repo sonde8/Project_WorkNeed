@@ -1,5 +1,6 @@
 package com.Workneed.workneed.Schedule.controller;
 
+import com.Workneed.workneed.Chat.service.FileLogService;
 import com.Workneed.workneed.Meetingroom.dto.MeetingReservationDTO;
 import com.Workneed.workneed.Members.dto.UserDTO;
 import com.Workneed.workneed.Schedule.dto.*;
@@ -35,6 +36,7 @@ public class ScheduleController {
 
     private final ScheduleParticipantService scheduleParticipantService;
     private final ScheduleService scheduleService;
+    private final FileLogService fileLogService;
 
     private final com.Workneed.workneed.Meetingroom.mapper.MeetingRoomMapper meetingRoomMapper;
 
@@ -325,6 +327,11 @@ public class ScheduleController {
 
         model.addAttribute("schedule", schedule);
         model.addAttribute("commentList", commentList);
+
+        // 1) [추가] 업무별 파일 목록 조회 (새로고침 시 목록 유지용)
+        // FileLogService를 통해 DB(schedule_file 테이블)의 데이터를 가져옵니다.
+        List<ScheduleFileDTO> fileList = fileLogService.getFilesByScheduleId(scheduleId);
+        model.addAttribute("fileList", fileList); // HTML의 th:each="f : ${fileList}"와 연결됨
 
         return "Schedule/task";
     }
