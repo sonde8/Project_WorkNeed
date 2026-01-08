@@ -1,5 +1,6 @@
 package com.Workneed.workneed.Schedule.controller;
 
+import com.Workneed.workneed.Chat.service.FileLogService;
 import com.Workneed.workneed.Meetingroom.dto.MeetingReservationDTO;
 import com.Workneed.workneed.Members.dto.UserDTO;
 import com.Workneed.workneed.Schedule.dto.*;
@@ -35,6 +36,7 @@ public class ScheduleController {
 
     private final ScheduleParticipantService scheduleParticipantService;
     private final ScheduleService scheduleService;
+    private final FileLogService fileLogService;
 
     private final com.Workneed.workneed.Meetingroom.mapper.MeetingRoomMapper meetingRoomMapper;
 
@@ -70,6 +72,8 @@ public class ScheduleController {
         model.addAttribute("todoList", todoList);
         model.addAttribute("doingList", doingList);
         model.addAttribute("doneList", doneList);
+
+        model.addAttribute("now", java.time.LocalDateTime.now());
 
         return "Schedule/kanban";
     }
@@ -307,11 +311,11 @@ public class ScheduleController {
 
 
 
-        // 1) 회의실 예약 리스트 조회
+        //  회의실 예약 리스트 조회
         List<MeetingReservationDTO> reservations =
                 meetingRoomMapper.selectReservationsByScheduleId(scheduleId);
 
-        // 2) endAt이 현재시간보다 지난 예약은 화면에서 제외
+        //  endAt이 현재시간보다 지난 예약
         LocalDateTime now = LocalDateTime.now();
         List<MeetingReservationDTO> activeReservations = reservations.stream()
                 .filter(r -> r.getEndAt() != null && !r.getEndAt().isBefore(now))
@@ -325,6 +329,11 @@ public class ScheduleController {
 
         model.addAttribute("schedule", schedule);
         model.addAttribute("commentList", commentList);
+
+        // [추가] 업무별 파일 목록 조회 (새로고침 시 목록 유지용)
+        // FileLogService를 통해 DB(schedule_file 테이블)의 데이터를 가져옵니다.
+        List<ScheduleFileDTO> fileList = fileLogService.getFilesByScheduleId(scheduleId);
+        model.addAttribute("fileList", fileList); // HTML의 th:each="f : ${fileList}"와 연결됨
 
         return "Schedule/task";
     }

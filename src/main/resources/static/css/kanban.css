@@ -32,6 +32,22 @@
     border-radius: 0.5rem;
     position: relative;
 }
+.kanban-card.is-overdue {
+    background: rgba(0,0,0,.5);
+}
+.badge-expired {
+    position: absolute;
+    right: 1rem;
+    bottom: 1rem;
+    padding: 0.5rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #fff;
+    background-color: #ff4d4f;
+    border-radius: 0.4rem;
+    opacity: 0.7;
+    line-height: 1;
+}
 .kanban-done .kanban-card {
     background: rgba(0, 0, 0, 0.5);
 }

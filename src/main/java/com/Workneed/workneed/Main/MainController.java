@@ -50,6 +50,7 @@ public class MainController {
 
         model.addAttribute("googleCalendarApiKey", googleCalendarApiKey);
 
+
         return "Main/main";
     }
 
