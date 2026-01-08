@@ -46,4 +46,8 @@
         DELETE FROM schedule_file WHERE file_id = #{fileId}
     </delete>
 
+    <delete id="deleteFilesByScheduleId" parameterType="long">
+        DELETE FROM schedule_file WHERE schedule_id = #{scheduleId}
+    </delete>
+
 </mapper>
