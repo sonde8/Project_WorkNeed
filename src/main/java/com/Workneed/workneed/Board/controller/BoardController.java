@@ -67,4 +67,30 @@ public class BoardController {
         return ok ? ResponseEntity.ok().build()
                 : ResponseEntity.badRequest().body("insert failed");
     }
+
+    // 게시물 삭제
+    @DeleteMapping("/posts/{postId}")
+    public ResponseEntity<?> delete(@PathVariable Long postId, HttpSession session) {
+
+        boolean isAdmin = session.getAttribute("admin") != null;
+
+        Long loginUserId = null;
+        Object userObj = session.getAttribute("user");
+        if (userObj != null) {
+            com.Workneed.workneed.Members.dto.UserDTO u =
+                    (com.Workneed.workneed.Members.dto.UserDTO) userObj;
+            loginUserId = u.getUserId();
+        } else if (isAdmin) {
+            Object adminObj = session.getAttribute("admin");
+            com.Workneed.workneed.Members.dto.UserDTO a =
+                    (com.Workneed.workneed.Members.dto.UserDTO) adminObj;
+            loginUserId = a.getUserId();
+        }
+
+        boolean ok = boardService.deletePost(postId, loginUserId, isAdmin);
+
+        if (!ok) return ResponseEntity.status(403).body("삭제 권한이 없습니다.");
+
+        return ResponseEntity.noContent().build();
+    }
 }

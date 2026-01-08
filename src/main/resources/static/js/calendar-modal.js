@@ -353,5 +353,19 @@
 
     closeBtn?.addEventListener("click", closeModal);
     cancelBtn?.addEventListener("click", closeModal);
+    // ESC 키로 등록 모달 닫기
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && !overlay.classList.contains("hidden")) {
+            closeModal();
+        }
+    });
+
+    // 배경 클릭 시 등록 모달 닫기
+    overlay.addEventListener("click", (e) => {
+        // 클릭된 대상이 하얀색 폼 박스가 아니라 바깥 배경(overlay)일 때만 닫기
+        if (e.target === overlay) {
+            closeModal();
+        }
+    });
 
 })();

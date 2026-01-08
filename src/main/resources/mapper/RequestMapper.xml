@@ -8,21 +8,21 @@
             parameterType="long"
             resultType="com.Workneed.workneed.Members.dto.RequestDTO">
         SELECT *
-        FROM Request
+        FROM request
         WHERE request_id = #{requestId}
     </select>
 
     <select id="findPendingAttendanceRequests"
             resultType="RequestDTO">
         SELECT *
-        FROM Request
+        FROM request
         WHERE request_type = 'ATTENDANCE'
         AND status = 'PENDING'
         ORDER BY request_created_at ASC
     </select>
 
     <update id="approve">
-        UPDATE Request
+        UPDATE request
         SET status = 'APPROVED',
         admin_id = #{adminId},
         request_updated_at = NOW()
@@ -30,7 +30,7 @@
     </update>
 
     <update id="reject">
-        UPDATE Request
+        UPDATE request
         SET status = 'REJECTED',
         admin_id = #{adminId},
         request_payload = #{payload},
@@ -40,7 +40,7 @@
 
     <insert id="insert" parameterType="RequestDTO"
             useGeneratedKeys="true" keyProperty="requestId">
-        INSERT INTO Request (
+        INSERT INTO request (
         user_id, request_type, request_payload, status
         ) VALUES (
         #{userId}, #{requestType}, #{requestPayload}, #{status}

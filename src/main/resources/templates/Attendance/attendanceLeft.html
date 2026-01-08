@@ -8,6 +8,9 @@
     <div class="rows">
         <div class="row"><span>출근시간</span><span class="muted" data-checkin>미등록</span></div>
         <div class="row"><span>퇴근시간</span><span class="muted" data-checkout>미등록</span></div>
+    </div>
+
+    <div class="rowMonth">
         <div class="row"><span>월간누적시간</span><span class="muted" data-monthtotal>미등록</span></div>
     </div>
 
@@ -32,10 +35,9 @@
                 <ul class="state-modal_list">
                     <li class="state-item" data-action="set-state" data-state="출근">출근</li>
                     <li class="state-item" data-action="set-state" data-state="퇴근">퇴근</li>
-                    <li class="state-item" data-action="set-state" data-state="출장">출장</li>
                     <li class="state-item" data-action="set-state" data-state="연차">연차</li>
-                    <li class="state-item" data-action="set-state" data-state="병가">병가</li>
-                    <li class="state-item" data-action="set-state" data-state="휴가">휴가</li>
+                    <li class="state-item" data-action="set-state" data-state="오전 연차">오전 연차</li>
+                    <li class="state-item" data-action="set-state" data-state="오후 연차">오후 연차</li>
                 </ul>
 
                 <button class="state-modal_close" data-action="close-state-modal" type="button"> 닫기 </button>
@@ -47,8 +49,8 @@
         <a class="cli" th:href="@{/attendance}">근 태 관 리</a>
         <a class="cli" th:href="@{/attendance/month}">출 근 부</a>
         <a class="cli" th:href="@{/attendance/leave}">연 차 관 리</a>
-        <a class="cli" th:href="@{/attendance/team}">부 서 근 태</a>
-        <a class="cli" th:href="@{/attendance/position}">직 급 수 정</a>
+        <a class="cli" th:href="@{/attendance/teamAttend}">부 서 근 태</a>
+        <a class="cli" th:href="@{/attendance/teamLeave}">부 서 연 차</a>
     </div>
 
 </section>

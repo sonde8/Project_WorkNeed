@@ -1,160 +1,219 @@
-.mainPage{
-    display : flex;
-    gap: 20px;
+@charset "UTF-8";
+
+/* =========================================
+   0. Variables (공통 디자인)
+   ========================================= */
+:root {
+    --color-bg: #F2F4F7;
+    --color-surface: #FFFFFF;
+    --color-primary: #2C3E50;
+    --color-primary-light: #f0f4f8;
+    --color-text-main: #333333;
+    --color-border: #E5E7EB;
+
+    --border-radius: 12px;
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+    --gap-size: 20px;
 }
 
-.leftPage{
-    width: 420px;
-    height: 100%;
-    border: 1px solid black;
+/* =========================================
+   1. Main Layout (전체 틀)
+   ========================================= */
+body {
+    background-color: var(--color-bg);
+    margin: 0;
+    overflow: hidden;
+    height: 100dvh;
+}
+
+.pageMain {
+    width: 100%;
+    height: calc(100dvh - 80px);
+    padding: var(--gap-size);
     box-sizing: border-box;
 }
 
-.toDay{
-    border: 1px solid black;
-    border-radius: 16px;
-    margin-top: 30px;
-    padding: 18px;
-    text-align: center;
-    font-size: 34px;
-    font-weight: 800;
-}
-
-
-
-.pw-btn {
-  background: #f2f4ff;
-  color: #4e73df;
-  font-weight: 700;
-}
-
-
-.profile-card {
-    border: 1px solid black;
-    border-radius: 16px;
-    box-shadow: 0 6px 20px rgba(31, 41, 55, 0.08);
-    margin-top: 20px;
-    padding: 18px;
-    display: grid;
-    grid-template-columns: 90px 1fr;
-    column-gap: 14px;
-    row-gap: 6px;
-    align-items: center;
-}
-
-.profileImg {
-    width: 90px;
-    height: 90px;
-    border-radius: 50%;
-    background: #f2f4ff;
-    border: 1px solid #f2f4ff;
+.mainPage {
+    width: 100%;
+    height: 100%;
     display: flex;
-    justify-content: center;
-    align-items: center;
-    font-weight: 700;
-    color: #6b7280;
-    grid-row: 1 / 5;
-
-    /* 이미지가 넘치지 않게 방지 */
+    gap: var(--gap-size);
     overflow: hidden;
 }
 
-/* 프로필 이미지가 있을 때 적용될 스타일 */
+/* =========================================
+   2. Left Sidebar (왼쪽 패널)
+   ========================================= */
+.leftPage {
+    width: 420px;
+    flex-shrink: 0;
+    height: 100%;
+    background-color: var(--color-surface);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-sm);
+    padding: 20px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* 요소 간 간격 최적화 */
+    overflow: hidden; /* 내부 스크롤 방지 */
+}
+
+/* (1) 오늘 날짜 */
+.toDay {
+    text-align: center;
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--color-primary);
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--color-primary);
+    margin: 0;
+}
+
+/* (2) 프로필 섹션 - 글씨 크기 강화 */
+.profile-card {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 15px 20px;
+    background-color: var(--color-primary-light);
+    border-radius: var(--border-radius);
+    flex-shrink: 0;
+}
+
+.profileImg {
+    width: 70px; /* 크기 약간 복구 */
+    height: 70px;
+    flex-shrink: 0;
+}
+
 .profileImg img {
     width: 100%;
     height: 100%;
-    object-fit: cover; /* 가로세로 비율 유지하며 영역 꽉 채움 */
-    display: block;
+    border-radius: 50%;
+    object-fit: cover;
 }
 
+.profileText {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
 
-
-.name {
-    font-size: 20px;
+.profileText .name {
+    font-size: 20px; /* 이름 크기 확대 */
+    font-weight: 800;
+    color: var(--color-primary);
 }
 
 .profileMeta {
-    font-size: 15px;
-    margin-top: 5px;
-}
-
-.attendancePage{
+    font-size: 15px; /* 부서/직급 크기 확대 */
+    font-weight: 600;
+    color: #555;
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    text-align: center;
+    gap: 8px;
+}
 
-    margin-top: 5px;
-    padding: 14px 16px;
-    border-radius: 14px;
+.profileMeta .bar {
+    color: #ccc;
+}
+
+/* (3) 근태 위젯 - 스크롤 없이 영역 차지 */
+.attendWidget {
+    flex: 1; /* 남은 공간을 차지하되 비율 유지 */
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+/* (4) 결재 위젯 - 6개 한 줄 배치 */
+.main-kpi-approval {
+    display: flex;
+    justify-content: space-between; /* 한 줄 꽉 차게 배치 */
+    gap: 6px;
+    flex-shrink: 0;
+    padding: 5px 0;
+}
+
+.main-kpi-approval .kpi {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 16%; /* 6개 한 줄 배치 */
+    height: 65px; /* 높이 약간 조절 */
     text-decoration: none;
+    color: #222;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    background: #f9fafb;
+    transition: all 0.2s ease;
+}
 
-    border: 1px solid black;
-    color: black;
+.main-kpi-approval .kpi:hover {
+    background: #ffffff;
+    border-color: var(--color-primary);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
 
-    font-size: 15px;
+.main-kpi-approval .kpi-num {
+    font-size: 18px;
+    font-weight: 900;
+    line-height: 1.2;
+    color: var(--color-primary);
+}
+
+.main-kpi-approval .kpi-label {
+    font-size: 11px;
     font-weight: 800;
-
+    color: #666;
+    line-height: 1;
 }
 
-.pay{
-    border: 1px solid black;
+.main-kpi-approval .kpi--danger .kpi-num {
+    color: #b00020;
 }
 
-/* 오른쪽 영역 */
+/* =========================================
+   3. Right Page (오른쪽 그리드 영역)
+   ========================================= */
 .rightPage {
-    width: 900px;
+    flex: 1;
+    height: 100%;
     display: grid;
-
-    /* 2 : 2 : 1.5 비율 */
-    grid-template-columns: 2fr 2fr 1.5fr;
-
-    /* 위 / 아래 */
-    grid-template-rows: 260px 1fr;
-
-    gap: 16px;
-    box-sizing: border-box;
-}
-
-.borad {
-    grid-column: 1 / 2;
-    grid-row: 1 / 2;
-}
-
-.mini-calendar {
-    grid-column: 2 / 3;
-    grid-row: 1 / 2;
-}
-
-.mini-kanban {
-    grid-column: 1 / 3;
-    grid-row: 2 / 3;
-}
-
-.mini-meetingroom {
-    grid-column: 3 / 4;
-    grid-row: 1 / 3;
+    grid-template-columns: 1fr 1fr 300px;
+    grid-template-rows: 1fr 1fr;
+    gap: var(--gap-size);
 }
 
 .rightPage > div {
-    border: 1px dashed #999;
-    background: whitesmoke;
-
+    background: var(--color-surface);
+    border-radius: var(--border-radius);
+    padding: 20px;
+    box-sizing: border-box;
     display: flex;
-    align-items: center;
-    justify-content: center;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
 }
 
-/* attendanceLeft에서 제거 영역 */
-.pageMain .state-wrap { display:none; }
+.main-borad { grid-column: 1 / 2; grid-row: 1 / 2; }
+.mini-calendar { grid-column: 2 / 3; grid-row: 1 / 2; }
+.mini-kanban { grid-column: 1 / 3; grid-row: 2 / 3; }
+.mini-meetingroom { grid-column: 3 / 4; grid-row: 1 / 3; }
+
+.main-borad > div, .mini-kanban > div {
+    flex: 1;
+    overflow-y: auto;
+}
+
+/* =========================================
+   4. Utility / Cleanups
+   ========================================= */
+.pageMain .state-wrap,
 .pageMain .title,
 .pageMain .clock,
 .pageMain .click,
-.pageMain .rowMonth { display:none; }
+.pageMain .rowMonth { display: none; }
 
-.pageMain .attendWidget .att-left {
-    width: auto;
-    height: auto;
-    border: none;
-    padding: 0;
-}

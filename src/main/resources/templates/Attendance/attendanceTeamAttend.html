@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+
+<head>
+    <title th:text="${pageTitle}"> 부서근태관리 </title>
+
+    <!-- 페이지 전용 CSS -->
+    <th:block layout:fragment="head">
+        <link rel="stylesheet" th:href="@{/css/attendanceLeft.css}">
+        <link rel="stylesheet" th:href="@{/css/attendanceMain.css}">
+        <link rel="stylesheet" th:href="@{/css/attendanceBook.css}">
+        <link rel="stylesheet" th:href="@{/css/attendanceLeave.css}">
+        <link rel="stylesheet" th:href="@{/css/attendanceTeamAttend.css}">
+    </th:block>
+
+</head>
+
+<body>
+
+    <th:block layout:fragment="script">
+        <script th:src="@{/js/attendanceLeft.js}"></script>
+        <script th:src="@{/js/attendanceMain.js}"></script>
+        <script th:src="@{/js/attendanceBook.js}"></script>
+        <script th:src="@{/js/attendanceLeave.js}"></script>
+        <script th:src="@{/js/attendanceTeamAttend.js}"></script>
+    </th:block>
+
+<main layout:fragment="content" class = "teamAttend">
+
+    <div class="team">
+
+        <!-- 왼쪽 -->
+        <section th:replace="~{Attendance/attendanceLeft :: attendanceLeft}"></section>
+
+        <!-- 오른쪽 -->
+        <section class="right3">
+
+            <!-- 년도 월 -->
+            <div class = "teamHead">
+                <button type="button" class="monthBtn" id="prevMonth"> &lt; </button>
+                <div class="month_title" id="monthTitle"></div>
+                <button type="button" class="monthBtn" id="nextMonth"> &gt; </button>
+            </div>
+
+            <!-- 표 -->
+            <div class="teamTableWrap">
+
+                <table class="teamTable">
+
+                    <thead>
+
+                        <tr>
+                            <th> 이름 </th>
+                            <th> 누적 시간 </th>
+                            <th> 1주 </th>
+                            <th> 2주 </th>
+                            <th> 3주 </th>
+                            <th> 4주 </th>
+                            <th> 5주 </th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="teamAttendTbody"></tbody>
+                </table>
+            </div>
+
+
+
+        </section>
+    </div>
+</main>
+
+
+</body>
+</html>
+
+
+

@@ -40,4 +40,18 @@ public class BoardServiceImpl implements BoardService {
         return boardMapper.insertPost(postDTO) == 1;
     }
 
+    //5. 게시물 삭제
+    @Override
+    public boolean deletePost(Long postId, Long loginUserId, boolean isAdmin) {
+        BoardPostDTO post = boardMapper.selectPostById(postId);
+        if (post == null) return false;
+
+        // admin이면 무조건 허용, 아니면 작성자만 허용
+        if (!isAdmin) {
+            if (loginUserId == null || post.getWriterId() == null) return false;
+            if (!loginUserId.equals(post.getWriterId())) return false;
+        }
+
+        return boardMapper.deletePostById(postId) == 1;
+    }
 }

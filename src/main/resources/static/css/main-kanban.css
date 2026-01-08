@@ -8,6 +8,8 @@
 
     display: grid;
     grid-template-rows: auto 1fr;
+    overflow-y: scroll;
+    overflow-x: auto;
 }
 .mk-head{
     padding: 1rem 0;

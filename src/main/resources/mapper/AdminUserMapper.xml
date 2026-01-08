@@ -51,9 +51,9 @@
         a.admin_created_at AS adminCreatedAt,
         r.role_name AS roleName,
         r.role_description AS roleDescription
-        FROM AdminUser a
+        FROM adminuser a
         /* 테이블명을 Role에서 AdminRole로 수정 */
-        LEFT JOIN AdminRole r ON a.role_id = r.role_id
+        LEFT JOIN adminrole r ON a.role_id = r.role_id
         ORDER BY a.admin_created_at DESC
     </select>
 
@@ -65,16 +65,16 @@
         l.log_action_type AS logActionType,
         l.log_description AS logDescription,
         l.log_created_at AS logCreatedAt
-        FROM AdminActivityLog l
-        JOIN AdminUser a ON l.admin_id = a.admin_id
+        FROM adminactivitylog l
+        JOIN adminuser a ON l.admin_id = a.admin_id
         /* 여기도 Role에서 AdminRole로 수정 */
-        LEFT JOIN AdminRole r ON a.role_id = r.role_id
+        LEFT JOIN adminrole r ON a.role_id = r.role_id
         ORDER BY l.log_created_at DESC
     </select>
 
     <select id="findPermissionsByRoleId" resultType="string">
         SELECT permission_code
-        FROM AdminPermission
+        FROM adminpermission
         WHERE role_id = #{roleId}
     </select>
 
@@ -86,7 +86,7 @@
 
     <insert id="insertAdmin" parameterType="com.Workneed.workneed.Members.dto.AdminUserDTO"
             useGeneratedKeys="true" keyProperty="adminId">
-        INSERT INTO AdminUser (
+        INSERT INTO adminuser (
         admin_email,    admin_password, admin_name,     role_id,        admin_status    ) VALUES (
         #{adminEmail},   #{adminPassword},
         #{adminName},
@@ -95,7 +95,7 @@
     </insert>
 
     <insert id="insertActivityLog" parameterType="com.Workneed.workneed.Members.dto.AdminUserDTO">
-        INSERT INTO AdminActivityLog (
+        INSERT INTO adminactivitylog (
         admin_id,
         log_action_type,
         log_target_type,
@@ -132,7 +132,7 @@
     </update>
 
     <update id="updateAdminStatus">
-        UPDATE AdminUser
+        UPDATE adminuser
         SET admin_status = #{status}
         WHERE admin_id = #{adminId}
     </update>

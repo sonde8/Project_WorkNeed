@@ -47,4 +47,4 @@ jobs:
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/workneed-app
             sudo docker stop workneed-container || true
             sudo docker rm workneed-container || true
-            sudo docker run -d --name workneed-container -p 8080:8080 ${{ secrets.DOCKER_USERNAME }}/workneed-app
+            sudo docker run -d --name workneed-container -e TZ=Asia/Seoul -p 8080:8080 ${{ secrets.DOCKER_USERNAME }}/workneed-app

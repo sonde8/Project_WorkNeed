@@ -16,4 +16,7 @@ public interface FileLogMapper {
 
     // 2. 특정 채팅방의 파일 목록 조회 (사이드바 모아보기용)
     List<FileLogDTO> findFilesByRoomId(Long roomId);
+
+    // 3. 파일 ID로 단건 정보 조회 다운로드
+    FileLogDTO selectFileLogById(Long fileLogId);
 }

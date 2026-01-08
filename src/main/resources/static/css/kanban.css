@@ -19,17 +19,34 @@
 .kanban-cards{
     height: 66vh;
     margin: 2rem 1.5rem;
-    overflow: auto;
+    overflow-x: hidden;
+    overflow-y: scroll;
 }
 .kanban-card{
     display: grid;
-    grid-template-columns: 2fr 1fr;
+    grid-template-columns: 66% 33%;
     height: 16rem;
     margin: 1rem 0.8rem;
     padding: 1.2rem;
     background: rgba(0,0,0,.06);
     border-radius: 0.5rem;
     position: relative;
+}
+.kanban-card.is-overdue {
+    background: rgba(0,0,0,.5);
+}
+.badge-expired {
+    position: absolute;
+    right: 1rem;
+    bottom: 1rem;
+    padding: 0.5rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #fff;
+    background-color: #ff4d4f;
+    border-radius: 0.4rem;
+    opacity: 0.7;
+    line-height: 1;
 }
 .kanban-done .kanban-card {
     background: rgba(0, 0, 0, 0.5);
@@ -43,6 +60,7 @@
 .kanban-card .title-event-type{
     display: flex;
     flex-direction: column;
+    overflow: hidden;
 }
 .kanban-card .title{
     display: inline-block;
@@ -131,7 +149,7 @@
 #modal-backdrop{
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,.45);
+    background: rgba(0,0,0,0.6);
     z-index: 1000;
 }
 [hidden]{
@@ -145,19 +163,19 @@
     display: grid;
     place-items: center;
     z-index: 1001;
-    padding: 2.4rem;
 }
 
 /* ===== Panel ===== */
 .modal-panel{
     width: 75rem;
-    height: 85vh;
+    height: auto;
     padding: 2rem;
     background: #fff;
     border-radius: 0.5rem;
     box-shadow: 0 1.8rem 5rem rgba(0,0,0,.25);
     position: relative;
-    overflow: scroll;
+    overflow-y: scroll;
+    overflow-x: auto;
 }
 .modal-header{
     padding: 1.8rem;
@@ -182,12 +200,12 @@
 
 /* ===== Form sheet ===== */
 .modal-sheet{
-    padding:3rem;
+    padding:4rem;
     margin:1rem;
     display: grid;
     background: rgba(0,0,0,.05);
     border-radius: 0.5rem;
-    gap: 1.7rem;
+    gap: 2rem;
 }
 .modal-sheet .field{
     width: 100%;
@@ -196,21 +214,17 @@
 #titleR input,
 #locationR input{
     width: 100%;
-    height: 3.6rem;
+    height: 4rem;
     padding: 0 1.2rem;
     border: .1rem solid rgba(0,0,0,.15);
     border-radius: 1rem;
     outline: none;
     font-size: 1.4rem;
 }
-#titleR input:focus,
-#locationR input:focus{
-    border-color: rgba(0,0,0,.35);
-}
 #dateTimeR{
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 1.3rem;
+    gap: 1.5rem;
 }
 #dateTimeR input{
     width: 100%;
@@ -221,7 +235,10 @@
     outline: none;
     font-size: 1.3rem;
 }
-#dateTimeR input:focus{
+#titleR input:focus,
+#locationR input:focus,
+#dateTimeR input:focus,
+#descriptionR textarea:focus{
     border-color: rgba(0,0,0,.35);
 }
 .eventTypeGroup{
@@ -280,10 +297,7 @@
     border-radius: 1.2rem;
     outline: none;
     resize: vertical;
-    font-size: 1.3rem;
-}
-#descriptionR textarea:focus{
-    border-color: rgba(0,0,0,.35);
+    font-size: 1.4rem;
 }
 
 /* File */

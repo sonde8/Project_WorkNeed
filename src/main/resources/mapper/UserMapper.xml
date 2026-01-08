@@ -103,7 +103,7 @@
             useGeneratedKeys="true"
             keyProperty="userId"
             keyColumn="user_id">
-        INSERT INTO User (
+        INSERT INTO user (
         user_login_id,
         user_email,
         user_password,
@@ -149,7 +149,7 @@
     </update>
 
     <update id="updatePassword">
-        UPDATE User
+        UPDATE user
         SET user_password = #{userPassword}
         WHERE user_id = #{userId}
     </update>

@@ -91,31 +91,45 @@
     }
 
     function getEventColor(dto) {
+        const type = (dto?.type || "").toString().toUpperCase();
+        const source = getSource(dto); // CALENDAR | SCHEDULE
 
-            // 사용자가 직접 지정한 색상이 있다면 최우선 적용
-            if (dto?.color) return dto.color;
-
-            const type = (dto?.type || "").toString().toUpperCase();
-            const source = getSource(dto);
-
-            // 1. [업무] (스케줄 소스) -> 빨간색 계열 통일
-            if (source === "SCHEDULE") {
-                return "#ef4444";
+        // =========================================================
+        // 1. [SCHEDULE] 업무 일정 (스케줄 연동)
+        //    - 업무는 DB가 다르므로 커스텀 색상(dto.color)보다 타입별 지정 색상이 우선됨
+        // =========================================================
+        if (source === "SCHEDULE") {
+            if (type === "PERSONAL") {
+                return "#3b82f6"; // 업무-개인 (기본 파랑)
             }
-
-            // 2. [회사] (관리자 등록) -> 보라색 계열 통일
-            if (type === "COMPANY") {
-                return "#8b5cf6";
-            }
-
-            // 3. [팀] -> 초록색 (필요시 업무 색상인 #ef4444로 변경 가능)
             if (type === "TEAM") {
-                return "#22c55e";
+                return "#22c55e"; // 업무-팀 (초록)
             }
-
-            // 4. [개인] (기본) -> 파란색 계열 통일
+            if (type === "COMPANY") {
+                return "#ef4444"; // 업무-회사 (빨강)
+            }
+            // 예외(타입 없는 경우) 처리: 업무 기본색(여기선 파랑으로 둠)
             return "#3b82f6";
         }
+
+        // =========================================================
+        // 2. [CALENDAR] 캘린더 일정 (내장 기능)
+        // =========================================================
+
+        // 2-1. 관리자가 등록한 회사 전체 일정 (보라색 고정)
+        if (type === "COMPANY") {
+            return "#8b5cf6";
+        }
+
+        // 2-2. 내 개인 일정
+        // 사용자가 등록/수정 시 직접 지정한 색상(dto.color)이 있으면 최우선
+        if (dto?.color) {
+            return dto.color;
+        }
+
+        // 지정 안 했으면 기본 파랑
+        return "#3b82f6";
+    }
 
     function getTypeEmoji(dto) {
         const type = (dto?.type || "").toUpperCase();
@@ -142,18 +156,28 @@
         const type = (dto?.type || "").toUpperCase();
         const source = getSource(dto);
 
-        // 1. 회사 (연한 보라 배경 + 진한 보라 글씨)
-        if (source === "CALENDAR" && type === "COMPANY") {
-            return { text: "회사", bg: "#f3e8ff", color: "#7e22ce" };
-        }
-
-        // 2. 업무 (연한 빨강 배경 + 진한 빨강 글씨)
+        // 1. [SCHEDULE] 업무 연동 (타입별 색상 매칭)
         if (source === "SCHEDULE") {
-            return { text: "업무", bg: "#fee2e2", color: "#b91c1c" };
+            if (type === "COMPANY") {
+                // 업무-회사: 빨강 계열
+                return { text: "업무(전사)", bg: "#fee2e2", color: "#b91c1c" };
+            }
+            if (type === "TEAM") {
+                // 업무-팀: 초록 계열
+                return { text: "업무(팀)", bg: "#dcfce7", color: "#15803d" };
+            }
+            // 업무-개인: 파랑 계열 (텍스트로 '업무'임을 명시)
+            return { text: "업무(개인)", bg: "#dbeafe", color: "#1d4ed8" };
         }
 
-        // 3. 개인 (연한 파랑 배경 + 진한 파랑 글씨)
-        return { text: "개인", bg: "#dbeafe", color: "#1d4ed8" };
+        // 2. [CALENDAR] 내장 캘린더
+        // 회사 (관리자 공지 등): 보라 계열
+        if (type === "COMPANY") {
+            return { text: "사내공지", bg: "#f3e8ff", color: "#7e22ce" };
+        }
+
+        // 개인 (기본): 파랑 계열
+        return { text: "개인", bg: "#eff6ff", color: "#1e40af" };
     }
 
     function getDtoId(dto) {
@@ -350,23 +374,65 @@
             });
         }
 
-        // 5. 버튼 이벤트
-        closeBtn.onclick = () => overlay.classList.add("hidden");
+        const hideDailyListModal = () => {
+            // 1. [핵심] 숨기기 전에 포커스를 먼저 모달 밖으로 강제 이동시킵니다.
+            // blur()보다 focus()를 먼저 하는 것이 브라우저가 포커스 위치를 파악하는 데 훨씬 명확합니다.
+            const externalBtn = document.getElementById("openCalendarCreateModal");
+            if (externalBtn) {
+                externalBtn.focus();
+            } else {
+                document.activeElement?.blur();
+            }
 
-        addBtn.onclick = () => {
+            // 2. 브라우저가 포커스 이동을 완전히 인지할 수 있도록 micro-task(setTimeout 0)를 사용하거나,
+            // 순서를 확실히 하여 숨김 처리를 진행합니다.
             overlay.classList.add("hidden");
+
+            // 3. 포커스가 이미 밖(externalBtn)으로 나갔으므로, 이제 안전하게 숨김 처리를 할 수 있습니다.
+            overlay.setAttribute("aria-hidden", "true");
+        };
+
+        // 닫기 버튼 클릭 시
+        closeBtn.onclick = () => {
+            hideDailyListModal();
+        };
+
+        // 등록 버튼 클릭 시
+        addBtn.onclick = () => {
+            hideDailyListModal(); // 모달을 먼저 닫고
             const startAt = new Date(baseDate);
             startAt.setHours(9, 0, 0);
             const endAt = new Date(startAt);
             endAt.setMinutes(30);
+
+            // 등록 모달 열기
             safeOpenCreateModal({
                 start: toDtoDateTime(startAt),
                 end: toDtoDateTime(endAt)
             });
         };
 
+        // 모달 표시
         overlay.classList.remove("hidden");
+
+        // ESC 키 감지 (익명 함수로 추가)
+        const handleEsc = (e) => {
+            if (e.key === "Escape") {
+                hideDailyListModal(); // ESC로 닫을 때도 포커스 해제
+                document.removeEventListener("keydown", handleEsc);
+            }
+        };
+        document.addEventListener("keydown", handleEsc);
+
+        // 배경(오버레이) 클릭 시 닫기
+        overlay.onclick = (e) => {
+            if (e.target === overlay) {
+                hideDailyListModal(); // 배경 클릭 시에도 포커스 해제
+                document.removeEventListener("keydown", handleEsc);
+            }
+        };
     }
+
     /* ================= Calendar Init ================= */
 
     function initCalendar() {
@@ -379,7 +445,7 @@
         calendar = new FullCalendar.Calendar(el, {
             locale: "ko",
             initialView: "dayGridMonth",
-            googleCalendarApiKey: 'AIzaSyBM_oNQ8dkUcn_lK-EmAn2iwXgVGz_cp_s',
+            googleCalendarApiKey: window.GOOGLE_CALENDAR_API_KEY,
 
             /* ================= 레이아웃 설정 ================= */
             height: '100%',
@@ -422,6 +488,14 @@
             moreLinkClick: function(info) {
                 openDailyListModal(info.date);
                 return "void";
+            },
+            dayCellDidMount: function(info) {
+                if (info.date.getDay() === 0) { // 0은 일요일
+                    const numberEl = info.el.querySelector('.fc-daygrid-day-number');
+                    if (numberEl) {
+                        numberEl.style.color = '#e03131';
+                    }
+                }
             },
 
             selectable: true,
@@ -477,27 +551,19 @@
             },
 
             // 일정 클릭
-                eventClick(info) {
+            eventClick(info) {
+                if (info.event.url) {
+                    info.jsEvent.preventDefault();
+                    return;
+                }
 
-                    if (info.event.url) {
-                        info.jsEvent.preventDefault();
-                        return;
-                    }
+                const raw = info.event.extendedProps?.raw;
+                if (raw) {
+                    const targetDate = info.event.start;
 
-                    const raw = info.event.extendedProps?.raw;
-                    if (raw) {
-
-                        const clickedDate = calendar.getDateFromPixel({
-                            x: info.jsEvent.clientX,
-                            y: info.jsEvent.clientY
-                        });
-
-                        // 클릭 좌표에서 날짜를 못 찾으면(예외 상황) 이벤트 시작일 사용
-                        const targetDate = clickedDate || info.event.start;
-
-                        openDailyListModal(targetDate);
-                    }
-                },
+                    openDailyListModal(targetDate);
+                }
+            },
 
             // 드래그/리사이즈
             eventDrop(info) {

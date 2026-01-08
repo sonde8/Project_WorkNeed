@@ -20,4 +20,7 @@ public interface BoardMapper {
 
     // 4. 게시글 등록
     int insertPost(BoardPostDTO postDTO);
+
+    // 5. 게시물 삭제
+    int deletePostById(Long postId);
 }

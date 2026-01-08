@@ -72,7 +72,6 @@
             </section>
         </aside>
 
-        <div class="calendar-gap"></div>
 
         <section class="calendar-right">
             <div class="calendar-inner">
@@ -113,13 +112,16 @@
 
 <th:block layout:fragment="script">
     <script th:inline="javascript">
-        /*<![CDATA[*/
         const loginUser = /*[[${loginUser}]]*/ null;
+
         window.USER_ID = loginUser ? loginUser.userId : null;
         window.USER_NAME = loginUser ? loginUser.userName : 'Guest';
-        window.IS_ADMIN = false;
-        /*]]>*/
+
+        window.IS_ADMIN = /*[[${session.admin != null}]]*/ false;
+
+        window.GOOGLE_CALENDAR_API_KEY = /*[[${googleCalendarApiKey}]]*/ '';
     </script>
+
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
     <script src='https://cdn.jsdelivr.net/npm/@fullcalendar/google-calendar@6.1.10/index.global.min.js'></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>

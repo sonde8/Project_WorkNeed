@@ -1,265 +1,243 @@
+@charset "UTF-8";
+
+/* =========================================
+   1. Global Variables
+   ========================================= */
+:root {
+    --color-primary: #0B2E4F;
+    --color-secondary: #3A7BD5;
+    --color-bg: #F6F8FB;
+    --color-text-main: #1F2937;
+    --color-text-sub: #6B7280;
+    --color-border: #E5E7EB;
+    --color-white: #ffffff;
+
+    /* [추가] 레이아웃 고정 수치 변수화 */
+    --size-sidebar-width: 80px;
+    --size-header-height: 80px;
+}
+
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
 }
+
 html {
-    font-size: 62.5%;        /* 1rem = 10px */
+    font-size: 62.5%; /* 1rem = 10px */
     scroll-behavior: smooth;
 }
-.body{
+
+body {
     margin: 0 auto;
+    font-family: 'Noto Sans KR', sans-serif;
+    color: var(--color-text-main);
+    background-color: var(--color-bg);
+    /* 페이지 전체 스크롤 허용 */
+    overflow-y: auto;
 }
-/*main-layout*/
+
+/* =========================================
+   2. Main Layout (Grid 시스템)
+   ========================================= */
 .main-layout {
     width: 100%;
-    min-width: 1440px;
-    height: 100vh;
-    margin: 0 auto;
-
+    /* 최소 높이를 화면 꽉 차게 설정하여 하단 여백 보존 */
+    min-height: 100dvh;
     display: grid;
-    grid-template-columns: 80px 1360px;
-    grid-template-rows: 60px 1fr;
+    /* 사이드바 너비와 헤더 높이를 동일하게 80px로 고정 */
+    grid-template-columns: var(--size-sidebar-width) 1fr;
+    grid-template-rows: var(--size-header-height) 1fr;
     grid-template-areas:
-  "sidebar  header"
-  "sidebar  content";
+      "sidebar  header"
+      "sidebar  content";
 }
-.sidebar { grid-area: sidebar; border: 1px solid #aaa; }
-.header  { grid-area: header;  border: 1px solid #aaa; }
-.content { grid-area: content; border: 1px solid #aaa; margin-top: 10px;}
-           /*padding-right: 20px;}*/
 
+.sidebar { grid-area: sidebar; z-index: 100; }
+.header  { grid-area: header;  z-index: 90; }
+.content {
+    grid-area: content;
+    position: relative;
+}
 
-.sidebar { background: #f0f0f0; }
-.header  { background: #fafafa; }
-.content { background: #ffffff; }
-
-
-/* 사이드바 css */
-/* 사이드바 기본 설정 */
+/* =========================================
+   3. Sidebar (사이드바) 수정 버전
+   ========================================= */
 .sidebar {
-    width: 80px;
-    background-color: #ffffff;
-    border-right: 1px solid #ddd;
+    width: var(--size-sidebar-width);
+    background-color: var(--color-white);
+    border-right: 1px solid var(--color-border);
     height: 100vh;
+    position: sticky;
+    top: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding-top: 60px;
+    padding-top: var(--size-header-height);
+}
+
+.sidebar-nav {
+    width: 100%; /* 네비게이션이 사이드바 너비를 꽉 채우도록 */
 }
 
 .sidebar-nav ul {
     list-style: none;
-    padding: 0;
-    margin: 0;
     width: 100%;
 }
 
-/* 각 메뉴 항목 스타일 */
 .nav-item {
+    display: flex;
+    width: 100%; /* 가로 폭 꽉 채우기 */
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+/* 링크 영역이 칸 전체를 차지하도록 설정 */
+.nav-item a {
+    text-decoration: none;
+    color: #4B5563; /* 기본 글자색 (조금 더 진하게 조정) */
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 15px 0;
-    cursor: pointer;
-    transition: background 0.3s;
+    width: 100%;
+    padding: 20px 0; /* 상하 여백으로 높이 조절 */
+    transition: all 0.2s;
 }
 
-/*.nav-item:hover {*/
-/*    background-color: #f0f0f0;*/
-/*}*/
-
-/* 아이콘 스타일 */
-.side-icon {
-    font-size: 24px;
-    margin-bottom: 5px;
-}
-
-/* 텍스트 스타일 */
-.side-text {
-    font-size: 12px;
-    font-weight: bold;
-    color: #333;
-}
-
-/* 링크 기본 스타일 제거 */
-.nav-item a {
-    text-decoration: none; /* 밑줄 제거 */
-    color: inherit;        /* 부모(li)의 글자색 상속 */
-    display: flex;         /* flex를 유지해야 정렬이 깨지지 않음 */
-    flex-direction: column;
-    align-items: center;
-    width: 100%;           /* 클릭 영역을 가로로 꽉 채움 */
-    padding: 10px 0;       /* li에 있던 패딩을 a로 옮기면 클릭 범위가 넓어짐 */
-}
-
-/* 마우스 올렸을 때 효과 (선택 사항) */
-/*.nav-item a:hover {*/
-/*    background-color: #f4f4f4;*/
-/*}*/
-
-/* 이미지 크기 조정 (이미지가 너무 크다면) */
+/* 아이콘 선명도 수정: 기본 투명도를 없애서 굵게 보이게 함 */
 .side-icon img {
-    width: 24px;  /* 적절한 크기로 조절 */
-    height: 24px;
+    width: 26px; /* 크기 미세 조정 가능 */
+    height: 26px;
+    opacity: 1; /* 투명도 제거하여 원래 굵기 유지 */
+    transition: transform 0.2s;
 }
 
+.side-text {
+    font-size: 11px;
+    font-weight: 600;
+    margin-top: 8px;
+}
 
-/* 헤더부분 css */
+/* [호버 효과] 칸 전체 배경색 + 아이콘/글자 강조 */
+.nav-item:hover {
+    background-color: #F3F4F6; /* 칸 전체 배경색 변경 */
+}
+
+.nav-item:hover a,
+.nav-item.active a {
+    color: var(--color-primary); /* 호버 시 글자색 강조 */
+}
+
+.nav-item:hover .side-icon img {
+    transform: scale(1.1); /* 호버 시 아이콘 살짝 커지는 효과 (선택사항) */
+    filter: brightness(0.5); /* 아이콘을 더 검게 강조 (색상에 따라 조절) */
+}
+
+/* 활성화 상태일 때 왼쪽 선 표시 (포인트 효과) */
+.nav-item.active {
+    border-left: 3px solid var(--color-primary);
+    background-color: #EBF5FF;
+}
+
+/* =========================================
+   4. Header (헤더)
+   ========================================= */
+.header {
+    background-color: var(--color-white);
+    border-bottom: 1px solid var(--color-border);
+    /* 상단 고정을 원할 경우 아래 주석 해제 */
+    /* position: sticky; top: 0; z-index: 110; */
+}
+
 .header-container {
     display: flex;
-    justify-content: space-between; /* 양 끝 정렬 */
-    align-items: center;            /* 세로 중앙 정렬 */
-    padding: 0 40px;
-    height: 100%;                   /* 헤더 높이 설정 */
-    background-color: #f8f9fa;
-    border-bottom: 1px solid #ddd;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 30px;
+    height: 100%; /* grid-template-rows에서 설정한 80px을 그대로 채움 */
 }
 
-/* 로고 이미지 크기 조절 */
 .header-logo img {
-    height: 60px;
-    display: block;
+    height: 40px; /* 80px 헤더 내에서 여유 있게 조정 */
     width: auto;
-    image-rendering: crisp-edges;
-    image-rendering: pixelated;
+    object-fit: contain;
 }
 
-/* 프로필 영역 스타일 */
 .header-profile {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 15px;
 }
 
 .profile-info {
-    display: flex;            /* 내부 요소들을 flex로 배치 */
-    flex-direction: row;      /* 가로로 나열 */
-    align-items: center;      /* 이름과 아이콘의 세로 중앙 맞춤 */
-    gap: 12px;                /* 이름과 아이콘 사이 간격 */
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
+
+.profile-name {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.profile-img-wrapper {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+    background-color: #f0f0f0;
+}
+
+.profile { width: 100%; height: 100%; object-fit: cover; }
 
 .logout-btn {
     cursor: pointer;
-    background: #f8f9fa;
-    border: 1px solid #ddd;
+    background: transparent;
+    border: 1px solid var(--color-border);
     border-radius: 4px;
-    font-size: 11px;
-    padding: 3px 8px;
-    color: #666;
+    font-size: 12px;
+    padding: 6px 12px;
+    color: var(--color-text-sub);
     transition: all 0.2s;
 }
 
 .logout-btn:hover {
-    background: #eeeeee;
-    color: #333;
+    background: #f3f4f6;
+    color: var(--color-text-main);
 }
 
-/* 사용자 이름 스타일 */
-.profile-name {
-    font-size: 14px;
-    font-weight: 500;
-    color: #333;
-    white-space: nowrap;
-}
-
-/* 프로필 이미지를 감싸는 원형 박스 (이미지처럼 보이게 함) */
-.profile-img-wrapper {
-    width: 35px;
-    height: 35px;
-    border-radius: 50%;
-    overflow: hidden; /* 영역 밖으로 나가는 이미지 숨김 */
-    border: 1px solid #ddd; /* 테두리 추가 */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: #f0f0f0;
-}
-
-.profile {
-    width: 100%;
-    height: 100%;
-    object-fit: cover; /* 이미지가 찌그러지지 않게 채움 */
-}
-
-/* 알림 전체 컨테이너 */
-/* 전체 알림 컨테이너: 위치와 크기 고정 */
-/* 알림창 본체: 오른쪽 상단 작게 고정 */
+/* =========================================
+   5. Toast Notification
+   ========================================= */
 .chat-toast {
     position: fixed !important;
-    top: 15px !important;
-    right: -350px !important; /* 화면 밖 대기 */
-    width: 280px !important; /* 너비 고정 */
-    max-width: 300px !important;
-    /* 1. 배경 투명도 대폭 수정 (0.7 -> 0.4) */
-    background-color: rgba(255, 255, 255, 0.3) !important;
-
-    /* 2. 블러 효과 (접두사 포함하여 확실하게 적용) */
-    backdrop-filter: blur(15px) saturate(150%) !important;
-    -webkit-backdrop-filter: blur(15px) !important;
-
-
-    border-radius: 12px !important;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1) !important;
+    top: 20px !important;
+    right: -350px !important;
+    width: 300px !important;
+    background-color: rgba(255, 255, 255, 0.9) !important;
+    backdrop-filter: blur(10px) !important;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
     z-index: 999999 !important;
-    transition: right 0.5s cubic-bezier(0.19, 1, 0.22, 1) !important;
-    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    transition: right 0.4s ease-out !important;
+    border: 1px solid rgba(255, 255, 255, 0.4) !important;
     cursor: pointer;
     overflow: hidden !important;
 }
 
-/* 나타났을 때 */
-.chat-toast.active {
-    right: 20px !important;
-}
+.chat-toast.active { right: 25px !important; }
 
-/* 내부 레이아웃 */
-.toast-inner {
-    display: flex !important;
-    padding: 15px !important;
-    align-items: center !important;
-    width: 100% !important;
-    box-sizing: border-box !important;
-}
+.toast-inner { display: flex !important; padding: 16px !important; align-items: center !important; }
 
-/* 프로필 이미지 영역 */
-.toast-profile {
-    width: 42px !important;
-    height: 42px !important;
-    margin-right: 12px !important;
-    flex-shrink: 0 !important;
-}
+.toast-profile { width: 40px !important; height: 40px !important; margin-right: 12px !important; flex-shrink: 0 !important; }
 
-.toast-profile img {
-    width: 100% !important;
-    height: 100% !important;
-    border-radius: 50% !important; /* 원형 프로필 */
-    object-fit: cover !important;
-}
+.toast-profile img { width: 100% !important; height: 100% !important; border-radius: 50% !important; object-fit: cover !important; }
 
-/* 텍스트 영역 */
-.toast-text-area {
-    flex: 1 !important;
-    min-width: 0 !important; /* 텍스트 생략 처리를 위한 필수 설정 */
-}
+.toast-text-area { flex: 1 !important; min-width: 0 !important; }
 
-.toast-user-name {
-    display: block !important;
-    font-weight: 700 !important;
-    font-size: 13px !important;
-    color: #1d1d1f !important;
-    margin-bottom: 2px !important;
-}
-
-.toast-message {
-    display: block !important;
-    font-size: 13px !important;
-    color: #3a3a3c !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important; /* 길면 ... 처리 */
-}
+.toast-user-name { display: block !important; font-weight: 700 !important; font-size: 14px !important; color: var(--color-text-main) !important; margin-bottom: 2px !important; }
 
 /* 호버 시 살짝 반응 */
 .chat-toast:hover {
@@ -383,3 +361,4 @@ html {
   border-radius: 6px;
   text-decoration: none;
 }
+.toast-message { display: block !important; font-size: 13px !important; color: var(--color-text-sub) !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; }

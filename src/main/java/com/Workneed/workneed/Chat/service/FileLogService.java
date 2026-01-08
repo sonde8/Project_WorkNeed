@@ -2,10 +2,14 @@ package com.Workneed.workneed.Chat.service;
 
 import com.Workneed.workneed.Chat.dto.FileLogDTO;
 import com.Workneed.workneed.Chat.mapper.FileLogMapper;
+import com.Workneed.workneed.Schedule.dto.ScheduleFileDTO;
+import com.Workneed.workneed.Schedule.mapper.ScheduleFileMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -13,33 +17,72 @@ public class FileLogService {
 
     private final StorageService storageService;
     private final FileLogMapper fileLogMapper;
+    private final ScheduleFileMapper scheduleFileMapper;
 
+    /**
+     * [채팅방] 파일 저장
+     */
     @Transactional
     public FileLogDTO saveFile(MultipartFile file, Long roomId) {
-        // 원본 파일명 가져오기
         String originalFilename = file.getOriginalFilename();
+        String fileUrl = storageService.store(file);
 
-        // 1. 물리적 저장 실행 (LocalStorageService.store 호출)
-        // 저장된 후 UUID가 포함된 storedName을 반환 받음
-        String storedName = storageService.store(file);
-
-        // 2. 파일 타입 변환 (단순 확장자 체크)
         String contentType = file.getContentType();
         String fileType = (contentType != null && contentType.startsWith("image")) ? "IMAGE" : "FILE";
 
-        // 3. DB에 저장할 DTO
         FileLogDTO fileLog = FileLogDTO.builder()
                 .roomId(roomId)
-                .fileName(originalFilename)             // 원본이름
-                .storedName(storedName)                 // 저장된 이름
-                .filePath("/uploads/" + storedName)     // 웹 접근 경로
-                .fileSize(file.getSize())               // 파일 용량
+                .fileName(originalFilename)
+                .storedName(fileUrl.substring(fileUrl.lastIndexOf("/") + 1))
+                .filePath(fileUrl)
+                .fileSize(file.getSize())
                 .fileType(fileType)
                 .build();
 
-        // 4. FileLog 테이블에 INSERT
         fileLogMapper.insertFileLog(fileLog);
-
         return fileLog;
+    }
+
+    /**
+     * [업무/태스크] 파일 저장
+     */
+    @Transactional
+    public ScheduleFileDTO saveScheduleFile(MultipartFile file, Long scheduleId, Long userId) {
+        // S3 업로드 로직 재사용
+        String fileUrl = storageService.store(file);
+
+        ScheduleFileDTO dto = ScheduleFileDTO.builder()
+                .scheduleId(scheduleId)
+                .originalName(file.getOriginalFilename())
+                .storedName(fileUrl.substring(fileUrl.lastIndexOf("/") + 1))
+                .filePath(fileUrl)
+                .fileSize(file.getSize())
+                .contentType(file.getContentType())
+                .uploadedBy(userId)
+                .build();
+
+        scheduleFileMapper.insertScheduleFile(dto);
+        return dto;
+    }
+
+    /**
+     * [업무/태스크] 특정 업무의 전체 파일 목록 조회
+     */
+    public List<ScheduleFileDTO> getFilesByScheduleId(Long scheduleId) {
+        return scheduleFileMapper.findFilesByScheduleId(scheduleId);
+    }
+
+    /**
+     * [채팅방] 다운로드용 단건 조회
+     */
+    public FileLogDTO getFileById(Long fileLogId) {
+        return fileLogMapper.selectFileLogById(fileLogId);
+    }
+
+    /**
+     * [업무/태스크] 다운로드용 단건 조회 (TaskFileController 필수 메서드)
+     */
+    public ScheduleFileDTO getScheduleFileById(Long fileId) {
+        return scheduleFileMapper.findFileById(fileId);
     }
 }
