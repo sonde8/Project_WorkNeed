@@ -6,6 +6,7 @@ import com.Workneed.workneed.Approval.dto.*;
 import com.Workneed.workneed.Approval.entity.ApprovalDoc;
 import com.Workneed.workneed.Approval.entity.User;
 import com.Workneed.workneed.Approval.mapper.DocMapper;
+import com.Workneed.workneed.Members.dto.UserDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,7 +14,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ApprovalService {
@@ -39,7 +42,6 @@ public class ApprovalService {
 
         ApprovalDoc doc = new ApprovalDoc();
         doc.setWriterId(dto.getWriterId()); // 세션에서 넘어온 값 그대로
-        //doc.setWriterId(writerId);
         doc.setTitle(dto.getTitle());
         doc.setTypeId(dto.getTypeId());
         doc.setContent(dto.getContent());
@@ -60,12 +62,35 @@ public class ApprovalService {
     }
 
 
+    // 참조자 조회 ( 추후 참조자 테이블 추가해서 인덱스 향상)
+    public List<RefUserDTO> findRefUsersByDocId(Long docId) {
+
+        // 1) docId로 CSV 가져오기
+        String csv = mapper.selectRefUserIdsByDocId(docId); // "3,7,12"
+
+        if (csv == null || csv.isBlank()) {
+            return List.of();
+        }
+
+        // 2) "3,7,12" -> [3,7,12]
+        List<Long> ids = Arrays.stream(csv.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .map(Long::valueOf)
+                .toList();
+
+        // 3) ids로 유저 한 번에 조회
+        return mapper.selectUsersByIds(ids);
+    }
+
+
+
     /* ===============================
        제출(상신): 결재라인 생성 + 문서 상태 변경
        =============================== */
 
     @Transactional
-    public void submit(Long docId, List<Long> approverIds, List<Integer> orderNums) {
+    public void submit(Long docId, List<Long> approverIds, List<Integer> orderNums, List<Long> referenceIds) {
 
         // 1) 라인 insert (전부 PENDING)
         for (int i = 0; i < approverIds.size(); i++) {
@@ -76,11 +101,21 @@ public class ApprovalService {
                     LineStatus.PENDING
             );
         }
+        // 2) 참조자 저장
+        if(referenceIds != null && !referenceIds.isEmpty()) {
+            String refUserIds =
+                    "," + referenceIds.stream()
+                            .distinct()
+                            .map(String::valueOf)
+                            .collect(Collectors.joining(","))
+                    +"," ;
+            mapper.updateRefUserIds(docId, refUserIds);
+        }
 
-        // 2) 문서 상태 IN_PROGRESS
+        // 3) 문서 상태 IN_PROGRESS
         mapper.submitDoc(DocStatus.IN_PROGRESS, docId);
 
-        // 3) 첫 차수 WAITING 오픈
+        // 4) 첫 차수 WAITING 오픈
         mapper.openFirstWaiting(LineStatus.WAITING, LineStatus.PENDING, docId);
     }
 
@@ -159,9 +194,14 @@ public class ApprovalService {
         return mapper.findLinesByDocId(docId);
     }
 
+
     public boolean isMyTurn(Long docId, Long userId) {
         if (userId == null) return false;
         return mapper.countWaitingLineByUser(docId, userId) > 0;
+    }
+
+    public boolean isReferenceUser(String refUserIds, Long userId) {
+        return refUserIds != null && refUserIds.contains("," + userId + ",");
     }
 
     public boolean existsAnyApprovedLine(Long docId) {
@@ -180,6 +220,8 @@ public class ApprovalService {
         if (orderNum == null) {
             throw new IllegalStateException("반려 권한이 없습니다.");
         }
+
+
 
         mapper.rejectMyWaitingLine(docId, loginUserId, comment);
         mapper.updateDocStatus(docId, DocStatus.REJECTED);
@@ -216,6 +258,7 @@ public class ApprovalService {
 
         ApprovalSidebarCountDTO dto = new ApprovalSidebarCountDTO();
 
+
         // 결재자
         dto.setApproverTodoCount(
                 mapper.countInboxWaiting(userId)
@@ -240,7 +283,9 @@ public class ApprovalService {
         dto.setDrafterRejectedCount(
                 mapper.countMyRejected(userId)
         );
-
+        dto.setDrafterReferencedCount(
+                mapper.countReferenceDocs(userId)
+        );
         return dto;
     }
 
@@ -260,9 +305,11 @@ public class ApprovalService {
        ✅ 리스트: 기안자 문서함 (My)
        =============================== */
 
+    /*
     public List<ApprovalDocListItemDTO> getMyAllList(Long userId) {
         return mapper.selectMyAllList(userId);
     }
+    */
 
     public List<ApprovalDocListItemDTO> getMyDraftList(Long userId) {
         return mapper.selectMyDraftList(userId);
@@ -278,6 +325,10 @@ public class ApprovalService {
 
     public List<ApprovalDocListItemDTO> getMyRejectedList(Long userId) {
         return mapper.selectMyRejectedList(userId);
+    }
+
+    public List<ApprovalDocListItemDTO> getReferenceList(Long userId) {
+        return mapper.selectReferenceList(userId);
     }
 
     public void deleteMyDraft(Long docId, Long userId) {

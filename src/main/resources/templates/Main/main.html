@@ -72,11 +72,51 @@
 
             <!-- 결제 -->
             <div class = "pay"> 결제 </div>
+            <!-- MAIN KPI 결재 위젯 -->
 
+            <div class="main-kpi-approval">
+                <a class="kpi" th:href="@{/approval/inbox/waiting}">
+                    <span class="kpi-num" th:text="${counts.approverTodoCount}">0</span>  <!-- 여기 -->
+                    <span class="kpi-label">대기</span>
+                </a>
+
+                <a class="kpi" th:href="@{/approval/inbox/done}">
+                    <span class="kpi-num" th:text="${counts.approverDoneCount}">0</span>
+                    <span class="kpi-label">완료</span>
+                </a>
+
+                <a class="kpi" th:href="@{/approval/my/drafts}">
+                    <span class="kpi-num" th:text="${counts.drafterDraftCount}">0</span>
+                    <span class="kpi-label">임시</span>
+                </a>
+
+                <a class="kpi" th:href="@{/approval/my/in-progress}">
+                    <span class="kpi-num" th:text="${counts.drafterInProgressCount}">0</span>
+                    <span class="kpi-label">진행</span>
+                </a>
+
+                <a class="kpi" th:href="@{/approval/my/approved}">
+                    <span class="kpi-num" th:text="${counts.drafterApprovedCount}">0</span>
+                    <span class="kpi-label">승인</span>
+                </a>
+
+                <a class="kpi" th:href="@{/approval/my/reference}">
+                    <span class="kpi-num" th:text="${counts.drafterReferencedCount}">0</span>
+                    <span class="kpi-label">참조</span>
+                </a>
+
+                <a class="kpi kpi--danger" th:href="@{/approval/my/rejected}">
+                    <span class="kpi-num" th:text="${counts.drafterRejectedCount}">0</span>
+                    <span class="kpi-label">반려</span>
+                </a>
+
+            </div>
         </section>
 
         <!-- 오른쪽-->
+
         <section class = "rightPage">
+
             <!--게시판           -->
             <div class="main-borad">
                 <div class="mini-borad">

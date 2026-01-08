@@ -1,5 +1,6 @@
 package com.Workneed.workneed.Main;
 
+import com.Workneed.workneed.Approval.service.ApprovalService;
 import com.Workneed.workneed.Members.dto.UserDTO;
 import com.Workneed.workneed.Schedule.mapper.ScheduleMapper;
 import jakarta.servlet.http.HttpSession;
@@ -14,10 +15,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class MainController {
 
     private final ScheduleMapper scheduleMapper;
+    private final ApprovalService approvalService;
 
     @GetMapping("/main")
     public String main(HttpSession session, Model model) {
-
 
         if (session.getAttribute("admin") != null) {
             return "redirect:/admin/member/list";
@@ -35,6 +36,7 @@ public class MainController {
 
         Long userId = user.getUserId();
 
+        model.addAttribute("counts", approvalService.getCounts(userId)); // ✅ 이 줄
         model.addAttribute("mainTodo",  scheduleMapper.selectByStatusForMain(userId, "TODO"));
         model.addAttribute("mainDoing", scheduleMapper.selectByStatusForMain(userId, "DOING"));
 
@@ -48,5 +50,7 @@ public class MainController {
                 ? "NO USER IN SESSION"
                 : "USER IN SESSION";
     }
+
+
 
 }

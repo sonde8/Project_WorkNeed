@@ -49,7 +49,9 @@ public class LeaveController {
 
     // ✅ 휴가 신청 제출
     @PostMapping("/leave/request")
-    public String request(@ModelAttribute("dto") LeaveRequestDTO dto, HttpSession session) {
+    public String request(@ModelAttribute("dto") LeaveRequestDTO dto,
+                          HttpSession session){
+
         Long userId = getLoginUserId(session);
         if (userId == null) return "redirect:/login";
 
@@ -64,4 +66,20 @@ public class LeaveController {
         System.out.println("userId attr = " + session.getAttribute("userId"));
     }
 
+    // ✅ 휴가 신청 결과(상세) 화면
+    @GetMapping("/leave/{docId}")
+    public String leaveDetail(
+            @PathVariable Long docId,
+            Model model,
+            HttpSession session) {
+        Long userId = getLoginUserId(session);
+        if (userId == null) return redirectLogin();
+
+        LeaveRequestDTO leave = leaveService.getLeaveDetail(docId, userId);
+        if (leave == null) return "redirect:/approval/leave";
+
+        model.addAttribute("leave", leave);
+        return "Approval/approval.leave.detail";
+        // ⬆️ 템플릿 실제 경로에 맞게 조정
+    }
 }

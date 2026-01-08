@@ -24,7 +24,7 @@ public class AdminUserService {
     private final UserMapper userMapper;
     private final DeptMapper deptMapper;
     private final RankMapper rankMapper;
-  private final MailService mailService;
+  //private final MailService mailService;
 
     // 1. 화면 데이터 가져오기 (기존 동일)
     public List<UserDTO> getAllMembers(String userName, String userLoginId, Long deptId, Long rankId, String userStatus) {
@@ -154,7 +154,7 @@ public class AdminUserService {
         if ("ACTIVE".equals(status)) {
             UserDTO targetUser = userMapper.findById(userId);
             if (targetUser != null && targetUser.getUserEmail() != null) {
-                mailService.sendApprovalEmail(targetUser.getUserEmail(), targetUser.getUserName());
+                //mailService.sendApprovalEmail(targetUser.getUserEmail(), targetUser.getUserName());
             }
         }
 

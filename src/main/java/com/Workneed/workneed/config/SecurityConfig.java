@@ -4,26 +4,23 @@ import com.Workneed.workneed.Members.auth.principal.LoginSuccessHandler;
 import com.Workneed.workneed.Members.service.CustomOidcUserService;
 import com.Workneed.workneed.Members.service.CustomOAuth2UserService;
 import com.Workneed.workneed.Members.service.LocalUserDetailsService;
-
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 
-@EnableWebSecurity
 @Configuration
+@EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-
     private final CustomOAuth2UserService customOAuth2UserService;
     private final LocalUserDetailsService totalAuthService;
-    private final CustomOidcUserService customOidcUserService;
     private final LoginSuccessHandler loginSuccessHandler;
+    private final CustomOidcUserService customOidcUserService;
+
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -51,52 +48,52 @@ public class SecurityConfig {
                                 "/favicon.ico"
                         ).permitAll()
 
-                 //🔽 여기부터 권한
-                .requestMatchers("/admin/dept/**")
-                .hasAnyAuthority(
-                        "DEPT_ASSIGN",
-                        "DEPT_CREATE",
-                        "DEPT_UPDATE",
-                        "DEPT_DELETE"
+                        // 🔽 여기부터 권한
+                        .requestMatchers("/admin/dept/**")
+                        .hasAnyAuthority(
+                                "DEPT_ASSIGN",
+                                "DEPT_CREATE",
+                                "DEPT_UPDATE",
+                                "DEPT_DELETE"
+                        )
+
+                        .requestMatchers("/admin/rank/**")
+                        .hasAnyAuthority(
+                                "RANK_ASSIGN",
+                                "RANK_CREATE",
+                                "RANK_UPDATE",
+                                "RANK_DELETE"
+                        )
+
+                        .requestMatchers("/admin/leave/**")
+                        .hasAnyAuthority(
+                                "LEAVE_APPROVE",
+                                "LEAVE_REJECT"
+                        )
+
+                        .requestMatchers("/admin/attend/**")
+                        .hasAnyAuthority(
+                                "ATTEND_APPROVE",
+                                "ATTEND_REJECT"
+                        )
+
+                        // ※ 관리자는 아직 세션 기반이므로 일단 permit
+                        .requestMatchers("/admin/**").authenticated()
+                        .requestMatchers("/main", "/main/**").authenticated()
+                        .anyRequest().authenticated()
                 )
 
-                .requestMatchers("/admin/rank/**")
-                .hasAnyAuthority(
-                        "RANK_ASSIGN",
-                        "RANK_CREATE",
-                        "RANK_UPDATE",
-                        "RANK_DELETE"
-                )
 
-                .requestMatchers("/admin/leave/**")
-                .hasAnyAuthority(
-                        "LEAVE_APPROVE",
-                        "LEAVE_REJECT"
-                )
-
-                .requestMatchers("/admin/attend/**")
-                .hasAnyAuthority(
-                        "ATTEND_APPROVE",
-                        "ATTEND_REJECT"
-                )
-
-                // ※ 관리자는 아직 세션 기반이므로 일단 permit
-                .requestMatchers("/admin/**").authenticated()
-                .requestMatchers("/main", "/main/**").authenticated()
-                .anyRequest().authenticated()
-                )
-
-
-        // 일반 로그인 (HTML 구조에 맞춤)
+                // 일반 로그인 (HTML 구조에 맞춤)
                 .formLogin(form -> form
-                .loginPage("/login")
-                .loginProcessingUrl("/login-user")
-                .usernameParameter("loginId")
-                .passwordParameter("password")
-                .successHandler(loginSuccessHandler)
-                .failureUrl("/login?error")
-                .permitAll()
-        );
+                        .loginPage("/login")
+                        .loginProcessingUrl("/login-user")
+                        .usernameParameter("loginId")
+                        .passwordParameter("password")
+                        .successHandler(loginSuccessHandler)
+                        .failureUrl("/login?error")
+                )
+
 
                 // 자동 로그인 (remember-me) — 핵심 5줄
                 .rememberMe(r -> r
@@ -115,17 +112,13 @@ public class SecurityConfig {
                 )
 
 
-
-
-                //로그아웃
+                // 로그아웃
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/login")
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID", "remember-me")
                 );
-
-
 
         return http.build();
     }

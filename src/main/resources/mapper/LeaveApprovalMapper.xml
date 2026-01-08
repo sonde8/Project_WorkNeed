@@ -5,14 +5,30 @@
 
 <mapper namespace="com.Workneed.workneed.Approval.mapper.LeaveApprovalMapper">
 
-
+    <insert id="leaveSave" parameterType="com.Workneed.workneed.Approval.dto.LeaveRequestDTO">
+        INSERT INTO LEAVE_REQUEST (
+            user_id           AS userId,
+            leave_type        AS leaveType,
+            leave_start_date  AS leaveStartDate,
+            leave_end_date    AS leaveEndDate,
+            reason            AS reason
+            status            AS Status
+        )
+        VALUES (
+            #{userId},
+            #{leaveType},
+            #{leaveStartDate},
+            #{leaveEndDate},
+            #{reason}
+        )
+    </insert>
 
     <insert id="insertLeaveRequest"
             parameterType="com.Workneed.workneed.Approval.dto.LeaveRequestDTO">
         INSERT INTO test.LEAVE_REQUEST
         (approval_doc_id, user_id, leave_type, start_date, end_date, reason, created_at)
         VALUES
-        (#{docId}, #{userId}, #{leaveType}, #{startDate}, #{endDate}, #{reason}, NOW())
+        (#{docId}, #{userId}, #{requestType}, #{startDate}, #{endDate}, #{reason}, NOW())
     </insert>
 
     <!-- 1) 작성자 부서 -->
@@ -27,7 +43,7 @@
         FROM test.user u
         JOIN test.Ranks r ON r.rank_id = u.rank_id
         WHERE u.dept_id = #{deptId}
-        AND r.rank_name = '차장'
+        AND r.rank_id = '4'
         LIMIT 1
     </select>
 
@@ -48,5 +64,18 @@
         null
         )
     </insert>
+
+    <select id="selectLeaveDetail" resultType="com.Workneed.workneed.Approval.dto.LeaveRequestDTO">
+        SELECT
+        lr.approval_doc_id AS docId,
+        lr.user_id         AS userId,
+        lr.leave_type      AS leaveType,
+        lr.start_date      AS startDate,
+        lr.end_date        AS endDate,
+        lr.reason          AS reason
+        FROM leave_request lr
+        WHERE lr.approval_doc_id = #{docId}
+    </select>
+
 
 </mapper>

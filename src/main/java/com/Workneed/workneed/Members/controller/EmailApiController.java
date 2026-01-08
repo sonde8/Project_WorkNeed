@@ -33,11 +33,13 @@ public class EmailApiController {
             return ResponseEntity.badRequest().body("이미 가입된 이메일입니다.");
         }
 
+
         //  체크 통과 시 발송
         String code = mailService.createCode();
         session.setAttribute("authCode", code);
         mailService.sendEmail(email, code);
         session.setMaxInactiveInterval(60 * 3); // 3분
+
 
         return ResponseEntity.ok("인증번호가 발송되었습니다.");
     }
@@ -71,7 +73,7 @@ public class EmailApiController {
 
         try {
             String content = "회원님의 임시 비밀번호는 [" + tempPw + "] 입니다. 로그인 후 반드시 변경하세요.";
-            mailService.sendEmail(email, content);
+           // mailService.sendEmail(email, content);
 
             // 2. 세션에 마킹 (이 세션에서 로그인하면 알람이 뜨게 함)
             session.setAttribute("isTempLogin", true);
