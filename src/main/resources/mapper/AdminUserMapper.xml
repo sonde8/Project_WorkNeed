@@ -80,7 +80,7 @@
 
     <select id="findByAdminId" resultType="com.Workneed.workneed.Members.dto.AdminUserDTO">
         SELECT *
-        FROM AdminUser
+        FROM adminUser
         WHERE admin_id = #{adminId}
     </select>
 
