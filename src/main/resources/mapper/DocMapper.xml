@@ -18,6 +18,7 @@
         VALUES (#{writerId}, #{typeId}, #{title}, #{content}, #{status})
     </insert>
 
+
     <!-- ===============================
          문서 단건 조회
          =============================== -->
@@ -31,8 +32,32 @@
             title,
             content,
             status,
+            ref_user_ids    AS refUserIds,
             created_at,
             updated_at
+        FROM approval_doc
+        WHERE approval_doc_id = #{docId}
+    </select>
+
+    <!-- 참조자 조회 -->
+    <select id="selectUsersByIds" resultType="com.Workneed.workneed.Approval.dto.RefUserDTO">
+        SELECT
+        u.user_id    AS userId,
+        u.user_name  AS userName,
+        d.dept_name  AS deptName,
+        r.rank_name  AS rankName
+        FROM User u
+        LEFT JOIN dept d  ON d.dept_id = u.dept_id
+        LEFT JOIN ranks r ON r.rank_id = u.rank_id
+        WHERE u.user_id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
+
+    <select id="selectRefUserIdsByDocId" resultType="string">
+        SELECT ref_user_ids
         FROM approval_doc
         WHERE approval_doc_id = #{docId}
     </select>
@@ -72,6 +97,19 @@
         FROM approval_type
         ORDER BY approval_type_id ASC
     </select>
+    <!-- =========================================================
+             3-1) 참조자 저장(approval_doc)
+             ========================================================= -->
+
+    <!-- ===============================
+         참조장 저장
+         =============================== -->
+    <update id="updateRefUserIds">
+        UPDATE approval_doc
+        SET ref_user_ids = #{refUserIds}
+        WHERE approval_doc_id = #{docId}
+    </update>
+
 
 
     <!-- =========================================================
@@ -339,6 +377,14 @@
         AND status = 'REJECTED'
     </select>
 
+    <!-- [COUNT] 참조됨 -->
+    <select id="countReferenceDocs" resultType="int">
+        SELECT COUNT(*)
+        FROM approval_doc
+        WHERE ref_user_ids IS NOT NULL
+        AND ref_user_ids LIKE CONCAT('%,', #{userId}, ',%')
+    </select>
+
     <!-- [LIST] 임시저장 -->
     <select id="selectMyDraftList" resultType="com.Workneed.workneed.Approval.dto.ApprovalDocListItemDTO">
         SELECT
@@ -363,40 +409,76 @@
     <!-- [LIST] 진행중 -->
     <select id="selectMyInProgressList" resultType="com.Workneed.workneed.Approval.dto.ApprovalDocListItemDTO">
         SELECT
-        approval_doc_id AS docId,
-        title           AS title,
-        status          AS docStatus,
-        created_at      AS createdAt
-        FROM approval_doc
-        WHERE writer_id = #{userId}
-        AND status = 'IN_PROGRESS'
-        ORDER BY created_at DESC
+        d.approval_doc_id AS docId,
+        d.title           AS title,
+        d.status          AS docStatus,
+        d.created_at      AS createdAt,
+
+        u.user_name       AS writerUserName,
+        r.rank_name       AS rankName
+        FROM approval_doc d
+        LEFT JOIN user u ON u.user_id = d.writer_id
+        LEFT JOIN ranks r ON r.rank_id = u.rank_id
+        WHERE d.writer_id = #{userId}
+        AND d.status = 'IN_PROGRESS'
+        ORDER BY d.created_at DESC
     </select>
 
     <!-- [LIST] 완료(승인됨) -->
     <select id="selectMyApprovedList" resultType="com.Workneed.workneed.Approval.dto.ApprovalDocListItemDTO">
         SELECT
-        approval_doc_id AS docId,
-        title           AS title,
-        status          AS docStatus,
-        created_at      AS createdAt
-        FROM approval_doc
-        WHERE writer_id = #{userId}
+        d.approval_doc_id AS docId,
+        d.title           AS title,
+        d.status          AS docStatus,
+        d.created_at      AS createdAt,
+
+        u.user_name       AS writerUserName,
+        r.rank_name       AS rankName
+        FROM approval_doc d
+        LEFT JOIN user u ON u.user_id = d.writer_id
+        LEFT JOIN ranks r ON r.rank_id = u.rank_id
+        WHERE d.writer_id = #{userId}
         AND status = 'APPROVED'
         ORDER BY created_at DESC
     </select>
 
     <!-- [LIST] 반려됨 -->
-    <select id="selectMyRejectedList" resultType="com.Workneed.workneed.Approval.dto.ApprovalDocListItemDTO">
+    <select id="selectMyRejectedList"
+            resultType="com.Workneed.workneed.Approval.dto.ApprovalDocListItemDTO">
         SELECT
-        approval_doc_id AS docId,
-        title           AS title,
-        status          AS docStatus,
-        created_at      AS createdAt
-        FROM approval_doc
-        WHERE writer_id = #{userId}
-        AND status = 'REJECTED'
-        ORDER BY created_at DESC
+        d.approval_doc_id AS docId,
+        d.title           AS title,
+        d.status          AS docStatus,
+        d.created_at      AS createdAt,
+
+        u.user_name       AS writerUserName,
+        r.rank_name       AS rankName
+        FROM approval_doc d
+        LEFT JOIN user u ON u.user_id = d.writer_id
+        LEFT JOIN ranks r ON r.rank_id = u.rank_id
+        WHERE d.writer_id = #{userId}
+        AND d.status = 'REJECTED'
+        ORDER BY d.created_at DESC
+    </select>
+
+
+    <!-- [LIST] 참조됨 -->
+    <select id="selectReferenceList"
+            resultType="com.Workneed.workneed.Approval.dto.ApprovalDocListItemDTO">
+        SELECT
+        d.approval_doc_id AS docId,
+        d.title           AS title,
+        d.status          AS docStatus,
+        d.created_at      AS createdAt,
+
+        u.user_name       AS writerUserName,
+        r.rank_name       AS rankName
+        FROM approval_doc d
+        LEFT JOIN `user` u ON u.user_id = d.writer_id
+        LEFT JOIN ranks r  ON r.rank_id = u.rank_id
+        WHERE d.ref_user_ids IS NOT NULL
+        AND FIND_IN_SET(#{userId}, d.ref_user_ids) > 0
+        ORDER BY d.created_at DESC
     </select>
 
 
@@ -428,23 +510,38 @@
         d.approval_doc_id AS docId,
         d.title           AS title,
         d.status          AS docStatus,
-        d.created_at      AS createdAt
+        d.created_at      AS createdAt,
+
+        u.user_name       AS writerUserName,
+        r.rank_name       AS rankName,
+
+        l.status          AS myLineStatus,
+        l.order_num       AS myOrderNum
         FROM approval_line l
         JOIN approval_doc d ON d.approval_doc_id = l.approval_doc_id
+        LEFT JOIN `user` u  ON u.user_id = d.writer_id
+        LEFT JOIN ranks r   ON r.rank_id = u.rank_id
         WHERE l.approver_id = #{userId}
         AND l.status = 'WAITING'
         ORDER BY d.created_at DESC
     </select>
-
     <!-- [LIST] 처리한 문서 (APPROVED/REJECTED) -->
     <select id="selectInboxDoneList" resultType="com.Workneed.workneed.Approval.dto.ApprovalDocListItemDTO">
         SELECT DISTINCT
         d.approval_doc_id AS docId,
         d.title           AS title,
         d.status          AS docStatus,
-        d.created_at      AS createdAt
+        d.created_at      AS createdAt,
+
+        u.user_name       AS writerUserName,
+        r.rank_name       AS rankName,
+
+        l.status          AS myLineStatus,
+        l.order_num       AS myOrderNum
         FROM approval_line l
         JOIN approval_doc d ON d.approval_doc_id = l.approval_doc_id
+        LEFT JOIN `user` u  ON u.user_id = d.writer_id
+        LEFT JOIN ranks r   ON r.rank_id = u.rank_id
         WHERE l.approver_id = #{userId}
         AND l.status IN ('APPROVED','REJECTED')
         ORDER BY d.created_at DESC

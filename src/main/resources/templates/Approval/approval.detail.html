@@ -65,6 +65,26 @@
                         </li>
                     </ul>
                 </div>
+                <!-- =========================
+                     참조자
+                     ========================= -->
+                <div class="card">
+                    <div class="card-head">
+                        <h3>참조자</h3>
+                        <p class="meta">열람만 가능 (승인/반려 불가)</p>
+                    </div>
+
+                    <ul class="line-list">
+                        <li th:each="u : ${refUsers}"
+                            th:text="${u.username}">
+                            이름
+                        </li>
+
+                        <li th:if="${doc.refUserIds == null or #lists.isEmpty(doc.refUserIds)}" class="line-empty">
+                            참조자가 없습니다.
+                        </li>
+                    </ul>
+                </div>
 
                 <!-- =========================
                      문서 정보
@@ -101,7 +121,7 @@
                             <span class="value" th:text="${doc.title}">-</span>
                         </div>
 
-                        <div class="row row-content">
+                        <div class="row-row-content">
                             <span class="label">내용</span>
                             <pre class="content" th:text="${doc.content}">-</pre>
                         </div>
@@ -153,7 +173,7 @@
 
                         <!-- 승인: IN_PROGRESS + 내 차례 -->
                         <form class="inline"
-                              th:if="${doc.status.name() == 'IN_PROGRESS' and isMyTurn}"
+                              th:if="${doc.status == 'IN_PROGRESS' and isMyTurn and !isReference}"
                               method="post" th:action="@{/approval/approve}">
                             <input type="hidden" name="docId" th:value="${doc.docId}">
                             <button type="submit" class="btn primary"
@@ -164,7 +184,7 @@
 
                         <!-- 반려: IN_PROGRESS + 내 차례 -->
                         <div class="reject-wrap"
-                             th:if="${doc.status.name() == 'IN_PROGRESS' and isMyTurn}">
+                             th:if="${doc.status.name() == 'IN_PROGRESS' and isMyTurn and !isReference}">
                             <button type="button" class="btn danger" id="btnToggleReject">
                                 반려 사유 입력
                             </button>
@@ -184,6 +204,14 @@
                                     </button>
                                 </div>
                             </form>
+
+
+                            <div style="padding:10px; border:1px solid #ddd; margin:10px 0;">
+                                <div>status = <span th:text="${doc.status}"></span></div>
+                                <div>isMyTurn = <span th:text="${isMyTurn}"></span></div>
+                                <div>isReference = <span th:text="${isReference}"></span></div>
+                                <div>isWriter = <span th:text="${isWriter}"></span></div>
+                            </div>
                         </div>
 
                     </div>
