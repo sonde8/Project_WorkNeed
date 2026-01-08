@@ -8,6 +8,8 @@ import java.time.LocalDateTime;
 @Mapper
 public interface LeaveApprovalMapper {
 
+    //휴가 문서 저장
+    int leaveSave(LeaveRequestDTO dto);
     Long selectDeptIdByUserId(@Param("userId") Long userId);
 
     Long findTeamLeaderId(@Param("deptId") Long deptId);
@@ -19,4 +21,8 @@ public interface LeaveApprovalMapper {
                            @Param("approvedAt") LocalDateTime approvedAt);
 
     int insertLeaveRequest(LeaveRequestDTO dto);
+
+    //디테일
+    LeaveRequestDTO selectLeaveDetail(@Param("docId") Long docId);
+
 }

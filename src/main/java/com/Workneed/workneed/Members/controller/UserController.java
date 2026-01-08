@@ -48,7 +48,7 @@ public class UserController {
 
             try {
                 // 2. 파일 저장 물리 경로 설정 (상대 경로 기준)
-                String s3Url = storageService.store(file);
+                String s3Url = storageService.store(file, "profile");
                 log.info("S3 프로필 업로드 완료: {}", s3Url);
 
                 // 3. DB 업데이트

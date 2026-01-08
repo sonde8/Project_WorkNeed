@@ -30,7 +30,12 @@
                  th:classappend="${room != null && r.roomId == room.roomId} ? 'active'">
                 <a th:href="@{/chat/room/{id}(id=${r.roomId})}">
                     <div class="profile-img">
-                        <img th:src="@{/images/profile300.svg}" alt="사용자">
+                        <img th:if="${r.roomType == 'DIRECT'}"
+                             th:src="${r.roomProfileImage != null ? r.roomProfileImage : '/images/default-profile.svg'}"
+                             alt="사용자">
+                        <img th:if="${r.roomType == 'GROUP'}"
+                             th:src="@{/images/team2_300.svg}"
+                             alt="그룹">
                     </div>
                     <div class="room-text">
                         <div class="name-row">
@@ -56,7 +61,13 @@
                 <div class="current-user">
                     <th:block th:if="${room != null}">
                         <div class="profile-img-sm">
-                            <img th:src="@{/images/profile300.svg}" alt="프로필">
+                            <img th:if="${room.roomType == 'DIRECT'}"
+                                 th:src="${room.roomProfileImage != null ? room.roomProfileImage : '/images/default-profile.svg'}"
+                                 alt="프로필">
+
+                            <img th:if="${room.roomType == 'GROUP'}"
+                                 th:src="@{/images/team2_300.svg}"
+                                 alt="그룹">
                         </div>
                         <strong th:text="${room.roomName}">방 이름</strong>
                     </th:block>

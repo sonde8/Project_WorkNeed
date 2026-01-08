@@ -25,7 +25,7 @@ public class FileLogService {
     @Transactional
     public FileLogDTO saveFile(MultipartFile file, Long roomId) {
         String originalFilename = file.getOriginalFilename();
-        String fileUrl = storageService.store(file);
+        String fileUrl = storageService.store(file, "chat");
 
         String contentType = file.getContentType();
         String fileType = (contentType != null && contentType.startsWith("image")) ? "IMAGE" : "FILE";
@@ -49,7 +49,7 @@ public class FileLogService {
     @Transactional
     public ScheduleFileDTO saveScheduleFile(MultipartFile file, Long scheduleId, Long userId) {
         // S3 업로드 로직 재사용
-        String fileUrl = storageService.store(file);
+        String fileUrl = storageService.store(file, "task");
 
         ScheduleFileDTO dto = ScheduleFileDTO.builder()
                 .scheduleId(scheduleId)

@@ -27,9 +27,6 @@
         window.LOGIN_USER_ID = /*[[${session.user != null ? session.user.userId : null}]]*/ null;
         window.IS_ADMIN = /*[[${session.admin != null}]]*/ false;
     </script>
-
-
-
 </head>
 
 <body>
@@ -70,9 +67,6 @@
                 </div>
 
             </div>
-
-            <!-- 근태관리 -->
-            <a class="attendancePage" th:href="@{/attendance}"> 근 태 관 리 👉 </a>
 
             <!-- 출 퇴근 -->
             <div class = "attendWidget">

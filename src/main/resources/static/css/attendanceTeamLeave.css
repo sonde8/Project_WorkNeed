@@ -1,0 +1,121 @@
+.teLe{
+    display: flex;
+    gap: 20px;
+}
+
+.teamLeave{
+    margin: 0;
+}
+
+/* 오른쪽 */
+.right4{
+    width: 900px;
+    height: 845px;
+    border: 1px solid black;
+    box-sizing: border-box;
+    padding: 18px 10px;
+}
+
+/* 연도 */
+.teamYearHead{
+    height: 85px;
+    border: 1px solid black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 40px;
+    margin-bottom: 18px;
+    box-sizing: border-box;
+}
+
+.yearTitle{
+    font-size: 34px;
+    font-weight: 700;
+}
+
+.teamYearBtn{
+    width: 70px;
+    height: 48px;
+    border: none;
+    background: transparent;
+    font-size: 28px;
+    cursor: pointer;
+}
+
+/* 검색바 */
+.teamLeaveSearch{
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.nameSearchInput{
+    width: 260px;
+    height: 46px;
+    border: 2px solid #777;
+    padding: 0 12px;
+    font-size: 18px;
+    box-sizing: border-box;
+}
+
+.searchBtn{
+    width: 160px;
+    height: 46px;
+    border: 2px solid #777;
+    background: #d9d9d9;
+    font-size: 20px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+/* 표 */
+.teamLeaveTableWrap{
+    height: 620px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    box-sizing: border-box;
+
+    border: 1px solid #000;
+    background: #fff;
+}
+
+.teamLeaveTable{
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+
+    margin: 0;
+}
+
+.teamLeaveTable thead td{
+    position: sticky;
+    top: 0;
+    background: #d9d9d9;
+    font-weight: 800;
+    z-index: 5;
+
+    border-bottom: 1px solid #000;
+}
+
+.teamLeaveTable td{
+    border: 1px solid #000;
+    text-align: center;
+    padding: 12px 8px;
+    font-size: 16px;
+    height: 70px;
+    box-sizing: border-box;
+    word-break: break-word;
+}
+
+.teamLeaveTable thead tr td{
+    border-top: none;
+}
+
+/* 사유 칸 */
+.teamLeaveTable td.reasonCell{
+    text-align: left;
+    padding: 12px 10px;
+    white-space: normal;
+    line-height: 1.3;
+}

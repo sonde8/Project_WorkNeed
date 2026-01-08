@@ -141,6 +141,60 @@
                 </div>
 
                 <!-- =========================
+                     참조자 선택 영역
+                     (읽기 전용 / 결재 불가)
+                     ========================= -->
+                <div class="divider"></div>
+
+                <div class="card-head">
+                    <h3>참조자 선택</h3>
+                    <p class="meta">체크 → 문서 열람만 가능 (승인/반려 불가)</p>
+                </div>
+
+                <div class="approver-layout">
+
+                    <!-- 후보 리스트 -->
+                    <div class="approver-box">
+                        <div class="box-head">
+                            <div class="box-title">참조자 후보</div>
+                            <div class="box-meta">ACTIVE 사용자</div>
+                        </div>
+
+                        <div class="candidate-list">
+                            <!-- ✅ referenceIds 로 전송 -->
+                            <label class="candidate" th:each="u : ${approvers}">
+                                <input type="checkbox"
+                                       name="referenceIds"
+                                       th:value="${u.userId}">
+                                <span class="cand-name" th:text="${u.username}">이름</span>
+                                <span class="cand-meta">
+                  (<span th:text="${u.deptName}">부서</span>
+                  <span th:if="${u.rankName != null}" th:text="' / ' + ${u.rankName}">/ 직급</span>)
+                </span>
+                            </label>
+                        </div>
+
+                        <div class="hint">
+                            체크한 사용자는 “참조자”로 저장되며, 문서 열람만 가능합니다.
+                        </div>
+                    </div>
+
+                    <!-- 안내/미리보기(선택 사항: JS 없이 정적 안내만) -->
+                    <div class="approver-box">
+                        <div class="box-head">
+                            <div class="box-title">참조자 안내</div>
+                            <div class="box-meta">Read Only</div>
+                        </div>
+
+                        <div class="hint">
+                            참조자는 결재선(approval_line)에 저장되지 않습니다.<br>
+                            문서 상세는 동일하게 볼 수 있으나 승인/반려 버튼은 노출되지 않습니다.
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- =========================
                      버튼 영역
                      ========================= -->
                 <div class="btns">
