@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+
+<head>
+    <meta charset="UTF-8">
+    <title>휴가 신청 상세</title>
+
+    <th:block layout:fragment="head">
+        <link rel="stylesheet" th:href="@{/css/approve.css}">
+        <!-- leave 전용 css도 쓰면 여기에 추가 -->
+        <!-- <link rel="stylesheet" th:href="@{/css/leave.css}"> -->
+    </th:block>
+</head>
+
+<body>
+
+<th:block layout:fragment="content">
+    <div class="leave-detail">
+
+        <h1 class="leave-detail__title">휴가 신청 상세</h1>
+
+        <hr>
+
+        <section class="leave-detail__section">
+            <h2 class="leave-detail__section-title">휴가 정보</h2>
+
+            <p class="leave-detail__row">
+                <span class="leave-detail__label">휴가 종류</span>
+                <span class="leave-detail__value" th:text="${leave.leaveType}">연차</span>
+            </p>
+
+            <p class="leave-detail__row">
+                <span class="leave-detail__label">시작일</span>
+                <span class="leave-detail__value" th:text="${leave.startDate}">2026-01-01</span>
+            </p>
+
+            <p class="leave-detail__row">
+                <span class="leave-detail__label">종료일</span>
+                <span class="leave-detail__value" th:text="${leave.endDate}">2026-01-02</span>
+            </p>
+
+            <p class="leave-detail__row">
+                <span class="leave-detail__label">사유</span>
+                <span class="leave-detail__value" th:text="${leave.reason}">개인 사유</span>
+            </p>
+        </section>
+
+        <hr>
+
+        <section class="leave-detail__section">
+            <h2 class="leave-detail__section-title">결재 상태</h2>
+            <p class="leave-detail__row">
+                <span class="leave-detail__label">상태</span>
+                <span class="leave-detail__value leave-detail__status"
+                      th:text="${doc != null ? doc.status : '-'}">APPROVED</span>
+            </p>
+        </section>
+
+        <hr>
+
+        <a href="/main" class="leave-detail__back">메인으로</a>
+
+    </div>
+</th:block>
+
+</body>
+</html>

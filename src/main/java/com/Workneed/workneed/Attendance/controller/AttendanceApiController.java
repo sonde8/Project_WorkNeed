@@ -7,6 +7,7 @@ import com.Workneed.workneed.Attendance.service.AttendanceService;
 import com.Workneed.workneed.Members.dto.UserDTO;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -80,5 +81,22 @@ public class AttendanceApiController {
         Long empId = getEmpId(session);
 
         return attendanceService.teamAttend(empId, year, month);
+    }
+
+    // 근태 현황
+    @GetMapping("/month-summary")
+    public Map<String, Object> monthSummary(HttpSession session,
+                                            @RequestParam int year,
+                                            @RequestParam int month) {
+        Long empId = getEmpId(session);
+        return attendanceService.monthSummary(empId, year, month);
+    }
+
+    // 연간 근무
+    @GetMapping("/year-summary")
+    public Map<String, Object> yearSummary(HttpSession session,
+                                           @RequestParam int year) {
+        Long empId = getEmpId(session);
+        return attendanceService.yearSummary(empId, year);
     }
 }

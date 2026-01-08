@@ -45,8 +45,7 @@ public class ApprovalController {
         this.service = service;
         this.docMapper = docMapper;
     }
-
-    /* ==========================================================
+   /* ==========================================================
        공통 세션 유틸 (유저 파트 기준)
        ========================================================== */
 
@@ -63,6 +62,7 @@ public class ApprovalController {
         // ✅ 성욱님 프로젝트는 /login 쓰고 있으니 통일
         return "redirect:/login";
     }
+
 
     /* ==========================================================
        전자결재 진입 (관문)
@@ -144,6 +144,7 @@ public class ApprovalController {
 
         model.addAttribute("doc", doc);
         model.addAttribute("lines", service.findLinesByDocId(docId));
+        model.addAttribute("refUsers", service.findRefUsersByDocId(docId));
         model.addAttribute("files", service.getFilesByDocId(docId)); // ✅ 파일 목록은 기존 service 그대로 사용
 
         Long loginUserId = getLoginUserId(session);
@@ -153,6 +154,10 @@ public class ApprovalController {
 
         boolean isMyTurn = (loginUserId != null) && service.isMyTurn(docId, loginUserId);
         model.addAttribute("isMyTurn", isMyTurn);
+
+        boolean isReference = service.isReferenceUser(doc.getRefUserIds(), loginUserId);
+        model.addAttribute("isReference", isReference);
+
 
         return "Approval/approval.detail";
     }
@@ -167,6 +172,7 @@ public class ApprovalController {
                          @RequestParam(required = false) List<MultipartFile> files,
                          @RequestParam(required = false, name = "approverIds") List<Long> approverIds,
                          @RequestParam(required = false, name = "orderNums") List<Integer> orderNums,
+                         @RequestParam(required = false, name = "referenceIds") List<Long> referenceIds,
                          HttpSession session) throws Exception {
 
         System.out.println("REQ typeId=" + request.getParameter("typeId"));
@@ -195,7 +201,7 @@ public class ApprovalController {
         }
 
         // 결재 흐름 시작
-        service.submit(docId, approverIds, orderNums);
+        service.submit(docId, approverIds, orderNums, referenceIds);
 
         return "redirect:/approval/detail/" + docId;
     }
@@ -288,7 +294,6 @@ public class ApprovalController {
     public String reject(@RequestParam Long docId,
                          @RequestParam String comment,
                          HttpSession session) {
-
         Long loginUserId = getLoginUserId(session);
         if (loginUserId == null) return redirectLogin();
 
@@ -317,7 +322,7 @@ public class ApprovalController {
         if (userId == null) return redirectLogin();
 
         model.addAttribute("title", "처리 대기");
-        model.addAttribute("active", "inboxWaiting");
+        model.addAttribute("active", "waiting");
         model.addAttribute("list", service.getWaitingInbox(userId));
         return "Approval/approval.inbox";
     }
@@ -328,7 +333,7 @@ public class ApprovalController {
         if (userId == null) return redirectLogin();
 
         model.addAttribute("title", "처리 완료");
-        model.addAttribute("active", "inboxDone");
+        model.addAttribute("active", "done");
         model.addAttribute("list", service.getDoneInbox(userId));
         return "Approval/approval.inbox";
     }
@@ -336,7 +341,7 @@ public class ApprovalController {
     /* ==========================================================
        내 문서함 (공통 템플릿 approval.inbox)
        ========================================================== */
-
+/*
     @GetMapping("/my/all")
     public String myAll(HttpSession session, Model model) {
         Long userId = getLoginUserId(session);
@@ -347,7 +352,7 @@ public class ApprovalController {
         model.addAttribute("list", service.getMyAllList(userId));
         return "Approval/approval.inbox";
     }
-
+*/
     @GetMapping("/my/drafts")
     public String myDrafts(HttpSession session, Model model) {
         Long userId = getLoginUserId(session);
@@ -389,6 +394,16 @@ public class ApprovalController {
         model.addAttribute("title", "반려됨");
         model.addAttribute("active", "myRejected");
         model.addAttribute("list", service.getMyRejectedList(userId));
+        return "Approval/approval.inbox";
+    }
+    @GetMapping("/my/reference")
+    public String myReference(HttpSession session, Model model) {
+        Long userId = getLoginUserId(session);
+        if (userId == null) return redirectLogin();
+
+        model.addAttribute("title", "참조됨");
+        model.addAttribute("active", "myReference");
+        model.addAttribute("list", service.getReferenceList(userId));
         return "Approval/approval.inbox";
     }
 }

@@ -31,9 +31,14 @@
     font-variant-numeric: tabular-nums;
 }
 
+.rows, .rowMonth{
+    margin: 14px 20px;
+    border: 1px solid #d9d9d9;
+    background: #fff;
+}
+
 .row{
     display: flex;
-    border: 1px solid black;
     font-size: 20px;
     margin: 15px 0;
     justify-content: space-between;
@@ -48,7 +53,6 @@
 
 /* 출퇴근 버튼 */
 .active{
-    border: 1px solid black;
     display: flex;
     width: 100%;
     justify-content: center;
@@ -56,12 +60,19 @@
     margin: 13px 0;
 }
 
-.btn{
-    width: 125px;
+.btn {
+    width: 172px;
+    height: 45px;
     font-size: 20px;
-    border-radius: 10px;
-    cursor : pointer;
-    margin: 15px 0;
+    font-weight: 600;
+    color: #111;
+    border: 1px solid #cfcfcf;
+    border-radius: 14px;
+    cursor: pointer;
+}
+
+.btn:hover{
+    background: #fafafa;
 }
 
 .btn:disabled{
@@ -98,7 +109,7 @@
     flex-direction: column;
     gap: 20px;
     cursor : pointer;
-    margin: 38px auto;
+    margin: 26px auto;
     width: 150px;
 }
 

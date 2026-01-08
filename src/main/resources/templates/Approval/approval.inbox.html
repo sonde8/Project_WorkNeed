@@ -22,12 +22,12 @@
             <!-- =========================
                  PAGE HEAD
                  ========================= -->
+            <!--
             <div class="page-head">
                 <h1 class="page-title" th:text="${title}">전자결재</h1>
-                <div class="page-actions">
-                    <a class="btn primary" th:href="@{/approval/create}">결재 문서 작성</a>
-                </div>
             </div>
+            -->
+
 
             <div class="inbox-layout">
 
@@ -38,7 +38,9 @@
                     <div class="card side-card">
                         <div class="card-head">
                             <h3>문서함</h3>
-                            <p class="meta">결재자/기안자 기준으로 분리된 문서함입니다.</p>
+
+
+
                         </div>
 
                         <nav class="side-menu">
@@ -118,8 +120,16 @@
                                     <span class="txt">반려</span>
                                     <span class="count-badge" th:text="${counts.drafterRejectedCount}">0</span>
                                 </a>
+
+                                <!-- 참조됨(REFERENCE) -->
+                                <a class="side-link"
+                                   th:href="@{/approval/my/reference}"
+                                   th:classappend="${active == 'myReference'} ? ' active' : ''">
+                                    <span class="txt">참조됨</span>
+                                    <span class="count-badge" th:text="${counts.drafterReferencedCount}">0</span>
+                                </a>
                             </div>
-                            <a class="side-btn" th:href="@{/approval/leave}">휴가 신청</a>
+
 
 
                         </nav>
@@ -134,7 +144,11 @@
                     <div class="card">
                         <div class="card-head">
                             <h3 th:text="${title}">목록</h3>
-                            <p class="meta">최신순</p>
+
+
+                            <div class="page-actions">
+                                <a class="btn primary" th:href="@{/approval/create}">결재 문서 작성</a>
+                            </div>
                         </div>
 
                         <div class="table-wrap">
@@ -180,18 +194,36 @@
                                     <td class="td-writer">
                                         <div class="writer">
                                             <span class="name"
-                                                  th:text="${row.writer != null ? row.writer.userName : '-'}">작성자</span>
-                                            <span class="meta"
-                                                  th:if="${row.writer != null and (row.writer.deptName != null or row.writer.rankName != null)}">
-                                                (
-                                                <span th:text="${row.writer.deptName != null ? row.writer.deptName : '-'}"></span>
-                                                <span th:if="${row.writer.rankName != null}"
-                                                      th:text="' / ' + ${row.writer.rankName}"></span>
-                                                )
+                                                  th:text="${row.writerUserName == null ? '-'
+                                                   : (row.rankName != null ? row.writerUserName + ' ' + row.rankName
+                                                                           : row.writerUserName)}">-
                                             </span>
                                         </div>
                                     </td>
 
+
+                                    <!--
+
+                                    <td class="td-writer">
+                                        <div class="writer">
+
+                                            <span class="name"
+                                                  th:text="${row.writer == null ? '-'
+                                                  : (row.writer.rankName != null
+                                                    ? row.writer.userName + ' ' + row.writer.rankName
+                                                    : row.writer.userName)}">
+                                                    작성자
+                                                </span>
+
+                                    <span class="meta"
+                                          th:if="${row.writer != null and row.writer.deptName != null}"
+                                          th:text="'(' + ${row.writer.deptName} + ')'">
+                                            </span>
+
+                        </div>
+                        </td>
+
+                                    -->
                                     <!-- 상태 -->
                                     <td class="td-status">
                                         <span class="badge"

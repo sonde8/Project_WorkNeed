@@ -236,6 +236,7 @@
     align-items: center;
     justify-content: space-between;
     margin-bottom: 8px;
+    padding: 10px 3px;
 }
 
 .approval-scope .group-title {
@@ -249,7 +250,7 @@
     align-items: center;
     justify-content: space-between;
     gap: 10px;
-    padding: 10px 10px;
+    padding : 5px 3px;
     border-radius: 6px;
     text-decoration: none;
     color: #333333;
@@ -460,8 +461,8 @@
     color: #888888;
 }
 
-/* ========== Detail: Content / Reject ========== */
-.approval-scope .approval-detail pre.content {
+ ========== Detail: Content / Reject ==========
+.approval-scope .approval-detail pre.content{
     margin: 0;
     padding: 12px;
     border: 1px solid #eeeeee;
@@ -471,6 +472,17 @@
     line-height: 1.6;
     font-size: 13px;
 }
+/*
+.row-row-content .pre.content{
+    margin: 0;
+    padding: 12px !important ;
+    border: 1px solid #eeeeee  ;
+    border-radius: 6px;
+    background: #fcfcfc;
+    white-space: pre-wrap;
+    line-height: 1.6;
+    font-size: 13px;
+}*/
 
 .approval-scope .reject-wrap {
     display: flex;
@@ -504,18 +516,207 @@
     .approval-scope table.table {
         min-width: 680px;
     }
-
+}
 
 .side-btn{
   display:block;
   padding:12px 14px;
   margin:8px 0;
-  border:1px solid #ddd;
+  border:2px solid #ddd;
   border-radius:10px;
+  font-size: 13px;
+  font-weight: 700;
   text-decoration:none;
+  color: #333333;
 }
 .side-btn:hover{
   background:#f5f5f5;
 }
+/* ==========================================================
+   LEAVE (휴가 신청) - 페이지 전용
+   - 기존 .approval-scope 절대 수정/영향 없음
+   - approval.leave.html 구조 기준(.wrap/.page-title/.card/.form-row/.form-actions)
+   ========================================================== */
 
+.approval-leave-scope {
+    color: #333333;
+}
+
+/* Layout: approval-scope와 동일한 톤 */
+.approval-leave-scope .wrap {
+    width: 40%;
+    max-width: 1340px;
+    padding: 20px 40px 40px;
+}
+
+.approval-leave-scope .page-title {
+    font-size: 22px;
+    font-weight: 800;
+    margin: 0 0 14px;
+}
+
+/* Card: 동일 톤 */
+.approval-leave-scope .card {
+    background: #ffffff;
+    border: 1px solid #dddddd;
+    border-radius: 8px;
+    padding: 16px;
+}
+
+/* Form row */
+.approval-leave-scope .form-row {
+    margin-bottom: 12px;
+}
+
+.approval-leave-scope .form-row label {
+    display: block;
+    font-size: 12px;
+    font-weight: 800;
+    color: #666666;
+    margin-bottom: 6px;
+}
+
+/* Controls */
+.approval-leave-scope input[type="date"],
+.approval-leave-scope select,
+.approval-leave-scope textarea {
+    width: 100%;
+    border: 1px solid #cccccc;
+    background: #ffffff;
+    border-radius: 6px;
+    padding: 9px 10px;
+    font-size: 13px;
+    outline: none;
+    box-sizing: border-box;
+}
+
+.approval-leave-scope textarea {
+    resize: vertical;
+}
+
+.approval-leave-scope input:focus,
+.approval-leave-scope select:focus,
+.approval-leave-scope textarea:focus {
+    border-color: #999999;
+}
+
+/* Actions */
+.approval-leave-scope .form-actions {
+    margin-top: 14px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+}
+
+/* Buttons: leave 페이지는 btn / btn-primary 사용 */
+.approval-leave-scope .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 34px;
+    padding: 0 12px;
+    border: 1px solid #cccccc;
+    background: #ffffff;
+    color: #333333;
+    font-size: 13px;
+    font-weight: 700;
+    border-radius: 6px;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.approval-leave-scope .btn:hover {
+    background: #f0f0f0;
+}
+
+.approval-leave-scope .btn-primary {
+    background: #333333;
+    border-color: #333333;
+    color: #ffffff;
+}
+
+.approval-leave-scope .btn-primary:hover {
+    background: #111111;
+    border-color: #111111;
+}
+/* ==========================================================
+   LEAVE DETAIL (휴가 신청 상세) - 페이지 전용
+   - 기존 CSS 절대 수정 없음
+   - scope: .leave-detail
+   - chat.css / approval 톤 유지 (심플)
+   ========================================================== */
+
+.leave-detail {
+    width: 40%;
+    max-width: 1340px;
+    padding: 20px 40px 40px;
+}
+
+/* 제목 */
+.leave-detail__title {
+    font-size: 22px;
+    font-weight: 800;
+    margin: 0 0 16px;
+}
+
+/* 구분선 */
+.leave-detail hr {
+    border: none;
+    border-top: 1px solid #eeeeee;
+    margin: 18px 0;
+}
+
+/* 섹션 */
+.leave-detail__section {
+    padding: 4px 0;
+}
+
+.leave-detail__section-title {
+    font-size: 15px;
+    font-weight: 800;
+    margin: 0 0 10px;
+    color: #333333;
+}
+
+/* row (label + value) */
+.leave-detail__row {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    gap: 12px;
+    padding: 10px 0;
+    font-size: 13px;
+}
+
+.leave-detail__label {
+    font-weight: 800;
+    color: #666666;
+}
+
+.leave-detail__value {
+    color: #333333;
+    line-height: 1.5;
+    word-break: break-word;
+}
+
+/* 상태 강조 (과하지 않게) */
+.leave-detail__status {
+    font-weight: 800;
+}
+
+/* 하단 링크 */
+.leave-detail__back {
+    display: inline-block;
+    margin-top: 18px;
+    padding: 8px 14px;
+    border: 1px solid #cccccc;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 700;
+    color: #333333;
+}
+
+.leave-detail__back:hover {
+    background: #f5f5f5;
 }

@@ -27,26 +27,23 @@
         window.LOGIN_USER_ID = /*[[${session.user != null ? session.user.userId : null}]]*/ null;
         window.IS_ADMIN = /*[[${session.admin != null}]]*/ false;
     </script>
-
-
 </head>
 
 <body>
 
-<div layout:fragment="content" class="pageMain">
+<div layout:fragment="content" class = "pageMain">
 
     <div class="mainPage">
 
         <!-- 왼쪽 -->
-        <section class="leftPage">
+        <section class = "leftPage">
 
             <!-- 오늘 날짜 -->
-            <div class="toDay" id="todayStart"
-                 th:text="${today != null ? today : '날짜'}"> 날짜
-            </div>
+            <div class = "toDay" id="todayStart"
+                 th:text="${today != null ? today : '날짜'}"> 날짜 </div>
 
             <!-- 프로필 -->
-            <div class="profile-card">
+            <div class = "profile-card">
 
                 <div class="profileImg">
                     <img th:if="${session.user.userProfileImage != null}"
@@ -72,7 +69,7 @@
             </div>
 
             <!-- 출 퇴근 -->
-            <div class="attendWidget">
+            <div class = "attendWidget">
                 <section th:replace="~{Attendance/attendanceLeft :: attendanceLeft}"></section>
             </div>
 
@@ -111,7 +108,7 @@
         </section>
 
         <!-- 오른쪽-->
-        <section class="rightPage">
+        <section class = "rightPage">
             <!--게시판           -->
             <div class="main-borad">
                 <div class="mini-borad">

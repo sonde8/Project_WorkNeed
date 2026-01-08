@@ -2,8 +2,10 @@ package com.Workneed.workneed.Approval.dto;
 
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 @Data
 public class LeaveRequestDTO {
@@ -12,14 +14,14 @@ public class LeaveRequestDTO {
 
     private String leaveType;     // ANNUAL / HALF_AM / HALF_PM / VACATION
 
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate startDate;
 
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate endDate;
 
     private LocalDateTime createdAt; // created_at
 
     private String reason;
+
+    private Double days;
 
 }

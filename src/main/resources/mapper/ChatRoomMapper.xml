@@ -14,6 +14,7 @@
         <result property="lastMessageType" column="last_message_type"/>
         <result property="userCount" column="user_count"/>
         <result property="unreadCount" column="unread_count"></result>
+        <result property="roomProfileImage" column="room_profile_image"/>
     </resultMap>
 
     <insert id="createChatRoom" parameterType="ChatRoomDTO" useGeneratedKeys="true" keyProperty="roomId">
@@ -29,38 +30,46 @@
             cr.creator_id,
             cr.created_at,
 
+            (SELECT u.user_profile_image
+             FROM roomparticipant rp_sub
+                      JOIN user u ON rp_sub.user_id = u.user_id
+             WHERE rp_sub.room_id = cr.room_id
+               AND rp_sub.user_id != #{userId}
+            AND rp_sub.left_at IS NULL
+            LIMIT 1) AS room_profile_image,
+
             -- 방 이름을 설정하지 않을 때 참여자들의 이름을 조합하는 쿼리 (User -> user)
             CASE
-                WHEN cr.room_name IS NOT NULL AND cr.room_name != '' THEN cr.room_name
-                ELSE (
-                    SELECT
-                        CASE
-                            WHEN COUNT(*) > 3 THEN CONCAT(GROUP_CONCAT(u.user_name ORDER BY u.user_name ASC SEPARATOR ', '), '...')
-                            ELSE GROUP_CONCAT(u.user_name ORDER BY u.user_name ASC SEPARATOR ', ')
-                            END
-                    FROM roomparticipant rp2
-                             JOIN user u ON rp2.user_id = u.user_id
-                    WHERE rp2.room_id = cr.room_id
-                      AND rp2.user_id != #{userId}
-                AND rp2.left_at IS NULL
-                LIMIT 3
+            WHEN cr.room_name IS NOT NULL AND cr.room_name != '' THEN cr.room_name
+            ELSE (
+        SELECT
+            CASE
+            WHEN COUNT(*) > 3 THEN CONCAT(GROUP_CONCAT(u.user_name ORDER BY u.user_name ASC SEPARATOR ', '), '...')
+            ELSE GROUP_CONCAT(u.user_name ORDER BY u.user_name ASC SEPARATOR ', ')
+            END
+        FROM roomparticipant rp2
+            JOIN user u ON rp2.user_id = u.user_id
+        WHERE rp2.room_id = cr.room_id
+          AND rp2.user_id != #{userId}
+          AND rp2.left_at IS NULL
+            LIMIT 3
             )
         END AS room_name,
 
-            -- [파생 필드] 현재 참여 인원수 (roomparticipant 소문자 확인)
-            (SELECT COUNT(*) FROM roomparticipant WHERE room_id = cr.room_id AND left_at IS NULL) AS user_count,
+        -- [파생 필드] 현재 참여 인원수 (roomparticipant 소문자 확인)
+        (SELECT COUNT(*) FROM roomparticipant WHERE room_id = cr.room_id AND left_at IS NULL) AS user_count,
 
-            -- [파생 필드] 마지막 메시지 정보 조회 (message 소문자 확인)
-            (SELECT content FROM message WHERE room_id = cr.room_id ORDER BY message_id DESC LIMIT 1) AS last_message_content,
-            (SELECT message_type FROM message WHERE room_id = cr.room_id ORDER BY message_id DESC LIMIT 1) AS last_message_type,
-            (SELECT created_at FROM message WHERE room_id = cr.room_id ORDER BY message_id DESC LIMIT 1) AS last_message_time,
+        -- [파생 필드] 마지막 메시지 정보 조회 (message 소문자 확인)
+        (SELECT content FROM message WHERE room_id = cr.room_id ORDER BY message_id DESC LIMIT 1) AS last_message_content,
+        (SELECT message_type FROM message WHERE room_id = cr.room_id ORDER BY message_id DESC LIMIT 1) AS last_message_type,
+        (SELECT created_at FROM message WHERE room_id = cr.room_id ORDER BY message_id DESC LIMIT 1) AS last_message_time,
 
-            -- 내가 읽지 않은 메세지 개수 (messagereadstatus 소문자 확인)
-            (SELECT COUNT(*)
-            FROM message m
-            JOIN messagereadstatus mrs ON m.message_id = mrs.message_id
-            WHERE m.room_id = cr.room_id
-            AND mrs.user_id = #{userId}
+        -- 내가 읽지 않은 메세지 개수 (messagereadstatus 소문자 확인)
+        (SELECT COUNT(*)
+        FROM message m
+        JOIN messagereadstatus mrs ON m.message_id = mrs.message_id
+        WHERE m.room_id = cr.room_id
+        AND mrs.user_id = #{userId}
         AND mrs.is_read = 0) AS unread_count
 
         FROM chatroom cr
@@ -80,9 +89,21 @@
         ORDER BY u.user_name ASC
     </select>
 
-    <select id="findRoomById" parameterType="Long" resultMap="ChatRoomResultMap">
+    <select id="findRoomById" resultMap="ChatRoomResultMap">
         SELECT
-            cr.*,
+            cr.room_id,
+            cr.room_name,
+            cr.room_type,
+            cr.creator_id,
+            cr.created_at,
+            (SELECT u.user_profile_image
+            FROM roomparticipant rp_sub
+            JOIN user u ON rp_sub.user_id = u.user_id
+            WHERE rp_sub.room_id = cr.room_id
+            AND rp_sub.user_id != #{userId}
+            AND rp_sub.left_at IS NULL
+            LIMIT 1) AS room_profile_image,
+
             (SELECT COUNT(*) FROM roomparticipant WHERE room_id = cr.room_id AND left_at IS NULL) AS user_count
         FROM chatroom cr
         WHERE cr.room_id = #{roomId}
@@ -114,16 +135,24 @@
             cr.creator_id,
             cr.created_at,
 
-            (SELECT content FROM message WHERE room_id = cr.room_id ORDER BY message_id DESC LIMIT 1) AS last_message_content,
-        (SELECT message_type FROM message WHERE room_id = cr.room_id ORDER BY message_id DESC LIMIT 1) AS last_message_type,
-        (SELECT created_at FROM message WHERE room_id = cr.room_id ORDER BY message_id DESC LIMIT 1) AS last_message_time,
+            (SELECT u.user_profile_image
+             FROM roomparticipant rp_sub
+                      JOIN user u ON rp_sub.user_id = u.user_id
+             WHERE rp_sub.room_id = cr.room_id
+               AND rp_sub.user_id != #{userId}
+            AND rp_sub.left_at IS NULL
+            LIMIT 1) AS room_profile_image,
 
-        (SELECT COUNT(*)
+            (SELECT content FROM message WHERE room_id = cr.room_id ORDER BY message_id DESC LIMIT 1) AS last_message_content,
+            (SELECT message_type FROM message WHERE room_id = cr.room_id ORDER BY message_id DESC LIMIT 1) AS last_message_type,
+            (SELECT created_at FROM message WHERE room_id = cr.room_id ORDER BY message_id DESC LIMIT 1) AS last_message_time,
+
+            (SELECT COUNT(*)
         FROM message m
-        JOIN messagereadstatus mrs ON m.message_id = mrs.message_id
+            JOIN messagereadstatus mrs ON m.message_id = mrs.message_id
         WHERE m.room_id = cr.room_id
-        AND mrs.user_id = #{userId}
-            AND mrs.is_read = 0) AS unread_count
+          AND mrs.user_id = #{userId}
+          AND mrs.is_read = 0) AS unread_count
 
         FROM chatroom cr
             INNER JOIN roomparticipant rp ON cr.room_id = rp.room_id

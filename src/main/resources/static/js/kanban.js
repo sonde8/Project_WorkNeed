@@ -368,6 +368,40 @@ document.addEventListener("DOMContentLoaded", () => {
     /* ======================================================
      * Drag & Drop
      * ====================================================== */
+    function ensureDoneSelectCheckbox(cardEl, isDone) {
+        if (!cardEl) return;
+
+        // DONE이면 체크박스 → 없으면 생성
+        let label = cardEl.querySelector("label.done-check");
+        if (isDone) {
+            if (!label) {
+                label = document.createElement("label");
+                label.className = "done-check";
+
+                const chk = document.createElement("input");
+                chk.type = "checkbox";
+                chk.className = "done-select";
+
+                // 체크박스 클릭 상세페이지 이동에 먹히지 않게
+                label.addEventListener("click", (e) => e.stopPropagation());
+                chk.addEventListener("click", (e) => e.stopPropagation());
+
+                label.appendChild(chk);
+
+                // 카드 맨 앞에 DONE 체크박스 영역 삽입
+                cardEl.insertBefore(label, cardEl.firstChild);
+            } else {
+                // 숨김 상태일 때 대비
+                const chk = label.querySelector("input.done-select");
+                if (chk) chk.checked = false;
+            }
+            return;
+        }
+
+        // DONE이 아니면 체크박스 영역 제거
+        if (label) label.remove();
+    }
+
     document.querySelectorAll(".kanban-cards").forEach(list => {
         new Sortable(list, {
             group: "kanban",
@@ -400,9 +434,18 @@ document.addEventListener("DOMContentLoaded", () => {
                     body: params.toString()
                 });
 
+                // 실패 시
                 if (!res.ok) {
                     evt.from.insertBefore(evt.item, evt.from.children[evt.oldIndex] || null);
+                    ensureDoneSelectCheckbox(evt.item, evt.from.dataset.status === "DONE");
+                    updateDoneDeleteUI();
+                    return;
                 }
+
+                // 성공 시
+                ensureDoneSelectCheckbox(evt.item, evt.to.dataset.status === "DONE");
+                updateDoneDeleteUI();
+
             }
         });
     });
