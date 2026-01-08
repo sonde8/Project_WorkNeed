@@ -3,49 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <title>근태 요청 관리</title>
+    <link rel="stylesheet" th:href="@{/css/admin_user_list.css}">
+    <style>
+        /* 탭 메뉴 스타일 유지 */
+        .btn-tab { padding: 10px 20px; text-decoration: none; color: #666; border-bottom: 3px solid transparent; }
+        .btn-tab.active { color: #3182ce; border-bottom: 3px solid #3182ce; font-weight: bold; }
+
+        /* 근태 관리용 테이블 추가 스타일 */
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; background: white; }
+        th, td { border: 1px solid #eee; padding: 12px; text-align: left; }
+        th { background-color: #f8f9fa; font-weight: bold; }
+        .payload-cell { font-family: monospace; font-size: 0.9em; color: #4a5568; }
+    </style>
 </head>
 <body>
 
-<h2>근태 수정 요청 (대기)</h2>
+<div class="admin-header" th:if="${admin != null}"
+     style="padding: 15px; background: #fff; border-bottom: 1px solid #ddd; margin-bottom: 20px;">
+    <span> 관리자: <b th:text="${admin.adminName}">관리자</b></span>
+    <form th:action="@{/logout}" method="post" style="display:inline; float: right;">
+        <button type="submit" class="btn-secondary" style="padding: 5px 12px; cursor: pointer;">로그아웃</button>
+    </form>
+</div>
 
-<table border="1" cellpadding="6">
-    <thead>
-    <tr>
-        <th>요청 ID</th>
-        <th>사용자 ID</th>
-        <th>요청 내용</th>
-        <th>요청일</th>
-        <th>처리</th>
-    </tr>
-    </thead>
+<div style="padding: 0 20px;">
+    <div style="display: flex; gap: 20px; border-bottom: 1px solid #ddd; margin-bottom: 20px;">
+        <a th:href="@{/admin/member/list}" class="btn-tab">직원 관리</a>
+        <a th:href="@{/admin/attendance/list}" class="btn-tab active">근태 요청 관리</a>
+        <a th:href="@{/admin/manage/list}" class="btn-tab">관리자 설정</a>
+        <a th:href="@{/admin/log/list}" class="btn-tab">활동 로그</a>
+    </div>
 
-    <tbody>
-    <tr th:each="req : ${requests}">
-        <td th:text="${req.requestId}"></td>
-        <td th:text="${req.userId}"></td>
+    <h2>📅 근태 수정 요청 (대기)</h2>
 
-        <td>
-            <pre th:text="${req.requestPayload}"></pre>
-        </td>
+    <table>
+        <thead>
+        <tr>
+            <th>요청 ID</th>
+            <th>사용자 ID</th>
+            <th>요청 내용</th>
+            <th>요청일</th>
+            <th>처리</th>
+        </tr>
+        </thead>
 
-        <td th:text="${#temporals.format(req.requestCreatedAt, 'yyyy-MM-dd HH:mm')}"></td>
+        <tbody>
+        <tr th:each="req : ${requests}">
+            <td th:text="${req.requestId}"></td>
+            <td th:text="${req.userId}"></td>
 
-        <td>
-            <button type="button"
-                    th:attr="data-id=${req.requestId}"
-                    onclick="approve(this)">
-                승인
-            </button>
+            <td class="payload-cell">
+                <span class="raw-json" style="display:none;" th:text="${req.requestPayload}"></span>
+                <div class="parsed-display"></div>
+            </td>
 
-            <button type="button"
-                    th:attr="data-id=${req.requestId}"
-                    onclick="reject(this)">
-                반려
-            </button>
-        </td>
-    </tr>
-    </tbody>
-</table>
+            <td th:text="${#temporals.format(req.requestCreatedAt, 'yyyy-MM-dd HH:mm')}"></td>
+
+            <td>
+                <button type="button" class="btn-primary"
+                        th:attr="data-id=${req.requestId}"
+                        onclick="approve(this)" style="padding: 5px 10px; cursor:pointer;">
+                    승인
+                </button>
+
+                <button type="button" class="btn-secondary"
+                        th:attr="data-id=${req.requestId}"
+                        onclick="reject(this)" style="padding: 5px 10px; cursor:pointer; margin-left: 5px;">
+                    반려
+                </button>
+            </td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(requests)}">
+            <td colspan="5" style="text-align: center; padding: 30px; color: #999;">대기 중인 요청이 없습니다.</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
 
 <script src="/js/admin-attendance.js"></script>
 </body>

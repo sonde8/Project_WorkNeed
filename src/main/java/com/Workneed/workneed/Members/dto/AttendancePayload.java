@@ -11,4 +11,5 @@ public class AttendancePayload {
     LocalTime fromTime;
     LocalTime toTime;
     String reason;
+    String rejectReason;
 }

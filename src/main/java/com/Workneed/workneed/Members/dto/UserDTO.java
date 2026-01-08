@@ -19,17 +19,19 @@ public class UserDTO implements Serializable {
     private String userName;
     private String userProfileImage;
     private String userStatus;
+    private String userPhone;
 
     private LocalDateTime userCreatedAt;
     private LocalDateTime userUpdatedAt;
     private LocalDate userBirthday;
 
-    private String rememberToken;
-    private LocalDateTime rememberTokenExpired;
+
 
     private Long rankId;
     private Long deptId;
 
     private String deptName;
     private String rankName;
+
+    private String tempPwYn;
 }

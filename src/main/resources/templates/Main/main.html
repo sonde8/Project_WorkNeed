@@ -45,16 +45,18 @@
             <div class = "toDay" id="todayStart"
                  th:text="${today != null ? today : '날짜'}"> 날짜 </div>
 
+            <!-- 프로필 -->
             <div class = "profile-card">
 
                 <div class="profileImg">
-                    <img th:if="${user.userProfileImage != null}"
-                         th:src="@{/uploads/profiles/} + ${user.userProfileImage}"
+                    <img th:if="${session.user.userProfileImage != null}"
+                         th:src="${session.user.userProfileImage}"
                          alt="프로필 이미지">
 
-                    <img th:unless="${user.userProfileImage != null}"
+                    <img th:unless="${session.user.userProfileImage != null}"
                          th:src="@{/images/default-profile.svg}"
-                         alt="기본 이미지">
+                         alt="기본프로필"
+                         class="profile">
                 </div>
 
                 <div class="profileText">
@@ -78,8 +80,37 @@
             </div>
 
             <!-- 결제 -->
-            <div class = "pay"> 결제 </div>
+            <div class="main-kpi-approval">
+                <a class="kpi" th:href="@{/approval/inbox/waiting}">
+                    <span class="kpi-num" th:text="${counts.approverTodoCount}">0</span>  <!-- 여기 -->
+                    <span class="kpi-label">대기</span>
+                </a>
 
+                <a class="kpi" th:href="@{/approval/inbox/done}">
+                    <span class="kpi-num" th:text="${counts.approverDoneCount}">0</span>
+                    <span class="kpi-label">완료</span>
+                </a>
+
+                <a class="kpi" th:href="@{/approval/my/drafts}">
+                    <span class="kpi-num" th:text="${counts.drafterDraftCount}">0</span>
+                    <span class="kpi-label">임시</span>
+                </a>
+
+                <a class="kpi" th:href="@{/approval/my/in-progress}">
+                    <span class="kpi-num" th:text="${counts.drafterInProgressCount}">0</span>
+                    <span class="kpi-label">진행</span>
+                </a>
+
+                <a class="kpi" th:href="@{/approval/my/approved}">
+                    <span class="kpi-num" th:text="${counts.drafterApprovedCount}">0</span>
+                    <span class="kpi-label">승인</span>
+                </a>
+
+                <a class="kpi kpi--danger" th:href="@{/approval/my/rejected}">
+                    <span class="kpi-num" th:text="${counts.drafterRejectedCount}">0</span>
+                    <span class="kpi-label">반려</span>
+                </a>
+            </div>
         </section>
 
         <!-- 오른쪽-->

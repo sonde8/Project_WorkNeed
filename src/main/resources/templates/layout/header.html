@@ -10,25 +10,40 @@
 
     <div class="header-profile">
         <div class="profile-info" th:if="${session.user != null}">
+
             <span class="profile-name" th:text="${session.user.userName}">사용자명</span>
 
-            <div class="profile-img-wrapper">
-                <img th:if="${session.user.userProfileImage != null}"
-                     th:src="@{/uploads/profiles/} + ${session.user.userProfileImage}"
-                     alt="프로필" class="profile">
+            <div class="profile-dropdown-container" style="position: relative;">
 
-                <img th:unless="${session.user.userProfileImage != null}"
-                     th:src="@{/images/default-profile.svg}"
-                     alt="기본프로필" class="profile">
+                <div class="profile-img-wrapper" id="profileTrigger">
+                    <img th:src="${session.user.userProfileImage != null ? session.user.userProfileImage : '/images/default-profile.svg'}"
+                         alt="프로필">
+                </div>
+
+                <div id="profileModal" class="profile-modal-content">
+                    <div class="modal-profile-circle" id="modalImgTrigger" style="cursor:pointer;">
+                        <img th:src="${session.user.userProfileImage != null ? session.user.userProfileImage : '/images/default-profile.svg'}"
+                             alt="모달 프로필">
+                        <form id="profileUploadForm" action="/user/uploadProfile" method="post"
+                              enctype="multipart/form-data">
+                            <input type="file" id="hiddenFileSelect" name="profileFile" style="display:none;"
+                                   accept="image/*">
+                        </form>
+                    </div>
+
+                    <div class="modal-user-name" th:text="${session.user.userName}">사용자명</div>
+
+                    <div class="modal-action-buttons">
+                        <a href="javascript:void(0)" id="changeProfileBtn" class="modal-btn edit-btn">프로필 사진 변경</a>
+                        <a href="/password/change" class="modal-btn pw-btn">비밀번호 변경</a>
+                    </div>
+                </div>
             </div>
 
-            <form th:action="@{/logout}" method="post" style="margin-left: 10px;">
+            <!-- ✅ 로그아웃 (완전히 별개) -->
+            <form th:action="@{/logout}" method="post" class="logout-form">
                 <button type="submit" class="logout-btn">로그아웃</button>
             </form>
-        </div>
-
-        <div class="profile-info" th:unless="${session.user != null}">
-            <a th:href="@{/login}" class="login-link">로그인</a>
         </div>
     </div>
 </header>

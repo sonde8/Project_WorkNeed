@@ -1,203 +1,231 @@
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+@charset "UTF-8";
+
+/* =========================================
+   0. Variables (디자인 토큰)
+   ========================================= */
+:root {
+    /* 브랜드 컬러: 차분한 네이비 & 신뢰감 있는 블루 */
+    --color-primary: #2C3E50;
+    --color-primary-dark: #1a252f;
+    --color-secondary: #3A7BD5;
+
+    /* 배경 및 카드 색상 */
+    --color-bg: #F2F4F7;          /* 전체 배경 (연한 쿨그레이) */
+    --color-surface: #FFFFFF;     /* 카드 배경 (흰색) */
+    --color-surface-hover: #F8F9FA;
+
+    /* 텍스트 & 테두리 */
+    --color-text-main: #333333;
+    --color-text-sub: #666666;
+    --border-color: #DEE2E6;      /* 구분선 색상 */
+
+    /* 카테고리 컬러 (이전 코드에서 가독성이 검증된 컬러) */
+    --color-work: #d63384;
+    --color-work-bg: #ffeef6;
+    --color-personal: #4f46e5;
+    --color-personal-bg: #eef2ff;
+
+    /* 둥글기 및 그림자 */
+    --border-radius-lg: 12px;
+    --border-radius-md: 8px;
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
+/* =========================================
+   1. Global Layout (레이아웃 설정)
+   ========================================= */
 body {
-    font-family: 'Noto Sans KR', sans-serif;
+    background-color: var(--color-bg);
+    font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
+    margin: 0;
     height: 100vh;
     overflow: hidden;
-    display: flex; /* 중앙 정렬 복구 */
-    justify-content: center;
-    align-items: center;
-    background-color: #fff;
+    color: var(--color-text-main);
 }
 
-/* ============================
-   메인 레이아웃 (1340px 고정)
-   ============================ */
 .calendar-container {
-    width: 1340px;
-    height: 95vh;
+    width: 100%;
+    height: 100%;
+    padding: 20px;
+    box-sizing: border-box;
     display: flex;
-    margin: 0 auto;
-
-    /* 깔끔한 외관을 위한 스타일 */
-    background-color: #fff;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-    overflow: hidden;
+    gap: 20px;
 }
 
-/* --- 왼쪽 사이드바 (420px) --- */
+/* =========================================
+   2. Left Sidebar (사이드바)
+   ========================================= */
 .calendar-left {
     width: 420px;
+    flex-shrink: 0;
     height: 100%;
-
-    border-right: 1px solid #ddd;
-    background-color: #fff;
-
-    padding: 20px;
+    background-color: var(--color-surface);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-sm);
+    padding: 30px;
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 28px;
     overflow-y: auto;
 }
 
-/* 일정 등록 버튼 */
+/* 스크롤바 커스텀 */
+.calendar-left::-webkit-scrollbar { width: 6px; }
+.calendar-left::-webkit-scrollbar-thumb { background-color: #ddd; border-radius: 4px; }
+.calendar-left::-webkit-scrollbar-track { background-color: transparent; }
+
+.left-title {
+    font-size: 15px;
+    font-weight: 800;
+    color: #222;
+    margin: 0 0 12px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* (1) 일정 등록 버튼 */
 .schedule-add-btn {
     width: 100%;
     padding: 15px;
     font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    background-color: #f8f9fa;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    text-align: center;
-    transition: all 0.2s;
-    color: #333;
-}
-.schedule-add-btn:hover { background-color: #e9ecef; }
-
-/* 왼쪽 박스 공통 */
-.left-box {
-    border: 1px solid #eee;
-    padding: 15px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-}
-.left-title {
-    font-size: 18px;
     font-weight: 700;
-    margin-bottom: 12px;
-    border-bottom: 1px solid #f0f0f0;
-    padding-bottom: 8px;
-    color: #333;
+    cursor: pointer;
+    background-color: var(--color-primary);
+    color: #fff;
+    border: none;
+    border-radius: var(--border-radius-md);
+    box-shadow: 0 4px 6px rgba(44, 62, 80, 0.2);
+    transition: all 0.2s ease;
 }
 
-/* Today List */
+.schedule-add-btn:hover {
+    background-color: var(--color-primary-dark);
+    transform: translateY(-2px);
+}
+
+/* (2) Today List */
 .today-list {
     list-style: none;
-    min-height: 0;
+    padding: 0;
+    margin: 0;
     max-height: 250px;
     overflow-y: auto;
 }
-.today-list::-webkit-scrollbar { width: 4px; }
-.today-list::-webkit-scrollbar-thumb { background-color: #ddd; border-radius: 2px; }
 
 .today-list li {
-    cursor: pointer;
-    padding: 10px 5px;
-    border-bottom: 1px dashed #eee;
+    padding: 12px;
+    margin-bottom: 8px;
+    border-radius: var(--border-radius-md);
+    background-color: var(--color-surface-hover);
     font-size: 14px;
     display: flex;
     align-items: center;
-    gap: 8px;
-    color: #444;
+    gap: 10px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all 0.2s;
 }
-.today-list li:hover { background-color: #f8fbff; font-weight: 500; }
 
-.today-empty-msg { text-align: center; color: #aaa; font-size: 13px; padding: 20px 0; }
+.today-list li:hover {
+    background-color: #fff;
+    border-color: var(--color-secondary);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
 
+.today-empty-msg {
+    font-size: 14px;
+    color: #888;
+    text-align: center;
+    padding: 15px 0;
+}
 
-/* Week Preview 스타일 */
+/* (3) Week Preview */
 .preview-container {
     display: flex;
     flex-direction: column;
-    gap: 20px;
-    padding-top: 5px;
+    gap: 14px;
 }
 
-.preview-group-title {
-    font-size: 15px;
-    font-weight: 700;
-    margin-bottom: 8px;
-    display: inline-block;
+.preview-group {
+    background-color: #fff;
+    border: 1px solid #eee;
+    border-radius: var(--border-radius-md);
+    padding: 14px;
 }
-
-/* 색상 구분 */
-.work-color { color: #d63384; /* 예: 핑크/보라 계열 */ }
-.personal-color { color: #4f46e5; /* 예: 인디고/블루 계열 */ }
 
 .preview-list {
     list-style: none;
-    padding-left: 5px;
+    padding: 0;
+    margin: 10px 0 0 0;
 }
 
 .preview-list li {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 6px 0;
     font-size: 14px;
-    color: #444;
-}
-
-.preview-label {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-.preview-label::before {
-    content: '•';
-    color: #ccc;
-    font-size: 1.2em;
-    line-height: 0;
-}
-
-.preview-right {
-    display: flex;
-    align-items: center;
-    gap: 6px;
+    color: #555;
+    padding: 4px 0;
 }
 
 .preview-count {
-    font-weight: 600;
+    font-weight: 700;
     color: #222;
 }
 
-.warning-icon {
-    font-size: 12px;
-    animation: blink 2s infinite;
-    cursor: help;
-}
-.warning-icon.hidden { display: none; }
-
-@keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
+/* 공통 뱃지 스타일 */
+.category-badge {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.4;
 }
 
-.filter-radio-group { display: flex; flex-direction: column; gap: 8px; }
-.filter-radio { cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 6px; color: #444; }
-
-/* --- 중앙 갭 (20px) 복구 --- */
-.calendar-gap {
-    width: 20px;
-    height: 100%;
-    background-color: #fff; /* 또는 투명 */
-    border-left: 1px solid #eee; /* 구분선 */
-    border-right: 1px solid #eee;
+.category-badge.work {
+    background-color: var(--color-work-bg);
+    color: var(--color-work);
 }
 
-/* --- 오른쪽 메인 캘린더 (900px) --- */
+.category-badge.personal {
+    background-color: var(--color-personal-bg);
+    color: var(--color-personal);
+}
+
+/* (4) 필터 라디오 */
+.filter-radio-group { display: flex; flex-direction: column; gap: 10px; }
+.filter-radio {
+    cursor: pointer; font-size: 14px; color: #444;
+    display: flex; align-items: center; gap: 8px;
+}
+.filter-radio input[type="radio"] {
+    accent-color: var(--color-primary);
+    width: 18px; height: 18px; margin: 0;
+}
+
+/* =========================================
+   3. Main Calendar Area (오른쪽 캘린더)
+   ========================================= */
 .calendar-right {
-    width: 900px;
+    flex: 1;
     height: 100%;
-    /* 내부 여백 */
-    padding: 20px;
+    background-color: var(--color-surface);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-sm);
+    padding: 40px 50px;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
+    position: relative;
 }
 
 .calendar-inner {
-    flex: 1;
-    position: relative;
-    border: none;
-    overflow: hidden;
+    width: 100%;
+    height: 100%;
     display: flex;
     flex-direction: column;
 }
@@ -205,102 +233,208 @@ body {
 #calendar {
     width: 100%;
     height: 100%;
+    font-size: 13px;
 }
 
 /* =========================================
-   FullCalendar Custom Styling
+   4. FullCalendar Custom Styling
    ========================================= */
 
-/* 1. 툴바 */
-.fc-header-toolbar { margin-bottom: 1em !important; }
-.fc-toolbar-title { font-size: 1.5rem !important; font-weight: 800; color: #222; }
-.fc-button {
-    background-color: #333 !important;
-    border-color: #333 !important;
+.fc .fc-header-toolbar {
+    margin-bottom: 24px !important;
+    padding: 0 5px;
+}
+
+.fc .fc-toolbar-title {
+    font-size: 26px !important;
+    font-weight: 800;
+    color: var(--color-primary);
+    letter-spacing: -0.5px;
+}
+
+.fc .fc-button {
+    background-color: #fff !important;
+    border: 1px solid #ced4da !important;
+    color: #555 !important;
+    padding: 8px 18px !important;
     font-size: 13px !important;
-    border-radius: 4px !important;
-}
-.fc-button:hover { background-color: #555 !important; }
-
-/* 2. 그리드 셀 */
-.fc-daygrid-day-frame {
-    height: 100% !important;
-    padding: 2px;
-    cursor: pointer;
-}
-.fc-daygrid-day-top { flex-direction: row; }
-.fc-daygrid-day-number { color: #444; font-weight: 500; padding: 4px 8px !important; }
-
-/* 3. 이벤트 바 (Block 스타일 통일) */
-.fc-event {
-    margin-top: 2px !important;
-    padding: 2px 4px !important;
-    border-radius: 3px !important;
-    border: none !important;
-    font-size: 12px !important;
-    font-weight: 500 !important;
-    cursor: grab;
-    transition: transform 0.1s, box-shadow 0.1s;
+    font-weight: 600 !important;
+    border-radius: 6px !important;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important;
+    outline: none !important;
 }
 
-.fc-event:hover {
-    transform: scale(1.02);
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2) !important;
-    opacity: 0.9 !important;
-    z-index: 10;
+.fc .fc-button:hover {
+    background-color: #f1f3f5 !important;
+    color: #222 !important;
 }
 
-/* 4. +more 링크 */
-.fc-daygrid-more-link {
-    font-size: 11px !important;
-    color: #666 !important;
-    font-weight: 600;
-    margin-top: 2px;
-    padding-left: 4px;
+.fc .fc-button-active,
+.fc .fc-today-button {
+    background-color: var(--color-primary) !important;
+    border-color: var(--color-primary) !important;
+    color: #fff !important;
+    opacity: 1 !important;
+}
+
+.fc-theme-standard th {
+    background-color: #F8F9FA;
+    border: 1px solid #DEE2E6 !important;
+    border-bottom: 2px solid #CED4DA !important;
+    padding: 10px 0 !important;
+    vertical-align: middle;
+}
+
+.fc-col-header-cell-cushion {
+    font-size: 14px;
+    font-weight: 700;
+    color: #495057;
     text-decoration: none !important;
 }
-.fc-daygrid-more-link:hover { color: #111 !important; background-color: #eee; border-radius: 3px; }
 
-/* 모달 리스트 스타일 */
-.daily-list-simple-ul { list-style: none; padding: 0; margin: 0; }
-.daily-list-simple-ul li { padding: 12px; border-bottom: 1px solid #f5f5f5; cursor: pointer; display: flex; align-items: center; gap: 12px; transition: background-color 0.1s; }
-.daily-list-simple-ul li:hover { background-color: #f8fbff; }
+.fc-theme-standard td,
+.fc-theme-standard .fc-scrollgrid {
+    border-color: #E9ECEF !important;
+}
 
-.fc-popover-body ul li,
-.todays-schedule-list li {
-    font-size: 15px;
-    margin-bottom: 8px;
+.fc-daygrid-day-top {
+    flex-direction: row;
+    padding: 6px 8px !important;
+}
+
+.fc-daygrid-day-number {
+    font-size: 13px;
+    color: #666;
+    font-weight: 600;
+    text-decoration: none !important;
+    padding: 4px !important;
+}
+
+/* 오늘 날짜 타원형 디자인 */
+.fc-day-today {
+    background-color: rgba(58, 123, 213, 0.03) !important;
+}
+
+.fc-day-today .fc-daygrid-day-number {
+    width: auto !important;
+    height: auto !important;
+    border-radius: 12px !important;
+    padding: 4px 10px !important;
+    background-color: var(--color-secondary);
+    color: #fff;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    margin-left: 2px;
+    box-shadow: 0 2px 4px rgba(58, 123, 213, 0.4);
+    font-size: 12px !important;
+    font-weight: 700 !important;
+}
+
+.fc-event {
+    border: none !important;
+    border-radius: 3px !important;
+    padding: 3px 6px !important;
+    margin-bottom: 2px !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    cursor: pointer;
+}
+
+.fc-daygrid-more-link {
+    font-size: 11px !important;
+    color: #888 !important;
+    font-weight: 600;
+    text-decoration: none !important;
+    margin-left: 6px;
+    background: #f1f3f5;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+/* =========================================
+   5. Modals (모달 공통 및 일정 리스트 복구)
+   ========================================= */
+.modal-overlay {
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(2px);
+    z-index: 1000;
+}
+
+.modal-container {
+    border-radius: 12px !important;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important;
+    border: none !important;
+    background: #fff;
+}
+
+.modal-header {
+    border-bottom: 1px solid #eee;
+    padding: 16px 24px;
     display: flex;
+    justify-content: space-between;
     align-items: center;
 }
 
-/* 카테고리 라벨 공통 스타일 */
-.category-label {
-    font-size: 0.9em;
-    font-weight: bold;
-    margin-left: 6px;
-    margin-right: 4px;
-}
-
-/* [업무] */
-.category-label.work {
-    color: #d63384;
-}
-
-/* [개인] */
-.category-label.personal {
-    color: #4f46e5;
-}
-
-/* 카테고리 뱃지 공통 스타일 */
-.category-badge {
-    display: inline-block;
-    padding: 3px 6px;
-    border-radius: 4px;
-    font-size: 11px;
+.modal-header h2 {
+    font-size: 18px;
     font-weight: 700;
-    margin-right: 6px;
-    vertical-align: middle;
-    line-height: 1;
-    box-shadow: none;
+    margin: 0;
+}
+
+.modal-body { padding: 24px; }
+
+.modal-footer {
+    padding: 16px 24px;
+    background-color: #f8f9fa;
+    border-top: 1px solid #eee;
+}
+
+/* 일정 리스트 모달 스타일 */
+.daily-list-simple-ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.daily-list-simple-ul li {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border-color);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: background-color 0.2s ease;
+    font-size: 15px; /* 가독성을 위해 크게 설정 */
+    color: var(--color-text-main);
+}
+
+.daily-list-simple-ul li:hover {
+    background-color: rgba(58, 123, 213, 0.05);
+}
+
+.daily-list-simple-ul li:last-child {
+    border-bottom: none;
+}
+
+/* 모달 리스트 내 제목 */
+.event-title {
+    font-weight: 500;
+    flex: 1;
+}
+
+/* 모달 하단 일정 등록 버튼 */
+.btn-submit#dailyListAddBtn {
+    width: 100%;
+    padding: 12px;
+    background-color: var(--color-primary);
+    color: white;
+    border: none;
+    border-radius: var(--border-radius-md);
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.btn-submit#dailyListAddBtn:hover {
+    background-color: var(--color-primary-dark);
 }
