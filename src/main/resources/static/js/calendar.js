@@ -375,22 +375,21 @@
         }
 
         const hideDailyListModal = () => {
-            // 1. 현재 포커스된 요소(닫기 버튼 등) 해제
-            if (document.activeElement instanceof HTMLElement) {
-                document.activeElement.blur();
+            // 1. [핵심] 숨기기 전에 포커스를 먼저 모달 밖으로 강제 이동시킵니다.
+            // blur()보다 focus()를 먼저 하는 것이 브라우저가 포커스 위치를 파악하는 데 훨씬 명확합니다.
+            const externalBtn = document.getElementById("openCalendarCreateModal");
+            if (externalBtn) {
+                externalBtn.focus();
+            } else {
+                document.activeElement?.blur();
             }
 
-            // 2. 모달을 숨김 처리
+            // 2. 브라우저가 포커스 이동을 완전히 인지할 수 있도록 micro-task(setTimeout 0)를 사용하거나,
+            // 순서를 확실히 하여 숨김 처리를 진행합니다.
             overlay.classList.add("hidden");
-            // 접근성 속성도 명확히 동기화 (경고 방지 보조)
-            overlay.setAttribute("aria-hidden", "true");
 
-            // 3. [핵심] 포커스를 모달 외부의 안전한 요소로 강제 이동
-            // '일정 등록' 버튼이 가장 적절합니다.
-            const addBtn = document.getElementById("openCalendarCreateModal");
-            if (addBtn) {
-                addBtn.focus();
-            }
+            // 3. 포커스가 이미 밖(externalBtn)으로 나갔으므로, 이제 안전하게 숨김 처리를 할 수 있습니다.
+            overlay.setAttribute("aria-hidden", "true");
         };
 
         // 닫기 버튼 클릭 시
