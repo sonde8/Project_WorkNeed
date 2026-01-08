@@ -21,6 +21,7 @@ public class ApprovalLeaveService {
         this.leaveApprovalMapper = leaveApprovalMapper;
     }
 
+
     public LeaveRequestDTO getLeaveDetail(Long docId, Long userId) {
         LeaveRequestDTO leave = leaveApprovalMapper.selectLeaveDetail(docId);
 
@@ -37,11 +38,13 @@ public class ApprovalLeaveService {
         return leave;
     }
 
+
     @Transactional
     public Long submitLeave(LeaveRequestDTO dto, Long userId) {
 
         // 1) approval_doc 생성
         ApprovalDoc doc = new ApprovalDoc();
+
         // 작성자
         doc.setWriterId(userId);
         // 제목(연차 종류)
@@ -56,6 +59,7 @@ public class ApprovalLeaveService {
         //마감일
         doc.setLeaveEndDate(dto.getEndDate());
         //
+
         doc.setStatus(DocStatus.APPROVED); // 또는 WAITING
 
         docMapper.save(doc);   // ✅ 타입 일치
@@ -68,7 +72,9 @@ public class ApprovalLeaveService {
 
         // 2) leave_request 저장 (✅ LeaveApprovalMapper로)
         dto.setDocId(docId);
+
         dto.setUserId(userId);
+
         leaveApprovalMapper.insertLeaveRequest(dto);
 
         // 3) 팀장 찾기 + 결재라인 APPROVED INSERT
@@ -76,10 +82,11 @@ public class ApprovalLeaveService {
         Long teamLeadId = leaveApprovalMapper.findTeamLeaderId(deptId);
 
         if (teamLeadId == null) {
+
             throw new IllegalStateException("관리자 찾지 못했습니다. deptId=" + deptId);
         }
 
-        // 결재라인 남김
+
         leaveApprovalMapper.insertApprovedLine(docId, teamLeadId, 1, LocalDateTime.now());
 
         // 4) doc 승인완료
