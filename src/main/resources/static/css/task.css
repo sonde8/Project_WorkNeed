@@ -74,6 +74,32 @@ main{
     border-radius: 99.9rem;
     background: rgba(0,0,0,.08);
 }
+.meeting-room {
+    position: relative; /* tooltip의 기준점 */
+    display: inline-block;
+    cursor: default;
+}
+.meeting-tooltip {
+    display: none;
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+
+    min-width: 20rem;
+    padding: 1.5rem;
+    border: 1px solid #ddd;
+    background: #fff;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+    border-radius: 0.8rem;
+
+    z-index: 9999; /* 다른 요소 위로 */
+}
+.meeting-room:hover .meeting-tooltip {
+    display: block;
+}
+.meeting-row{
+    padding: 0.4rem;
+}
 
 #detail .description{
     grid-column: 1 / -1;
@@ -252,7 +278,7 @@ main{
 }
 #etc-chart{
     display: flex;
-    margin: 4rem auto;
+    margin: 2rem auto;
 }
 #etc-chart button{
     border: none;
@@ -266,7 +292,10 @@ canvas{
     font-weight: 700;
     font-size: 1.6rem;
 }
-
+#etc-chart .goto-progress{
+    opacity: 0.6;
+    font-weight: 600;
+}
 #etc-file,
 #etc-git{
     padding: 2rem 1rem;
@@ -331,11 +360,17 @@ canvas{
 .btn-send-message-modal{
     display: flex;
     align-items: flex-end;
+    flex-direction: column;
     border: none;
     margin: 0 1rem 0 auto;
 }
-.btn-send-message-modal img{
+.btn-send-message-modal .etc-images{
+    padding:0 0.5rem
+}
 
+.btn-send-message-modal .goto-image{
+    opacity: 0.6;
+    font-weight: 600;
 }
 
 
@@ -641,4 +676,89 @@ canvas{
     border-radius: 0.5rem;
     padding: 0.3rem;
     font-size: 1rem;
+}
+
+
+/* 1. 사이드바 전체 높이를 브라우저 화면에 고정 */
+#etc {
+    display: flex;
+    flex-direction: column;
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    height: calc(100vh - 17rem); /* 화면 전체 높이에서 상단 여백 제외 */
+    position: sticky;
+    top: 20px;
+}
+
+/* 2. 파일 보관함 블록 설정 */
+#etc-file {
+    height: 190px;           /* ★ 전체 블록 높이를 고정하여 화면 이탈 방지 */
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+    border-radius: 0.8rem;
+    border: 0.1rem solid rgba(0, 0, 0, 0.1);
+
+    margin: 1rem;
+}
+
+/* 3. 실제 파일들이 쌓이는 목록 영역에만 스크롤 부여 */
+.task-file-list {
+    flex: 1;                 /* ★ 버튼을 아래로 밀어내고 남은 공간을 다 씀 */
+    width: 100%;
+    overflow-y: auto;        /* ★ 파일이 많아지면 여기서만 스크롤 발생 */
+    margin: 1rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+/* 4. 파일 뷰 정렬 수정 */
+#etc-file .file-view {
+    display: flex;
+    flex-direction: column;
+    height: 100%;            /* 부모(#etc-file) 높이를 100% 활용 */
+}
+
+#etc-file .btn-etc-edit {
+    margin-top: auto;        /* 목록이 적어도 아래에 붙게 함 */
+    flex-shrink: 0;          /* 목록이 많아져도 버튼 크기가 줄어들지 않음 */
+}
+
+/* 5. 스크롤바 커스텀 */
+.task-file-list::-webkit-scrollbar {
+    width: 4px;
+}
+.task-file-list::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+/* 6. 개별 파일 아이템 스타일 */
+.file-item {
+    width: 100%;
+    /*background: #ffffff;*/
+    border: 1px solid rgba(0,0,0,0.1);
+    border-radius: 0.6rem;
+    padding: 0.8rem 1rem;
+    transition: background 0.2s;
+}
+
+.file-item:hover {
+    background: #f8f9fa;
+}
+
+/* 7. 링크 텍스트 정렬 및 가독성 */
+.file-link {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: #333;
+    font-size: 1.2rem;
+    word-break: break-all; /* 파일명이 길면 자동 줄바꿈 */
+}
+
+.file-link span {
+    margin-left: 0.5rem;
+    text-decoration: underline;
 }

@@ -125,6 +125,34 @@
     align-items: center;
     margin-right: 12px;
     font-size: 2rem;
+    flex-shrink: 0;   /* [추가] 부모 너비에 의해 찌그러짐 방지 */
+    overflow: hidden; /* [추가] 원형 밖으로 나가는 이미지 절단 */
+}
+
+/* ✅ 추가: 이미지 태그 자체에 대한 제어 */
+.profile-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* [중요] 비율 유지하며 꽉 채움 */
+}
+
+/* 채팅창 상단(View Header)의 작은 프로필 */
+.profile-img-sm {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    overflow: hidden;
+    background-color: #eeeeee;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ✅ 추가: 이미지 태그 제어 */
+.profile-img-sm img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 /* 사이드바 텍스트 레이아웃 */
@@ -565,6 +593,42 @@ li.other-msg { justify-content: flex-start; display: flex; width: 100%; }
     background-color: #eee;  /* 배경색 변경 */
     cursor: default;         /* 커서를 기본으로 변경 */
     pointer-events: none;    /* [중요] 모든 클릭 이벤트 무시 */
+}
+
+/* 목록의 작은 프로필 원형 */
+.user-profile-circle-small {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    overflow: hidden;
+    background-color: #eee;
+    flex-shrink: 0;
+}
+.user-profile-circle-small img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* 오른쪽 선택된 유저 프로필 원형 */
+.selected-profile-circle {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-right: 8px;
+    background-color: #eee;
+}
+.selected-profile-circle img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* 정렬을 위한 flex 추가 */
+.selected-info {
+    display: flex;
+    align-items: center;
 }
 
 /* 선택된 유저의 아이콘 색상 변경 (옵션) */

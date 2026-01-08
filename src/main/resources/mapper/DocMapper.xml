@@ -131,7 +131,7 @@
             user_login_id  AS loginId,
             user_password  AS password,
             user_name      AS userName
-        FROM User
+        FROM user
         WHERE user_login_id = #{loginId}
             LIMIT 1
     </select>
@@ -156,7 +156,7 @@
             l.status           AS status,
             l.approved_at      AS approvedAt
         FROM approval_line l
-                 JOIN User u ON u.user_id = l.approver_id
+                 JOIN user u ON u.user_id = l.approver_id
         WHERE l.approval_doc_id = #{docId}
         ORDER BY l.order_num ASC, l.approval_line_id ASC
     </select>
@@ -172,7 +172,7 @@
             d.dept_name   AS deptName,
             r.rank_name   AS rankName,
             u.user_status AS userStatus
-        FROM User u
+        FROM user u
                  LEFT JOIN dept  d ON d.dept_id = u.dept_id
                  LEFT JOIN ranks r ON r.rank_id = u.rank_id
         WHERE u.user_status = 'ACTIVE'

@@ -22,6 +22,7 @@ public class UserService {
     private final UserMapper userMapper;
     private final BCryptPasswordEncoder passwordEncoder; // 분리된 PasswordConfig의 빈 주입
     private final SocialAccountMapper socialAccountMapper;
+    private final MailService mailService;
 
     private static final Long DEFAULT_DEPT_ID = 6L; // 부서 미지정
     private static final Long DEFAULT_RANK_ID = 6L; // 직급 신입
@@ -34,15 +35,19 @@ public class UserService {
     }
 
 
-
     public void register(UserDTO user) {
         if (user.getUserPassword() != null) {
             user.setUserPassword(passwordEncoder.encode(user.getUserPassword()));
         }
-        user.setUserStatus("INACTIVE"); // 회원가입시 비활성
-        user.setDeptId(DEFAULT_DEPT_ID); // 부서 미지정
-        user.setRankId(DEFAULT_RANK_ID); // 직급 신입
+        user.setUserStatus("INACTIVE");
+        user.setDeptId(DEFAULT_DEPT_ID);
+        user.setRankId(DEFAULT_RANK_ID);
+
+        // 1.DB에 유저 정보를 저장
         userMapper.insertUser(user);
+
+
+        log.info("신규 유저 가입 완료 및 환영 메일 발송: {}", user.getUserLoginId());
     }
 
     //비밀번호 재설정 암호하
@@ -53,7 +58,7 @@ public class UserService {
         }
 
         // 2 8자리 이상 영문/숫자/특수문자 조합 검사 (정규식)
-        String pwPattern =  "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[$!%*#?&])[A-Za-z\\d$!%*#?&]{8,}$";
+        String pwPattern = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[$!%*#?&])[A-Za-z\\d$!%*#?&]{8,}$";
         if (!newPassword.matches(pwPattern)) {
             throw new IllegalArgumentException("비밀번호는 8자 이상의 영문, 숫자, 특수문자(@ 제외) 조합이어야 합니다.");
         }
@@ -113,30 +118,20 @@ public class UserService {
 
     // 이름과 이메일로 아이디 찾기
     public String findId(String userName, String userEmail) {
-        String foundId = userMapper.findLoginIdByNameAndEmail(userName, userEmail);
 
-        if (foundId == null) {
-            return null; // 일치하는 정보 없음
-        }
-
-        // 마스킹 처리: 앞 2자만 보여주고 나머지는 * 처리 (예: admin -> ad***)
-        if (foundId.length() > 2) {
-            return foundId.substring(0, 2) + "*".repeat(foundId.length() - 2);
-        }
-
-        return foundId;
+        return userMapper.findLoginIdByNameAndEmail(userName, userEmail);
     }
 
     @Transactional
     public String createTempPassword(String loginId, String email) {
         UserDTO user = userMapper.findByLoginId(loginId);
 
-        // 유저가 아예 없거나 이메일 정보가 없는 경우 안전하게 차단
+        log.info("비밀번호 찾기 시도 - 입력ID: {}, 입력Email: {}", loginId, email);
+
         if (user == null || user.getUserEmail() == null) {
             return null;
         }
 
-        // [중요] 입력받은 email을 먼저 써서 비교하면 null 에러를 방지
         if (!email.equals(user.getUserEmail())) {
             return null;
         }
@@ -144,9 +139,13 @@ public class UserService {
         String tempPw = UUID.randomUUID().toString().substring(0, 8);
         String encodedPw = passwordEncoder.encode(tempPw);
 
+        // DB 비밀번호 업데이트
         userMapper.updatePassword(user.getUserId(), encodedPw);
 
+        // 2. 메일 발송 서비스
+        mailService.sendTempPasswordEmail(email, tempPw);
+
+        log.info("유저 {}님에게 임시 비밀번호 메일 발송을 요청했습니다.", loginId);
         return tempPw;
     }
-
 }

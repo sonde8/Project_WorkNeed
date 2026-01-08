@@ -78,7 +78,11 @@
         WHERE role_id = #{roleId}
     </select>
 
-
+    <select id="findByAdminId" resultType="com.Workneed.workneed.Members.dto.AdminUserDTO">
+        SELECT *
+        FROM adminUser
+        WHERE admin_id = #{adminId}
+    </select>
 
     <insert id="insertAdmin" parameterType="com.Workneed.workneed.Members.dto.AdminUserDTO"
             useGeneratedKeys="true" keyProperty="adminId">
@@ -89,7 +93,6 @@
         #{roleId},      #{adminStatus}
         )
     </insert>
-
 
     <insert id="insertActivityLog" parameterType="com.Workneed.workneed.Members.dto.AdminUserDTO">
         INSERT INTO adminactivitylog (

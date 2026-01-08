@@ -30,7 +30,12 @@
                  th:classappend="${room != null && r.roomId == room.roomId} ? 'active'">
                 <a th:href="@{/chat/room/{id}(id=${r.roomId})}">
                     <div class="profile-img">
-                        <img th:src="@{/images/profile300.svg}" alt="사용자">
+                        <img th:if="${r.roomType == 'DIRECT'}"
+                             th:src="${r.roomProfileImage != null ? r.roomProfileImage : '/images/default-profile.svg'}"
+                             alt="사용자">
+                        <img th:if="${r.roomType == 'GROUP'}"
+                             th:src="@{/images/team2_300.svg}"
+                             alt="그룹">
                     </div>
                     <div class="room-text">
                         <div class="name-row">
@@ -56,7 +61,13 @@
                 <div class="current-user">
                     <th:block th:if="${room != null}">
                         <div class="profile-img-sm">
-                            <img th:src="@{/images/profile300.svg}" alt="프로필">
+                            <img th:if="${room.roomType == 'DIRECT'}"
+                                 th:src="${room.roomProfileImage != null ? room.roomProfileImage : '/images/default-profile.svg'}"
+                                 alt="프로필">
+
+                            <img th:if="${room.roomType == 'GROUP'}"
+                                 th:src="@{/images/team2_300.svg}"
+                                 alt="그룹">
                         </div>
                         <strong th:text="${room.roomName}">방 이름</strong>
                     </th:block>
@@ -80,8 +91,9 @@
             <th:block th:if="${room != null}">
                 <ul id="messageLog" class="message-log">
                     <th:block th:each="msg, iterStat : ${history}">
+
                         <th:block th:with="currDate=${#temporals.format(msg.createdAt, 'yyyy-MM-dd')},
-                                               prevDate=${!iterStat.first ? #temporals.format(history[iterStat.index - 1].createdAt, 'yyyy-MM-dd') : ''}">
+                           prevDate=${!iterStat.first ? #temporals.format(history[iterStat.index - 1].createdAt, 'yyyy-MM-dd') : ''}">
                             <li th:if="${currDate != prevDate}" class="system-msg date-divider">
                                 <div class="system-inner">
                                     <span th:text="${#temporals.format(msg.createdAt, 'yyyy년 MM월 dd일 EEEE')}"></span>
@@ -89,24 +101,28 @@
                             </li>
                         </th:block>
 
-                        <li th:class="${msg.messageType != null && #strings.trim(msg.messageType).toUpperCase() == 'ENTER'} ? 'system-msg' : (${msg.senderId == currentUserId} ? 'my-msg' : 'other-msg')">
-                            <th:block th:if="${msg.messageType != null && #strings.trim(msg.messageType).toUpperCase() == 'ENTER'}">
-                                <div class="system-inner">
-                                    <span th:text="${msg.content}">시스템 메시지</span>
-                                </div>
+                        <li th:class="${msg.messageType == 'ENTER' || msg.messageType == 'LEAVE'} ? 'system-msg' : (${msg.senderId == currentUserId} ? 'my-msg' : 'other-msg')"
+                            th:data-msg-id="${msg.messageId}"
+                            th:data-file-log-id="${msg.fileLogId}">
+
+                            <th:block th:if="${msg.messageType == 'ENTER' || msg.messageType == 'LEAVE'}">
+                                <div class="system-inner"><span th:text="${msg.content}"></span></div>
                             </th:block>
-                            <th:block th:unless="${msg.messageType != null && #strings.trim(msg.messageType).toUpperCase() == 'ENTER'}">
+
+                            <th:block th:unless="${msg.messageType == 'ENTER' || msg.messageType == 'LEAVE'}">
                                 <div class="msg-unit">
                                     <span class="sender" th:if="${msg.senderId != currentUserId}" th:text="${msg.senderName}">이름</span>
                                     <div class="bubble-row">
                                         <div class="bubble">
-                                            <th:block th:with="mType=${msg.messageType != null ? #strings.trim(msg.messageType).toUpperCase() : 'TALK'}" th:switch="${mType}">
+                                            <th:block th:switch="${msg.messageType}">
                                                 <img th:case="'IMAGE'" th:src="${msg.content}"
                                                      style="max-width: 250px; border-radius: 8px; display: block; cursor: pointer;"
                                                      th:onclick="openImageModal(this.src)">
-                                                <a th:case="'FILE'" th:href="${msg.content}" download class="file-link">
-                                                    📎 <span th:text="${#strings.contains(msg.content, '_') ? #strings.substringAfter(msg.content, '_') : '파일 다운로드'}">파일명</span>
-                                                </a>
+
+                                                <a th:case="'FILE'"
+                                                   th:href="${msg.fileLogId != null ? '/api/chat/files/download/' + msg.fileLogId : msg.content}"
+                                                   class="file-link">📎 <span th:text="${msg.fileName != null ? msg.fileName : '파일 다운로드'}">파일명</span></a>
+
                                                 <span th:case="*" th:text="${msg.content}"></span>
                                             </th:block>
                                         </div>
@@ -131,7 +147,7 @@
                     <form id="messageForm" class="input-form">
                         <textarea id="message" placeholder="메시지를 입력하세요..." rows="2"></textarea>
                         <div class="form-bottom">
-                            <span class="info">사용자를 태그하려면 @를 입력하세요.</span>
+                            <span class="info"></span>
                             <button type="submit" class="send-btn"><img th:src="@{/images/send300.svg}" width="26"></button>
                         </div>
                     </form>
