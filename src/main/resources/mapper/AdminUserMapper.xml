@@ -2,6 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.Workneed.workneed.Members.mapper.AdminUserMapper">
 
+    <!--관리자 기능중 근태만x-->
     <select id="findAllMembersForAdmin" resultType="com.Workneed.workneed.Members.dto.UserDTO">
         SELECT u.*, r.rank_name AS rankname, d.dept_name AS deptname
         FROM user u

@@ -1,5 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
 
+    /* ===============================
+       DOM 요소
+    =============================== */
     const tbody = document.getElementById('bookTbody');
     const ymEl = document.getElementById('bookYm');
     const prevBtn = document.getElementById('prevMonth');
@@ -9,9 +12,36 @@ document.addEventListener('DOMContentLoaded', () => {
     const openBtn = document.getElementById('openRequestBtn');
     const closeBtn = document.getElementById('closeModal');
 
-    if (!tbody || !ymEl || !prevBtn || !nextBtn) return;
+    const dateInput = document.getElementById('reqWorkDate');
+    const submitBtn = document.getElementById('submitRequest');
 
-    // 현재 월
+
+
+    if (!tbody || !ymEl || !prevBtn || !nextBtn || !dateInput) return;
+
+    /* ===============================
+       날짜 제약 (오늘 기준 최근 1년)
+    =============================== */
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    const todayStr = `${yyyy}-${mm}-${dd}`;
+
+    const lastYear = new Date(today);
+    lastYear.setFullYear(today.getFullYear() - 1);
+    const ly = lastYear.getFullYear();
+    const lm = String(lastYear.getMonth() + 1).padStart(2, '0');
+    const ld = String(lastYear.getDate()).padStart(2, '0');
+    const lastYearStr = `${ly}-${lm}-${ld}`;
+
+    dateInput.min = lastYearStr;
+    dateInput.max = todayStr;
+    dateInput.value = todayStr;
+
+    /* ===============================
+       출근부 기본 설정
+    =============================== */
     let cur = new Date();
     cur.setDate(1);
 
@@ -21,38 +51,22 @@ document.addEventListener('DOMContentLoaded', () => {
         return String(n).padStart(2, '0');
     }
 
-    function toYMD(v){
+    function toYMD(v) {
         if (!v) return '';
-        if (typeof v === 'string') {
-
-            if (/^\d{4}-\d{2}-\d{2}$/.test(v)) return v;
-
-            if (v.length >= 10) return v.slice(0, 10);
-            return v;
-        }
-
+        if (typeof v === 'string') return v.slice(0, 10);
         if (v instanceof Date) {
             return `${v.getFullYear()}-${pad(v.getMonth()+1)}-${pad(v.getDate())}`;
         }
-        return String(v);
+        return '';
     }
 
     function minToLabel(min) {
-
-        if (min == null || min === '') return '';
-
         const total = Number(min);
-        if (!Number.isFinite(total)) return '';
-        if (total < 0) return '';
-        if (total === 0) return '0분';
-
+        if (!Number.isFinite(total) || total <= 0) return '';
         if (total < 60) return `${total}분`;
-
         const h = Math.floor(total / 60);
         const m = total % 60;
-
-        if (m === 0) return `${h}시간`;
-        return `${h}시간 ${m}분`;
+        return m === 0 ? `${h}시간` : `${h}시간 ${m}분`;
     }
 
     async function loadMonth(year, month) {
@@ -61,12 +75,12 @@ document.addEventListener('DOMContentLoaded', () => {
         return await res.json();
     }
 
-    // 월간 출근부 렌더링
+    /* ===============================
+       출근부 렌더링
+    =============================== */
     async function render() {
         const year = cur.getFullYear();
         const month = cur.getMonth() + 1;
-
-        // 상단
         ymEl.textContent = `${year}-${month}`;
 
         const records = await loadMonth(year, month);
@@ -85,36 +99,22 @@ document.addEventListener('DOMContentLoaded', () => {
             const rec = map[key] || {};
 
             const dow = weekKor[date.getDay()];
-
             let rowClass = '';
-
-            if(dow === '토') rowClass = 'sat-row';
-            if(dow === '일') rowClass = 'sun-row';
+            if (dow === '토') rowClass = 'sat-row';
+            if (dow === '일') rowClass = 'sun-row';
 
             const type = rec.type ?? '';
-            const normType = String(type).replace(/\s+/g, '');
+            const isLeave = ['연차', '휴가', '병가'].includes(type.replace(/\s+/g, ''));
 
-            const isLeave = ['연차', '휴가', '병가'].includes(normType);
-
-            const leaveRowClass = isLeave ? 'leave-row' : '';
-
-            const otVal = rec.otMin ?? rec.overtimeMin ?? rec.overtimeMinutes ?? rec.overtime_minutes ?? 0;
-            const workVal = rec.workMin ?? rec.workMinutes ?? rec.work_minutes ?? 0;
-
-            const hasInOut = Boolean(rec.checkIn) || Boolean(rec.checkOut);
-
-            const otLabel   = (isLeave || !hasInOut) ? '' : minToLabel(otVal);
-            const workLabel = (isLeave || !hasInOut) ? '' : minToLabel(workVal);
-
-            const typeClass = (type === '지각') ? 'type-late' : '';
+            const otLabel = isLeave ? '' : minToLabel(rec.otMin ?? 0);
+            const workLabel = isLeave ? '' : minToLabel(rec.workMin ?? 0);
 
             const tr = document.createElement('tr');
-
-            tr.className = [rowClass, leaveRowClass].filter(Boolean).join(' ');
+            tr.className = [rowClass, isLeave ? 'leave-row' : ''].join(' ').trim();
 
             tr.innerHTML = `
                 <td>${d} (${dow})</td>
-                <td class="${type ? typeClass : ''}">${type}</td>
+                <td>${type}</td>
                 <td>${rec.checkIn ?? ''}</td>
                 <td>${rec.checkOut ?? ''}</td>
                 <td>${otLabel}</td>
@@ -124,59 +124,74 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // ◀ 이전 달
-    prevBtn.addEventListener('click', () => {
-        cur.setMonth(cur.getMonth() - 1);   // 연도 자동 처리
+    /* ===============================
+       월 이동
+    =============================== */
+    prevBtn.onclick = () => {
+        cur.setMonth(cur.getMonth() - 1);
         cur.setDate(1);
         render();
-    });
-
-    // ▶ 다음 달
-    nextBtn.addEventListener('click', () => {
-        cur.setMonth(cur.getMonth() + 1);   // 12월 → 1월 자동 처리
-        cur.setDate(1);
-        render();
-    });
-
-    openBtn.onclick = () => modal.style.display = 'block';
-    closeBtn.onclick = () => modal.style.display = 'none';
-
-    // 모달 바깥쪽 클릭 시 닫기
-    window.onclick = (event) => {
-        if (event.target == modal) modal.style.display = 'none';
     };
 
-    // 2. 등록 버튼 클릭 시 서버로 요청 전송
-    document.getElementById('submitRequest').onclick = function() {
-        // 폼 데이터 수집
-        const requestData = {
-            title: document.getElementById('reqTitle').value,
-            workDate: document.getElementById('reqStartDate').value,
-            fromTime: document.getElementById('reqStartTime').value,
-            toTime: document.getElementById('reqEndTime').value,
-            reason: document.getElementById('reqReason').value
-        };
+    nextBtn.onclick = () => {
+        cur.setMonth(cur.getMonth() + 1);
+        cur.setDate(1);
+        render();
+    };
 
-        // 서버의 AttendanceRequestService 호출 (JSON 전송)
+    /* ===============================
+       모달 제어 (hidden 방식)
+    =============================== */
+    openBtn.onclick = () => modal.hidden = false;
+    closeBtn.onclick = () => modal.hidden = true;
+
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.hidden = true;
+    });
+
+    /* ===============================
+       근태 수정 요청 등록
+    =============================== */
+    submitBtn.onclick = () => {
+
+         const title = document.getElementById('reqTitle').value.trim();
+         const workDate = dateInput.value;
+         const reason = document.getElementById('reqReason').value.trim();
+
+       // 필수 입력 체크
+           if (!title) {
+               alert('제목을 입력하세요.');
+               return;
+           }
+
+           if (!workDate) {
+               alert('날짜를 선택하세요.');
+               return;
+           }
+
+           if (!reason) {
+               alert('사유를 입력하세요.');
+               return;
+           }
+
+           //
+           if (workDate < lastYearStr || workDate > todayStr) {
+               alert('날짜는 최근 1년 이내만 선택할 수 있습니다.');
+               return;
+           }
+
         fetch('/attendance/request', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(requestData)
+            body: JSON.stringify({ title, workDate, reason })
         })
-        .then(response => {
-            if (response.ok) {
-                alert("요청 성공! 관리자 승인을 기다려주세요.");
-                modal.style.display = 'none';
-                location.reload(); // 성공 시 새로고침
-            } else {
-                alert("요청 실패. 내용을 다시 확인해주세요.");
-            }
+        .then(res => {
+            if (!res.ok) throw new Error();
+            alert('요청 성공! 관리자 승인을 기다려주세요.');
+            modal.hidden = true;
+            location.reload();
         })
-        .catch(error => console.error('Error:', error));
+        .catch(() => alert('요청 실패. 내용을 확인하세요.'));
     };
-
-
-
-    // 최초 렌더링
     render();
 });
