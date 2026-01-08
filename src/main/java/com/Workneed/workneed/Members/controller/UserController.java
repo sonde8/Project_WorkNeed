@@ -7,9 +7,12 @@ import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -27,21 +30,20 @@ public class UserController {
 
      // 프로필 이미지 업로드 처리
     @PostMapping("/user/uploadProfile")
-    public String uploadProfile(@RequestParam("profileFile") MultipartFile file,
-                                HttpSession session) {
+    @ResponseBody
+    public ResponseEntity<String> uploadProfile(@RequestParam("profileFile") MultipartFile file,
+                                        HttpSession session) {
 
         // 1. 세션에서 로그인 유저 정보 가져오기
         UserDTO user = (UserDTO) session.getAttribute("user");
-        if (user == null) {
-            log.warn("로그인 세션이 만료되었습니다.");
-            return "redirect:/login";
-        }
+
+        if (user == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 
         if (!file.isEmpty()) {
             // 이미지 파일 여부 체크 (보안 강화)
             if (file.getContentType() == null || !file.getContentType().startsWith("image")) {
-                log.warn("이미지 파일만 업로드 가능합니다.");
-                return "redirect:/main?error=notImage";
+                log.warn("이미지 파일이 아닙니다: {}", file.getContentType());
+                return ResponseEntity.badRequest().body("이미지 파일만 업로드 가능합니다.");
             }
 
             try {
@@ -56,12 +58,15 @@ public class UserController {
                 user.setUserProfileImage(s3Url);
                 session.setAttribute("user", user);
 
+                // 성공 시 새로운 URL 반환
+                return ResponseEntity.status(HttpStatus.OK).header("Content-Type", "text/plain; charset=utf-8").body(s3Url);
+
             } catch (Exception e) {
                 log.error("파일 저장 중 에러 발생", e);
-                return "redirect:/main?error=uploadFail";
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류가 발생했습니다.");
             }
         }
 
-        return "redirect:/main";
+        return ResponseEntity.badRequest().body("파일이 비어있습니다.");
     }
 }
