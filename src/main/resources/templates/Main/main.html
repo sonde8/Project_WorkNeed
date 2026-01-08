@@ -45,16 +45,18 @@
             <div class = "toDay" id="todayStart"
                  th:text="${today != null ? today : '날짜'}"> 날짜 </div>
 
+            <!-- 프로필 -->
             <div class = "profile-card">
 
                 <div class="profileImg">
-                    <img th:if="${user.userProfileImage != null}"
-                         th:src="@{/uploads/profiles/} + ${user.userProfileImage}"
+                    <img th:if="${session.user.userProfileImage != null}"
+                         th:src="${session.user.userProfileImage}"
                          alt="프로필 이미지">
 
-                    <img th:unless="${user.userProfileImage != null}"
+                    <img th:unless="${session.user.userProfileImage != null}"
                          th:src="@{/images/default-profile.svg}"
-                         alt="기본 이미지">
+                         alt="기본프로필"
+                         class="profile">
                 </div>
 
                 <div class="profileText">
@@ -68,6 +70,9 @@
                 </div>
 
             </div>
+
+            <!-- 근태관리 -->
+            <a class="attendancePage" th:href="@{/attendance}"> 근 태 관 리 👉 </a>
 
             <!-- 출 퇴근 -->
             <div class = "attendWidget">

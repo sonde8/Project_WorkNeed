@@ -34,32 +34,55 @@
         <section th:replace="~{Attendance/attendanceLeft :: attendanceLeft}"></section>
 
         <!-- 오른쪽 -->
-        <section class = "right_1">
+        <section class="right_1">
 
-            <div class = "month_chart">
+            <div class="month_chart">
                 <button type="button" id="prevMonth">&lt;</button>
                 <div class="bookWrap"><span id="bookYm"></span></div>
                 <button type="button" id="nextMonth">&gt;</button>
             </div>
 
-            <div class = "tableWrap">
+            <div class="tableWrap">
                 <table class="bookTable">
                     <thead>
-                        <tr>
-                            <th> 일자 </th>
-                            <th> 구분 </th>
-                            <th> 출근시간 </th>
-                            <th> 퇴근시간 </th>
-                            <th> 연장근무시간 </th>
-                            <th> 근로시간 </th>
-                        </tr>
+                    <tr>
+                        <th> 일자</th>
+                        <th> 구분</th>
+                        <th> 출근시간</th>
+                        <th> 퇴근시간</th>
+                        <th> 연장근무시간</th>
+                        <th> 근로시간</th>
+                    </tr>
                     </thead>
                     <tbody id="bookTbody"></tbody>
                 </table>
             </div>
 
-            <div class = "bookChange">
-            <button type="button" class="changeBtn" > 수정 </button>
+            <div class="bookChange">
+                <button type="button" class="changeBtn" id="openRequestBtn"> 요청</button>
+            </div>
+
+            <div id="attendanceRequestModal" class="modal-overlay" style="display:none;">
+                <div class="attendance-modal">
+                    <div class="modal-header">근태 수정 요청</div>
+                    <div class="modal-body">
+                        <div class="input-section">
+                            <input type="text" id="reqTitle" placeholder="제목: ㅇㅇㅇ(직급) 연장근무 승인요청">
+                        </div>
+                        <div class="input-section inline">
+                            <input type="date" id="reqStartDate"> - <input type="date" id="reqEndDate">
+                        </div>
+                        <div class="input-section inline">
+                            <input type="time" id="reqStartTime"> - <input type="time" id="reqEndTime">
+                        </div>
+                        <textarea id="reqReason" placeholder="상세 내용을 입력하세요 (예: 당초 계획 대비 3시간 추가 근무 발생)"></textarea>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" id="submitRequest" class="reg-btn">등록</button>
+                        <button type="button" id="closeModal" class="cancel-btn">취소</button>
+                    </div>
+                </div>
+
             </div>
         </section>
 
