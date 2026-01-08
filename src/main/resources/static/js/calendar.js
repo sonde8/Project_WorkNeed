@@ -374,41 +374,66 @@
             });
         }
 
-        // 5. 버튼 이벤트
-        closeBtn.onclick = () => overlay.classList.add("hidden");
+        const hideDailyListModal = () => {
+            // 1. 현재 포커스된 요소(닫기 버튼 등) 해제
+            if (document.activeElement instanceof HTMLElement) {
+                document.activeElement.blur();
+            }
 
-        addBtn.onclick = () => {
+            // 2. 모달을 숨김 처리
             overlay.classList.add("hidden");
+            // 접근성 속성도 명확히 동기화 (경고 방지 보조)
+            overlay.setAttribute("aria-hidden", "true");
+
+            // 3. [핵심] 포커스를 모달 외부의 안전한 요소로 강제 이동
+            // '일정 등록' 버튼이 가장 적절합니다.
+            const addBtn = document.getElementById("openCalendarCreateModal");
+            if (addBtn) {
+                addBtn.focus();
+            }
+        };
+
+        // 닫기 버튼 클릭 시
+        closeBtn.onclick = () => {
+            hideDailyListModal();
+        };
+
+        // 등록 버튼 클릭 시
+        addBtn.onclick = () => {
+            hideDailyListModal(); // 모달을 먼저 닫고
             const startAt = new Date(baseDate);
             startAt.setHours(9, 0, 0);
             const endAt = new Date(startAt);
             endAt.setMinutes(30);
+
+            // 등록 모달 열기
             safeOpenCreateModal({
                 start: toDtoDateTime(startAt),
                 end: toDtoDateTime(endAt)
             });
         };
 
+        // 모달 표시
         overlay.classList.remove("hidden");
-        /* openDailyListModal 함수 내부 하단부 */
 
         // ESC 키 감지 (익명 함수로 추가)
         const handleEsc = (e) => {
             if (e.key === "Escape") {
-                overlay.classList.add("hidden");
-                document.removeEventListener("keydown", handleEsc); // 메모리 누수 방지
+                hideDailyListModal(); // ESC로 닫을 때도 포커스 해제
+                document.removeEventListener("keydown", handleEsc);
             }
         };
         document.addEventListener("keydown", handleEsc);
 
-        // 배경 클릭 시 닫기
+        // 배경(오버레이) 클릭 시 닫기
         overlay.onclick = (e) => {
             if (e.target === overlay) {
-                overlay.classList.add("hidden");
+                hideDailyListModal(); // 배경 클릭 시에도 포커스 해제
                 document.removeEventListener("keydown", handleEsc);
             }
         };
     }
+
     /* ================= Calendar Init ================= */
 
     function initCalendar() {
@@ -527,27 +552,19 @@
             },
 
             // 일정 클릭
-                eventClick(info) {
+            eventClick(info) {
+                if (info.event.url) {
+                    info.jsEvent.preventDefault();
+                    return;
+                }
 
-                    if (info.event.url) {
-                        info.jsEvent.preventDefault();
-                        return;
-                    }
+                const raw = info.event.extendedProps?.raw;
+                if (raw) {
+                    const targetDate = info.event.start;
 
-                    const raw = info.event.extendedProps?.raw;
-                    if (raw) {
-
-                        const clickedDate = calendar.getDateFromPixel({
-                            x: info.jsEvent.clientX,
-                            y: info.jsEvent.clientY
-                        });
-
-                        // 클릭 좌표에서 날짜를 못 찾으면(예외 상황) 이벤트 시작일 사용
-                        const targetDate = clickedDate || info.event.start;
-
-                        openDailyListModal(targetDate);
-                    }
-                },
+                    openDailyListModal(targetDate);
+                }
+            },
 
             // 드래그/리사이즈
             eventDrop(info) {
