@@ -129,10 +129,12 @@
                 <div class="file-view etc-view">
                     <div class="etc-label">File 보관함</div>
 
-                    <div id="taskFileList" class="task-file-list">
+                    <div id="taskFileList" class="task-file-list" th:if="${not #lists.isEmpty(fileList)}">
                         <th:block th:each="f : ${fileList}">
                             <div class="file-item">
-                                <a th:href="@{/api/task/files/download/{id}(id=${f.fileId})}" class="file-link">📎<span th:text="${f.originalName}"></span></a>
+                                <a th:href="@{/api/task/files/download/{id}(id=${f.fileId})}" class="file-link">
+                                    📎<span th:text="${f.originalName}"></span>
+                                </a>
                             </div>
                         </th:block>
                     </div>
