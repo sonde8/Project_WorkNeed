@@ -21,6 +21,13 @@
     overflow-x: hidden;
     overflow-y: scroll;
 }
+.kanban-cards::-webkit-scrollbar {
+    width: 4px;
+}
+.kanban-cards::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
 .kanban-card{
     display: grid;
     grid-template-columns: 66% 33%;
@@ -371,3 +378,5 @@
 
 .drag-ghost{opacity: .4;}
 .drag-chosen{transform: scale(1.1);}
+
+
