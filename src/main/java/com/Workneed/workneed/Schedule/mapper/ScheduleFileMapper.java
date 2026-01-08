@@ -18,4 +18,7 @@ public interface ScheduleFileMapper {
 
     // 4. 파일 삭제
     int deleteScheduleFile(Long fileId);
+
+    // 5. 업무(schedule) 기준 파일 전체 삭제
+    int deleteFilesByScheduleId(Long scheduleId);
 }

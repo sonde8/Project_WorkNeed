@@ -278,7 +278,7 @@ main{
 }
 #etc-chart{
     display: flex;
-    margin: 4rem auto;
+    margin: 2rem auto;
 }
 #etc-chart button{
     border: none;
@@ -688,7 +688,6 @@ canvas{
     height: calc(100vh - 17rem); /* 화면 전체 높이에서 상단 여백 제외 */
     position: sticky;
     top: 20px;
-    gap: 1rem;
 }
 
 /* 2. 파일 보관함 블록 설정 */
