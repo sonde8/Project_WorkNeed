@@ -1,5 +1,7 @@
 package com.Workneed.workneed.Attendance.service;
 
+import com.Workneed.workneed.Approval.dto.LeaveRequestDTO;
+import com.Workneed.workneed.Approval.service.ApprovalLeaveService;
 import com.Workneed.workneed.Attendance.dto.*;
 import com.Workneed.workneed.Attendance.mapper.LeaveMapper;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +18,7 @@ import java.util.List;
 public class LeaveService {
 
     private final LeaveMapper leaveMapper;
+    private final ApprovalLeaveService approvalLeaveService;
 
     // 1일 8시간
     private static final int DAY_MIN = 8 * 60;
@@ -95,6 +98,18 @@ public class LeaveService {
             u.setReason(req.getReason());
 
         leaveMapper.insertLeaveUsage(u);
+
+        // 전자결제
+        LeaveRequestDTO dto = new LeaveRequestDTO();
+
+        dto.setUserId(userId);
+        dto.setLeaveType(req.getLeaveType());
+        dto.setStartDate(req.getStartDate());
+        dto.setEndDate(req.getEndDate());
+        dto.setReason(req.getReason());
+        dto.setDays(days);
+
+        approvalLeaveService.submitLeave(dto, userId);
     }
 
     // 주말엔 연차 금지
@@ -295,4 +310,5 @@ public class LeaveService {
 
         return d + "d " + h + "h";
     }
+
 }

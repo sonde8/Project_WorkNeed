@@ -172,4 +172,43 @@
         </foreach>
         GROUP BY emp_id
     </select>
+
+    <select id="countWorkDays" resultType="int">
+        SELECT COALESCE(COUNT(*), 0)
+        FROM attendance
+        WHERE emp_id = #{empId}
+          AND work_date &gt;= #{startDate}
+          AND work_date &lt;  #{endDate}
+          AND check_in_time IS NOT NULL
+    </select>
+
+    <!-- 지각 횟수 -->
+    <select id="countLate" resultType="int">
+        SELECT COALESCE(COUNT(*), 0)
+        FROM attendance
+        WHERE emp_id = #{empId}
+          AND work_date &gt;= #{startDate}
+          AND work_date &lt;  #{endDate}
+          AND is_late = 'Y'
+    </select>
+
+    <!-- 조퇴 횟수 -->
+    <select id="countEarlyLeave" resultType="int">
+        SELECT COALESCE(COUNT(*), 0)
+        FROM attendance
+        WHERE emp_id = #{empId}
+          AND work_date &gt;= #{startDate}
+          AND work_date &lt;  #{endDate}
+          AND is_early_leave = 'Y'
+    </select>
+
+    <!-- 연장근무 합계 -->
+    <select id="overtimeMinutes" resultType="int">
+        SELECT COALESCE(SUM(overtime_minutes), 0)
+        FROM attendance
+        WHERE emp_id = #{empId}
+          AND work_date &gt;= #{startDate}
+          AND work_date &lt;  #{endDate}
+          AND check_out_time IS NOT NULL
+    </select>
 </mapper>

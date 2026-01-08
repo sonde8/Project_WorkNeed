@@ -1,6 +1,7 @@
 package com.Workneed.workneed.Attendance.mapper;
 
 import com.Workneed.workneed.Attendance.dto.LeaveRequestInsertDTO;
+import com.Workneed.workneed.Attendance.dto.LeaveTeamUseDTO;
 import com.Workneed.workneed.Attendance.dto.LeaveUsageInsertDTO;
 import com.Workneed.workneed.Attendance.dto.LeaveUseDTO;
 import com.Workneed.workneed.Members.dto.LeaveUsageDTO;
@@ -29,4 +30,12 @@ public interface LeaveMapper {
     int countOver(@Param("userId") Long userId,
                   @Param("startDate") LocalDate startDate,
                   @Param("endDate") LocalDate endDate);
+
+    // 팀 연차
+    Long selectDeptIdByUserId(@Param("userId") Long userId);
+
+    List<LeaveTeamUseDTO> selectDeptLeaveUsage(@Param("deptId") Long deptId,
+                                               @Param("start") LocalDate start,
+                                               @Param("end") LocalDate end,
+                                               @Param("name") String name);
 }
