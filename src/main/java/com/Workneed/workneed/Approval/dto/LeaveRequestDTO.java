@@ -22,4 +22,6 @@ public class LeaveRequestDTO {
 
     private String reason;
 
+    private Double days;
+
 }

@@ -411,4 +411,42 @@ public class AttendanceService {
         return (v == null) ? 0 : v;
     }
 
+    // 메인 오른쪽 현황
+    public Map<String, Object> monthSummary(Long empId, int year, int month) {
+
+        LocalDate startDate = LocalDate.of(year, month, 1);
+        LocalDate endDate = startDate.plusMonths(1);
+
+        int workDays = attendanceMapper.countWorkDays(empId, startDate, endDate);
+        int lateCount = attendanceMapper.countLate(empId, startDate, endDate);
+        int earlyCount = attendanceMapper.countEarlyLeave(empId, startDate, endDate);
+
+        return Map.of(
+                "year", year,
+                "month", month,
+                "workDays", workDays,
+                "lateCount", lateCount,
+                "earlyCount", earlyCount
+        );
+    }
+
+    // 연간근무
+    public Map<String, Object> yearSummary(Long empId, int year) {
+
+        LocalDate startDate = LocalDate.of(year, 1, 1);
+        LocalDate endDate = startDate.plusYears(1);
+
+        int workMin = attendanceMapper.workMinutes(empId, startDate, endDate);
+        int otMin = attendanceMapper.overtimeMinutes(empId, startDate, endDate);
+        int holMin = attendanceMapper.holidayMinutes(empId, startDate, endDate);
+
+        return Map.of(
+                "workHours", workMin / 60,
+                "otHours", otMin / 60,
+                "holidayHours", holMin / 60
+        );
+    }
+
+
+
 }
