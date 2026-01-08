@@ -73,6 +73,8 @@ public class ScheduleController {
         model.addAttribute("doingList", doingList);
         model.addAttribute("doneList", doneList);
 
+        model.addAttribute("now", java.time.LocalDateTime.now());
+
         return "Schedule/kanban";
     }
 

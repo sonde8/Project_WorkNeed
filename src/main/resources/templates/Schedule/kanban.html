@@ -18,8 +18,12 @@
             <div class="kanban-header">TODO</div>
             <div class="kanban-cards" data-status="TODO">
                 <div class="kanban-card" th:each="item : ${todoList}"
-                                         th:attr="data-id=${item.scheduleId}">
+                                         th:attr="data-id=${item.scheduleId}"
+                                         th:classappend="${item.endAt != null and item.endAt.isBefore(now)} ? 'is-overdue'">
                     <div class="title-event-type">
+                        <span class="badge-expired" th:if="${item.endAt != null and item.endAt.isBefore(now)}">
+                            만료
+                        </span>
                         <div class="title" th:text="${item.title}">Title</div>
                         <div class="event-type" th:text="${item.eventType}">Event Type</div>
                     </div>
@@ -38,8 +42,12 @@
             <div class="kanban-header">DOING</div>
             <div class="kanban-cards" data-status="DOING">
                 <div class="kanban-card" th:each="item : ${doingList}"
-                                         th:attr="data-id=${item.scheduleId}">
+                                         th:attr="data-id=${item.scheduleId}"
+                                         th:classappend="${item.endAt != null and item.endAt.isBefore(now)} ? 'is-overdue'">
                     <div class="title-event-type">
+                        <span class="badge-expired" th:if="${item.endAt != null and item.endAt.isBefore(now)}">
+                            만료
+                        </span>
                         <div class="title" th:text="${item.title}">Title</div>
                         <div class="event-type" th:text="${item.eventType}">Event Type</div>
                     </div>
@@ -61,11 +69,17 @@
             </div>
             <div class="kanban-cards" data-status="DONE">
                 <div class="kanban-card" th:each="item : ${doneList}"
-                                         th:attr="data-id=${item.scheduleId}">
+                                         th:attr="data-id=${item.scheduleId}"
+                                         th:classappend="${item.endAt != null and item.endAt.isBefore(now)} ? 'is-overdue'">
                     <label class="done-check">
                         <input type="checkbox" class="done-select">
                     </label>
                     <div class="title-event-type">
+
+                        <span class="badge-expired" th:if="${item.endAt != null and item.endAt.isBefore(now)}">
+                            만료
+                        </span>
+
                         <div class="title" th:text="${item.title}">Title</div>
                         <div class="event-type" th:text="${item.eventType}">Event Type</div>
                     </div>

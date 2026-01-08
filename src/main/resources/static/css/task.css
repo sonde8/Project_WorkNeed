@@ -292,7 +292,10 @@ canvas{
     font-weight: 700;
     font-size: 1.6rem;
 }
-
+#etc-chart .goto-progress{
+    opacity: 0.6;
+    font-weight: 600;
+}
 #etc-file,
 #etc-git{
     padding: 2rem 1rem;
@@ -357,11 +360,17 @@ canvas{
 .btn-send-message-modal{
     display: flex;
     align-items: flex-end;
+    flex-direction: column;
     border: none;
     margin: 0 1rem 0 auto;
 }
-.btn-send-message-modal img{
+.btn-send-message-modal .etc-images{
+    padding:0 0.5rem
+}
 
+.btn-send-message-modal .goto-image{
+    opacity: 0.6;
+    font-weight: 600;
 }
 
 
