@@ -199,6 +199,16 @@ function getKstDisplayTime(dateString) {
     return `${ampm} ${formattedHours}:${formattedMinutes}`;
 }
 
+function getRelativeTime() {
+    const now = new Date();
+    const hours = now.getHours();
+    const minutes = now.getMinutes();
+    const ampm = hours >= 12 ? "오후 " : "오전 ";
+    const formattedHours = hours % 12 || 12;
+    const formattedMinutes = minutes < 10 ? "0" + minutes : minutes;
+    return ampm + formattedHours + ":" + formattedMinutes;
+}
+
 /**
  * 실시간 메시지 수신 시 목록 갱신 함수 (주석 포함)
  */
