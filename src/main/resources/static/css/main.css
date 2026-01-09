@@ -217,3 +217,14 @@ body {
 .pageMain .click,
 .pageMain .rowMonth { display: none; }
 
+.pageMain .attendWidget{
+    flex: 0 0 auto;
+    min-height: auto;
+    display: block;
+}
+
+.pageMain .attendWidget .att-left{
+    flex: 0 0 auto;
+    min-height: auto;
+}
+

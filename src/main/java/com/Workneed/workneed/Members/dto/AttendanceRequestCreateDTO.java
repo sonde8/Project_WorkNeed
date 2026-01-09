@@ -8,15 +8,20 @@ import java.time.LocalTime;
 
 @Data
 public class AttendanceRequestCreateDTO {
-    Long userId;
-    @JsonFormat(pattern = "yyyy-MM-dd") // 형식 지정
-    LocalDate workDate;
 
-    @JsonFormat(pattern = "HH:mm")      // 형식 지정 (24시간제)
-    LocalTime fromTime;
+    private Long userId;
 
-    @JsonFormat(pattern = "HH:mm")      // 형식 지정
-    LocalTime toTime;
-    String reason;
-    String rejectReason;
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate workDate;
+
+    // mapper.xml 기준에 맞춤
+    @JsonFormat(pattern = "HH:mm")
+    private LocalTime startTime;
+
+    @JsonFormat(pattern = "HH:mm")
+    private LocalTime endTime;
+
+    private String type;
+    private String reason;
+    private String rejectReason;
 }

@@ -4,7 +4,9 @@ import com.Workneed.workneed.Attendance.dto.AttendanceBookDTO;
 import com.Workneed.workneed.Attendance.dto.AttendanceResponseDTO;
 import com.Workneed.workneed.Attendance.dto.TeamAttendRowDTO;
 import com.Workneed.workneed.Attendance.service.AttendanceService;
+import com.Workneed.workneed.Members.dto.AttendanceRequestCreateDTO;
 import com.Workneed.workneed.Members.dto.UserDTO;
+import com.Workneed.workneed.Members.service.AttendanceRequestService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.apache.ibatis.annotations.Param;
@@ -19,6 +21,8 @@ import java.util.Map;
 public class AttendanceApiController {
 
     private final AttendanceService attendanceService;
+
+    private final AttendanceRequestService attendanceRequestService;
 
     private Long getEmpId(HttpSession session) {
         UserDTO user = (UserDTO) session.getAttribute("user");
@@ -99,4 +103,18 @@ public class AttendanceApiController {
         Long empId = getEmpId(session);
         return attendanceService.yearSummary(empId, year);
     }
+
+    // 근태 수정 요청 등록
+    @PostMapping("/request")
+    public void createAttendanceRequest(HttpSession session,
+                                        @RequestBody AttendanceRequestCreateDTO dto) {
+        // 세션에서 로그인한 사용자 ID(userId)를 꺼내 DTO에 세팅합니다.
+        Long userId = getEmpId(session);
+        dto.setUserId(userId);
+
+        // 서비스 호출 (DB 저장 로직)
+        attendanceRequestService.create(userId, dto);
+    }
+
+
 }

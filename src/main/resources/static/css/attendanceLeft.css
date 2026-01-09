@@ -1,10 +1,26 @@
+@charset "UTF-8";
+
 /* 왼쪽 공통 패널 영역만 */
 .att-left{
-    width: 420px;
-    height: 845px;
-    border: 1px solid black;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    flex: 1;
+    min-height: 0;
+    padding: 20px;
+    margin: 0;
     box-sizing: border-box;
+
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-sm);
+
+
 }
+
+
+
 
 /* 근태관리 */
 .title{
@@ -52,13 +68,6 @@
 }
 
 /* 출퇴근 버튼 */
-.active{
-    display: flex;
-    width: 100%;
-    justify-content: center;
-    gap: 32px;
-    margin: 13px 0;
-}
 
 .btn {
     width: 172px;
@@ -105,23 +114,98 @@
 
 /* 메뉴 링크 */
 .click{
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+    margin-top: 18px;
+    justify-content: center;
+    cursor : pointer;
+}
+
+.menuGroup{
     display: flex;
     flex-direction: column;
     gap: 20px;
-    cursor : pointer;
-    margin: 26px auto;
-    width: 150px;
 }
 
-.cli{
-    font-size : 17px;
-    text-align: center;
-    cursor: pointer;
-    text-decoration: none;
-    color: inherit;
-    border: 1px solid #111;
-    border-radius: 10px;
+.menuGroupTeam{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+
 }
+
+.cli {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    height: 56px;
+    padding: 0 18px;
+
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--color-primary);
+    letter-spacing: -0.2px;
+
+    text-decoration: none;
+
+    background: #ffffff;
+    border: 1px solid var(--color-border);
+    border-radius: 14px;
+
+    transition: all 0.18s ease;
+}
+
+.cli:hover {
+    background: var(--color-primary-light);
+    border-color: var(--color-primary);
+
+    box-shadow: 0 8px 18px rgba(0,0,0,0.08);
+    transform: translateY(-1px);
+}
+
+.menuGroupTeam .cli {
+    height: 56px;
+    font-size: 17px;
+    background: #f9fafb;
+    border-radius: 14px;
+    font-weight: 700;
+}
+
+.menuGroupTeam .cli:hover {
+    background: #eef3f8;
+}
+
+.cli.active {
+    background: var(--color-primary);
+    color: #ffffff;
+    border-color: var(--color-primary);
+}
+
+@media (max-width: 520px){
+    .click{
+        grid-template-columns: 1fr;
+    }
+    .menuGroupTeam{
+        padding-top: 0;
+        width: 100%;
+    }
+}
+
+.click:has(.menuGroupTeam){
+    grid-template-columns: 1fr 1fr;
+    justify-items: stretch;
+    align-items: start;
+}
+
+.click:has(.menuGroupTeam) .menuGroup,
+.click:has(.menuGroupTeam) .menuGroupTeam{
+    width: 100%;
+}
+
+
 
 /* 업무 변경 모달 */
 .state-modal[hidden]{

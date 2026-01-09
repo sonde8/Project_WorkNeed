@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.Workneed.workneed.Members.mapper.MemberAttendanceMapper">
+
+    <!-- 해당 사용자/날짜 attendance 조회 -->
+    <select id="findByUserAndDate" resultType="com.Workneed.workneed.Members.dto.MemberAttendanceDTO">
+        SELECT
+            attendance_id AS attendanceId,
+            emp_id       AS empId,
+            work_date    AS workDate,
+            check_in_time AS checkInTime,
+            check_out_time AS checkOutTime,
+            work_minutes AS workMinutes,
+            overtime_minutes AS overtimeMinutes,
+            status_code  AS statusCode
+        FROM attendance
+        WHERE emp_id = #{userId}
+          AND work_date = #{workDate}
+    </select>
+
+    <!-- 연장근무시간 업데이트 -->
+    <update id="updateOvertime">
+        UPDATE attendance
+        SET overtime_minutes = #{minutes},
+            updated_at = NOW()
+        WHERE attendance_id = #{attendanceId}
+    </update>
+
+    <!-- 연장근무 INSERT (attendance row 없을 때) -->
+    <insert id="insertOvertime">
+        INSERT INTO attendance
+        (emp_id, work_date, overtime_minutes, work_minutes, is_late, is_early_leave, status_code, created_at, updated_at)
+        VALUES
+            (#{userId}, #{workDate}, #{minutes}, 0, 'N', 'N', 'APPROVED_EDIT', NOW(), NOW())
+    </insert>
+
+    <update id="updateCheckIn">
+        UPDATE attendance
+        SET check_in_time = #{checkInTime},
+            updated_at = NOW()
+        WHERE attendance_id = #{attendanceId}
+    </update>
+
+    <update id="updateCheckOut">
+        UPDATE attendance
+        SET check_out_time = #{checkOutTime},
+            updated_at = NOW()
+        WHERE attendance_id = #{attendanceId}
+    </update>
+
+    <insert id="insertCheckIn">
+        INSERT INTO attendance
+        (emp_id, work_date, check_in_time, work_minutes, overtime_minutes, is_late, is_early_leave, status_code, created_at, updated_at)
+        VALUES
+            (#{userId}, #{workDate}, #{checkInTime}, 0, 0, 'N', 'N', 'APPROVED_EDIT', NOW(), NOW())
+    </insert>
+
+    <insert id="insertCheckOut">
+        INSERT INTO attendance
+        (emp_id, work_date, check_out_time, work_minutes, overtime_minutes, is_late, is_early_leave, status_code, created_at, updated_at)
+        VALUES
+            (#{userId}, #{workDate}, #{checkOutTime}, 0, 0, 'N', 'N', 'APPROVED_EDIT', NOW(), NOW())
+    </insert>
+
+    <update id="updateWorkAndOvertime">
+        UPDATE attendance
+        SET work_minutes = #{workMinutes},
+            overtime_minutes = #{overtimeMinutes},
+            updated_at = NOW()
+        WHERE attendance_id = #{attendanceId}
+    </update>
+
+
+    <update id="updateCalculatedFields">
+        UPDATE attendance
+        SET work_minutes = #{workMinutes},
+            overtime_minutes = #{overtimeMinutes},
+            is_late = #{isLate},
+            is_early_leave = #{isEarlyLeave},
+            status_code = #{statusCode},
+            updated_at = NOW()
+        WHERE attendance_id = #{attendanceId}
+    </update>
+
+
+
+</mapper>

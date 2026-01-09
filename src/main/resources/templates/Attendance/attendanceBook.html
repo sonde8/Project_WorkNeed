@@ -8,6 +8,7 @@
 
     <!-- 페이지 전용 CSS -->
     <th:block layout:fragment="head">
+        <link rel="stylesheet" th:href="@{/css/main.css}">
         <link rel="stylesheet" th:href="@{/css/attendanceLeft.css}">
         <link rel="stylesheet" th:href="@{/css/attendanceMain.css}">
         <link rel="stylesheet" th:href="@{/css/attendanceBook.css}">
@@ -31,7 +32,9 @@
     <div class="att-bk">
 
         <!-- 왼쪽 -->
-        <section th:replace="~{Attendance/attendanceLeft :: attendanceLeft}"></section>
+        <section class="leftPage">
+            <section th:replace="~{Attendance/attendanceLeft :: attendanceLeft}"></section>
+        </section>
 
         <!-- 오른쪽 -->
         <section class="right_1">
@@ -62,35 +65,49 @@
                 <button type="button" class="changeBtn" id="openRequestBtn"> 요청</button>
             </div>
 
-            <div id="attendanceRequestModal" class="modal-overlay" style="display:none;">
-                <div class="attendance-modal">
-                    <div class="modal-header">근태 수정 요청</div>
-                    <div class="modal-body">
-                        <div class="input-section">
-                            <input type="text" id="reqTitle" placeholder="제목: ㅇㅇㅇ(직급) 연장근무 승인요청">
-                        </div>
-                        <div class="input-section inline">
-                            <input type="date" id="reqStartDate"> - <input type="date" id="reqEndDate">
-                        </div>
-                        <div class="input-section inline">
-                            <input type="time" id="reqStartTime"> - <input type="time" id="reqEndTime">
-                        </div>
-                        <textarea id="reqReason" placeholder="상세 내용을 입력하세요 (예: 당초 계획 대비 3시간 추가 근무 발생)"></textarea>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" id="submitRequest" class="reg-btn">등록</button>
-                        <button type="button" id="closeModal" class="cancel-btn">취소</button>
-                    </div>
-                </div>
 
+            <div class="lv-modal" id="attendanceRequestModal" hidden>
+                <div class="lv-modal_back" id="closeModalBack"></div>
+
+                <div class="lv-modal_panel" role="dialog" aria-modal="true">
+                    <div class="lv-modal_title">근태 수정 요청</div>
+
+                    <form id="attendanceRequestForm" class="lv-form">
+                        <label class="lv-label">유형
+                            <select id="reqType" class="lv-input">
+                                <option value="CHECK_IN">출근수정요청</option>
+                                <option value="CHECK_OUT">퇴근수정요청</option>
+                                <option value="OVERTIME">연장근무요청</option>
+                            </select>
+                        </label>
+
+                        <label class="lv-label">수정할 날짜
+                            <input type="date" id="reqWorkDate" class="lv-input"/>
+                        </label>
+
+                        <label class="lv-label">수정할 시간
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <input type="time" id="reqStartTime" class="lv-input" style="flex: 1;"/>
+                                <span style="color: #666;">~</span>
+                                <input type="time" id="reqEndTime" class="lv-input" style="flex: 1;"/>
+                            </div>
+                        </label>
+
+                        <label class="lv-label">사유
+                            <textarea id="reqReason" class="lv-textarea" rows="3"
+                                      placeholder="사유를 입력하세요 (예: 15시~20시 추가 근무)"></textarea>
+                        </label>
+
+                        <div class="lv-modal_actions">
+                            <button type="button" class="lv-btn submit" id="submitRequest">등록</button>
+                            <button type="button" class="lv-btn cancel" id="closeModal">취소</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </section>
-
     </div>
-
 </main>
-
-
 </body>
 </html>
 

@@ -5,7 +5,6 @@
 <mapper namespace="com.Workneed.workneed.Members.mapper.RequestMapper">
 
     <select id="findById"
-            parameterType="long"
             resultType="com.Workneed.workneed.Members.dto.RequestDTO">
         SELECT *
         FROM request
@@ -13,7 +12,7 @@
     </select>
 
     <select id="findPendingAttendanceRequests"
-            resultType="RequestDTO">
+            resultType="com.Workneed.workneed.Members.dto.RequestDTO">
         SELECT *
         FROM request
         WHERE request_type = 'ATTENDANCE'
@@ -38,7 +37,8 @@
         WHERE request_id = #{requestId}
     </update>
 
-    <insert id="insert" parameterType="RequestDTO"
+    <insert id="insert"
+            parameterType="com.Workneed.workneed.Members.dto.RequestDTO"
             useGeneratedKeys="true" keyProperty="requestId">
         INSERT INTO request (
         user_id, request_type, request_payload, status
