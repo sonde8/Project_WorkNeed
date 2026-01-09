@@ -31,7 +31,7 @@ public class PasswordController {
             session.removeAttribute("passwordChangeError");
         }
 
-        return "layout/passwordchange"; // templates/password/change.html
+        return "layout/passwordChange"; // templates/password/change.html
     }
 
     @PostMapping("/my/password/change")

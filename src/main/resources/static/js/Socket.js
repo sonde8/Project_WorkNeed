@@ -200,18 +200,8 @@ function getKstDisplayTime(dateString) {
 }
 
 /**
- * 실시간 채팅방 목록 관리 함수를 위한 현재 시간 생성
+ * 실시간 메시지 수신 시 목록 갱신 함수 (주석 포함)
  */
-function getRelativeTime() {
-    const now = new Date();
-    const hours = now.getHours();
-    const minutes = now.getMinutes();
-    const ampm = hours >= 12 ? '오후' : '오전';
-    const formattedHours = hours % 12 || 12;
-    const formattedMinutes = minutes < 10 ? '0' + minutes : minutes;
-    return `${ampm} ${formattedHours}:${formattedMinutes}`;
-}
-
 function refreshRoomList(data) {
     const roomListContainer = document.getElementById('room-list');
     if (!roomListContainer) return;
@@ -219,23 +209,31 @@ function refreshRoomList(data) {
     const targetRoomId = data.roomId;
     const roomElement = document.getElementById('room-' + targetRoomId);
 
-    // 방 타입에 따른 이미지 경로 결정
-    let profileImgSrc = (data.roomType === 'DIRECT')
-        ? (data.roomProfileImage || '/images/profile300.svg')
-        : '/images/team2_300.svg';
+    // [핵심 수정] 서버에서 내려주는 'roomProfileImage' 필드를 그대로 사용합니다.
+    // 검색 시 잘 나온다고 하셨으므로, 실시간 데이터(data)에도 이 명칭으로 담겨 있습니다.
+    let displayImg = "";
+    if (data.roomType === 'DIRECT') {
+        // 데이터에 프로필이 있으면 사용, 없으면 기본 이미지
+        displayImg = data.roomProfileImage || '/images/default-profile.svg';
+    } else {
+        // 그룹 채팅은 팀 아이콘 고정
+        displayImg = '/images/team2_300.svg';
+    }
+
+    const type = data.messageType ? data.messageType.trim().toUpperCase() : 'TALK';
+    let previewText = data.content || "새로운 대화가 있습니다.";
+    if (type === 'IMAGE') previewText = "사진을 보냈습니다.";
+    else if (type === 'FILE') previewText = "파일을 보냈습니다.";
+
+    const currentTime = getRelativeTime();
 
     if (roomElement) {
-        // 1. 기존 방 업데이트 시 이미지 태그 src 변경
+        // 1. 기존 방 업데이트: 메시지가 올 때 이미지 src가 변하지 않도록 고정
         const imgTag = roomElement.querySelector('.profile-img img');
-        if (imgTag) imgTag.src = profileImgSrc;
+        if (imgTag) {
+            imgTag.src = displayImg;
+        }
 
-        const type = data.messageType ? data.messageType.trim().toUpperCase() : 'TALK';
-        let previewText = data.content || "새로운 대화가 있습니다.";
-        if (type === 'IMAGE') previewText = "사진을 보냈습니다.";
-        else if (type === 'FILE') previewText = "파일을 보냈습니다.";
-        const currentTime = getRelativeTime();
-
-        // 1. 기존 방 업데이트
         const previewElement = roomElement.querySelector('.preview');
         const timeElement = roomElement.querySelector('.last-time');
         const badgeElement = document.getElementById('unread-badge-' + targetRoomId);
@@ -243,15 +241,13 @@ function refreshRoomList(data) {
         if (previewElement) previewElement.textContent = previewText;
         if (timeElement) timeElement.textContent = currentTime;
 
-        // [배지 업데이트 핵심]
+        // 배지 처리
         if (badgeElement) {
-            // 내가 지금 이 방에 들어가 있는 상태가 아닐 때만 숫자 상승
             if (String(targetRoomId) !== String(window.roomId)) {
                 let currentCount = parseInt(badgeElement.textContent) || 0;
                 badgeElement.textContent = currentCount + 1;
                 badgeElement.classList.remove('hidden');
             } else {
-                // 현재 방이면 읽음 처리 (DB 업데이트 호출)
                 fetch(`/chat/room/${targetRoomId}/read`, {method: 'POST'});
                 badgeElement.textContent = '0';
                 badgeElement.classList.add('hidden');
@@ -259,22 +255,24 @@ function refreshRoomList(data) {
         }
         roomListContainer.prepend(roomElement);
     } else {
-        // 2. 목록에 없는 새 방일 때: 새로 생성 (배지 포함)
+        // 2. 목록에 없는 새 방 생성 시
         const userCountHtml = (data.roomType === 'GROUP' && data.userCount > 0)
             ? `<span class="user-count">${data.userCount}</span>` : '';
 
         const roomHtml = `
         <div id="room-${data.roomId}" class="room-card" data-room-id="${data.roomId}">
             <a href="/chat/room/${data.roomId}">
-                <div class="profile-img"><img src="${profileImgSrc}"></div>
+                <div class="profile-img">
+                    <img src="${displayImg}" alt="프로필">
+                </div>
                 <div class="room-text">
                     <div class="name-row">
                         <span class="name">${data.roomName || '새 채팅방'}</span>
                         ${userCountHtml}
-                        <span class="last-time">${getRelativeTime()}</span> 
+                        <span class="last-time">${currentTime}</span> 
                     </div>
                     <div class="preview-row" style="display: flex; justify-content: space-between; align-items: center;">
-                        <span class="preview">${data.content || '내용'}</span>
+                        <span class="preview">${previewText}</span>
                         <span id="unread-badge-${data.roomId}" class="unread-badge">1</span>
                     </div>
                 </div>
@@ -283,7 +281,6 @@ function refreshRoomList(data) {
         roomListContainer.insertAdjacentHTML('afterbegin', roomHtml);
     }
 }
-
 /**
  * 실시간 숫자 차감 로직
  */
@@ -623,24 +620,55 @@ if (searchInput) {
     });
 }
 
+/**
+ * 검색 및 목록 렌더링 함수 수정
+ */
 function renderRoomList(rooms) {
     const container = document.getElementById('room-list');
     if (!container) return;
     container.innerHTML = '';
+
     if (!Array.isArray(rooms) || rooms.length === 0) {
         container.innerHTML = '<p style="padding: 20px; text-align: center; color: #999;">결과 없음</p>';
         return;
     }
+
     rooms.forEach(r => {
+        // 1. 현재 활성화된 방인지 확인
         const activeClass = (String(window.roomId) === String(r.roomId)) ? 'active' : '';
+        // 2. 안 읽은 메시지 배지 클래스 설정
         const badgeClass = (r.unreadCount > 0) ? 'unread-badge' : 'unread-badge hidden';
+
+        // 3. [핵심 수정] 방 타입에 따른 이미지 경로 결정
+        // 개인(DIRECT)이면 유저 프로필, 그룹(GROUP)이면 팀 아이콘 출력
+        let profileImgSrc = "";
+        if (r.roomType === 'DIRECT') {
+            profileImgSrc = (r.roomProfileImage != null) ? r.roomProfileImage : '/images/default-profile.svg';
+        } else {
+            profileImgSrc = '/images/team2_300.svg';
+        }
+
+        // 4. [핵심 수정] 그룹 채팅일 때만 인원수 표시
+        const userCountHtml = (r.roomType === 'GROUP')
+            ? `<span class="user-count">${r.userCount}</span>`
+            : '';
+
         const html = `
         <div id="room-${r.roomId}" class="room-card ${activeClass}" data-room-id="${r.roomId}">
             <a href="/chat/room/${r.roomId}">
-                <div class="profile-img"><img src="/images/profile300.svg"></div>
+                <div class="profile-img">
+                    <img src="${profileImgSrc}" alt="프로필">
+                </div>
                 <div class="room-text">
-                    <div class="name-row"><span class="name">${r.roomName || '방'}</span><span class="last-time">${r.lastMessageDisplayTime || ''}</span></div>
-                    <div class="preview-row" style="display: flex; justify-content: space-between;"><span class="preview">${r.lastMessageContent || ''}</span><span id="unread-badge-${r.roomId}" class="${badgeClass}">${r.unreadCount || 0}</span></div>
+                    <div class="name-row">
+                        <span class="name">${r.roomName || '방'}</span>
+                        ${userCountHtml}
+                        <span class="last-time">${r.lastMessageDisplayTime || ''}</span>
+                    </div>
+                    <div class="preview-row" style="display: flex; justify-content: space-between; align-items: center;">
+                        <span class="preview">${r.lastMessageContent || ''}</span>
+                        <span id="unread-badge-${r.roomId}" class="${badgeClass}">${r.unreadCount || 0}</span>
+                    </div>
                 </div>
             </a>
         </div>`;
