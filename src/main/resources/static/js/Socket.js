@@ -220,8 +220,12 @@ function refreshRoomList(data) {
         displayImg = '/images/team2_300.svg';
     }
 
-    const type = data.messageType ? data.messageType.trim().toUpperCase() : 'TALK';
-    let previewText = data.content || "새로운 대화가 있습니다.";
+    // [추가] 메시지 타입 판별 로직 (data.lastMessageType이 있다면 우선 사용)
+    const msgType = data.messageType || data.lastMessageType || 'TALK';
+    const type = msgType.trim().toUpperCase();
+
+    // [추가] 프리뷰 텍스트 결정 (내용이 없으면 기본 문구 출력)
+    let previewText = data.content || data.lastMessageContent || "새로운 대화가 시작되었습니다.";
     if (type === 'IMAGE') previewText = "사진을 보냈습니다.";
     else if (type === 'FILE') previewText = "파일을 보냈습니다.";
 
@@ -253,14 +257,18 @@ function refreshRoomList(data) {
                 badgeElement.classList.add('hidden');
             }
         }
+        // [수정] 메시지가 온 방을 목록의 최상단으로 이동시킴
         roomListContainer.prepend(roomElement);
     } else {
         // 2. 목록에 없는 새 방 생성 시
         const userCountHtml = (data.roomType === 'GROUP' && data.userCount > 0)
             ? `<span class="user-count">${data.userCount}</span>` : '';
 
+        // [추가] 새 방 생성 시 active 클래스 조건 (현재 생성된 방으로 바로 이동한 경우 대비)
+        const activeClass = (String(window.roomId) === String(data.roomId)) ? 'active' : '';
+
         const roomHtml = `
-        <div id="room-${data.roomId}" class="room-card" data-room-id="${data.roomId}">
+        <div id="room-${data.roomId}" class="room-card ${activeClass}" data-room-id="${data.roomId}">
             <a href="/chat/room/${data.roomId}">
                 <div class="profile-img">
                     <img src="${displayImg}" alt="프로필">
@@ -278,9 +286,12 @@ function refreshRoomList(data) {
                 </div>
             </a>
         </div>`;
+
+        // [수정] 신규 방을 목록의 가장 위(afterbegin)에 삽입함
         roomListContainer.insertAdjacentHTML('afterbegin', roomHtml);
     }
 }
+
 /**
  * 실시간 숫자 차감 로직
  */
