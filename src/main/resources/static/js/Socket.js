@@ -249,7 +249,8 @@ function refreshRoomList(data) {
         if (badgeElement) {
             if (String(targetRoomId) !== String(window.roomId)) {
                 let currentCount = parseInt(badgeElement.textContent) || 0;
-                badgeElement.textContent = currentCount + 1;
+                badgeElement.textContent = (data.unreadCount !== undefined && data.unreadCount !== 0)
+                    ? data.unreadCount : currentCount + 1;
                 badgeElement.classList.remove('hidden');
             } else {
                 fetch(`/chat/room/${targetRoomId}/read`, {method: 'POST'});
