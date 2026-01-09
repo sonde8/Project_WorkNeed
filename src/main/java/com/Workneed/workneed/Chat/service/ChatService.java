@@ -202,6 +202,8 @@ public class ChatService {
                 // 2. MessageDTO에 해당 수신자의 정확한 unreadCount를 주입
                 messageDTO.setUnreadCount(updatedRoomInfo.getUnreadCount());
 
+                // 1:1 채팅이면 프로필사진이 출력되게 하는 코드
+                messageDTO.setRoomType(updatedRoomInfo.getRoomType());
                 messageDTO.setRoomProfileImage(updatedRoomInfo.getRoomProfileImage());
 
                 // 3. 1:1 채팅일 경우 상대방 이름이 정확히 나오도록 보정
