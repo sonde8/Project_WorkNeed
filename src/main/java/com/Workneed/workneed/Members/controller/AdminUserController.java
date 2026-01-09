@@ -63,9 +63,16 @@ public class AdminUserController {
 
         try {
             // 서비스에서 개별 로그를 남기도록 adminId 전달
-            adminUserService.updateMember(userDto, admin.getAdminId());
+            adminUserService.updateMemberStatusWithLog(
+                    userDto.getUserId(),
+                    userDto.getUserStatus(),
+                    userDto.getDeptId(),
+                    userDto.getRankId(),
+                    admin
+            );
             return "success";
         } catch (Exception e) {
+            e.printStackTrace();
             return "fail";
         }
     }
@@ -80,7 +87,7 @@ public class AdminUserController {
         if (admin == null) return "fail";
 
         try {
-            adminUserService.batchUpdateUserStatus(userIds, status, admin.getAdminId());
+            adminUserService.batchUpdateUserStatus(userIds, status, admin);
             return "success";
         } catch (Exception e) {
             return "fail";
@@ -97,7 +104,7 @@ public class AdminUserController {
 
         try {
             // 기존 생성 로직 + 수행자 ID 전달
-            adminUserService.createAdmin(adminDto, admin.getAdminId());
+            adminUserService.createAdmin(adminDto, admin);
             return "success";
         } catch (Exception e) {
             e.printStackTrace();
@@ -115,7 +122,7 @@ public class AdminUserController {
         if (admin == null) return "fail";
 
         try {
-            adminUserService.changeAdminStatus(targetId, status, admin.getAdminId());
+            adminUserService.changeAdminStatus(targetId, status, admin);
             return "success";
         } catch (Exception e) {
             return "fail";
@@ -130,7 +137,7 @@ public class AdminUserController {
         AdminUserDTO admin = (AdminUserDTO) session.getAttribute("admin");
         if (admin == null) return "fail";
         try {
-            adminUserService.createDept(deptName, admin.getAdminId());
+            adminUserService.createDept(deptName, admin);
             return "success";
         } catch (Exception e) {
             return "fail";
@@ -144,7 +151,7 @@ public class AdminUserController {
         AdminUserDTO admin = (AdminUserDTO) session.getAttribute("admin");
         if (admin == null) return "fail";
         try {
-            adminUserService.createRank(rankName, admin.getAdminId());
+            adminUserService.createRank(rankName, admin);
             return "success";
         } catch (Exception e) {
             return "fail";
@@ -157,7 +164,8 @@ public class AdminUserController {
     public String deleteDept(@RequestParam("deptId") Long deptId, HttpSession session) {
         AdminUserDTO admin = (AdminUserDTO) session.getAttribute("admin");
         if (admin == null) return "fail";
-        return adminUserService.deleteDept(deptId, admin.getAdminId());
+        adminUserService.deleteDept(deptId, admin);
+        return "success";
     }
 
     // 6. 직급 삭제 (adminId 전달)
@@ -166,7 +174,8 @@ public class AdminUserController {
     public String deleteRank(@RequestParam("rankId") Long rankId, HttpSession session) {
         AdminUserDTO admin = (AdminUserDTO) session.getAttribute("admin");
         if (admin == null) return "fail";
-        return adminUserService.deleteRank(rankId, admin.getAdminId());
+        adminUserService.deleteRank(rankId, admin);
+        return "success";
     }
 
 
@@ -208,7 +217,7 @@ public class AdminUserController {
             if (targetId.equals(admin.getAdminId()) && "SUSPENDED".equals(status)) {
                 return "self_error";
             }
-            adminUserService.changeAdminStatus(targetId, status, admin.getAdminId());
+            adminUserService.changeAdminStatus(targetId, status, admin);
             return "success";
         } catch (Exception e) {
             return "fail";

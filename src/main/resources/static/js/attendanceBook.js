@@ -5,6 +5,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const prevBtn = document.getElementById('prevMonth');
     const nextBtn = document.getElementById('nextMonth');
 
+    const modal = document.getElementById('attendanceRequestModal');
+    const openBtn = document.getElementById('openRequestBtn');
+    const closeBtn = document.getElementById('closeModal');
+
     if (!tbody || !ymEl || !prevBtn || !nextBtn) return;
 
     // 현재 월
@@ -90,7 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const type = rec.type ?? '';
             const normType = String(type).replace(/\s+/g, '');
 
-            const isLeave = ['연차', '휴가', '병가', '오전반차', '오후반차', '반차'].includes(normType);
+            const isLeave = ['연차', '휴가', '병가'].includes(normType);
 
             const leaveRowClass = isLeave ? 'leave-row' : '';
 
@@ -133,6 +137,45 @@ document.addEventListener('DOMContentLoaded', () => {
         cur.setDate(1);
         render();
     });
+
+    openBtn.onclick = () => modal.style.display = 'block';
+    closeBtn.onclick = () => modal.style.display = 'none';
+
+    // 모달 바깥쪽 클릭 시 닫기
+    window.onclick = (event) => {
+        if (event.target == modal) modal.style.display = 'none';
+    };
+
+    // 2. 등록 버튼 클릭 시 서버로 요청 전송
+    document.getElementById('submitRequest').onclick = function() {
+        // 폼 데이터 수집
+        const requestData = {
+            title: document.getElementById('reqTitle').value,
+            workDate: document.getElementById('reqStartDate').value,
+            fromTime: document.getElementById('reqStartTime').value,
+            toTime: document.getElementById('reqEndTime').value,
+            reason: document.getElementById('reqReason').value
+        };
+
+        // 서버의 AttendanceRequestService 호출 (JSON 전송)
+        fetch('/attendance/request', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(requestData)
+        })
+        .then(response => {
+            if (response.ok) {
+                alert("요청 성공! 관리자 승인을 기다려주세요.");
+                modal.style.display = 'none';
+                location.reload(); // 성공 시 새로고침
+            } else {
+                alert("요청 실패. 내용을 다시 확인해주세요.");
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    };
+
+
 
     // 최초 렌더링
     render();

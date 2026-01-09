@@ -24,27 +24,49 @@ public class S3StorageService implements StorageService {
     private String bucket;
 
     @Override
-    public String store(MultipartFile file) {
+    public String store(MultipartFile file, String folderName) {
         try {
             if (file.isEmpty()) throw new RuntimeException("빈 파일입니다.");
 
-            // 1. 저장용 고유 이름 생성
+            // 2. 저장용 고유 이름 생성
             String originalFilename = file.getOriginalFilename().replaceAll("\\s+", "_");
             String storedName = UUID.randomUUID().toString() + "_" + originalFilename;
 
-            // 2. 메타데이터 설정
+            // 3. 폴더 경로와 파일명 결합 (S3 내부 경로 생성)
+            // 예: profiles/uuid_filename.jpg
+            String key = folderName + "/" + storedName;
+
             ObjectMetadata metadata = new ObjectMetadata();
             metadata.setContentType(file.getContentType());
             metadata.setContentLength(file.getSize());
 
-            // 3. S3 업로드
-            amazonS3.putObject(new PutObjectRequest(bucket, storedName, file.getInputStream(), metadata)
+            // 4. S3 업로드 (저장 대상을 storedName에서 key로 변경)
+            amazonS3.putObject(new PutObjectRequest(bucket, key, file.getInputStream(), metadata)
                     .withCannedAcl(CannedAccessControlList.PublicRead));
 
-            // 4. 저장된 파일의 S3 URL 반환 (DB의 filePath에 저장될 값)
-            return amazonS3.getUrl(bucket, storedName).toString();
+            // 5. 전체 URL 반환 (DB에 폴더명이 포함된 주소가 저장됨)
+            return amazonS3.getUrl(bucket, key).toString();
         } catch (IOException e) {
             throw new RuntimeException("S3 업로드 실패", e);
+        }
+    }
+
+    @Override
+    public void delete(String fileUrl) {
+        if (fileUrl == null || fileUrl.isEmpty()) return;
+
+        try {
+            // 1. 전체 URL에서 S3의 Key(경로+파일명)만 추출합니다.
+            // 예: https://버킷명.s3.region.amazonaws.com/tasks/uuid_file.txt
+            // -> "tasks/uuid_file.txt"만 남깁니다.
+            String key = fileUrl.substring(fileUrl.lastIndexOf(".com/") + 5);
+
+            // 2. S3 버킷에서 해당 키를 가진 객체 삭제
+            amazonS3.deleteObject(bucket, key);
+
+        } catch (Exception e) {
+            // 삭제 실패 시 로그를 남기거나 예외 처리를 합니다.
+            System.err.println("S3 파일 삭제 중 오류 발생: " + e.getMessage());
         }
     }
 }

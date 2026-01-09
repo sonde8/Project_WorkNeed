@@ -32,6 +32,7 @@ function loadDeptAndUsers() {
     fetch('/chat/users') // 컨트롤러에 만든 API 주소
         .then(response => response.json())
         .then(data => {
+            console.log("서버에서 받은 유저 목록:", data);
             renderDeptTree(data);
         })
         .catch(error => console.error('유저 목록 로드 실패:', error));
@@ -70,22 +71,29 @@ function renderDeptTree(users) {
             <ul id="${deptId}" class="user-list hidden">
                 ${filteredUsers.map(user => {
             // 수정 이미 선택된 유저인지 확인하여 클래스 부여
-            const isSelected = selectedUsers.some(u => u.id === user.userId);
+            const isSelected = selectedUsers.some(u => u.id === user.userId)
+
+            // 프로필 이미지가 없으면 기본 이미지(SVG)를 사용하도록 처리
+            const profileSrc = user.userProfileImage ? user.userProfileImage : '/images/default-profile.svg';
+            
             return `
-                    <li class="user-item ${isSelected ? 'selected-disabled' : ''}" 
-                        id="user-item-${user.userId}"
-                        onclick="selectUser(${user.userId}, '${user.userName}', '${deptName}')">
-                        <div class="user-info-row">
-                            <span class="user-icon">👤</span>
-                            <div class="user-text">
-                                <span class="u-name">${user.userName}</span>
-                                <span class="u-dept">${user.positionName || ''}</span>
-                            </div>
+                <li class="user-item ${isSelected ? 'selected-disabled' : ''}" 
+                    id="user-item-${user.userId}"
+                    onclick="selectUser(${user.userId}, '${user.userName}', '${deptName}', '${profileSrc}')">
+                    <div class="user-info-row">
+                        <div class="user-profile-circle-small">
+                            <img src="${profileSrc}" alt="프로필">
                         </div>
-                    </li>
-                `}).join('')}
-            </ul>
-        `;
+                        <div class="user-text">
+                            <span class="u-name">${user.userName}</span>
+                            <span class="u-dept">${user.positionName || ''}</span>
+                        </div>
+                    </div>
+                </li>
+            `;
+        }).join('')}
+    </ul>
+`;
         deptTree.appendChild(li);
     });
 }
@@ -102,11 +110,11 @@ function toggleDept(deptId) {
 }
 
 // 6. 유저 선택 (오른쪽 패널로 추가)
-function selectUser(userId, userName, deptName) {
+function selectUser(userId, userName, deptName, profileSrc) {
     // 본인은 제외하고 싶다면 여기서 currentUserId와 비교 로직 추가 가능
     if (selectedUsers.some(u => u.id === userId)) return;
 
-    selectedUsers.push({ id: userId, name: userName, dept: deptName });
+    selectedUsers.push({ id: userId, name: userName, dept: deptName, profile: profileSrc });
 
     // 왼쪽 리스트에서 해당 유저 비활성화 클래스 추가
     const userItem = document.getElementById(`user-item-${userId}`);
@@ -140,8 +148,13 @@ function renderSelectedUsers() {
     container.innerHTML = selectedUsers.map(user => `
         <div class="selected-user-item">
             <div class="selected-info">
-                <span class="s-name">${user.name}</span>
-                <span class="s-dept">${user.dept}</span>
+                <div class="selected-profile-circle">
+                    <img src="${user.profile}" alt="프로필">
+                </div>
+                <div class="selected-text">
+                    <span class="s-name">${user.name}</span>
+                    <span class="s-dept">${user.dept}</span>
+                </div>
             </div>
             <button type="button" class="remove-btn" onclick="removeUser(${user.id})">&times;</button>
         </div>

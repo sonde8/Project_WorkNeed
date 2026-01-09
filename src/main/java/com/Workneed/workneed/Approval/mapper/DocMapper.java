@@ -5,6 +5,7 @@ import com.Workneed.workneed.Approval.LineStatus;
 import com.Workneed.workneed.Approval.dto.*;
 import com.Workneed.workneed.Approval.entity.ApprovalDoc;
 import com.Workneed.workneed.Approval.entity.User;
+import com.Workneed.workneed.Members.dto.UserDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -22,6 +23,11 @@ public interface DocMapper {
 
     // 단건 조회 (디테일)
     ApprovalDoc findById(Long docId);
+
+    // 참조자 조회
+    String selectRefUserIdsByDocId(@Param("docId") Long docId);
+    List<RefUserDTO>  selectUsersByIds(@Param("ids") List<Long> ids);
+
 
     // 문서 타입 목록
     List<ApprovalTypeDTO> findAllTypes();
@@ -54,7 +60,8 @@ public interface DocMapper {
     // 로그인 유저 조회
     User findLoginUserByLoginId(@Param("loginId") String loginId);
 
-
+    int updateRefUserIds(@Param("docId")Long docId,
+                         @Param("refUserIds") String refUserIds);
     /* ===============================
        결재선/결재자 후보
        =============================== */
@@ -138,6 +145,8 @@ public interface DocMapper {
 
     int countMyRejected(@Param("userId") Long userId);
 
+    int countReferenceDocs(@Param("userId") Long userId);
+
     /* ==========================================================
        6) ✅ 기안자 문서함 (lists)
        ========================================================== */
@@ -151,6 +160,8 @@ public interface DocMapper {
     List<ApprovalDocListItemDTO> selectMyApprovedList(@Param("userId") Long userId);
 
     List<ApprovalDocListItemDTO> selectMyRejectedList(@Param("userId") Long userId);
+
+    List<ApprovalDocListItemDTO> selectReferenceList(@Param("userId") Long userId);
 
     /* ==========================================================
        7) ✅ 결재자 문서함 (approver 기준, 라인 status 기준)

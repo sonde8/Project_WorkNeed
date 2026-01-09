@@ -23,7 +23,7 @@
         SELECT
             u.user_id AS userId,
             u.user_name AS userName,
-            d.dept_name AS deptname,
+            u.user_profile_image AS userProfileImage,  d.dept_name AS deptname,
             r.rank_name AS rankname
         FROM user u
                  JOIN dept d ON u.dept_id = d.dept_id

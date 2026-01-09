@@ -219,13 +219,22 @@ function refreshRoomList(data) {
     const targetRoomId = data.roomId;
     const roomElement = document.getElementById('room-' + targetRoomId);
 
-    const type = data.messageType ? data.messageType.trim().toUpperCase() : 'TALK';
-    let previewText = data.content || "새로운 대화가 있습니다.";
-    if (type === 'IMAGE') previewText = "사진을 보냈습니다.";
-    else if (type === 'FILE') previewText = "파일을 보냈습니다.";
-    const currentTime = getRelativeTime();
+    // 방 타입에 따른 이미지 경로 결정
+    let profileImgSrc = (data.roomType === 'DIRECT')
+        ? (data.roomProfileImage || '/images/profile300.svg')
+        : '/images/team2_300.svg';
 
     if (roomElement) {
+        // 1. 기존 방 업데이트 시 이미지 태그 src 변경
+        const imgTag = roomElement.querySelector('.profile-img img');
+        if (imgTag) imgTag.src = profileImgSrc;
+
+        const type = data.messageType ? data.messageType.trim().toUpperCase() : 'TALK';
+        let previewText = data.content || "새로운 대화가 있습니다.";
+        if (type === 'IMAGE') previewText = "사진을 보냈습니다.";
+        else if (type === 'FILE') previewText = "파일을 보냈습니다.";
+        const currentTime = getRelativeTime();
+
         // 1. 기존 방 업데이트
         const previewElement = roomElement.querySelector('.preview');
         const timeElement = roomElement.querySelector('.last-time');
@@ -243,7 +252,7 @@ function refreshRoomList(data) {
                 badgeElement.classList.remove('hidden');
             } else {
                 // 현재 방이면 읽음 처리 (DB 업데이트 호출)
-                fetch(`/chat/room/${targetRoomId}/read`, { method: 'POST' });
+                fetch(`/chat/room/${targetRoomId}/read`, {method: 'POST'});
                 badgeElement.textContent = '0';
                 badgeElement.classList.add('hidden');
             }
@@ -257,14 +266,15 @@ function refreshRoomList(data) {
         const roomHtml = `
         <div id="room-${data.roomId}" class="room-card" data-room-id="${data.roomId}">
             <a href="/chat/room/${data.roomId}">
-                <div class="profile-img"><img src="/images/profile300.svg"></div>
+                <div class="profile-img"><img src="${profileImgSrc}"></div>
                 <div class="room-text">
                     <div class="name-row">
                         <span class="name">${data.roomName || '새 채팅방'}</span>
                         ${userCountHtml}
-                        <span class="last-time">${currentTime}</span> </div>
+                        <span class="last-time">${getRelativeTime()}</span> 
+                    </div>
                     <div class="preview-row" style="display: flex; justify-content: space-between; align-items: center;">
-                        <span class="preview">${previewText}</span>
+                        <span class="preview">${data.content || '내용'}</span>
                         <span id="unread-badge-${data.roomId}" class="unread-badge">1</span>
                     </div>
                 </div>
@@ -317,7 +327,9 @@ function sendMessage(event) {
         messageInput.value = '';    // 입력창 비우기
         messageInput.focus();       // 포커스 유지
 
-        setTimeout(function() { isSending = false; }, 200);
+        setTimeout(function () {
+            isSending = false;
+        }, 200);
         console.log("메시지 전송:", chatMessage);
     }
 }
@@ -348,7 +360,7 @@ function onMessageReceived(payload) {
     if (!isMe) {
         // 서버에 읽음 신호 전송
         sendReadEvent(message.roomId, currentUserId);
-        fetch(`/chat/room/${message.roomId}/read`, { method: 'POST' })
+        fetch(`/chat/room/${message.roomId}/read`, {method: 'POST'})
             .then(() => console.log("DB 읽음 처리 성공"))
             .catch(err => console.error("읽음 처리 API 오류:", err));
 
@@ -383,7 +395,7 @@ function onMessageReceived(payload) {
         messageElement.className = isMe ? 'my-msg' : 'other-msg';
         var msgUnit = document.createElement('div');
         msgUnit.className = 'msg-unit';
-        if(!isMe) {
+        if (!isMe) {
             var userNameElement = document.createElement('span');
             userNameElement.className = 'sender';
             userNameElement.textContent = message.senderName;
@@ -397,10 +409,14 @@ function onMessageReceived(payload) {
         if (msgType === 'IMAGE') {
             var img = document.createElement('img');
             img.src = message.content;
-            img.style.maxWidth = '250px'; img.style.borderRadius = '8px'; img.style.display = 'block';
+            img.style.maxWidth = '250px';
+            img.style.borderRadius = '8px';
+            img.style.display = 'block';
 
             // 이미지 클릭 시 모달 열기
-            img.onclick = function () {openImageModal(this.src)};
+            img.onclick = function () {
+                openImageModal(this.src)
+            };
 
             bubble.appendChild(img);
         } else if (msgType === 'FILE') {
@@ -477,7 +493,7 @@ function onError(error) {
 /* --- 이벤트 리스너 등록 --- */
 
 if (messageInput) {
-    messageInput.addEventListener('keydown', function(event) {
+    messageInput.addEventListener('keydown', function (event) {
         if (event.isComposing) return;
         if (event.key === 'Enter') {
             if (!event.shiftKey) {
@@ -489,7 +505,7 @@ if (messageInput) {
 }
 
 if (messageForm) {
-    messageForm.addEventListener('submit', function(event) {
+    messageForm.addEventListener('submit', function (event) {
         event.preventDefault();
         sendMessage(event);
     }, true);
@@ -497,7 +513,7 @@ if (messageForm) {
 
 var sendButton = document.querySelector('.send-btn');
 if (sendButton) {
-    sendButton.addEventListener('click', function(event) {
+    sendButton.addEventListener('click', function (event) {
         event.preventDefault();
         sendMessage(event);
     });
@@ -511,10 +527,19 @@ function handleFileUpload(input, type) {
     formData.append("file", file);
     formData.append("roomId", window.roomId);
 
-    fetch('/api/chat/files/upload', { method: 'POST', body: formData })
-        .then(response => { if (!response.ok) throw new Error("업로드 실패"); return response.json(); })
-        .then(fileLogDTO => { sendFileMessage(fileLogDTO, type); input.value = ""; })
-        .catch(error => { console.error("Error:", error); alert("파일 업로드 중 오류 발생"); });
+    fetch('/api/chat/files/upload', {method: 'POST', body: formData})
+        .then(response => {
+            if (!response.ok) throw new Error("업로드 실패");
+            return response.json();
+        })
+        .then(fileLogDTO => {
+            sendFileMessage(fileLogDTO, type);
+            input.value = "";
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            alert("파일 업로드 중 오류 발생");
+        });
 }
 
 function sendFileMessage(fileLog, type) {
@@ -530,7 +555,7 @@ function leaveRoom() {
     if (confirm("채팅방을 나가시겠습니까? 나간 후에는 대화 내용을 볼 수 없습니다.")) {
         fetch(`/chat/room/${window.roomId}/leave`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' }
+            headers: {'Content-Type': 'application/json'}
         })
             .then(response => {
                 if (response.ok) {
@@ -553,16 +578,19 @@ function toggleChatSidebar() {
     }
 }
 
+// 보관함 및 미디어 보관함 로직
 function updateSidebarMedia() {
     const imageContainer = document.getElementById('sidebarImageList');
     const fileContainer = document.getElementById('sidebarFileList');
     if (!imageContainer || !fileContainer) return;
 
-    imageContainer.innerHTML = ''; fileContainer.innerHTML = '';
+    imageContainer.innerHTML = '';
+    fileContainer.innerHTML = '';
     const allImages = document.querySelectorAll('#messageLog img');
     allImages.forEach(img => {
         const copyImg = document.createElement('img');
-        copyImg.src = img.src; copyImg.onclick = () => openImageModal(img.src);
+        copyImg.src = img.src;
+        copyImg.onclick = () => openImageModal(img.src);
         imageContainer.appendChild(copyImg);
     });
     const allFiles = document.querySelectorAll('#messageLog .file-link');
@@ -583,7 +611,7 @@ function updateSidebarMedia() {
 let searchTimeout = null;
 const searchInput = document.querySelector('.search-container input');
 if (searchInput) {
-    searchInput.addEventListener('input', function(e) {
+    searchInput.addEventListener('input', function (e) {
         clearTimeout(searchTimeout);
         const keyword = e.target.value.trim();
         searchTimeout = setTimeout(() => {
@@ -607,15 +635,15 @@ function renderRoomList(rooms) {
         const activeClass = (String(window.roomId) === String(r.roomId)) ? 'active' : '';
         const badgeClass = (r.unreadCount > 0) ? 'unread-badge' : 'unread-badge hidden';
         const html = `
-            <div id="room-${r.roomId}" class="room-card ${activeClass}" data-room-id="${r.roomId}">
-                <a href="/chat/room/${r.roomId}">
-                    <div class="profile-img"><img src="/images/profile300.svg"></div>
-                    <div class="room-text">
-                        <div class="name-row"><span class="name">${r.roomName || '방'}</span><span class="last-time">${r.lastMessageDisplayTime || ''}</span></div>
-                        <div class="preview-row" style="display: flex; justify-content: space-between;"><span class="preview">${r.lastMessageContent || ''}</span><span id="unread-badge-${r.roomId}" class="${badgeClass}">${r.unreadCount || 0}</span></div>
-                    </div>
-                </a>
-            </div>`;
+        <div id="room-${r.roomId}" class="room-card ${activeClass}" data-room-id="${r.roomId}">
+            <a href="/chat/room/${r.roomId}">
+                <div class="profile-img"><img src="/images/profile300.svg"></div>
+                <div class="room-text">
+                    <div class="name-row"><span class="name">${r.roomName || '방'}</span><span class="last-time">${r.lastMessageDisplayTime || ''}</span></div>
+                    <div class="preview-row" style="display: flex; justify-content: space-between;"><span class="preview">${r.lastMessageContent || ''}</span><span id="unread-badge-${r.roomId}" class="${badgeClass}">${r.unreadCount || 0}</span></div>
+                </div>
+            </a>
+        </div>`;
         container.insertAdjacentHTML('beforeend', html);
     });
 }
@@ -700,7 +728,7 @@ document.addEventListener('keydown', function (event) {
 });
 
 // 페이지 로드 시 실행 (기존 코드를 아래와 같이 수정하세요)
-window.onload = function() {
+window.onload = function () {
     // 1. 웹소켓 연결 (기존 로직)
     if (currentUserId) connect();
 
@@ -746,7 +774,9 @@ window.onload = function() {
                     const user = users.find(u => Number(u.userId) === Number(id));
                     if (user && typeof selectUser === 'function') {
                         // 기존 selectUser 함수를 사용하여 오른쪽 '선택된 대상'에 추가
-                        selectUser(user.userId, user.userName, user.deptname || '기타');
+                        // ✅ 프로필 이미지 필드 누락 방지를 위해 DTO 구조에 맞춰 호출
+                        const profile = user.userProfileImage || '/images/default-profile.svg';
+                        selectUser(user.userId, user.userName, user.deptname || '기타', profile);
                     }
                 });
             })

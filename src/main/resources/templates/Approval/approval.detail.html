@@ -52,7 +52,7 @@
 
                     <ul class="line-list">
                         <li th:each="l : ${lines}" class="line-item">
-                            <span class="ord"><b th:text="${l.orderNum}"></b>차</span>
+                            <span class="ord"><b th:text="${l.orderNum}"></b></span>
                             <span class="name" th:text="${l.username}"></span>
                             <span class="status"
                                   th:classappend="' st-' + ${#strings.toLowerCase(l.status.name())}"
@@ -62,6 +62,26 @@
 
                         <li th:if="${#lists.isEmpty(lines)}" class="line-empty">
                             결재 라인이 없습니다.
+                        </li>
+                    </ul>
+                </div>
+                <!-- =========================
+                     참조자
+                     ========================= -->
+                <div class="card">
+                    <div class="card-head">
+                        <h3>참조자</h3>
+                        <p class="meta">열람만 가능 (승인/반려 불가)</p>
+                    </div>
+
+                    <ul class="line-list">
+                        <li th:each="u : ${refUsers}"
+                            th:text="${u.username}">
+                            이름
+                        </li>
+
+                        <li th:if="${doc.refUserIds == null or #lists.isEmpty(doc.refUserIds)}" class="line-empty">
+                            참조자가 없습니다.
                         </li>
                     </ul>
                 </div>
@@ -87,7 +107,7 @@
                             <span class="value badge strong"
                                   th:classappend="' st-' + ${#strings.toLowerCase(doc.status.name())}"
                                   th:text="${doc.status}">
-                DRAFT
+
               </span>
                         </div>
 
@@ -101,7 +121,7 @@
                             <span class="value" th:text="${doc.title}">-</span>
                         </div>
 
-                        <div class="row row-content">
+                        <div class="row-row-content">
                             <span class="label">내용</span>
                             <pre class="content" th:text="${doc.content}">-</pre>
                         </div>
@@ -127,14 +147,22 @@
                         <p class="meta">첨부된 파일 목록</p>
                     </div>
 
-                    <ul class="file-list">
-                        <li th:each="f : ${files}">
+                    <ul class="app-file-list">
+                        <li th:each="f : ${files}" class="app-file-item">
+
                             <a th:href="@{/approval/file/{id}/download(id=${f.fileId})}"
-                               th:text="${f.originalName}">
-                            </a>
+                               th:text="${f.originalName}"
+                               class="app-file-link">파일명.pdf</a>
+
+                            <form th:if="${isWriter}"
+                                  th:action="@{/approval/file/{id}/delete(id=${f.fileId})}"
+                                  method="post"
+                                  onsubmit="return confirm('파일을 삭제하시겠습니까?');">
+                                <button type="submit" class="app-btn-delete">삭제</button>
+                            </form>
                         </li>
 
-                        <li th:if="${#lists.isEmpty(files)}" class="empty">
+                        <li th:if="${#lists.isEmpty(files)}" class="app-file-empty">
                             첨부 파일이 없습니다.
                         </li>
                     </ul>
@@ -153,7 +181,7 @@
 
                         <!-- 승인: IN_PROGRESS + 내 차례 -->
                         <form class="inline"
-                              th:if="${doc.status.name() == 'IN_PROGRESS' and isMyTurn}"
+                              th:if="${doc.status == 'IN_PROGRESS' and isMyTurn and !isReference}"
                               method="post" th:action="@{/approval/approve}">
                             <input type="hidden" name="docId" th:value="${doc.docId}">
                             <button type="submit" class="btn primary"
@@ -164,7 +192,7 @@
 
                         <!-- 반려: IN_PROGRESS + 내 차례 -->
                         <div class="reject-wrap"
-                             th:if="${doc.status.name() == 'IN_PROGRESS' and isMyTurn}">
+                             th:if="${doc.status.name() == 'IN_PROGRESS' and isMyTurn and !isReference}">
                             <button type="button" class="btn danger" id="btnToggleReject">
                                 반려 사유 입력
                             </button>
@@ -184,6 +212,14 @@
                                     </button>
                                 </div>
                             </form>
+
+
+                            <div style="padding:10px; border:1px solid #ddd; margin:10px 0;">
+                                <div>status = <span th:text="${doc.status}"></span></div>
+                                <div>isMyTurn = <span th:text="${isMyTurn}"></span></div>
+                                <div>isReference = <span th:text="${isReference}"></span></div>
+                                <div>isWriter = <span th:text="${isWriter}"></span></div>
+                            </div>
                         </div>
 
                     </div>

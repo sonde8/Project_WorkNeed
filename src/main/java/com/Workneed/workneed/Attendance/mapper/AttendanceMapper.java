@@ -68,4 +68,27 @@ public interface AttendanceMapper {
             @Param("empIds") List<Long> empIds,
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate);
-    }
+
+
+    // 근무 일수
+    int countWorkDays(@Param("empId") Long empId,
+                      @Param("startDate") LocalDate startDate,
+                      @Param("endDate") LocalDate endDate);
+
+    // 월 지각
+    int countLate(@Param("empId") Long empId,
+                  @Param("startDate") LocalDate startDate,
+                  @Param("endDate") LocalDate endDate);
+
+    // 월 조퇴
+    int countEarlyLeave(@Param("empId") Long empId,
+                        @Param("startDate") LocalDate startDate,
+                        @Param("endDate") LocalDate endDate);
+
+    // 연장근무
+    int overtimeMinutes(@Param("empId") Long empId,
+                        @Param("startDate") LocalDate startDate,
+                        @Param("endDate") LocalDate endDate);
+}
+
+
