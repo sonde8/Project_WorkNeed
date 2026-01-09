@@ -198,6 +198,9 @@ public class ChatService {
             // 1. 받는 사람(participantId) 기준의 최신 방 정보(안 읽은 개수 포함)를 DB에서 조회
             ChatRoomDTO updatedRoomInfo = chatRoomMapper.findRoomById(messageDTO.getRoomId(), participantId);
 
+            // 토스트 메세지 발신자 최신 프로필 정보를 가져옴
+            UserDTO sender = chatUserMapper.findUserById(messageDTO.getSenderId());
+
             if (updatedRoomInfo != null) {
                 // 2. MessageDTO에 해당 수신자의 정확한 unreadCount를 주입
                 messageDTO.setUnreadCount(updatedRoomInfo.getUnreadCount());
@@ -210,6 +213,11 @@ public class ChatService {
                 if ("DIRECT".equals(updatedRoomInfo.getRoomType())) {
                     messageDTO.setRoomName(updatedRoomInfo.getRoomName());
                 }
+            }
+
+            // 토스트알림용 프로필 이미지 출력을 위한 로직
+            if (sender != null) {
+                messageDTO.setSenderProfileImage(sender.getUserProfileImage());
             }
 
             // 4. 개별 참여자의 채널로 '개인화된' 메시지 정보 전송
