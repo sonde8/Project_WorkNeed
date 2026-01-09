@@ -10,10 +10,10 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!newPw || !confirmPw) { pwMsg.textContent = ""; return; }
 
         if (newPw === confirmPw) {
-            pwMsg.textContent = " ✅ 비밀번호가 일치합니다.";
+            pwMsg.textContent = "비밀번호가 일치합니다.";
             pwMsg.style.color = "#2ecc71";
         } else {
-            pwMsg.textContent = " ❌ 비밀번호가 일치하지 않습니다.";
+            pwMsg.textContent = "비밀번호가 일치하지 않습니다.";
             pwMsg.style.color = "#e74c3c";
         }
     }

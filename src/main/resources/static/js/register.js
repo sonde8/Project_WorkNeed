@@ -10,11 +10,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
     let isEmailVerified = false;
 
-    // 1. [추가된 기능] 생년월일 오늘 이후 날짜 선택 금지
-    if (birthdayInput) {
-        const today = new Date().toISOString().split("T")[0];
-        birthdayInput.setAttribute("max", today);
-    }
+   // 1. 생년월일 설정 및 키보드 입력 차단
+   if (birthdayInput) {
+       const today = new Date().toISOString().split("T")[0];
+       const minDate = "1930-01-01";
+       birthdayInput.setAttribute("min", minDate);
+       birthdayInput.setAttribute("max", today);
+       birthdayInput.addEventListener('keydown', function(e) {
+           e.preventDefault();
+       });
+   }
 
     // 🔹 비밀번호 확인 관련
     const pwConfirmInput = document.getElementById('passwordConfirm');
@@ -75,18 +80,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
     updateMainBtnState();
 
-    // 2. 메인 버튼 클릭 이벤트 (인증 및 가입 제어)
+    // 2. 메인 버튼 클릭 이벤트
     mainBtn.addEventListener('click', function (e) {
 
-        // [중요] 이미 인증이 완료된 상태라면 JS 로직을 타지 않고 바로 폼 제출
+        //  이미 인증이 완료된 상태라면 JS 로직을 타지 않고 바로 폼 제출
         if (isEmailVerified) {
-            return; // type="submit"에 의해 폼이 전송됨
+            return;
         }
 
         // 인증 전에는 기본 submit 동작을 막음
         e.preventDefault();
 
-        // [단계 1] 인증번호 발송 단계 (인증창이 안 보일 때)
+        // [단계 1] 인증번호 발송 단계
         if (authGroup.style.display === 'none' || authGroup.style.display === '') {
             const email = emailInput.value;
             const loginId = idInput.value;
@@ -150,11 +155,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (success) {
                     alert("인증 성공! 가입 버튼을 눌러 완료하세요.");
                     isEmailVerified = true;
-                    authGroup.style.display = 'none'; // 인증창 숨김
+                    authGroup.style.display = 'none';
 
-                    // 버튼을 최종 가입 모드로 변경
                     mainBtn.innerText = "가입 완료";
-                    mainBtn.setAttribute('type', 'submit'); // 타입을 submit으로 변경
+                    mainBtn.setAttribute('type', 'submit');
                     mainBtn.disabled = false;
                 } else {
                     alert("인증번호가 틀렸습니다.");
