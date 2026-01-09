@@ -1,20 +1,52 @@
 @charset "UTF-8";
 
 /* =========================================
-   1. Global Variables
+    공통 디자인
+    var( ) 로 사용해주세요
    ========================================= */
 :root {
-    --color-primary: #0B2E4F;
-    --color-secondary: #3A7BD5;
-    --color-bg: #F6F8FB;
-    --color-text-main: #1F2937;
-    --color-text-sub: #6B7280;
-    --color-border: #E5E7EB;
-    --color-white: #ffffff;
-
-    /* [추가] 레이아웃 고정 수치 변수화 */
     --size-sidebar-width: 80px;
     --size-header-height: 80px;
+
+    /* Font size */
+    --font-size-12: 1.2rem;   /* 12px - 캡션, 메타 */
+    --font-size-13: 1.3rem;   /* 13px - 보조 텍스트 */
+    --font-size-14: 1.4rem;   /* 14px - 기본 본문 (표준) */
+    --font-size-16: 1.6rem;   /* 16px - 강조 텍스트 */
+    --font-size-18: 1.8rem;   /* 18px - 섹션 타이틀 */
+    --font-size-20: 2.0rem;  /* 20px - 페이지 타이틀 */
+    --font-size-24: 2.4rem;  /* 24px - 메인 헤더 */
+
+
+    /*  메인/포인트 컬러 */
+    --color-primary: #0B2E4F;         /* 깊은 네이비 (메인 포인트) */
+    --color-primary-light: #F0F4F8;   /* 연한 푸른빛 배경 */
+    --color-secondary: #3A7BD5;       /* 밝은 블루 (보조 포인트) */
+
+    /*  배경  */
+    --color-bg: #F6F8FB;              /* 전체 페이지 배경 */
+    --color-surface: #FFFFFF;         /* 카드, 패널 등 표면 색상 */
+    --color-white: #FFFFFF;
+
+    /*  텍스트 및 테두리 */
+    --color-text-main: #1F2937;       /* 메인 본문색 */
+    --color-text-sub: #6B7280;        /* 보조/설명 텍스트색 */
+    --color-border: #E5E7EB;          /* 경계선 색상 */
+
+    /* 갭 */
+    --gap-size1: 10px;
+    --gap-size2: 20px;
+
+    /* 버튼 height */
+    --btn-height-sm: 28px;
+    --btn-height-md: 32px;
+    --btn-height-lg: 36px;
+
+    /* 버튼 padding */
+    --btn-padding-x-sm: 8px;
+    --btn-padding-x-md: 12px;
+    --btn-padding-x-lg: 16px;
+
 }
 
 * {
@@ -22,165 +54,126 @@
     margin: 0;
     padding: 0;
 }
-
 html {
-    font-size: 62.5%; /* 1rem = 10px */
+    font-size: 62.5%;
     scroll-behavior: smooth;
 }
-
 body {
-    margin: 0 auto;
     font-family: 'Noto Sans KR', sans-serif;
     color: var(--color-text-main);
     background-color: var(--color-bg);
-    /* 페이지 전체 스크롤 허용 */
     overflow-y: auto;
 }
 
-/* =========================================
-   2. Main Layout (Grid 시스템)
-   ========================================= */
+/* =====Main Layout ===== */
 .main-layout {
     width: 100%;
-    /* 최소 높이를 화면 꽉 차게 설정하여 하단 여백 보존 */
     min-height: 100dvh;
     display: grid;
-    /* 사이드바 너비와 헤더 높이를 동일하게 80px로 고정 */
     grid-template-columns: var(--size-sidebar-width) 1fr;
     grid-template-rows: var(--size-header-height) 1fr;
     grid-template-areas:
       "sidebar  header"
       "sidebar  content";
 }
-
 .sidebar { grid-area: sidebar; z-index: 100; }
 .header  { grid-area: header;  z-index: 90; }
-.content {
-    grid-area: content;
-    position: relative;
+.content { grid-area: content; position: relative;
 }
 
-/* =========================================
-   3. Sidebar (사이드바) 수정 버전
-   ========================================= */
+/* =====Sidebar====== */
 .sidebar {
-    width: var(--size-sidebar-width);
-    background-color: var(--color-white);
-    border-right: 1px solid var(--color-border);
-    height: 100vh;
-    position: sticky;
-    top: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
+    height: 100vh;
+    width: var(--size-sidebar-width);
+    background-color: var(--color-white);
+    border-right: 1px solid var(--color-border);
+    position: sticky;
     padding-top: var(--size-header-height);
 }
-
 .sidebar-nav {
-    width: 100%; /* 네비게이션이 사이드바 너비를 꽉 채우도록 */
+    width: 100%;
 }
-
 .sidebar-nav ul {
     list-style: none;
     width: 100%;
 }
-
 .nav-item {
     display: flex;
-    width: 100%; /* 가로 폭 꽉 채우기 */
+    width: 100%;
     cursor: pointer;
     transition: all 0.2s ease;
 }
-
-/* 링크 영역이 칸 전체를 차지하도록 설정 */
 .nav-item a {
-    text-decoration: none;
-    color: #4B5563; /* 기본 글자색 (조금 더 진하게 조정) */
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     width: 100%;
-    padding: 20px 0; /* 상하 여백으로 높이 조절 */
+    padding: 20px 0;
+    text-decoration: none;
+    color:var(--color-text-main);
     transition: all 0.2s;
 }
-
-/* 아이콘 선명도 수정: 기본 투명도를 없애서 굵게 보이게 함 */
 .side-icon img {
-    width: 26px; /* 크기 미세 조정 가능 */
+    width: 26px;
     height: 26px;
-    opacity: 1; /* 투명도 제거하여 원래 굵기 유지 */
+    opacity: 1;
     transition: transform 0.2s;
 }
-
 .side-text {
-    font-size: 11px;
+    font-size:var(--font-size-12);
     font-weight: 600;
     margin-top: 8px;
 }
-
-/* [호버 효과] 칸 전체 배경색 + 아이콘/글자 강조 */
 .nav-item:hover {
-    background-color: #F3F4F6; /* 칸 전체 배경색 변경 */
+    background-color:var(--color-primary-light);
 }
-
 .nav-item:hover a,
 .nav-item.active a {
-    color: var(--color-primary); /* 호버 시 글자색 강조 */
-}
-
-.nav-item:hover .side-icon img {
-    transform: scale(1.1); /* 호버 시 아이콘 살짝 커지는 효과 (선택사항) */
-    filter: brightness(0.5); /* 아이콘을 더 검게 강조 (색상에 따라 조절) */
-}
-
-/* 활성화 상태일 때 왼쪽 선 표시 (포인트 효과) */
-.nav-item.active {
+    color: var(--color-primary);
     border-left: 3px solid var(--color-primary);
-    background-color: #EBF5FF;
+}
+.nav-item:hover .side-icon img {
+    transform: scale(1.1);
+    filter: brightness(0.5);
 }
 
-/* =========================================
-   4. Header (헤더)
-   ========================================= */
+/* =====Header====== */
 .header {
     background-color: var(--color-white);
     border-bottom: 1px solid var(--color-border);
-    /* 상단 고정을 원할 경우 아래 주석 해제 */
-    /* position: sticky; top: 0; z-index: 110; */
+    position: sticky;
+    top: 0;
 }
-
 .header-container {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 0 30px;
-    height: 100%; /* grid-template-rows에서 설정한 80px을 그대로 채움 */
+    height: 100%;
 }
-
 .header-logo img {
-    height: 40px; /* 80px 헤더 내에서 여유 있게 조정 */
+    height: 55px;
     width: auto;
     object-fit: contain;
 }
-
 .header-profile {
     display: flex;
     align-items: center;
     gap: 15px;
 }
-
+.profile-name {
+    font-size: var(--font-size-16);
+    font-weight: 600;
+}
 .profile-info {
     display: flex;
     align-items: center;
     gap: 10px;
 }
-
-.profile-name {
-    font-size: 14px;
-    font-weight: 600;
-}
-
 .profile-img-wrapper {
     width: 36px;
     height: 36px;
@@ -189,28 +182,28 @@ body {
     border: 1px solid var(--color-border);
     background-color: #f0f0f0;
 }
-
-.profile { width: 100%; height: 100%; object-fit: cover; }
-
+.profile { width: 100%;
+           height: 100%;
+           object-fit: cover;
+}
 .logout-btn {
     cursor: pointer;
     background: transparent;
     border: 1px solid var(--color-border);
     border-radius: 4px;
     font-size: 12px;
-    padding: 6px 12px;
+    padding: 8px 12px;
     color: var(--color-text-sub);
     transition: all 0.2s;
 }
-
 .logout-btn:hover {
     background: #f3f4f6;
     color: var(--color-text-main);
 }
 
-/* =========================================
-   5. Toast Notification
-   ========================================= */
+
+
+/* ====== Toast Notification======= */
 .chat-toast {
     position: fixed !important;
     top: 20px !important;

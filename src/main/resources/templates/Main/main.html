@@ -6,23 +6,24 @@
 <head>
     <title th:text="${pageTitle}"> 메인 </title>
 
-    <!-- 페이지 전용 CSS -->
+    <!-- CSS -->
     <th:block layout:fragment="head">
         <link rel="stylesheet" th:href="@{/css/main.css}">
         <link rel="stylesheet" th:href="@{/css/attendanceLeft.css}">
-        <link rel="stylesheet" th:href="@{/css/main-kanban.css}">
-        <link rel="stylesheet" th:href="@{/css/main-board.css}">
 
+        <!-- 칸반 -->
+        <link rel="stylesheet" th:href="@{/css/main-kanban.css}">
+        <!-- 게시판  -->
+        <link rel="stylesheet" th:href="@{/css/main-board.css}">
         <!-- 미니캘린더 -->
         <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet"/>
         <link rel="stylesheet" th:href="@{/css/mini-calendar.css}">
-
         <!-- 회의실 -->
         <link rel="stylesheet" th:href="@{/css/meetingroom.css}">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-
     </th:block>
-    <!-- 로그인 정보 JS 주입 -->
+
+    <!-- 로그인 정보 JS -->
     <script th:inline="javascript">
         window.LOGIN_USER_ID = /*[[${session.user != null ? session.user.userId : null}]]*/ null;
         window.IS_ADMIN = /*[[${session.admin != null}]]*/ false;
@@ -30,26 +31,20 @@
 </head>
 
 <body>
-
 <div layout:fragment="content" class = "pageMain">
 
     <div class="mainPage">
 
-        <!-- 왼쪽 -->
+        <!-- Left -->
         <section class = "leftPage">
 
-            <!-- 오늘 날짜 -->
-            <div class = "toDay" id="todayStart"
-                 th:text="${today != null ? today : '날짜'}"> 날짜 </div>
-
-            <!-- 프로필 -->
+            <!-- Left profile-card -->
             <div class = "profile-card">
 
                 <div class="profileImg">
                     <img th:if="${session.user.userProfileImage != null}"
                          th:src="${session.user.userProfileImage}"
                          alt="프로필 이미지">
-
                     <img th:unless="${session.user.userProfileImage != null}"
                          th:src="@{/images/default-profile.svg}"
                          alt="기본프로필"
@@ -68,12 +63,7 @@
 
             </div>
 
-            <!-- 출 퇴근 -->
-            <div class = "attendWidget">
-                <section th:replace="~{Attendance/attendanceLeft :: attendanceLeft}"></section>
-            </div>
-
-            <!-- 결제 -->
+            <!-- Left main-kpi-approval -->
             <div class="main-kpi-approval">
                 <a class="kpi" th:href="@{/approval/inbox/waiting}">
                     <span class="kpi-num" th:text="${counts.approverTodoCount}">0</span>  <!-- 여기 -->
@@ -105,11 +95,30 @@
                     <span class="kpi-label">반려</span>
                 </a>
             </div>
+
+            <!-- Left attendWidget -->
+            <div class = "attendWidget">
+                <section th:replace="~{Attendance/attendanceLeft :: attendanceLeft}"></section>
+            </div>
+
+            <!-- Left mini-calendar -->
+            <div class="mini-calendar">
+                <div id="miniCalendar" class="mini-calendar-wrapper"></div>
+                <div id="miniCalendarTooltip"></div>
+            </div>
+
+
         </section>
 
-        <!-- 오른쪽-->
+        <!-- right-->
         <section class = "rightPage">
-            <!--게시판           -->
+
+            <!-- mini-kanban -->
+            <div class="mini-kanban">
+                <div th:replace="~{Main/main-kanban :: miniKanban}"></div>
+            </div>
+
+            <!--main-borad-->
             <div class="main-borad">
                 <div class="mini-borad">
                     <div class="mb-header">
@@ -160,18 +169,7 @@
                 </div>
             </div>
 
-            <!-- 미니캘린더 -->
-            <div class="mini-calendar">
-                <div id="miniCalendar" class="mini-calendar-wrapper"></div>
-                <div id="miniCalendarTooltip"></div>
-            </div>
-
-
-            <div class="mini-kanban">
-                <div th:replace="~{Main/main-kanban :: miniKanban}"></div>
-            </div>
-
-            <!-- 회의실 -->
+            <!-- mini-meetingroom -->
             <div class="mini-meetingroom">
 
                 <input type="hidden" id="currentUserId" th:value="${user.userId}">
@@ -191,6 +189,7 @@
                 <div id="meeting-room-list" class="room-list-container">
                 </div>
             </div>
+
         </section>
     </div>
 
@@ -222,7 +221,6 @@
             </form>
         </div>
     </div>
-
 
 </div>
 <th:block layout:fragment="script">
