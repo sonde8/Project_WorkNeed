@@ -50,4 +50,23 @@ public class S3StorageService implements StorageService {
             throw new RuntimeException("S3 업로드 실패", e);
         }
     }
+
+    @Override
+    public void delete(String fileUrl) {
+        if (fileUrl == null || fileUrl.isEmpty()) return;
+
+        try {
+            // 1. 전체 URL에서 S3의 Key(경로+파일명)만 추출합니다.
+            // 예: https://버킷명.s3.region.amazonaws.com/tasks/uuid_file.txt
+            // -> "tasks/uuid_file.txt"만 남깁니다.
+            String key = fileUrl.substring(fileUrl.lastIndexOf(".com/") + 5);
+
+            // 2. S3 버킷에서 해당 키를 가진 객체 삭제
+            amazonS3.deleteObject(bucket, key);
+
+        } catch (Exception e) {
+            // 삭제 실패 시 로그를 남기거나 예외 처리를 합니다.
+            System.err.println("S3 파일 삭제 중 오류 발생: " + e.getMessage());
+        }
+    }
 }

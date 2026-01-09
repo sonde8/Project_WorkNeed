@@ -52,7 +52,7 @@
 
                     <ul class="line-list">
                         <li th:each="l : ${lines}" class="line-item">
-                            <span class="ord"><b th:text="${l.orderNum}"></b>차</span>
+                            <span class="ord"><b th:text="${l.orderNum}"></b></span>
                             <span class="name" th:text="${l.username}"></span>
                             <span class="status"
                                   th:classappend="' st-' + ${#strings.toLowerCase(l.status.name())}"
@@ -107,7 +107,7 @@
                             <span class="value badge strong"
                                   th:classappend="' st-' + ${#strings.toLowerCase(doc.status.name())}"
                                   th:text="${doc.status}">
-                DRAFT
+
               </span>
                         </div>
 
@@ -147,14 +147,22 @@
                         <p class="meta">첨부된 파일 목록</p>
                     </div>
 
-                    <ul class="file-list">
-                        <li th:each="f : ${files}">
+                    <ul class="app-file-list">
+                        <li th:each="f : ${files}" class="app-file-item">
+
                             <a th:href="@{/approval/file/{id}/download(id=${f.fileId})}"
-                               th:text="${f.originalName}">
-                            </a>
+                               th:text="${f.originalName}"
+                               class="app-file-link">파일명.pdf</a>
+
+                            <form th:if="${isWriter}"
+                                  th:action="@{/approval/file/{id}/delete(id=${f.fileId})}"
+                                  method="post"
+                                  onsubmit="return confirm('파일을 삭제하시겠습니까?');">
+                                <button type="submit" class="app-btn-delete">삭제</button>
+                            </form>
                         </li>
 
-                        <li th:if="${#lists.isEmpty(files)}" class="empty">
+                        <li th:if="${#lists.isEmpty(files)}" class="app-file-empty">
                             첨부 파일이 없습니다.
                         </li>
                     </ul>

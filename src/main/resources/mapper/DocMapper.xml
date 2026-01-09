@@ -304,7 +304,7 @@
         file_id       AS fileId,
         doc_id AS docId,
         original_name AS originalName,
-        saved_name   AS saveName,
+        saved_name   AS savedName,
         content_type  AS contentType,
         file_size     AS fileSize,
         created_at    AS createdAt
@@ -318,7 +318,7 @@
         file_id       AS fileId,
         doc_id        AS docId,
         original_name AS originalName,
-        saved_name   AS saveName,
+        saved_name   AS savedName,
         content_type  AS contentType,
         file_size     AS fileSize,
         created_at    AS createdAt
