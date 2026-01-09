@@ -131,5 +131,43 @@ th { background-color: #f8f9fa; font-weight: bold; }
     transition: background-color 0.15s ease, box-shadow 0.15s ease;
 }
 
+/* 비밀번호 아이콘 위치 조정 */
+#togglePw {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #718096;
+    font-size: 16px;
+    z-index: 10; /* 입력창보다 위에 오도록 */
+}
 
 
+
+/* 부서 컬럼 부분 */
+.dept-cell {
+    color: #2c5282;
+    font-weight: 500;
+}
+
+/* 요청 내용 셀 너비 제한 (데이터가 길어질 경우 대비) */
+.payload-cell {
+    max-width: 250px;
+    word-break: break-all;
+    font-size: 0.9em;
+}
+
+/* 버튼 그룹 간격 */
+.btn-group {
+    display: flex;
+    gap: 5px;
+}
+
+.btn-group button {
+    padding: 5px 10px;
+    font-size: 12px;
+    cursor: pointer;
+    border-radius: 4px;
+    border: none;
+}

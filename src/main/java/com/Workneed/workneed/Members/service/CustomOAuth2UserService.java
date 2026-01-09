@@ -12,6 +12,7 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.security.oauth2.core.OAuth2Error;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -26,28 +27,28 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     @Transactional
     public OAuth2User process(Map<String, Object> attributes) {
-
         String email = (String) attributes.get("email");
         String googleId = (String) attributes.get("sub");
-        String pic = (String) attributes.get("picture"); // 구글 프로필 이미지 URL
+        String pic = (String) attributes.get("picture");
 
-        // 2. 소셜 연동 테이블 조회
+        // 1. 소셜 계정 존재 여부 확인
         SocialAccountDTO socialAccount = socialAccountMapper.findBySocialAccount("google", googleId);
-        UserDTO userDto;
+        UserDTO userDto = null;
 
         if (socialAccount != null) {
-            // [이미 연동됨] 기존 정보를 통해 유저 로드
+            // [이미 연동된 경우] DB에서 사원 정보를 불러옴
             userDto = userMapper.findById(socialAccount.getUserId());
+            log.info("기존 소셜 계정 로그인: {}", email);
         } else {
-            // [처음 연동함] 이메일로 우리 사원인지 확인
+            // [최초 연동인 경우] 이메일로 사원 정보 먼저 찾기
             userDto = userMapper.findByEmail(email);
 
             if (userDto == null) {
                 log.error("사원 정보 없음: {}", email);
-                throw new OAuth2AuthenticationException("등록된 사원 정보가 없습니다. 관리자에게 문의하세요.");
+                throw new OAuth2AuthenticationException(new OAuth2Error("no_user"), "등록된 사원 정보가 없습니다.");
             }
 
-            // [최초 연동 기록] SocialAccount 테이블에 저장
+            // 여기서 연동 정보를 딱 한 번만 저장!
             SocialAccountDTO newSocial = SocialAccountDTO.builder()
                     .userId(userDto.getUserId())
                     .socialProvider("google")
@@ -57,8 +58,19 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                     .build();
 
             socialAccountMapper.insertSocialAccount(newSocial);
-            log.info("최초 소셜 연동 성공: {}", email);
+            log.info("새로운 소셜 연동 성공: {}", email);
         }
+
+        // 2. 계정 상태 체크 (차단 검문소)
+        if (!"ACTIVE".equals(userDto.getUserStatus())) {
+            String reason = "inactive";
+            if ("INACTIVE".equals(userDto.getUserStatus())) reason = "pending";
+            else if ("SUSPENDED".equals(userDto.getUserStatus())) reason = "suspended";
+            else if ("BANNED".equals(userDto.getUserStatus())) reason = "banned";
+
+            throw new OAuth2AuthenticationException(new OAuth2Error("login_failed", reason, null));
+        }
+
 
         // 3. 프로필 이미지 업데이트 (기본 이미지 정책 적용)
         // 현재 DB에 저장된 이미지 경로를 가져옵니다.

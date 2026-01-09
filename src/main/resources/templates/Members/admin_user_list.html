@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>관리자 - 직원관리 </title>
     <link rel="stylesheet" th:href="@{/css/admin_user_list.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 
@@ -28,7 +29,7 @@
         <form th:action="@{/admin/member/list}" method="get">
             <div class="flex-container">
                 <div>
-                    <strong>🔍 검색:</strong>
+                    <strong> 검색:</strong>
                     <input type="text" name="userLoginId" th:value="${param.userLoginId}" placeholder="아이디"
                            style="padding:6px;">
                     <input type="text" name="userName" th:value="${param.userName}" placeholder="이름"
@@ -194,7 +195,7 @@
 
 <div id="adminAddModal" class="modal">
     <div class="modal-content">
-        <h3 style="margin-top:0;">👤 신규 관리자 생성</h3>
+        <h3 style="margin-top:0;"> 신규 관리자 생성</h3>
         <div style="text-align:left;">
             <label>이름</label>
             <input type="text" id="newAdminName"
@@ -203,11 +204,13 @@
             <input type="email" id="newAdminEmail"
                    style="width:100%; padding:8px; margin-bottom:10px; box-sizing:border-box;">
             <label>비밀번호</label>
+            <label>비밀번호</label>
             <div style="position:relative; margin-bottom:5px;">
                 <input type="password" id="newAdminPassword" placeholder="8자리 이상, 특수문자 포함"
                        style="width:100%; padding:8px; padding-right:40px; box-sizing:border-box;">
-                <span id="togglePw" onclick="togglePasswordVisibility()"
-                      style="position:absolute; right:10px; top:50%; transform:translateY(-50%); cursor:pointer; font-size:18px;">👁️</span>
+
+                <i class="fa-solid fa-eye" id="togglePw" onclick="togglePasswordVisibility()"
+                   style="position:absolute; right:12px; top:50%; transform:translateY(-50%); cursor:pointer; color: #718096; font-size: 16px;"></i>
             </div>
             <p id="pwGuide" style="font-size:11px; color:#666; margin-bottom:15px;">* 8자 이상, 영문/숫자/특수문자(@제외) 포함</p>
             <label>관리자 권한 설정</label>

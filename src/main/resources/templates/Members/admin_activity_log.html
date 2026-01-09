@@ -30,28 +30,28 @@
         <tr>
             <th style="width: 180px;">발생 시각</th>
             <th style="width: 200px;">수행 관리자(권한)</th>
-            <th style="width: 120px;">작업 구분</th>
-            <th>상세 내용</th>
+            <th style="width: 150px;">작업 구분</th>
+            <th style="width: 100px;">대상 유형</th> <th style="width: 80px;">대상 ID</th>   <th>상세 내용</th>
         </tr>
         </thead>
         <tbody>
         <tr th:if="${#lists.isEmpty(logs)}">
-            <td colspan="4" style="text-align: center; padding: 30px; color: #a0aec0;">기록된 활동 로그가 없습니다.</td>
+            <td colspan="6" style="text-align: center; padding: 30px; color: #a0aec0;">기록된 활동 로그가 없습니다.</td>
         </tr>
         <tr th:each="log : ${logs}">
-            <td th:text="${#temporals.format(log.logCreatedAt, 'yyyy-MM-dd HH:mm:ss')}" style="color: #4a5568;">
-                2026-01-05 14:00:00
-            </td>
+            <td th:text="${#temporals.format(log.logCreatedAt, 'yyyy-MM-dd HH:mm:ss')}" style="color: #4a5568;"></td>
             <td>
                 <b th:text="${log.adminName}">관리자명</b>
-                <span class="role-tag" th:text="${log.roleName}">SUPER_ADMIN</span>
+                <span class="role-tag" th:text="${log.roleName}">권한</span>
             </td>
             <td>
-                <span class="action-badge">
-                    <b th:text="${log.logActionType}">UPDATE</b>
-                </span>
+                <span class="action-badge" th:text="${log.logActionType}">ACTION</span>
             </td>
-            <td th:text="${log.logDescription}" style="line-height: 1.5;">상세 내용이 여기에 표시됩니다.</td>
+            <td>
+                <span class="target-type-tag" th:text="${log.logTargetType}">-</span>
+            </td>
+            <td th:text="${log.logTargetId != null ? log.logTargetId : '-'}"></td>
+            <td th:text="${log.logDescription}" style="line-height: 1.5;"></td>
         </tr>
         </tbody>
     </table>

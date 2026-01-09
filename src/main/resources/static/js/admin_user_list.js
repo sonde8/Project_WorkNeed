@@ -160,72 +160,108 @@ function fnDeleteRank(rankId) {
 /* =========================
    관리자 생성
 ========================= */
-function togglePasswordVisibility() {
-    const pw = document.getElementById('newAdminPassword');
-    const icon = document.getElementById('togglePw');
-
-    if (pw.type === 'password') {
-        pw.type = 'text';
-        icon.innerText = '🔒';
-    } else {
-        pw.type = 'password';
-        icon.innerText = '👁️';
-    }
-}
-
 function saveNewAdmin() {
-    const data = {
-        adminName: document.getElementById('newAdminName').value,
-        adminEmail: document.getElementById('newAdminEmail').value,
-        adminPassword: document.getElementById('newAdminPassword').value,
-        roleId: document.getElementById('newAdminRoleId').value
-    };
+    const adminName = document.getElementById('newAdminName').value.trim();
+    const adminEmail = document.getElementById('newAdminEmail').value.trim();
+    const adminPassword = document.getElementById('newAdminPassword').value;
+    const roleId = document.getElementById('newAdminRoleId').value;
 
-    if (!data.adminName || !data.adminEmail || !data.adminPassword || !data.roleId) {
+    // 정규식 선언
+    const pwRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // 이메일 정규식 추가
+
+    // 2. 검증
+    if (!adminName || !adminEmail || !adminPassword || !roleId) {
         alert("모든 정보를 입력해주세요.");
         return;
     }
 
-    fetch('/admin/member/add-admin', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-    })
-    .then(res => res.text())
-    .then(result => {
-        if (result === "success") {
-            alert("관리자 생성 완료");
-            location.reload();
-        } else {
-            alert("관리자 생성 실패");
-        }
-    });
-}
+    if (!pwRegex.test(adminPassword)) {
+        alert("비밀번호는 영문, 숫자, 특수문자를 포함하여 8자 이상 입력해야 합니다.");
+        return;
+    }
 
-/* =========================
-   관리자 상태 변경
-========================= */
-function changeAdminStatus(targetId, currentStatus) {
-    const nextStatus = currentStatus === 'ACTIVE' ? 'SUSPENDED' : 'ACTIVE';
-    const msg = nextStatus === 'SUSPENDED'
-        ? "해당 관리자를 정지하시겠습니까?"
-        : "정지를 해제하시겠습니까?";
+    if (!emailRegex.test(adminEmail)) {
+        alert("올바른 이메일 형식을 입력해주세요.");
+        return;
+    }
 
-    if (!confirm(msg)) return;
+   // 4. 서버 전송
+       const data = {
+           adminName: adminName,
+           adminEmail: adminEmail,
+           adminPassword: adminPassword,
+           roleId: roleId
+       };
 
-    fetch('/admin/manage/status', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({ targetId, status: nextStatus })
-    })
-    .then(res => res.text())
-    .then(result => {
-        if (result === "success") {
-            location.reload();
-        } else if (result === "self_error") {
-            alert("본인 계정은 정지할 수 없습니다.");
-        } else {
-            alert("오류가 발생했습니다.");
-        }
-    });
-}
+       fetch('/admin/member/add-admin', {
+           method: 'POST',
+           headers: { 'Content-Type': 'application/json' },
+           body: JSON.stringify(data)
+       })
+       .then(res => res.text())
+       .then(result => {
+           if (result === "success") {
+               alert("관리자 생성 완료");
+               location.reload();
+           } else {
+               alert("생성 실패: " + result);
+           }
+       })
+       .catch(err => {
+           console.error("Error:", err);
+           alert("서버 통신 중 오류가 발생했습니다.");
+       });
+   }
+
+   //비밀번호 눈모양
+   function togglePasswordVisibility() {
+       const pw = document.getElementById('newAdminPassword');
+       const icon = document.getElementById('togglePw');
+
+       if (pw.type === 'password') {
+           pw.type = 'text';
+           // 눈 감은 모양으로 변경
+           icon.classList.remove('fa-eye');
+           icon.classList.add('fa-eye-slash');
+       } else {
+           pw.type = 'password';
+           // 눈 뜬 모양으로 변경
+           icon.classList.remove('fa-eye-slash');
+           icon.classList.add('fa-eye');
+       }
+   }
+
+   /* =========================
+      관리자 상태 변경
+   ========================= */
+   function changeAdminStatus(targetId, currentStatus) {
+       const nextStatus = currentStatus === 'ACTIVE' ? 'SUSPENDED' : 'ACTIVE';
+       const msg = nextStatus === 'SUSPENDED'
+           ? "해당 관리자를 정지하시겠습니까?"
+           : "정지를 해제하시겠습니까?";
+
+       if (!confirm(msg)) return;
+
+       fetch('/admin/manage/status', {
+           method: 'POST',
+           headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+           body: new URLSearchParams({ targetId, status: nextStatus })
+       })
+       .then(res => res.text())
+       .then(result => {
+           if (result === "success") {
+               location.reload();
+           } else if (result === "self_error") {
+               alert("본인 계정은 정지할 수 없습니다.");
+           } else {
+               alert("오류가 발생했습니다.");
+           }
+       });
+   }
+
+
+
+
+
+

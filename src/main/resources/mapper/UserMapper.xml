@@ -37,11 +37,15 @@
         WHERE u.user_login_id = #{loginId}
     </select>
 
-    <select id="findById" parameterType="long" resultType="com.Workneed.workneed.Members.dto.UserDTO">
+    <select id="findById" resultType="com.Workneed.workneed.Members.dto.UserDTO">
         SELECT
-        <include refid="allColumns"/>
-        FROM user
-        WHERE user_id = #{userId}
+        u.*,
+        d.dept_name AS deptname,
+        r.rank_name AS rankname
+        FROM user u
+        LEFT JOIN dept d ON u.dept_id = d.dept_id
+        LEFT JOIN ranks r ON u.rank_id = r.rank_id
+        WHERE u.user_id = #{userId}
     </select>
 
     <select id="findByEmail" resultType="com.Workneed.workneed.Members.dto.UserDTO">
