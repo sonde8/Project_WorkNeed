@@ -72,6 +72,7 @@ public class AdminUserController {
             );
             return "success";
         } catch (Exception e) {
+            e.printStackTrace();
             return "fail";
         }
     }

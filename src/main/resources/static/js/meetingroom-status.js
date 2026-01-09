@@ -195,3 +195,43 @@ function addMinutesStr(timeStr, addMins) {
     const nm = String(total % 60).padStart(2, "0");
     return `${nh}:${nm}`;
 }
+
+// 모달 닫기 로직
+document.addEventListener("DOMContentLoaded", () => {
+    const reservationModal = document.getElementById("reservationModal");
+
+    // 1. 모달 닫기 함수 정의
+    function closeReservationModal() {
+        if (reservationModal) {
+            // 현재 class="modal hidden" 구조를 사용 중이므로 hidden 클래스 추가
+            reservationModal.classList.add("hidden");
+
+            // 만약 CSS로 display를 조절한다면 아래 코드도 병행
+            // reservationModal.style.display = "none";
+        }
+    }
+
+    // 2. 모달 바깥 배경 클릭 시 닫기
+    window.addEventListener("click", (e) => {
+        // 클릭한 대상(e.target)이 모달 컨텐츠가 아닌 '바깥 배경(reservationModal)'일 때만 닫기
+        if (e.target === reservationModal) {
+            closeReservationModal();
+        }
+    });
+
+    // 3. ESC 키 클릭 시 닫기
+    window.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") {
+            // 모달이 현재 보이는 상태인지 확인 후 닫기
+            if (!reservationModal.classList.contains("hidden")) {
+                closeReservationModal();
+            }
+        }
+    });
+
+    // (참고) 기존 취소 버튼도 이 함수를 사용하도록 연결 (이미 되어있을 수 있음)
+    const closeBtn = document.getElementById("closeModalBtn");
+    if (closeBtn) {
+        closeBtn.addEventListener("click", closeReservationModal);
+    }
+});

@@ -6,6 +6,8 @@ import com.Workneed.workneed.Approval.dto.*;
 import com.Workneed.workneed.Approval.entity.ApprovalDoc;
 import com.Workneed.workneed.Approval.entity.User;
 import com.Workneed.workneed.Approval.mapper.DocMapper;
+import com.Workneed.workneed.Chat.service.S3StorageService;
+import com.Workneed.workneed.Chat.service.StorageService;
 import com.Workneed.workneed.Members.dto.UserDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -22,13 +24,13 @@ import java.util.stream.Collectors;
 public class ApprovalService {
 
     private final DocMapper mapper;
+    // s3 업로드를 위한 주입
+    private final StorageService storageService;
 
-    // ✅ application.properties 값 주입
-    @Value("${file.upload-dir}")
-    private String uploadDir;
 
-    public ApprovalService(DocMapper mapper) {
+    public ApprovalService(DocMapper mapper, StorageService storageService) {
         this.mapper = mapper;
+        this.storageService = storageService;
     }
 
 
@@ -108,7 +110,7 @@ public class ApprovalService {
                             .distinct()
                             .map(String::valueOf)
                             .collect(Collectors.joining(","))
-                    +"," ;
+                            +"," ;
             mapper.updateRefUserIds(docId, refUserIds);
         }
 
@@ -121,45 +123,34 @@ public class ApprovalService {
 
 
     /* ===============================
-       파일: 저장/조회
+       파일:S3저장/ DB 메타 저장
        =============================== */
-
     public void saveFile(Long docId, List<MultipartFile> files) throws Exception {
-
-        // 업로드 디렉토리 생성
-        File dir = new File(uploadDir);
-        if (!dir.exists()) {
-            dir.mkdirs();
-        }
+        if (files == null || files.isEmpty()) return;
 
         for (MultipartFile file : files) {
             if (file == null || file.isEmpty()) continue;
 
-            // 원본 파일명
-            String original = file.getOriginalFilename();
-            if (original == null || original.isBlank()) {
-                original = "file";
+            // 1. S3 업로드 (폴더명 'task'로 저장)
+            // S3StorageService.store는 업로드 후 생성된 전체 URL(https://...)을 반환합니다.
+            String s3Url = storageService.store(file, "task");
+
+            // 2. 원본 파일명 추출 및 방어 로직
+            String originalName = file.getOriginalFilename();
+            if (originalName == null || originalName.isBlank()) {
+                originalName = "unnamed_file";
             }
 
-            // 경로 문자 방어
-            original = original.replaceAll("[\\\\/]", "_");
-
-            // 저장 파일명 (덮어쓰기 방지)
-            String savedName =
-                    docId + "_" + System.currentTimeMillis() + "_" + original;
-
-            // 1️⃣ 디스크 저장
-            file.transferTo(new File(dir, savedName));
-
-            // 2️⃣ DB 메타 저장
+            // 3. DB 메타 데이터 저장 (savedName 필드에 긴 S3 URL 저장 가능)
             DocFileDTO dto = new DocFileDTO();
             dto.setDocId(docId);
-            dto.setOriginalName(original);
-            dto.setSavedName(savedName);
+            dto.setOriginalName(originalName); // 화면에 표시될 원본명
+            dto.setSavedName(s3Url);           // S3 전체 접근 경로 (DB TEXT 타입)
 
             mapper.insertFile(dto);
         }
     }
+
 
     /**
      * 문서 기준 파일 목록 조회
@@ -268,7 +259,7 @@ public class ApprovalService {
         );
 
         // 기안자
-       // dto.setDrafterAllCount(
+        // dto.setDrafterAllCount(
         //        mapper.countMyAll(userId)
         //);
         dto.setDrafterDraftCount(

@@ -57,9 +57,7 @@ public class ChatRoomController {
     public String joinRoom(@PathVariable Long roomId, @RequestParam(value="userId", required=false) Long tempId, // URL 파라미터 추가
                            Model model, HttpSession session) {
 
-        // 테스트를 위해 하드코딩 했던 1L 지우고 만든 세션에서 정보를 가져오는 코드
         UserDTO user = (UserDTO) session.getAttribute("user");
-        System.out.println("실제 세션에서 꺼낸 ID: " + user.getUserId());
 
         // null 체크
         if (user == null) {
