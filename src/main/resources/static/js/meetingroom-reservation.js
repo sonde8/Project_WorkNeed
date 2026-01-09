@@ -17,11 +17,10 @@ function bindEvents() {
     document.getElementById("reservationForm")
         .addEventListener("submit", submitReservation);
 
-    // [수정] 모든 주요 입력값이 바뀔 때 버튼 상태를 즉시 리셋하고 새로 체크합니다.
     const scheduleSelect = document.getElementById("scheduleSelect");
     if (scheduleSelect) {
         scheduleSelect.addEventListener("change", () => {
-            resetSubmitButton(); // 버튼 즉시 비활성화
+            resetSubmitButton();
             handleScheduleChange();
         });
     }
@@ -35,9 +34,6 @@ function bindEvents() {
     }
 }
 
-/**
- * [추가] 체크 결과가 나오기 전까지 버튼을 안전하게 막아두는 함수
- */
 function resetSubmitButton() {
     const submitBtn = document.querySelector('#reservationForm button[type="submit"]');
     if (submitBtn) {
@@ -91,11 +87,11 @@ function checkTimeOverlap() {
     const scheduleId = document.getElementById("scheduleSelect").value;
     const submitBtn = document.querySelector('#reservationForm button[type="submit"]');
 
-    // 필수 값이 하나라도 없으면 버튼을 비활성화 상태로 유지
-    if (!roomId || !dateVal || !startTime || !endTime) {
+    if (!roomId || !dateVal || !startTime || !endTime || startTime >= endTime) {
         if (submitBtn) {
             submitBtn.disabled = true;
-            submitBtn.innerText = "시간 선택 필요";
+            submitBtn.innerText = (startTime && endTime && startTime >= endTime)
+                ? "시간 오류" : "시간 선택 필요";
             submitBtn.style.backgroundColor = "#eee";
         }
         return;
@@ -159,54 +155,99 @@ function checkTimeOverlap() {
 }
 
 /* ======================
-   시간 제한 계산
+   시간 제한 계산 및 자동 보정 (업무 선택 시)
 ====================== */
 function updateTimeLimitsByDate(schStart, schEnd, selectedDate) {
     const getLocalDateStr = (d) => {
         return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
     };
 
+    const now = new Date();
     const selStr = getLocalDateStr(selectedDate);
     const startStr = getLocalDateStr(schStart);
     const endStr = getLocalDateStr(schEnd);
+    const todayStr = getLocalDateStr(now);
 
+    // [핵심] 기본 예약 시작은 09:00, 종료는 최소 09:30 (09:00 종료 불가)
     let finalMin = new Date(selectedDate).setHours(9, 0, 0, 0);
     let finalMax = new Date(selectedDate).setHours(18, 0, 0, 0);
 
+    // 업무 시작일에 따른 제한
     if (selStr === startStr) {
         const adjustedStart = roundUpTo30Min(new Date(schStart)).getTime();
         finalMin = Math.max(finalMin, adjustedStart);
     }
 
+    // 업무 종료일에 따른 제한
     if (selStr === endStr) {
         const adjustedEnd = roundDownTo30Min(new Date(schEnd)).getTime();
         finalMax = Math.min(finalMax, adjustedEnd);
     }
 
-    if (finalMin >= finalMax || finalMin >= new Date(selectedDate).setHours(18, 0, 0, 0) || finalMax <= new Date(selectedDate).setHours(9, 0, 0, 0)) {
-        alert("선택한 날짜의 업무 시간 내에 회의실 이용 가능 시간(09:00~18:00)이 없습니다.");
-        const datePicker = document.getElementById("reserveDate")._flatpickr;
-        datePicker.clear();
-        startPicker.clear();
-        endPicker.clear();
-        resetSubmitButton();
+    // 오늘 날짜인 경우 현재 시간 이후로 제한
+    if (selStr === todayStr) {
+        const currentLimit = roundUpTo30Min(new Date(now)).getTime();
+        finalMin = Math.max(finalMin, currentLimit);
+    }
+
+    // 날짜 유효성 체크
+    if (new Date(selStr).getTime() < new Date(todayStr).getTime()) {
+        alert("이미 지난 날짜는 예약할 수 없습니다.");
+        document.getElementById("reserveDate")._flatpickr.clear();
+        return;
+    }
+
+    if (finalMin >= finalMax) {
+        alert("해당 날짜는 예약 가능한 시간이 지났거나 업무 종료 시각 이후입니다.");
+        document.getElementById("reserveDate")._flatpickr.clear();
         return;
     }
 
     const minTimeStr = formatTime(new Date(finalMin));
     const maxTimeStr = formatTime(new Date(finalMax));
 
+    // [수정] 종료 시간의 절대 최소값은 09:30으로 강제 (시작이 09:00일 때)
+    let absoluteMinEnd = "09:30";
+    const currentStartVal = document.getElementById("startTime").value;
+
+    // 시작 시간이 선택되어 있다면 그보다 30분 뒤가 최소 종료 시간
+    if (currentStartVal) {
+        const [h, m] = currentStartVal.split(":").map(Number);
+        let total = h * 60 + m + 30;
+        absoluteMinEnd = `${String(Math.floor(total / 60)).padStart(2, "0")}:${String(total % 60).padStart(2, "0")}`;
+    }
+
+    // 피커 제한 설정
     startPicker.set("minTime", minTimeStr);
-    startPicker.set("maxTime", "17:30");
-    endPicker.set("minTime", minTimeStr);
+    startPicker.set("maxTime", formatTime(new Date(new Date(finalMax).getTime() - 30 * 60000)));
+
+    endPicker.set("minTime", absoluteMinEnd); // 종료는 무조건 시작 +30분 또는 09:30부터
     endPicker.set("maxTime", maxTimeStr);
 
-    startPicker.setDate(minTimeStr, true);
-    onStartTimeChange(null, minTimeStr);
+    /* --- 하단 자동 보정 로직 --- */
+
+    // 1. 시작 시각 보정
+    const currentStartTime = document.getElementById("startTime").value;
+    if (!currentStartTime || currentStartTime < minTimeStr || currentStartTime >= maxTimeStr) {
+        startPicker.setDate(minTimeStr, true);
+    }
+
+    // 2. 종료 시각 보정 (무조건 시작 시각보다 30분 뒤로 우선 설정)
+    const updatedStart = document.getElementById("startTime").value;
+    const [uh, um] = updatedStart.split(":").map(Number);
+    let uTotal = uh * 60 + um + 30;
+    const nextEnd = `${String(Math.floor(uTotal / 60)).padStart(2, "0")}:${String(uTotal % 60).padStart(2, "0")}`;
+
+    const currentEndTime = document.getElementById("endTime").value;
+    if (!currentEndTime || currentEndTime <= updatedStart || currentEndTime > maxTimeStr) {
+        endPicker.setDate(nextEnd, true);
+    }
+
+    checkTimeOverlap();
 }
 
 /* ======================
-   업무 선택 시 처리 함수 (수정)
+   업무 선택 시 처리 함수
 ====================== */
 function handleScheduleChange() {
     const scheduleId = document.getElementById("scheduleSelect").value;
@@ -223,30 +264,33 @@ function handleScheduleChange() {
         .then(schedule => {
             const rawStart = new Date(schedule.startAt);
             const rawEnd = new Date(schedule.endAt);
+            const now = new Date();
 
             datePicker.set("minDate", rawStart);
             datePicker.set("maxDate", rawEnd);
 
             let defaultDate = new Date(rawStart);
-            const adjustedStartCheck = roundUpTo30Min(new Date(rawStart));
-            if (adjustedStartCheck.getHours() >= 18) {
-                defaultDate.setDate(defaultDate.getDate() + 1);
-                if (defaultDate > rawEnd) defaultDate = new Date(rawStart);
+            if (defaultDate < now) {
+                defaultDate = new Date(now);
+            }
+
+            if (defaultDate > rawEnd) {
+                alert("해당 업무는 이미 종료되었습니다.");
+                resetReservationForm();
+                return;
             }
 
             datePicker.setDate(defaultDate);
             updateTimeLimitsByDate(rawStart, rawEnd, defaultDate);
 
-            // [추가] 날짜 선택기 설정 시 onChange를 재정의하여 즉각 반응하도록 함
             datePicker.set("onChange", (selectedDates) => {
-                resetSubmitButton(); // 날짜 바뀌자마자 버튼 막기
+                resetSubmitButton();
                 if (selectedDates.length > 0) {
                     updateTimeLimitsByDate(rawStart, rawEnd, selectedDates[0]);
-                    checkTimeOverlap();
                 }
             });
         })
-        .catch(err => console.error(err));
+        .catch(err => console.error("업무 상세 로드 실패:", err));
 }
 
 function resetDateTimePicker() {
@@ -254,12 +298,90 @@ function resetDateTimePicker() {
     if (dateInput) {
         dateInput.set("minDate", "today");
         dateInput.set("maxDate", null);
-        dateInput.set("onChange", checkTimeOverlap);
+        dateInput.set("onChange", function() {
+            resetSubmitButton();
+            checkTimeOverlap();
+        });
     }
-    startPicker.set("minTime", "09:00");
+    updateGeneralTimeLimits(false);
+}
+
+/* ======================
+   업무 미선택 시 기본 제한 (9:30 최소 종료 반영)
+====================== */
+function updateGeneralTimeLimits(isToday) {
+    let minStart = "09:00";
+    if (isToday) {
+        minStart = formatTime(roundUpTo30Min(new Date()));
+    }
+
+    // 시작은 09:00부터 가능하지만
+    startPicker.set("minTime", minStart);
     startPicker.set("maxTime", "17:30");
-    endPicker.set("minTime", "09:30");
+
+    // 종료는 아무리 빨라도 09:30부터 가능 (시작 09:00 + 30분)
+    const [h, m] = minStart.split(":").map(Number);
+    let minEndTotal = Math.max(9 * 60 + 30, h * 60 + m + 30);
+    const minEndStr = `${String(Math.floor(minEndTotal / 60)).padStart(2, "0")}:${String(minEndTotal % 60).padStart(2, "0")}`;
+
+    endPicker.set("minTime", minEndStr);
     endPicker.set("maxTime", "18:00");
+
+    // 초기값 세팅
+    if (!document.getElementById("startTime").value) {
+        startPicker.setDate(minStart, false);
+        endPicker.setDate(minEndStr, false);
+    }
+}
+
+/* ======================
+   시간 연동 핵심 로직 (시작 <-> 종료)
+====================== */
+function onStartTimeChange(selectedDates, timeStr) {
+    if (!timeStr) return;
+    const [h, m] = timeStr.split(":").map(Number);
+    let total = h * 60 + m + 30;
+    const nh = String(Math.floor(total / 60)).padStart(2, "0");
+    const nm = String(total % 60).padStart(2, "0");
+    const minEnd = `${nh}:${nm}`;
+
+    endPicker.set("minTime", minEnd);
+    if (document.getElementById("endTime").value <= timeStr) {
+        endPicker.setDate(minEnd, true);
+    }
+    checkTimeOverlap();
+}
+
+/**
+ * 종료 시간 변경 시 시작 시간을 자동으로 보정 (업무 제한 준수)
+ */
+function onEndTimeChange(selectedDates, timeStr) {
+    if (!timeStr) return;
+
+    const startTimeInput = document.getElementById("startTime");
+    const currentStartTime = startTimeInput.value;
+    const absoluteMinTime = startPicker.config.minTime || "09:00";
+
+    if (currentStartTime && currentStartTime >= timeStr) {
+        const [h, m] = timeStr.split(":").map(Number);
+        let total = h * 60 + m - 30;
+
+        const [minH, minM] = absoluteMinTime.split(":").map(Number);
+        const minTotal = minH * 60 + minM;
+
+        if (total < minTotal) total = minTotal;
+
+        const nh = String(Math.floor(total / 60)).padStart(2, "0");
+        const nm = String(total % 60).padStart(2, "0");
+        const newStart = `${nh}:${nm}`;
+
+        if (newStart < timeStr) {
+            startPicker.setDate(newStart, false);
+        } else {
+            startPicker.setDate(absoluteMinTime, false);
+        }
+    }
+    checkTimeOverlap();
 }
 
 /* ======================
@@ -270,8 +392,15 @@ function initPickers() {
         dateFormat: "Y-m-d",
         minDate: "today",
         defaultDate: new Date(),
-        onChange: () => {
-            resetSubmitButton(); // 날짜 변경 시 즉시 버튼 비활성화
+        onChange: (selectedDates) => {
+            resetSubmitButton();
+            const scheduleId = document.getElementById("scheduleSelect").value;
+            if (!scheduleId) {
+                const now = new Date();
+                const todayStr = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
+                const selStr = flatpickr.formatDate(selectedDates[0], "Y-m-d");
+                updateGeneralTimeLimits(selStr === todayStr);
+            }
             checkTimeOverlap();
         }
     });
@@ -285,7 +414,7 @@ function initPickers() {
         minTime: "09:00",
         maxTime: "17:30",
         onChange: (selectedDates, timeStr) => {
-            resetSubmitButton(); // 시간 변경 시작 시 버튼 비활성화
+            resetSubmitButton();
             onStartTimeChange(selectedDates, timeStr);
         },
         onClose: function(selectedDates, timeStr, instance) {
@@ -303,9 +432,9 @@ function initPickers() {
         minuteIncrement: 30,
         minTime: "09:30",
         maxTime: "18:00",
-        onChange: () => {
+        onChange: (selectedDates, timeStr) => {
             resetSubmitButton();
-            checkTimeOverlap();
+            onEndTimeChange(selectedDates, timeStr);
         },
         onClose: function(selectedDates, timeStr, instance) {
             const date = instance.latestSelectedDateObj;
@@ -315,9 +444,6 @@ function initPickers() {
     });
 }
 
-/* ======================
-   예약 요청 제출 및 기타 (생략 없이 유지)
-====================== */
 function submitReservation(e) {
     e.preventDefault();
     if (isSubmitting) return;
@@ -330,8 +456,8 @@ function submitReservation(e) {
     const startTime = form.startTime.value;
     const endTime = form.endTime.value;
 
-    if(!roomId || !dateVal || !startTime || !endTime || startTime === endTime) {
-        alert("유효한 회의 시간을 선택해주세요.");
+    if (!roomId || !dateVal || !startTime || !endTime || startTime >= endTime) {
+        alert("유효한 시간을 선택해주세요.");
         return;
     }
 
@@ -363,23 +489,8 @@ function submitReservation(e) {
         .catch(err => {
             alert(err.message);
             isSubmitting = false;
-            checkTimeOverlap(); // 실패 시 상태 재점검
+            checkTimeOverlap();
         });
-}
-
-function onStartTimeChange(selectedDates, timeStr) {
-    if (!timeStr) return;
-    const [h, m] = timeStr.split(":").map(Number);
-    let total = h * 60 + m + 30;
-    const nh = String(Math.floor(total / 60)).padStart(2, "0");
-    const nm = String(total % 60).padStart(2, "0");
-    const minEnd = `${nh}:${nm}`;
-
-    endPicker.set("minTime", minEnd);
-    if (document.getElementById("endTime").value <= timeStr) {
-        endPicker.setDate(minEnd, false);
-    }
-    checkTimeOverlap();
 }
 
 function openReservationModal(targetRoomId = null) {
@@ -388,7 +499,11 @@ function openReservationModal(targetRoomId = null) {
     loadScheduleSelect();
     document.getElementById("reservationModal").classList.remove("hidden");
     resetSubmitButton();
-    setTimeout(checkTimeOverlap, 500);
+    setTimeout(() => {
+        const startVal = document.getElementById("startTime").value;
+        if (startVal) onStartTimeChange(null, startVal);
+        checkTimeOverlap();
+    }, 500);
 }
 
 function closeReservationModal() {
@@ -418,13 +533,35 @@ function loadScheduleSelect() {
         .then(schedules => {
             const select = document.getElementById("scheduleSelect");
             select.innerHTML = '<option value="">업무 선택 안 함</option>';
+            const now = new Date();
+
             schedules.forEach(sch => {
                 const opt = document.createElement("option");
                 opt.value = sch.id;
-                opt.textContent = `[${sch.eventType || '업무'}] ${sch.title}`;
+                const isDone = (sch.status === 'DONE');
+                let isExpired = false;
+
+                if (sch.end) {
+                    const endAt = new Date(sch.end);
+                    isExpired = (endAt.getTime() < now.getTime());
+                } else {
+                    isExpired = true;
+                }
+
+                if (isDone || isExpired) {
+                    opt.disabled = true;
+                    opt.style.color = "#bbb";
+                    let reason = isDone ? "완료됨" : "기간 만료";
+                    opt.textContent = `[선택불가] ${sch.title} (${reason})`;
+                } else {
+                    opt.textContent = `[${sch.eventType || '업무'}] ${sch.title}`;
+                    opt.disabled = false;
+                    opt.style.color = "";
+                }
                 select.appendChild(opt);
             });
-        });
+        })
+        .catch(err => console.error("업무 목록 로드 실패:", err));
 }
 
 function resetReservationForm() {

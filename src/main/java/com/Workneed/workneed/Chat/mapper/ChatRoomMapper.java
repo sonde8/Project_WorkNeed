@@ -20,7 +20,8 @@ public interface ChatRoomMapper {
     List<String> getParticipantNamesExceptMe(@Param("roomId") Long roomId, @Param("userId") Long userId);
 
     // 3. room_id로 특정 채팅방 정보 조회
-    ChatRoomDTO findRoomById(Long roomId);
+    // ChatRoomMapper.java 수정
+    ChatRoomDTO findRoomById(@Param("roomId") Long roomId, @Param("userId") Long userId);
 
     // 4. 채팅방 참여자 테이블에 사용자 추가
     void addParticipant(Long roomId, Long userId);

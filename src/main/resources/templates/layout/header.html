@@ -21,6 +21,8 @@
                 </div>
 
                 <div id="profileModal" class="profile-modal-content">
+
+                    <div class="modal-user-name" th:text="${session.user.userName}">사용자명</div>
                     <div class="modal-profile-circle" id="modalImgTrigger" style="cursor:pointer;">
                         <img th:src="${session.user.userProfileImage != null ? session.user.userProfileImage : '/images/default-profile.svg'}"
                              alt="모달 프로필">
@@ -30,8 +32,6 @@
                                    accept="image/*">
                         </form>
                     </div>
-
-                    <div class="modal-user-name" th:text="${session.user.userName}">사용자명</div>
 
                     <div class="modal-action-buttons">
                         <a href="javascript:void(0)" id="changeProfileBtn" class="modal-btn edit-btn">프로필 사진 변경</a>

@@ -1,3 +1,69 @@
+/**
+ * 파일 관리를 위한 전역 변수 및 함수
+ * HTML의 onchange="handleFileSelection(this)"에서 접근할 수 있도록
+ * DOMContentLoaded 이벤트 리스너 밖에 정의합니다.
+ */
+let accumulatedFiles = new DataTransfer();
+
+// 파일을 선택할 때마다 기존 목록 아래에 추가하는 함수
+function handleFileSelection(input) {
+    const container = document.getElementById('fileListContainer');
+    const files = input.files;
+
+    if (files.length > 0) {
+        // 처음 추가 시 안내 문구 삭제
+        const placeholder = container.querySelector('.placeholder');
+        if (placeholder) placeholder.remove();
+
+        // 선택된 파일들을 하나씩 검사하며 쌓기
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+
+            // 1. 실제 전송될 목록(accumulatedFiles)에 추가
+            accumulatedFiles.items.add(file);
+
+            // 2. 화면에 목록 표시 (삭제 버튼 포함)
+            const fileItem = document.createElement('div');
+            fileItem.className = 'selected-file-item';
+            fileItem.style = "display: flex; justify-content: space-between; align-items: center; background: #f8f9fa; padding: 5px 10px; margin-bottom: 5px; border-radius: 4px; border: 1px solid #eee;";
+            fileItem.innerHTML = `
+                <span style="font-size: 0.9rem;">${file.name}</span>
+                <button type="button" onclick="removeFileFromList(this, '${file.name}')" 
+                        style="background:none; border:none; color:red; cursor:pointer; font-size: 1.1rem;">&times;</button>
+            `;
+            container.appendChild(fileItem);
+        }
+
+        // 3. 덮어쓰기 방지의 핵심: input 태그의 파일을 현재까지 쌓인 전체 목록으로 교체
+        input.files = accumulatedFiles.files;
+    }
+}
+
+// 개별 파일 삭제 기능
+function removeFileFromList(btnElement, fileName) {
+    const newFiles = new DataTransfer();
+    const files = accumulatedFiles.files;
+
+    for (let i = 0; i < files.length; i++) {
+        if (files[i].name !== fileName) {
+            newFiles.items.add(files[i]);
+        }
+    }
+
+    accumulatedFiles = newFiles;
+    // input 태그에 반영
+    const fileInput = document.getElementById('fileInput');
+    if (fileInput) fileInput.files = accumulatedFiles.files;
+
+    // 화면에서 제거
+    btnElement.parentElement.remove();
+
+    // 목록이 비었을 때 안내 텍스트 복구
+    if (accumulatedFiles.files.length === 0) {
+        document.getElementById('fileListContainer').innerHTML = '<p class="placeholder" style="color: #999; font-size: 0.9rem;">선택된 파일이 없습니다.</p>';
+    }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
 
     /* ==================================================

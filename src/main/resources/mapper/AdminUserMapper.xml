@@ -112,7 +112,7 @@
                )
     </insert>
 
-    <update id="updateMemberStatus">
+    <update id="updateMemberStatus" >
         UPDATE user
         <set>
             rank_id = #{rankId},

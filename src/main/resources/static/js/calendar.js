@@ -295,9 +295,7 @@
             extendedProps: { raw: dto },
         };
     }
-    /* ================= Daily List Modal Logic (Simple Version) ================= */
-
-    /* ================= Daily List Modal Logic (Time Fix) ================= */
+    /* ================= Daily List Modal Logic ================= */
 
     function openDailyListModal(targetDate) {
         const overlay = document.getElementById("calendarDailyListModalOverlay");
@@ -341,54 +339,51 @@
 
             dailyEvents.forEach(e => {
                 const li = document.createElement("li");
-
                 const emoji = getTypeEmoji(e);
                 const category = getCategoryInfo(e);
 
-                // [수정됨] 시간 표시 로직 (Start ~ End 모두 표시)
                 const sTime = new Date(e.start);
-                const eTime = e.end ? new Date(e.end) : addMinutes(sTime, 30); // 끝 시간 없으면 30분 뒤로
+                const eTime = e.end ? new Date(e.end) : addMinutes(sTime, 30);
 
                 const startStr = `${pad(sTime.getHours())}:${pad(sTime.getMinutes())}`;
                 const endStr = `${pad(eTime.getHours())}:${pad(eTime.getMinutes())}`;
-                const timeRange = `${startStr} ~ ${endStr}`; // 예: 09:00 ~ 10:00
+                const timeRange = `${startStr} ~ ${endStr}`;
 
                 li.innerHTML = `
                 <span style="font-size:1.4rem; margin-right: 8px;">${emoji}</span>
-                
                 <span class="category-badge" style="background-color: ${category.bg}; color: ${category.color};">
                     ${category.text}
                 </span>
                 <div style="flex:1;">
-                    <div style="flex:1;">
-                        <div style="font-weight:bold; font-size:1rem; color:#333; margin-bottom:2px;">${e.title || "(제목 없음)"}</div>
-                        <div style="font-size:0.85rem; color:#666;">${timeRange}</div>
-                    </div>
+                    <div style="font-weight:bold; font-size:1rem; color:#333; margin-bottom:2px;">${e.title || "(제목 없음)"}</div>
+                    <div style="font-size:0.85rem; color:#666;">${timeRange}</div>
+                </div>
                 `;
 
                 li.onclick = () => {
-                    overlay.classList.add("hidden");
+                    // 리스트 아이템 클릭 시 상세 모달로 바로 넘어가므로 포커스 이슈가 적으나,
+                    // 안전을 위해 닫기 로직을 통일합니다.
+                    hideDailyListModal();
                     safeOpenDetailModal(e);
                 };
                 listUl.appendChild(li);
             });
         }
 
+        // [핵심 수정 부분] 모달 닫기 함수
         const hideDailyListModal = () => {
-            // 1. [핵심] 숨기기 전에 포커스를 먼저 모달 밖으로 강제 이동시킵니다.
-            // blur()보다 focus()를 먼저 하는 것이 브라우저가 포커스 위치를 파악하는 데 훨씬 명확합니다.
-            const externalBtn = document.getElementById("openCalendarCreateModal");
-            if (externalBtn) {
-                externalBtn.focus();
-            } else {
-                document.activeElement?.blur();
+            // 1. [먼저 수행] 포커스를 모달 외부의 '일정 등록' 버튼으로 강제 이동
+            // 이렇게 하면 aria-hidden="true"가 붙기 전에 포커스가 숨겨질 영역을 탈출합니다.
+            const externalAddBtn = document.getElementById("openCalendarCreateModal");
+            if (externalAddBtn) {
+                externalAddBtn.focus();
+            } else if (document.activeElement instanceof HTMLElement) {
+                // 외부 버튼을 찾지 못할 경우 최소한 현재 버튼의 포커스를 해제
+                document.activeElement.blur();
             }
 
-            // 2. 브라우저가 포커스 이동을 완전히 인지할 수 있도록 micro-task(setTimeout 0)를 사용하거나,
-            // 순서를 확실히 하여 숨김 처리를 진행합니다.
+            // 2. 그 다음 모달을 숨김 처리
             overlay.classList.add("hidden");
-
-            // 3. 포커스가 이미 밖(externalBtn)으로 나갔으므로, 이제 안전하게 숨김 처리를 할 수 있습니다.
             overlay.setAttribute("aria-hidden", "true");
         };
 
@@ -399,26 +394,28 @@
 
         // 등록 버튼 클릭 시
         addBtn.onclick = () => {
-            hideDailyListModal(); // 모달을 먼저 닫고
             const startAt = new Date(baseDate);
             startAt.setHours(9, 0, 0);
             const endAt = new Date(startAt);
             endAt.setMinutes(30);
 
-            // 등록 모달 열기
+            // 포커스 이슈 해결을 위해 먼저 닫고(포커스 이동시키고) 등록 모달 실행
+            hideDailyListModal();
+
             safeOpenCreateModal({
                 start: toDtoDateTime(startAt),
                 end: toDtoDateTime(endAt)
             });
         };
 
-        // 모달 표시
+        // 모달 표시 시 aria-hidden 해제
         overlay.classList.remove("hidden");
+        overlay.setAttribute("aria-hidden", "false");
 
-        // ESC 키 감지 (익명 함수로 추가)
+        // ESC 키 감지
         const handleEsc = (e) => {
-            if (e.key === "Escape") {
-                hideDailyListModal(); // ESC로 닫을 때도 포커스 해제
+            if (e.key === "Escape" && !overlay.classList.contains("hidden")) {
+                hideDailyListModal();
                 document.removeEventListener("keydown", handleEsc);
             }
         };
@@ -427,7 +424,7 @@
         // 배경(오버레이) 클릭 시 닫기
         overlay.onclick = (e) => {
             if (e.target === overlay) {
-                hideDailyListModal(); // 배경 클릭 시에도 포커스 해제
+                hideDailyListModal();
                 document.removeEventListener("keydown", handleEsc);
             }
         };

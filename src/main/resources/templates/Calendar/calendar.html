@@ -72,7 +72,6 @@
             </section>
         </aside>
 
-
         <section class="calendar-right">
             <div class="calendar-inner">
                 <div id="calendar"></div>
@@ -81,22 +80,18 @@
 
     </div>
 
-    <div class="modal-overlay hidden" id="calendarDailyListModalOverlay" aria-hidden="true" style="z-index: 50;">
+    <div class="modal-overlay hidden" id="calendarDailyListModalOverlay" aria-hidden="true">
         <div class="modal-container" style="max-height: 500px; display: flex; flex-direction: column;">
-
             <div class="modal-header">
                 <h2 id="dailyListTitle"></h2>
                 <button type="button" class="modal-close-btn" id="closeDailyListBtn">✕</button>
             </div>
-
             <div class="modal-body" style="flex: 1; overflow-y: auto;">
-                <ul id="dailyEventList" class="daily-list-simple-ul">
-                </ul>
+                <ul id="dailyEventList" class="daily-list-simple-ul"></ul>
                 <div id="dailyListEmptyMsg" class="hidden" style="text-align: center; color: #999; padding: 20px;">
                     등록된 일정이 없습니다.
                 </div>
             </div>
-
             <div class="modal-footer">
                 <button type="button" class="btn-submit" id="dailyListAddBtn" style="width: 100%;">
                     + 이 날짜에 일정 등록
@@ -106,6 +101,7 @@
     </div>
 
     <div th:replace="~{Calendar/calendar-modal :: calendarCreateModal}"></div>
+
     <div th:replace="~{Calendar/calendar-detail-modal :: calendarDetailModal}"></div>
 
 </main>
@@ -113,12 +109,9 @@
 <th:block layout:fragment="script">
     <script th:inline="javascript">
         const loginUser = /*[[${loginUser}]]*/ null;
-
         window.USER_ID = loginUser ? loginUser.userId : null;
         window.USER_NAME = loginUser ? loginUser.userName : 'Guest';
-
         window.IS_ADMIN = /*[[${session.admin != null}]]*/ false;
-
         window.GOOGLE_CALENDAR_API_KEY = /*[[${googleCalendarApiKey}]]*/ '';
     </script>
 

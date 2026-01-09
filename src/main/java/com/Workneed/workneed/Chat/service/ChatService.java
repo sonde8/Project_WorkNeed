@@ -97,7 +97,7 @@ public class ChatService {
     // 1-3. 특정 채팅방 상세 정보 조회
     // 방 ID로 상세 정보 조회, 이름이 없는 경우 자동 생성 로직
     public ChatRoomDTO getRoomDetail(Long roomId, Long userId) {
-        ChatRoomDTO room = chatRoomMapper.findRoomById(roomId);
+        ChatRoomDTO room = chatRoomMapper.findRoomById(roomId, userId);
         if (room != null && (room.getRoomName() == null || room.getRoomName().trim().isEmpty())) {
             // 자동 방 생성 로직 적용
             room.setRoomName(generateAutoRoomName(roomId, userId));
@@ -207,7 +207,7 @@ public class ChatService {
     @Transactional
     public MessageDTO sendSystemMessage(Long roomId, Long userId, String type) {
         // 현재 방 정보를 조회하여 타입을 확인
-        ChatRoomDTO room = chatRoomMapper.findRoomById(roomId);
+        ChatRoomDTO room = chatRoomMapper.findRoomById(roomId,  userId);
 
         // 방이 존재하고 방 타입이 GROUP일 때만 시스템 메세지를 생성
         // 1:1인 경우에는 null 반환 or 로직 종료

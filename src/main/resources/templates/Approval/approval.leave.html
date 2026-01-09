@@ -14,45 +14,46 @@
 <body>
 
 <section layout:fragment="content">
+    <div class="approval-leave-scope">
+        <div class="wrap">
+            <h2 class="page-title">휴가 신청</h2>
 
-    <h2>휴가 신청</h2>
+            <div class="card">
+                <form th:action="@{/approval/leave/request}" method="post" th:object="${dto}">
+                    <div class="form-row">
+                        <label>휴가 종류</label>
+                        <select th:field="*{leaveType}" required>
+                            <option value="">선택</option>
+                            <option value="ANNUAL">연차</option>
+                            <option value="HALF_AM">반차(오전)</option>
+                            <option value="HALF_PM">반차(오후)</option>
+                        </select>
+                    </div>
 
-    <form th:action="@{/approval/leave/request}"
-          method="post"
-          th:object="${dto}">
+                    <div class="form-row">
+                        <label>시작일</label>
+                        <input type="datetime-local" th:field="*{leaveStartDate}" required>
+                    </div>
 
-        <div>
-            <label>휴가 종류</label>
-            <select th:field="*{leaveType}" required>
-                <option value="">선택</option>
-                <option value="ANNUAL">연차</option>
-                <option value="HALF_AM">반차(오전)</option>
-                <option value="HALF_PM">반차(오후)</option>
-            </select>
+                    <div class="form-row">
+                        <label>종료일</label>
+                        <input type="datetime-local" th:field="*{leaveEndDate}" required>
+                    </div>
+
+                    <div class="form-row">
+                        <label>사유</label>
+                        <textarea th:field="*{reason}" rows="4" required></textarea>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">신청</button>
+                        <a th:href="@{/approval/inbox}" class="btn">취소</a>
+                    </div>
+                </form>
+            </div>
+
         </div>
-
-        <div>
-            <label>시작일</label>
-            <input type="date" th:field="*{startDate}" required>
-        </div>
-
-        <div>
-            <label>종료일</label>
-            <input type="date" th:field="*{endDate}" required>
-        </div>
-
-        <div>
-            <label>사유</label>
-            <textarea th:field="*{reason}" rows="4" required></textarea>
-        </div>
-
-        <div style="margin-top:20px;">
-            <button type="submit">신청</button>
-            <a th:href="@{/approval/inbox}">취소</a>
-        </div>
-
-    </form>
-
+    </div>
 </section>
 
 <th:block layout:fragment="script">

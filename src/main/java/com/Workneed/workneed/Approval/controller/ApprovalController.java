@@ -8,12 +8,14 @@ import com.Workneed.workneed.Approval.dto.DocFileDTO;
 import com.Workneed.workneed.Approval.entity.ApprovalDoc;
 import com.Workneed.workneed.Approval.mapper.DocMapper;
 import com.Workneed.workneed.Approval.service.ApprovalService;
+import com.Workneed.workneed.Chat.service.StorageService;
 import com.Workneed.workneed.Members.dto.UserDTO;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -33,20 +35,17 @@ import java.util.List;
 public class ApprovalController {
 
     private final ApprovalService service;
-
     // ✅ 파일 메타 조회/삭제는 Mapper로 직접 처리 (서비스 수정 없이 최소 기능)
     private final DocMapper docMapper;
+    // S3 삭제 기능 등을 위해 주입
+    private final StorageService storageService;
 
-    // ✅ 업로드 디렉토리 (application.yml/properties의 file.upload-dir 사용)
-    @Value("${file.upload-dir}")
-    private String uploadDir;
-
-    public ApprovalController(ApprovalService service, DocMapper docMapper) {
+    public ApprovalController(ApprovalService service, DocMapper docMapper, StorageService storageService) {
         this.service = service;
         this.docMapper = docMapper;
+        this.storageService = storageService;
     }
-
-    /* ==========================================================
+   /* ==========================================================
        공통 세션 유틸 (유저 파트 기준)
        ========================================================== */
 
@@ -63,6 +62,7 @@ public class ApprovalController {
         // ✅ 성욱님 프로젝트는 /login 쓰고 있으니 통일
         return "redirect:/login";
     }
+
 
     /* ==========================================================
        전자결재 진입 (관문)
@@ -144,6 +144,7 @@ public class ApprovalController {
 
         model.addAttribute("doc", doc);
         model.addAttribute("lines", service.findLinesByDocId(docId));
+        model.addAttribute("refUsers", service.findRefUsersByDocId(docId));
         model.addAttribute("files", service.getFilesByDocId(docId)); // ✅ 파일 목록은 기존 service 그대로 사용
 
         Long loginUserId = getLoginUserId(session);
@@ -153,6 +154,10 @@ public class ApprovalController {
 
         boolean isMyTurn = (loginUserId != null) && service.isMyTurn(docId, loginUserId);
         model.addAttribute("isMyTurn", isMyTurn);
+
+        boolean isReference = service.isReferenceUser(doc.getRefUserIds(), loginUserId);
+        model.addAttribute("isReference", isReference);
+
 
         return "Approval/approval.detail";
     }
@@ -167,6 +172,7 @@ public class ApprovalController {
                          @RequestParam(required = false) List<MultipartFile> files,
                          @RequestParam(required = false, name = "approverIds") List<Long> approverIds,
                          @RequestParam(required = false, name = "orderNums") List<Integer> orderNums,
+                         @RequestParam(required = false, name = "referenceIds") List<Long> referenceIds,
                          HttpSession session) throws Exception {
 
         System.out.println("REQ typeId=" + request.getParameter("typeId"));
@@ -189,13 +195,14 @@ public class ApprovalController {
             docId = service.save(dto);
         }
 
-        // ✅ 파일 저장(업로드) - 기존 로직 유지
+        // ✅ 파일 저장(업로드) 호출 추가 (이 부분이 누락되어 있었습니다)
         if (files != null && !files.isEmpty()) {
-            service.saveFile(docId, files);
+            System.out.println("전송된 파일 저장 시작: " + files.size());
+            service.saveFile(docId, files); // 👈 서비스의 saveFile 호출
         }
 
         // 결재 흐름 시작
-        service.submit(docId, approverIds, orderNums);
+        service.submit(docId, approverIds, orderNums, referenceIds);
 
         return "redirect:/approval/detail/" + docId;
     }
@@ -206,76 +213,69 @@ public class ApprovalController {
        - 삭제    : POST /approval/file/{fileId}/delete
        ========================================================== */
 
+    // 다운로드
     @GetMapping("/file/{fileId}/download")
-    public ResponseEntity<Resource> downloadFile(@PathVariable Long fileId,
-                                                 HttpSession session) throws Exception {
+    public ResponseEntity<Resource> downloadFile(@PathVariable Long fileId, HttpSession session) {
+        try {
+            // 1. 세션 확인 및 파일 정보 조회
+            Long loginUserId = getLoginUserId(session);
+            if (loginUserId == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 
-        Long loginUserId = getLoginUserId(session);
-        if (loginUserId == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            DocFileDTO file = docMapper.selectFileById(fileId);
+            if (file == null) return ResponseEntity.notFound().build();
+
+            // 2. 권한 체크 (문서 작성자 또는 관련자 확인)
+            ApprovalDoc doc = service.findById(file.getDocId());
+            if (doc == null) return ResponseEntity.notFound().build();
+
+            // 3. S3 URL을 리소스로 변환 (중요: java.net.URI 사용)
+            Resource resource = new org.springframework.core.io.UrlResource(java.net.URI.create(file.getSavedName()));
+
+            if (!resource.exists() || !resource.isReadable()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+
+            // 4. 파일명 한글 깨짐 방지 인코딩
+            String originalName = (file.getOriginalName() != null) ? file.getOriginalName() : "file";
+            String encoded = URLEncoder.encode(originalName, StandardCharsets.UTF_8).replace("+", "%20");
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename*=UTF-8''" + encoded)
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                    .body(resource);
+
+        } catch (Exception e) {
+            // 서버 콘솔에서 구체적인 에러 원인을 확인할 수 있도록 로그 출력
+            System.err.println("다운로드 중 서버 에러 발생: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-
-        // 1) 파일 메타 조회 (mapper 직접)
-        DocFileDTO file = docMapper.selectFileById(fileId);
-        if (file == null) {
-            return ResponseEntity.notFound().build();
-        }
-
-        // 2) 권한 체크(기본: 작성자만)
-        ApprovalDoc doc = service.findById(file.getDocId());
-        if (doc == null) {
-            return ResponseEntity.notFound().build();
-        }
-        if (!loginUserId.equals(doc.getWriterId())) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
-
-        // 3) 디스크 파일 로드
-        Resource resource = new FileSystemResource(new File(uploadDir, file.getSavedName()));
-        if (resource == null || !resource.exists()) {
-            return ResponseEntity.notFound().build();
-        }
-
-        String encoded = URLEncoder.encode(file.getOriginalName(), StandardCharsets.UTF_8)
-                .replaceAll("\\+", "%20");
-
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename*=UTF-8''" + encoded)
-                .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                .body(resource);
     }
 
-    @PostMapping("/file/{fileId}/delete")
-    public String deleteFile(@PathVariable Long fileId,
-                             HttpSession session) {
-
+    // 삭제
+    @PostMapping("file/{fileId}/delete")
+    public String deleteFile(@PathVariable Long fileId, HttpSession session) {
         Long loginUserId = getLoginUserId(session);
         if (loginUserId == null) return redirectLogin();
 
-        // 1) 파일 메타 조회
         DocFileDTO file = docMapper.selectFileById(fileId);
-        if (file == null) {
-            // 이미 삭제된 경우 등: 안전하게 대기함으로
-            return "redirect:/approval/inbox/waiting";
-        }
+        if (file == null) return "redirect:/approval/inbox/waiting";
 
-        // 2) 권한 체크(기본: 작성자만)
         ApprovalDoc doc = service.findById(file.getDocId());
-        if (doc == null) {
-            return "redirect:/approval/inbox/waiting";
-        }
-        if (!loginUserId.equals(doc.getWriterId())) {
+        if (doc == null || !loginUserId.equals(doc.getWriterId())) {
             throw new IllegalStateException("파일 삭제 권한이 없습니다.");
         }
 
-        // 3) DB 메타 삭제
-        docMapper.deleteFileById(fileId);
-
-        // 4) 디스크 파일 삭제 (실패해도 흐름은 유지)
+        // S3 서버에서 삭제
         try {
-            File disk = new File(uploadDir, file.getSavedName());
-            if (disk.exists()) disk.delete();
-        } catch (Exception ignored) { }
+            // savedName(S3 URL)을 이용해 S3에서 삭제 시도
+            storageService.delete(file.getSavedName());
+        } catch (Exception e) {
+            // 삭제 실패 로그 기록 (흐름에는 지장 없게 처리 가능)
+            System.err.println("S3 파일 삭제 실패: " + e.getMessage());
+        }
+
+        // 2️⃣ DB 메타 데이터 삭제
+        docMapper.deleteFileById(fileId);
 
         return "redirect:/approval/detail/" + file.getDocId();
     }
@@ -288,7 +288,6 @@ public class ApprovalController {
     public String reject(@RequestParam Long docId,
                          @RequestParam String comment,
                          HttpSession session) {
-
         Long loginUserId = getLoginUserId(session);
         if (loginUserId == null) return redirectLogin();
 
@@ -317,7 +316,7 @@ public class ApprovalController {
         if (userId == null) return redirectLogin();
 
         model.addAttribute("title", "처리 대기");
-        model.addAttribute("active", "inboxWaiting");
+        model.addAttribute("active", "waiting");
         model.addAttribute("list", service.getWaitingInbox(userId));
         return "Approval/approval.inbox";
     }
@@ -328,7 +327,7 @@ public class ApprovalController {
         if (userId == null) return redirectLogin();
 
         model.addAttribute("title", "처리 완료");
-        model.addAttribute("active", "inboxDone");
+        model.addAttribute("active", "done");
         model.addAttribute("list", service.getDoneInbox(userId));
         return "Approval/approval.inbox";
     }
@@ -336,7 +335,7 @@ public class ApprovalController {
     /* ==========================================================
        내 문서함 (공통 템플릿 approval.inbox)
        ========================================================== */
-
+/*
     @GetMapping("/my/all")
     public String myAll(HttpSession session, Model model) {
         Long userId = getLoginUserId(session);
@@ -347,7 +346,7 @@ public class ApprovalController {
         model.addAttribute("list", service.getMyAllList(userId));
         return "Approval/approval.inbox";
     }
-
+*/
     @GetMapping("/my/drafts")
     public String myDrafts(HttpSession session, Model model) {
         Long userId = getLoginUserId(session);
@@ -389,6 +388,16 @@ public class ApprovalController {
         model.addAttribute("title", "반려됨");
         model.addAttribute("active", "myRejected");
         model.addAttribute("list", service.getMyRejectedList(userId));
+        return "Approval/approval.inbox";
+    }
+    @GetMapping("/my/reference")
+    public String myReference(HttpSession session, Model model) {
+        Long userId = getLoginUserId(session);
+        if (userId == null) return redirectLogin();
+
+        model.addAttribute("title", "참조됨");
+        model.addAttribute("active", "myReference");
+        model.addAttribute("list", service.getReferenceList(userId));
         return "Approval/approval.inbox";
     }
 }
