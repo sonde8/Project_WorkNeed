@@ -31,4 +31,7 @@ public class MessageDTO {
 
     // 파일 원본명
     private String fileName;
+
+    // 프로필 이미지 불러오기용
+    private String roomProfileImage;
 }
