@@ -191,11 +191,26 @@ public class ChatService {
         // 1. 방 채널로 메시지 전송 (방 내부에 있는 사람들용)
         messagingTemplate.convertAndSend("/sub/chat/room/" + messageDTO.getRoomId(), messageDTO);
 
-        // 2. [추가] 방 참여자 전원의 개인 채널로 메시지 전송 (방 외부에 있는 사람들 목록/배지 갱신용)
+        // 2. [추가] 방 참여자 전원의 개인 채널로 메시지 전송
         List<Long> participantIds = chatRoomMapper.findAllParticipantIdsByRoomId(messageDTO.getRoomId());
+
         for (Long participantId : participantIds) {
-            // 본인이 보낸 메시지도 목록 상단 이동을 위해 전송하거나, 타인에게만 보낼지 선택 가능
-            // 여기서는 모든 참여자의 목록을 실시간으로 갱신하기 위해 전원에게 발송합니다.
+            // [핵심 추가] 각 참여자별로 해당 방의 최신 상태(안 읽은 개수, 프로필 등)를 조회합니다.
+            // 매퍼에 추가한 findRoomById(roomId, userId)를 여기서 활용합니다.
+            ChatRoomDTO updatedRoomInfo = chatRoomMapper.findRoomById(messageDTO.getRoomId(), participantId);
+
+            if (updatedRoomInfo != null) {
+                // messageDTO에 수신자별 안 읽은 개수와 프로필 이미지를 세팅하여 보냅니다.
+                messageDTO.setUnreadCount(updatedRoomInfo.getUnreadCount());
+                // messageDTO.setRoomProfileImage(updatedRoomInfo.getRoomProfileImage());
+
+                // 만약 1:1 채팅인데 방 이름이 없다면 상대방 이름으로 세팅하는 로직도 포함하면 좋습니다.
+                if ("DIRECT".equals(updatedRoomInfo.getRoomType())) {
+                    messageDTO.setRoomName(updatedRoomInfo.getRoomName());
+                }
+            }
+
+            // 이제 각 참여자는 '나의 unreadCount'가 담긴 데이터를 받게 됩니다.
             messagingTemplate.convertAndSend("/sub/user/" + participantId + "/rooms", messageDTO);
         }
 
