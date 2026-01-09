@@ -22,8 +22,8 @@ public class AttendanceRequestService {
 
         Map<String, Object> payload = new HashMap<>();
         payload.put("workDate", dto.getWorkDate());
-        payload.put("fromTime", dto.getFromTime());
-        payload.put("toTime", dto.getToTime());
+        payload.put("toTime", dto.getStartTime());
+        payload.put("fromTime", dto.getEndTime());
         payload.put("reason", dto.getReason());
 
         try {

@@ -63,41 +63,43 @@
                 <button type="button" class="changeBtn" id="openRequestBtn">요청</button>
             </div>
 
-            <!-- 근태 수정 요청 모달 -->
-            <div id="attendanceRequestModal" class="modal-overlay" hidden>
-                <div class="attendance-modal">
+            <div class="lv-modal" id="attendanceRequestModal" hidden>
+                <div class="lv-modal_back" id="closeModalBack"></div>
 
-                    <div class="modal-header">근태 수정 요청</div>
+                <div class="lv-modal_panel" role="dialog" aria-modal="true">
+                    <div class="lv-modal_title">근태 수정 요청</div>
 
-                    <div class="modal-body">
+                    <form id="attendanceRequestForm" class="lv-form">
+                        <label class="lv-label">유형
+                            <select id="reqType" class="lv-input">
+                                <option value="ATTEND_EDIT">출근수정요청</option>
+                                <option value="LEAVE_EDIT">퇴근수정요청</option>
+                                <option value="OVERTIME">연장근무요청</option>
+                            </select>
+                        </label>
 
-                        <!-- 제목 (기존 유지, 선택사항) -->
-                        <div class="input-section">
-                            <span>제목</span>
-                            <input type="text" id="reqTitle" placeholder="근태 수정 요청">
+                        <label class="lv-label">수정할 날짜
+                            <input type="date" id="reqWorkDate" class="lv-input"/>
+                        </label>
+
+                        <label class="lv-label">수정할 시간
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <input type="time" id="reqStartTime" class="lv-input" style="flex: 1;"/>
+                                <span style="color: #666;">~</span>
+                                <input type="time" id="reqEndTime" class="lv-input" style="flex: 1;"/>
+                            </div>
+                        </label>
+
+                        <label class="lv-label">사유
+                            <textarea id="reqReason" class="lv-textarea" rows="3"
+                                      placeholder="사유를 입력하세요 (예: 15시~20시 추가 근무)"></textarea>
+                        </label>
+
+                        <div class="lv-modal_actions">
+                            <button type="button" class="lv-btn submit" id="submitRequest">등록</button>
+                            <button type="button" class="lv-btn cancel" id="closeModal">취소</button>
                         </div>
-
-                        <!-- 수정일자 (기존 기간 영역 대체) -->
-                        <div class="input-section">
-                            <input
-                                    type="date"
-                                    id="reqWorkDate"
-                            >
-                        </div>
-
-                        <!-- 사유 -->
-                        <textarea
-                                id="reqReason"
-                                placeholder="사유를 입력하세요 (예: 퇴근 미기록으로 인한 자동 퇴근 처리 요청)"
-                        ></textarea>
-
-                    </div>
-
-                    <div class="modal-footer">
-                        <button type="button" id="submitRequest" class="reg-btn">등록</button>
-                        <button type="button" id="closeModal" class="cancel-btn">취소</button>
-                    </div>
-
+                    </form>
                 </div>
             </div>
 

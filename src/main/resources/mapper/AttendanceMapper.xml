@@ -31,6 +31,30 @@
                                  status_code = VALUES(status_code)
     </insert>
 
+    <!--근태 요청-->
+    <insert id="insertAttendanceRequest"
+            parameterType="com.Workneed.workneed.Members.dto.AttendanceRequestCreateDTO">
+        INSERT INTO Request (
+        user_id,
+        request_type,
+        request_payload,
+        status,
+        request_created_at
+        ) VALUES (
+        #{userId},
+        'ATTENDANCE',
+        JSON_OBJECT(
+        'workDate', #{workDate},
+        'fromTime', #{startTime},
+        'toTime', #{endTime},
+        'type', #{type},
+        'reason', #{reason}
+        ),
+        'PENDING',
+        NOW()
+        )
+    </insert>
+
     <!-- 퇴근 시간 -->
     <update id = "updateCheckOut">
         UPDATE attendance

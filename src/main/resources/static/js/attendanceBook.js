@@ -8,14 +8,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const prevBtn = document.getElementById('prevMonth');
     const nextBtn = document.getElementById('nextMonth');
 
+    // 모달 관련 요소
     const modal = document.getElementById('attendanceRequestModal');
     const openBtn = document.getElementById('openRequestBtn');
     const closeBtn = document.getElementById('closeModal');
 
-    const dateInput = document.getElementById('reqWorkDate');
-    const submitBtn = document.getElementById('submitRequest');
-
-
+    // 입력 필드 요소
+    const typeSelect = document.getElementById('reqType');      // 유형 선택 (Select)
+    const dateInput = document.getElementById('reqWorkDate');   // 수정할 날짜
+    const startTimeInput = document.getElementById('reqStartTime'); // 시작 시간
+    const endTimeInput = document.getElementById('reqEndTime');     // 종료 시간
+    const reasonInput = document.getElementById('reqReason');   // 사유
+    const submitBtn = document.getElementById('submitRequest'); // 등록 버튼
 
     if (!tbody || !ymEl || !prevBtn || !nextBtn || !dateInput) return;
 
@@ -40,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
     dateInput.value = todayStr;
 
     /* ===============================
-       출근부 기본 설정
+       출근부 기본 설정 및 유틸 함수
     =============================== */
     let cur = new Date();
     cur.setDate(1);
@@ -140,58 +144,79 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     /* ===============================
-       모달 제어 (hidden 방식)
+       모달 제어 (Leave 스타일 반영)
     =============================== */
     openBtn.onclick = () => modal.hidden = false;
-    closeBtn.onclick = () => modal.hidden = true;
 
+    const hideModal = () => { modal.hidden = true; };
+    if (closeBtn) closeBtn.onclick = hideModal;
+
+    // 배경 클릭 시 닫기
     modal.addEventListener('click', (e) => {
-        if (e.target === modal) modal.hidden = true;
+        if (e.target === modal || e.target.id === 'closeModalBack') hideModal();
     });
 
     /* ===============================
-       근태 수정 요청 등록
+       근태 수정 요청 등록 (로직 강화)
     =============================== */
     submitBtn.onclick = () => {
+        const type = typeSelect ? typeSelect.value : '기본';
+        const workDate = dateInput.value;
+        const startTime = startTimeInput.value;
+        const endTime = endTimeInput.value;
+        const reason = reasonInput.value.trim();
 
-         const title = document.getElementById('reqTitle').value.trim();
-         const workDate = dateInput.value;
-         const reason = document.getElementById('reqReason').value.trim();
+        // 1. 필수 입력 체크
+        if (!workDate || !startTime || !endTime || !reason) {
+            alert('모든 항목을 입력해주세요.');
+            return;
+        }
 
-       // 필수 입력 체크
-           if (!title) {
-               alert('제목을 입력하세요.');
-               return;
-           }
+        // 2. 날짜 제약 체크
+        if (workDate < lastYearStr || workDate > todayStr) {
+            alert('날짜는 최근 1년 이내만 선택할 수 있습니다.');
+            return;
+        }
 
-           if (!workDate) {
-               alert('날짜를 선택하세요.');
-               return;
-           }
 
-           if (!reason) {
-               alert('사유를 입력하세요.');
-               return;
-           }
 
-           //
-           if (workDate < lastYearStr || workDate > todayStr) {
-               alert('날짜는 최근 1년 이내만 선택할 수 있습니다.');
-               return;
-           }
+        // 3. 시간 선후 관계 체크
+        if (startTime >= endTime) {
+            alert('종료 시간은 시작 시간보다 늦어야 합니다.');
+            return;
+        }
 
-        fetch('/attendance/request', {
+        // 4. 야간 시간 제한 (22:00 ~ 07:00 차단)
+        const startHour = parseInt(startTime.split(':')[0], 10);
+        const endHour = parseInt(endTime.split(':')[0], 10);
+
+        if ((startHour >= 22 || startHour < 7) || (endHour >= 22 || endHour < 7)) {
+            alert('22:00부터 07:00 사이의 시간은 선택할 수 없습니다.');
+            return;
+        }
+
+        // 서버 전송 데이터 구성
+      const payload = {
+          type: type,
+          workDate: workDate,
+          startTime: startTime,
+          endTime: endTime,
+          reason: reason
+      };
+
+        fetch('/api/attendance/request', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ title, workDate, reason })
+            body: JSON.stringify(payload)
         })
         .then(res => {
             if (!res.ok) throw new Error();
             alert('요청 성공! 관리자 승인을 기다려주세요.');
-            modal.hidden = true;
+            hideModal();
             location.reload();
         })
         .catch(() => alert('요청 실패. 내용을 확인하세요.'));
     };
+
     render();
 });

@@ -14,7 +14,7 @@ import java.io.IOException;
 
 
 @ControllerAdvice
-public class GlobalUserModelAdvice {
+public class GlobalUserModelAdviceService {
 
     @ModelAttribute("user")
     public UserDTO user(HttpSession session, HttpServletResponse response) throws IOException { // throws 추가

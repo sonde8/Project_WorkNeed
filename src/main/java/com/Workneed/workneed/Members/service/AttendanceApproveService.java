@@ -2,7 +2,7 @@ package com.Workneed.workneed.Members.service;
 
 import com.Workneed.workneed.Members.dto.AdminUserDTO;
 import com.Workneed.workneed.Members.dto.MemberAttendanceDTO;
-import com.Workneed.workneed.Members.dto.AttendancePayload;
+import com.Workneed.workneed.Members.dto.AttendancePayloadDTO;
 import com.Workneed.workneed.Members.dto.RequestDTO;
 import com.Workneed.workneed.Members.mapper.AdminUserMapper;
 import com.Workneed.workneed.Members.mapper.MemberAttendanceMapper;
@@ -36,7 +36,7 @@ public class AttendanceApproveService {
             if (req == null || !"PENDING".equals(req.getStatus())) return;
 
             // 🔑 payload 파싱 (방어적으로)
-            AttendancePayload payload = parsePayload(req.getRequestPayload());
+            AttendancePayloadDTO payload = parsePayload(req.getRequestPayload());
 
             LocalDate workDate = payload.getWorkDate();
             if (workDate == null) {
@@ -129,10 +129,10 @@ public class AttendanceApproveService {
 
 
     //🔑 payload 파싱- 근태 worktime 못받아옴
-    private AttendancePayload parsePayload(String json) throws Exception {
+    private AttendancePayloadDTO parsePayload(String json) throws Exception {
 
-        AttendancePayload payload =
-                objectMapper.readValue(json, AttendancePayload.class);
+        AttendancePayloadDTO payload =
+                objectMapper.readValue(json, AttendancePayloadDTO.class);
 
         // 최소 필드 보장
         if (payload.getWorkDate() == null) {
