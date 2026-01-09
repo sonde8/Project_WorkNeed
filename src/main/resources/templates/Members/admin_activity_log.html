@@ -7,17 +7,22 @@
 </head>
 <body>
 
-<div th:replace="~{Members/admin_user_list :: .admin-header}"></div>
+<div class="admin-header" th:if="${admin != null}">
+    <span>관리자: <b th:text="${admin.adminName}">관리자</b></span>
+    <form th:action="@{/logout}" method="post">
+        <button type="submit" class="btn-secondary">로그아웃</button>
+    </form>
+</div>
 
-<div style="padding: 20px;">
-    <div style="display: flex; gap: 20px; border-bottom: 1px solid #ddd; margin-bottom: 20px;">
-        <a th:href="@{/admin/member/list}" class="btn-tab">직원 관리</a>
-        <a th:href="@{/admin/attendance/list}" class="btn-tab">근태 요청 관리</a>
-        <a th:href="@{/admin/manage/list}" class="btn-tab">관리자 설정</a>
-        <a th:href="@{/admin/log/list}" class="btn-tab active">활동 로그</a>
-    </div>
+<div class="admin-tabs">
+    <a th:href="@{/admin/member/list}" class="btn-tab">직원 관리</a>
+    <a th:href="@{/admin/attendance/list}" class="btn-tab">근태 요청 관리</a>
+    <a th:href="@{/admin/manage/list}" class="btn-tab ">관리자 설정</a>
+    <a th:href="@{/admin/log/list}" class="btn-tab active">활동 로그</a>
+</div>
 
-    <h2>📜 시스템 활동 기록</h2>
+<div class="admin-content">
+    <h2>시스템 활동 기록</h2>
     <p style="color: #718096; font-size: 0.9em; margin-bottom: 15px;">* 모든 관리 활동은 보안을 위해 기록되며 수정 및 삭제가 불가능합니다.</p>
 
     <table>
@@ -51,5 +56,8 @@
         </tbody>
     </table>
 </div>
+
+
+<script src="/js/admin_activity_log.js"></script>
 </body>
 </html>

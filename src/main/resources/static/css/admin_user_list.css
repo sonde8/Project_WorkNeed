@@ -1,7 +1,9 @@
 .btn-tab { padding: 10px 20px; text-decoration: none; color: #666; border-bottom: 3px solid transparent; }
 .btn-tab.active { color: #3182ce; border-bottom: 3px solid #3182ce; font-weight: bold; }
+
 /* 작업 구분 배지 스타일 */
 .action-badge { background: #f7fafc; border: 1px solid #cbd5e0; padding: 2px 6px; border-radius: 4px; font-size: 0.85em; }
+
 /* 권한 배지 스타일 */
 .role-tag { font-size: 0.75em; color: #718096; background: #edf2f7; padding: 2px 5px; border-radius: 4px; margin-left: 5px; }
 
@@ -9,6 +11,7 @@
 .status-suspended { color: #e53e3e; font-weight: bold; }
 .btn-tab { padding: 10px 20px; text-decoration: none; color: #666; border-bottom: 3px solid transparent; }
 .btn-tab.active { color: #3182ce; border-bottom: 3px solid #3182ce; font-weight: bold; }
+
 /* 권한 배지 스타일 */
 .role-badge { background: #e2e8f0; color: #4a5568; padding: 3px 8px; border-radius: 6px; font-size: 0.85em; font-weight: 600; }
 
@@ -20,3 +23,51 @@ table { width: 100%; border-collapse: collapse; margin-top: 10px; background: wh
 th, td { border: 1px solid #eee; padding: 12px; text-align: left; }
 th { background-color: #f8f9fa; font-weight: bold; }
 .btn-delete-small { background: #e53e3e; color: white; border: none; padding: 2px 6px; border-radius: 4px; cursor: pointer; margin-left: 5px; font-size: 11px; }
+
+/* ===== 관리자 공통 콘텐츠 영역 ===== */
+.admin-content {
+    padding: 20px;
+}
+
+/* 제목 통일 */
+.admin-content h2 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: #2d3748;
+}
+
+/* 설명 문구 통일 */
+.admin-content p {
+    font-size: 0.9em;
+    color: #718096;
+    margin-bottom: 15px;
+}
+
+/* 테이블 위 여백 */
+.admin-content table {
+    margin-top: 10px;
+}
+
+
+
+/*관리자 헤더 폼*/
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    background: #fff;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 20px;
+}
+
+.admin-header form {
+    margin: 0;
+}
+
+.admin-content {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+}

@@ -45,17 +45,42 @@ public class AdminUserService {
 
 
     // 관리자 생성 (SUPER만)
+    @Transactional
     public void createAdmin(AdminUserDTO newAdmin, AdminUserDTO actor) {
+
         if (!isSuper(actor)) {
             throw new SecurityException("관리자 생성 권한 없음");
         }
 
-        newAdmin.setAdminPassword(passwordEncoder.encode(newAdmin.getAdminPassword()));
+
+        // 1. 필수값 체크
+        if (newAdmin.getAdminEmail() == null || newAdmin.getAdminPassword() == null) {
+            throw new IllegalArgumentException("필수 정보 누락");
+        }
+
+        // 2. 이메일 중복 체크
+        if (adminUserMapper.existsByEmail(newAdmin.getAdminEmail())) {
+            throw new IllegalStateException("이미 사용 중인 이메일");
+        }
+
+        // 3. 비밀번호 암호화
+        newAdmin.setAdminPassword(
+                passwordEncoder.encode(newAdmin.getAdminPassword())
+        );
+
         newAdmin.setAdminStatus("ACTIVE");
+
+        // 4. 저장
         adminUserMapper.insertAdmin(newAdmin);
 
-        saveLog(actor.getAdminId(), "CREATE", "ADMIN",
-                newAdmin.getAdminId(), "관리자 생성");
+        // 5. 로그
+        saveLog(
+                actor.getAdminId(),
+                "CREATE",
+                "ADMIN",
+                newAdmin.getAdminId(),
+                "관리자 계정 생성"
+        );
     }
 
     public List<String> getPermissionsByRoleId(Long roleId) {

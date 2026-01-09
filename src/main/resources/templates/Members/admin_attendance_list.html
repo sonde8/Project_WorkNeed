@@ -4,37 +4,26 @@
     <meta charset="UTF-8">
     <title>근태 요청 관리</title>
     <link rel="stylesheet" th:href="@{/css/admin_user_list.css}">
-    <style>
-        /* 탭 메뉴 스타일 유지 */
-        .btn-tab { padding: 10px 20px; text-decoration: none; color: #666; border-bottom: 3px solid transparent; }
-        .btn-tab.active { color: #3182ce; border-bottom: 3px solid #3182ce; font-weight: bold; }
 
-        /* 근태 관리용 테이블 추가 스타일 */
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; background: white; }
-        th, td { border: 1px solid #eee; padding: 12px; text-align: left; }
-        th { background-color: #f8f9fa; font-weight: bold; }
-        .payload-cell { font-family: monospace; font-size: 0.9em; color: #4a5568; }
-    </style>
 </head>
 <body>
 
-<div class="admin-header" th:if="${admin != null}"
-     style="padding: 15px; background: #fff; border-bottom: 1px solid #ddd; margin-bottom: 20px;">
-    <span> 관리자: <b th:text="${admin.adminName}">관리자</b></span>
-    <form th:action="@{/logout}" method="post" style="display:inline; float: right;">
-        <button type="submit" class="btn-secondary" style="padding: 5px 12px; cursor: pointer;">로그아웃</button>
+<div class="admin-header" th:if="${admin != null}">
+    <span>관리자: <b th:text="${admin.adminName}">관리자</b></span>
+    <form th:action="@{/logout}" method="post">
+        <button type="submit" class="btn-secondary">로그아웃</button>
     </form>
 </div>
 
-<div style="padding: 0 20px;">
-    <div style="display: flex; gap: 20px; border-bottom: 1px solid #ddd; margin-bottom: 20px;">
-        <a th:href="@{/admin/member/list}" class="btn-tab">직원 관리</a>
-        <a th:href="@{/admin/attendance/list}" class="btn-tab active">근태 요청 관리</a>
-        <a th:href="@{/admin/manage/list}" class="btn-tab">관리자 설정</a>
-        <a th:href="@{/admin/log/list}" class="btn-tab">활동 로그</a>
-    </div>
+<div class="admin-tabs">
+    <a th:href="@{/admin/member/list}" class="btn-tab">직원 관리</a>
+    <a th:href="@{/admin/attendance/list}" class="btn-tab active">근태 요청 관리</a>
+    <a th:href="@{/admin/manage/list}" class="btn-tab ">관리자 설정</a>
+    <a th:href="@{/admin/log/list}" class="btn-tab ">활동 로그</a>
+</div>
 
-    <h2>📅 근태 수정 요청 (대기)</h2>
+<div class="admin-content">
+    <h2>근태 수정 요청 (대기)</h2>
 
     <table>
         <thead>
@@ -80,6 +69,6 @@
     </table>
 </div>
 
-<script src="/js/admin-attendance.js"></script>
+<script src="/js/admin_attendance_list.js"></script>
 </body>
 </html>

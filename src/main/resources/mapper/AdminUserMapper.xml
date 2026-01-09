@@ -81,9 +81,16 @@
 
     <select id="findByAdminId" resultType="com.Workneed.workneed.Members.dto.AdminUserDTO">
         SELECT *
-        FROM adminUser
+        FROM adminuser
         WHERE admin_id = #{adminId}
     </select>
+
+    <select id="existsByEmail" resultType="boolean">
+        SELECT COUNT(*) > 0
+        FROM adminuser
+        WHERE admin_email = #{adminEmail}
+    </select>
+
 
     <insert id="insertAdmin" parameterType="com.Workneed.workneed.Members.dto.AdminUserDTO"
             useGeneratedKeys="true" keyProperty="adminId">

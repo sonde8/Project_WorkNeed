@@ -2,30 +2,26 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>관리자 - 직원관리 (통합본)</title>
+    <title>관리자 - 직원관리 </title>
     <link rel="stylesheet" th:href="@{/css/admin_user_list.css}">
 </head>
 <body>
 
-<div class="admin-header" th:if="${admin != null}"
-     style="padding: 15px; background: #fff; border-bottom: 1px solid #ddd; margin-bottom: 20px;">
-    <span> 관리자: <b th:text="${admin.adminName}">관리자</b></span>
-    <form th:action="@{/logout}" method="post" style="display:inline; float: right;">
-        <button type="submit" class="btn-secondary" style="padding: 5px 12px; cursor: pointer;">로그아웃</button>
+<div class="admin-header" th:if="${admin != null}">
+    <span>관리자: <b th:text="${admin.adminName}">관리자</b></span>
+    <form th:action="@{/logout}" method="post">
+        <button type="submit" class="btn-secondary">로그아웃</button>
     </form>
 </div>
 
-<div style="padding: 0 20px;">
+<div class="admin-tabs">
+    <a th:href="@{/admin/member/list}" class="btn-tab active">직원 관리</a>
+    <a th:href="@{/admin/attendance/list}" class="btn-tab">근태 요청 관리</a>
+    <a th:href="@{/admin/manage/list}" class="btn-tab ">관리자 설정</a>
+    <a th:href="@{/admin/log/list}" class="btn-tab ">활동 로그</a>
+</div>
 
-
-    <div style="display: flex; gap: 20px; border-bottom: 1px solid #ddd; margin-bottom: 20px;">
-        <a th:href="@{/admin/member/list}" style="padding: 10px 20px; text-decoration: none; color: #3182ce; border-bottom: 3px solid #3182ce; font-weight: bold;">직원 관리</a>
-        <a th:href="@{/admin/attendance/list}" style="padding: 10px 20px; text-decoration: none; color: #666;">근태 요청 관리</a>
-        <a th:href="@{/admin/manage/list}" style="padding: 10px 20px; text-decoration: none; color: #666;">관리자 설정</a>
-        <a th:href="@{/admin/log/list}" style="padding: 10px 20px; text-decoration: none; color: #666;">활동 로그</a>
-    </div>
-
-
+<div class="admin-content">
     <h2> 직원 관리 시스템</h2>
 
     <div class="admin-controls">
@@ -64,6 +60,7 @@
             </div>
         </form>
     </div>
+
 
     <table>
         <thead>
@@ -232,153 +229,7 @@
     </div>
 </div>
 
-<script th:inline="javascript">
-    /* 1. 공통 모달 및 체크박스 제어 */
-    function openModal(id) { document.getElementById(id).style.display = 'block'; }
-    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-    function toggleAll(source) { document.querySelectorAll('input[name="userCheck"]').forEach(cb => cb.checked = source.checked); }
 
-    /* 2. 유저 정보 수정 */
-    function openEditModal(id, deptId, rankId, status) {
-        document.getElementById('targetUserId').value = id;
-        document.getElementById('modalDept').value = deptId;
-        document.getElementById('modalRank').value = rankId;
-        document.getElementById('modalStatus').value = status;
-        openModal('editModal');
-    }
-
-    function saveChanges() {
-        const data = {
-            userId: document.getElementById('targetUserId').value,
-            deptId: document.getElementById('modalDept').value,
-            rankId: document.getElementById('modalRank').value,
-            userStatus: document.getElementById('modalStatus').value
-        };
-        fetch('/admin/member/edit/save', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-        }).then(res => res.text()).then(result => {
-            if (result === "success") { alert('저장되었습니다.'); location.reload(); }
-            else alert('오류가 발생했습니다.');
-        });
-    }
-
-    /* 3. 일괄 상태 변경 */
-    function fnBatchUpdate() {
-        const selectedIds = Array.from(document.querySelectorAll('input[name="userCheck"]:checked')).map(cb => cb.value);
-        if (selectedIds.length === 0) return alert("유저를 선택해주세요.");
-        const status = document.getElementById('batchStatus').value;
-        const params = new URLSearchParams();
-        selectedIds.forEach(id => params.append('userIds', id));
-        params.append('status', status);
-
-        fetch('/admin/member/batch-update', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: params
-        }).then(res => res.text()).then(result => {
-            if (result === "success") { alert('일괄 변경 완료'); location.reload(); }
-        });
-    }
-
-    /* 4. 부서 추가 및 삭제 */
-    function fnAddDept() {
-        const name = document.getElementById('newDeptName').value;
-        if(!name) return alert("부서명을 입력하세요.");
-        fetch('/admin/dept/add', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: new URLSearchParams({ deptName: name })
-        }).then(res => res.text()).then(result => { if(result === "success") location.reload(); });
-    }
-
-    function fnDeleteDept(id) {
-        if(!confirm("해당 부서를 삭제하시겠습니까? 소속 인원은 '미배정'으로 이동됩니다.")) return;
-        fetch('/admin/dept/delete', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: new URLSearchParams({ deptId: id })
-        }).then(res => res.text()).then(result => {
-            if(result === "success") location.reload();
-            else if(result === "is_default") alert("기본 부서는 삭제할 수 없습니다.");
-            else alert("삭제 실패");
-        });
-    }
-
-    /* 5. 직급 추가 및 삭제 */
-    function fnAddRank() {
-        const name = document.getElementById('newRankName').value;
-        if(!name) return alert("직급명을 입력하세요.");
-        fetch('/admin/rank/add', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: new URLSearchParams({ rankName: name })
-        }).then(res => res.text()).then(result => { if(result === "success") location.reload(); });
-    }
-
-    function fnDeleteRank(id) {
-        if(!confirm("해당 직급을 삭제하시겠습니까? 해당 인원은 '신입'으로 이동됩니다.")) return;
-        fetch('/admin/rank/delete', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: new URLSearchParams({ rankId: id })
-        }).then(res => res.text()).then(result => {
-            if(result === "success") location.reload();
-            else if(result === "is_default") alert("기본 직급은 삭제할 수 없습니다.");
-            else alert("삭제 실패");
-        });
-    }
-
-    /* 6. 관리자 생성 관련 */
-    function togglePasswordVisibility() {
-        const pwInput = document.getElementById('newAdminPassword');
-        const toggleIcon = document.getElementById('togglePw');
-        if (pwInput.type === 'password') { pwInput.type = 'text'; toggleIcon.innerText = '🔒'; }
-        else { pwInput.type = 'password'; toggleIcon.innerText = '👁️'; }
-    }
-
-    function saveNewAdmin() {
-        const pwd = document.getElementById('newAdminPassword').value;
-        const name = document.getElementById('newAdminName').value;
-        const email = document.getElementById('newAdminEmail').value;
-        const roleId = document.getElementById('newAdminRoleId').value;
-        const pwReg = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!#$%^&*()_+|~={}\[\]:";'<>?,.\/]).{8,}$/;
-
-        if(!name || !email || !roleId) return alert("모든 정보를 입력해주세요.");
-        if (!pwReg.test(pwd)) return alert("비밀번호 규정을 확인하세요.");
-
-        fetch('/admin/member/add-admin', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ adminName: name, adminEmail: email, adminPassword: pwd, roleId: roleId })
-        }).then(res => res.text()).then(result => {
-            if(result === "success") { alert("관리자 생성 완료"); location.reload(); }
-            else alert("생성 실패");
-        });
-
-        function changeAdminStatus(targetId, currentStatus) {
-    const nextStatus = (currentStatus === 'ACTIVE') ? 'SUSPENDED' : 'ACTIVE';
-    const msg = nextStatus === 'SUSPENDED' ? "해당 관리자를 정지시키겠습니까?" : "정지를 해제하시겠습니까?";
-
-    if(!confirm(msg)) return;
-
-    fetch('/admin/member/admin-status', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({ targetId: targetId, status: nextStatus })
-    }).then(res => res.text()).then(result => {
-        if(result === "success") {
-            alert("상태가 변경되었습니다.");
-            location.reload();
-        }
-    });
-}
-
-
-
-
-    }
-</script>
+<script src="/js/admin_user_list.js"></script>
 </body>
 </html>
