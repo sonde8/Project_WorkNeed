@@ -32,7 +32,7 @@ th { background-color: #f8f9fa; font-weight: bold; }
 /* 제목 통일 */
 .admin-content h2 {
     font-size: 20px;
-    font-weight: 700;
+    font-weight: 100%;
     margin-bottom: 16px;
     color: #2d3748;
 }
@@ -48,7 +48,6 @@ th { background-color: #f8f9fa; font-weight: bold; }
 .admin-content table {
     margin-top: 10px;
 }
-
 
 
 /*관리자 헤더 폼*/
@@ -67,7 +66,70 @@ th { background-color: #f8f9fa; font-weight: bold; }
 }
 
 .admin-content {
-    width: 100%;
-    max-width: 1200px;
     margin: 0 auto;
+    h
 }
+
+.admin-header .btn-secondary {
+    background: transparent;
+    border: 1px solid #e5e7eb;
+    border-radius: 4px;
+    font-size: 12px;
+    padding: 6px 12px;
+    cursor: pointer;
+    color: #6b7280;
+    transition: all 0.2s ease;
+}
+
+.admin-header .btn-secondary:hover {
+    background: #f3f4f6;
+    color: #1f2937;
+}
+
+.admin-header .btn-primary {
+    background: transparent;
+    border: 1px solid #e5e7eb;
+    border-radius: 4px;
+    font-size: 12px;
+    padding: 6px 12px;
+    cursor: pointer;
+    color: #6b7280;
+    transition: all 0.2s ease;
+}
+
+.admin-header .btn-primary:hover {
+    background: #f3f4f6;
+    color: #1f2937;
+}
+
+/* 직원 관리 테이블 안의 secondary 버튼 */
+.admin-content table .btn-secondary {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    color: #374151;
+    font-size: 12px;
+    padding: 6px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.admin-content table .btn-secondary:hover {
+    background: #f3f4f6;
+        color: #1f2937;
+}
+
+/* 관리자 페이지 주요 액션 버튼 (일괄 적용, 저장 등) */
+.admin-content .btn-primary {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    color: #000000;
+    padding: 7px 15px;
+    font-size: 13px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+
+
