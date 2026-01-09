@@ -36,24 +36,30 @@ public class ApprovalService {
        문서: 임시저장/조회/타입
        =============================== */
 
-    public Long save(DocDTO dto) {
+    @Transactional
+    public Long save(DocDTO doc) {
 
-        //Long writerId = 5L; // TODO: 나중에 session에서 받기
+        // ✅ 여기서 doc을 다시 dto로 덮어쓰지 않습니다.
+        // doc은 Controller에서 이미 세팅되어 들어온다고 가정합니다.
 
-        ApprovalDoc doc = new ApprovalDoc();
-        doc.setWriterId(dto.getWriterId()); // 세션에서 넘어온 값 그대로
-        doc.setTitle(dto.getTitle());
-        doc.setTypeId(dto.getTypeId());
-        doc.setContent(dto.getContent());
-        doc.setStatus(DocStatus.DRAFT);
-        doc.setCreatedAt(LocalDateTime.now());
-        doc.setUpdatedAt(LocalDateTime.now());
+        // 상태만 기본값 강제 (작성 중 문서)
+        if (doc.getStatus() == null) {
+            doc.setStatus(DocStatus.DRAFT);
+        }
+
+        // createdAt/updatedAt은 DB DEFAULT를 믿고 안 넣습니다.
+        // (만약 DTO에 필드가 있어도 mapper INSERT에 안 넣으면 DB가 자동 처리)
 
         mapper.save(doc);
+
+        if (doc.getDocId() == null) {
+            throw new IllegalStateException("docId 생성 실패 - useGeneratedKeys/keyProperty 확인 필요");
+        }
+
         return doc.getDocId();
     }
 
-    public ApprovalDoc findById(Long docId) {
+    public DocDTO findById(Long docId) {
         return mapper.findById(docId);
     }
 

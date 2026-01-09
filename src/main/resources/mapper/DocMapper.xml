@@ -13,9 +13,14 @@
     <!-- ===============================
          문서 임시저장
          =============================== -->
-    <insert id="save" parameterType="com.Workneed.workneed.Approval.dto.DocDTO" useGeneratedKeys="true" keyProperty="docId">
-        INSERT INTO approval_doc (writer_id, type_id, title, content, status)
-        VALUES (#{writerId}, #{typeId}, #{title}, #{content}, #{status})
+    <insert id="save"
+            parameterType="com.Workneed.workneed.Approval.dto.DocDTO"
+            useGeneratedKeys="true"
+            keyProperty="docId">
+        INSERT INTO approval_doc
+             (writer_id, type_id, title, content, status, leave_start_date, leave_end_date)
+        VALUES
+        (#{writerId}, #{typeId}, #{title}, #{content}, #{status}, #{startDate}, #{endDate})
     </insert>
 
 
@@ -24,20 +29,22 @@
          =============================== -->
     <select id="findById"
             parameterType="long"
-            resultType="com.Workneed.workneed.Approval.entity.ApprovalDoc">
+            resultType="com.Workneed.workneed.Approval.dto.DocDTO">
         SELECT
             approval_doc_id AS docId,
-            writer_id       AS writerId,
-            type_id         AS typeId,
             title,
             content,
+            writer_id AS writerId,
+            type_id AS typeId,
             status,
-            ref_user_ids    AS refUserIds,
+            leave_start_date AS leaveStartDate,
+            leave_end_date AS leaveEndDate,
             created_at,
             updated_at
         FROM approval_doc
         WHERE approval_doc_id = #{docId}
     </select>
+
 
     <!-- 참조자 조회 -->
     <select id="selectUsersByIds" resultType="com.Workneed.workneed.Approval.dto.RefUserDTO">

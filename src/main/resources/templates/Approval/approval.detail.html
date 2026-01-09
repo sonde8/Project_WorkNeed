@@ -42,7 +42,7 @@
             <div th:if="${doc != null}">
 
                 <!-- =========================
-                     결재 라인
+                     결재 라인 // 결재선
                      ========================= -->
                 <div class="card">
                     <div class="card-head">
@@ -56,8 +56,8 @@
                             <span class="name" th:text="${l.username}"></span>
                             <span class="status"
                                   th:classappend="' st-' + ${#strings.toLowerCase(l.status.name())}"
-                                  th:text="${l.status}">
-              </span>
+                                  th:text="${l.status.label}">
+                            </span>
                         </li>
 
                         <li th:if="${#lists.isEmpty(lines)}" class="line-empty">
@@ -65,6 +65,7 @@
                         </li>
                     </ul>
                 </div>
+
                 <!-- =========================
                      참조자
                      ========================= -->
@@ -98,22 +99,42 @@
                     <div class="rows">
 
                         <div class="row">
-                            <span class="label">문서 ID</span>
-                            <span class="value" th:text="${doc.docId}"></span>
-                        </div>
-
-                        <div class="row">
                             <span class="label">상태</span>
                             <span class="value badge strong"
                                   th:classappend="' st-' + ${#strings.toLowerCase(doc.status.name())}"
-                                  th:text="${doc.status}">
-                DRAFT
-              </span>
+                                  th:text="${doc.status.label}">
+                                DRAFT
+                            </span>
                         </div>
 
                         <div class="row">
                             <span class="label">문서 종류</span>
                             <span class="value" th:text="${doc.typeId}">-</span>
+                        </div>
+
+                        <!-- ✅ 휴가 정보: 휴가 문서일 때만 표시 (leave가 모델에 있을 때만) -->
+                        <div th:if="${leave != null}">
+
+                            <div class="row">
+                                <span class="label">휴가 종류</span>
+                                <span class="value" th:text="${leave.leaveType}">-</span>
+                            </div>
+
+                            <div class="row">
+                                <span class="label">시작일</span>
+                                <span class="value" th:text="${leave.startDate}">-</span>
+                            </div>
+
+                            <div class="row">
+                                <span class="label">마감일</span>
+                                <span class="value" th:text="${leave.endDate}">-</span>
+                            </div>
+
+                            <div class="row">
+                                <span class="label">일수</span>
+                                <span class="value" th:text="${leave.days}">-</span>
+                            </div>
+
                         </div>
 
                         <div class="row">
@@ -123,18 +144,14 @@
 
                         <div class="row-row-content">
                             <span class="label">내용</span>
-                            <pre class="content" th:text="${doc.content}">-</pre>
+                            <pre class="content-detail" th:text="${doc.content}">-</pre>
                         </div>
 
                         <div class="row">
                             <span class="label">작성일</span>
-                            <span class="value" th:text="${doc.createdAt}">-</span>
+                            <span th:text="${#temporals.format(doc.createdAt, 'yyyy년 MM월 dd일 HH:mm')}"></span>
                         </div>
 
-                        <div class="row">
-                            <span class="label">수정일</span>
-                            <span class="value" th:text="${doc.updatedAt}">-</span>
-                        </div>
                     </div>
                 </div>
 
@@ -171,9 +188,9 @@
 
                     <div class="btns">
 
-                        <!-- 승인: IN_PROGRESS + 내 차례 -->
+                        <!-- ✅ 승인: IN_PROGRESS + 내 차례 + 참조자 아님 -->
                         <form class="inline"
-                              th:if="${doc.status == 'IN_PROGRESS' and isMyTurn and !isReference}"
+                              th:if="${doc.status.name() == 'IN_PROGRESS' and isMyTurn and !isReference}"
                               method="post" th:action="@{/approval/approve}">
                             <input type="hidden" name="docId" th:value="${doc.docId}">
                             <button type="submit" class="btn primary"
@@ -182,7 +199,7 @@
                             </button>
                         </form>
 
-                        <!-- 반려: IN_PROGRESS + 내 차례 -->
+                        <!-- ✅ 반려: IN_PROGRESS + 내 차례 + 참조자 아님 -->
                         <div class="reject-wrap"
                              th:if="${doc.status.name() == 'IN_PROGRESS' and isMyTurn and !isReference}">
                             <button type="button" class="btn danger" id="btnToggleReject">
@@ -204,14 +221,6 @@
                                     </button>
                                 </div>
                             </form>
-
-
-                            <div style="padding:10px; border:1px solid #ddd; margin:10px 0;">
-                                <div>status = <span th:text="${doc.status}"></span></div>
-                                <div>isMyTurn = <span th:text="${isMyTurn}"></span></div>
-                                <div>isReference = <span th:text="${isReference}"></span></div>
-                                <div>isWriter = <span th:text="${isWriter}"></span></div>
-                            </div>
                         </div>
 
                     </div>

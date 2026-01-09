@@ -3,6 +3,7 @@ package com.Workneed.workneed.Approval.dto;
 import com.Workneed.workneed.Approval.DocStatus;
 import lombok.Data;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -20,6 +21,8 @@ public class DocDTO {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    private LocalDateTime leaveStartDate;
-    private LocalDateTime leaveEndDate;
+    // ✅ 휴가 문서 필드
+    private LocalDate startDate;
+    private LocalDate endDate;
+    private Double leaveDays;
 }

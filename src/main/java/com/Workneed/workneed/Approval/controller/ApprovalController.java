@@ -114,14 +114,14 @@ public class ApprovalController {
        ========================================================== */
 
     @PostMapping("/save")
-    public String save(@ModelAttribute DocDTO dto, HttpSession session) {
+    public String save(DocDTO doc, HttpSession session) {
 
-        Long writerId = getLoginUserId(session);
-        if (writerId == null) return redirectLogin();
+        Long userId = getLoginUserId(session);
+        if (userId == null) return redirectLogin();
 
-        dto.setWriterId(writerId);
-        Long docId = service.save(dto);
+        doc.setWriterId(userId);
 
+        Long docId = service.save(doc);
         return "redirect:/approval/detail/" + docId;
     }
 
@@ -134,7 +134,7 @@ public class ApprovalController {
                          Model model,
                          HttpSession session) {
 
-        ApprovalDoc doc = service.findById(docId);
+        DocDTO doc = service.findById(docId);
         if (doc == null) {
             model.addAttribute("doc", null);
             model.addAttribute("lines", List.of());
@@ -228,7 +228,7 @@ public class ApprovalController {
         }
 
         // 2) 권한 체크(기본: 작성자만)
-        ApprovalDoc doc = service.findById(file.getDocId());
+        DocDTO doc = service.findById(file.getDocId());
         if (doc == null) {
             return ResponseEntity.notFound().build();
         }
@@ -266,7 +266,7 @@ public class ApprovalController {
         }
 
         // 2) 권한 체크(기본: 작성자만)
-        ApprovalDoc doc = service.findById(file.getDocId());
+        DocDTO doc = service.findById(file.getDocId());
         if (doc == null) {
             return "redirect:/approval/inbox/waiting";
         }
@@ -380,7 +380,7 @@ public class ApprovalController {
         Long userId = getLoginUserId(session);
         if (userId == null) return redirectLogin();
 
-        model.addAttribute("title", "승인됨");
+        model.addAttribute("title", "승인함");
         model.addAttribute("active", "myApproved");
         model.addAttribute("list", service.getMyApprovedList(userId));
         return "Approval/approval.inbox";
@@ -391,7 +391,7 @@ public class ApprovalController {
         Long userId = getLoginUserId(session);
         if (userId == null) return redirectLogin();
 
-        model.addAttribute("title", "반려됨");
+        model.addAttribute("title", "반려함");
         model.addAttribute("active", "myRejected");
         model.addAttribute("list", service.getMyRejectedList(userId));
         return "Approval/approval.inbox";
@@ -401,9 +401,21 @@ public class ApprovalController {
         Long userId = getLoginUserId(session);
         if (userId == null) return redirectLogin();
 
-        model.addAttribute("title", "참조됨");
+        model.addAttribute("title", "참조함");
         model.addAttribute("active", "myReference");
         model.addAttribute("list", service.getReferenceList(userId));
         return "Approval/approval.inbox";
     }
+
+    @PostMapping("/my/drafts/delete")
+    public String deleteMyDraft(@RequestParam Long docId, HttpSession session) {
+
+        Long userId = getLoginUserId(session);
+        if (userId == null) return redirectLogin();
+
+        service.deleteMyDraft(docId, userId);
+
+        return "redirect:/approval/my/drafts";
+    }
+
 }
