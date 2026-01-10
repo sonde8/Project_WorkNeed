@@ -4,6 +4,8 @@ import com.Workneed.workneed.Attendance.dto.AttendanceDTO;
 import com.Workneed.workneed.Attendance.dto.TeamAggDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import com.Workneed.workneed.Members.dto.AttendanceRequestCreateDTO;
+
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -14,6 +16,9 @@ public interface AttendanceMapper {
 
     AttendanceDTO findByEmpAndDate(@Param("empId") Long empId,
                                    @Param("workDate") LocalDate workDate);
+
+    // 🔹 근태 수정 요청 저장
+    void insertAttendanceRequest(AttendanceRequestCreateDTO dto);
 
     int upsertCheckIn(@Param("empId") Long empId,
                       @Param("workDate") LocalDate workDate,

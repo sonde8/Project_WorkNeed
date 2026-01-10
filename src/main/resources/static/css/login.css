@@ -1,237 +1,202 @@
-/* 1. 전체 레이아웃 및 중앙 정렬 */
+body {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh; /* 화면 꽉 채우기 */
+    background-color: #f8f9fa;
+    font-family: 'Pretendard', sans-serif;
+}
+
 .login-wrapper {
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 80vh; /* 화면 중앙 배치를 위한 높이 설정 */
-    width: 1340px;
+    width: 100%;
 }
 
-/* 로그인 박스 메인 컨테이너 (이미지의 회색 배경 부분) */
+/* 2. 로그인 컨테이너 */
 .login-container {
-    background-color: #d9d9d9; /* 이미지와 동일한 회색 배경 */
-    padding: 50px 40px;
-    border-radius: 5px;
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
     width: 100%;
     max-width: 450px;
+    padding: 30px 40px 50px;
     text-align: center;
-}
-
-.password-group {
-    position: relative;
-}
-
-.password-group input {
-    padding-right: 45px;
-}
-
-.toggle-password {
-    all: unset;
-    position: absolute;
-    right: 14px;
-    top: 50%;
-    transform: translateY(-50%);
-    cursor: pointer;
-    color: #999;
-    font-size: 16px;
-    z-index: 2;
-}
-
-.toggle-password:hover {
-    color: #333;
-}
-
-
-.login-container h2 {
-    margin-bottom: 30px;
-    font-size: 24px;
-    font-weight: 500;
-}
-
-/* 2. 입력창 (ID, PW) 및 SVG 아이콘 스타일 */
-.input-group {
-    position: relative;
-    margin-bottom: 15px;
-}
-
-/* 입력창 내부 왼쪽 SVG 아이콘 위치 설정 */
-.input-icon {
-    position: absolute;
-    left: 15px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 24px;  /* SVG 아이콘 크기 조절 */
-    height: 24px;
-}
-
-/* 입력창 자체 스타일 */
-.input-group input {
-    width: 100%;
-    padding: 15px 15px 15px 50px; /* 아이콘 공간을 위해 왼쪽 패딩 50px */
-    border: 1px solid #000;
-    border-radius: 15px; /* 둥근 모서리 */
     box-sizing: border-box;
-    font-size: 18px;
+    transition: all 0.3s ease;
+}
+
+/* 애니메이션 효과 */
+.auth-section {
+    animation: fadeIn 0.4s ease-in-out;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* 로고 및 텍스트 간격 조절 */
+.main-logo { width: 130px; margin: 0 auto -20px; display: block; }
+h2 { margin-top: 0; margin-bottom: 25px; font-size: 24px; color: #333; }
+
+/* 입력창 공통 스타일 */
+.input-group { position: relative; margin-bottom: 12px; }
+.input-group input, .modal-input {
+    width: 100%;
+    padding: 15px 15px 15px 45px;
+    border: 1px solid #000;
+    border-radius: 12px;
+    box-sizing: border-box;
+    font-size: 16px;
     background-color: #f8f9fa;
 }
 
-
-/* 비밀번호 찾기 | 회원가입 링크 영역 */
-.links {
-    margin-bottom: 30px;
-    font-size: 15px;
-    color: #333;
-}
-
-.links a {
-    text-decoration: none;
-    color: #333;
-}
-
-/* 4. 버튼 스타일 (로그인, 구글, 관리자) */
-/* 상단 메인 로그인 버튼 */
-.btn-submit {
+/* 구글 로그인 버튼 스타일 */
+.social-btn.google-btn {
     width: 100%;
     padding: 15px;
-    background-color: #e0e0e0;
     border: 1px solid #000;
-    border-radius: 15px;
-    font-size: 20px;
-    font-weight: bold;
-    cursor: pointer;
-    margin-bottom: 20px;
-}
-
-/* 하단 소셜/관리자 로그인 버튼 공통 */
-.social-btn {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #000;
-    border-radius: 15px;
-    margin-bottom: 12px;
-    background-color: #f8f9fa;
+    border-radius: 12px;
+    margin-top: 15px;
+    background-color: #ffffff;
     display: flex;
     justify-content: center;
     align-items: center;
-    cursor: pointer;
-    font-size: 18px;
     text-decoration: none;
     color: #000;
+    font-size: 18px;
+    font-weight: 500;
+    cursor: pointer;
+    box-sizing: border-box;
+    transition: background-color 0.2s;
 }
 
-.social-btn img,
-.input-icon-small {
-    width: 24px;
-    height: 24px;
-    margin-right: 12px;
+.social-btn.google-btn:hover {
+    background-color: #f1f1f1;
 }
 
-.social-btn i {
-    margin-right: 12px;
-    font-size: 22px;
-}
-
+/* 구글 아이콘 크기 */
 .google-icon {
     width: 24px;
     height: 24px;
+    margin-right: 12px;
 }
 
-/* 5. 알림 메시지 스타일 (에러, 성공) */
-.error-msg { color: red; margin-bottom: 15px; font-weight: bold; }
-.info-msg { color: green; margin-bottom: 15px; font-weight: bold; }
+/* 아이디/비번 찾기용 입력창 */
+.modal-input { padding: 15px 20px !important; }
 
-/* 6. 계정 정보 찾기 모달 */
-/* ==========================================================
-   6. 계정 정보 찾기 모달 (단독 노출형 최종본)
-   ========================================================== */
-
-/* 1. 모달 전체 배경: 기존 화면을 완벽하게 덮어버림 */
-.modal {
-    display: none;        /* 초기 상태 숨김 */
-    position: fixed;      /* 브라우저 화면에 박제 (스크롤 해도 따라옴) */
-    top: 0;
-    left: 0;
-    width: 100vw;         /* 화면 가로 전체 */
-    height: 100vh;        /* 화면 세로 전체 */
-    background-color: rgba(0, 0, 0, 0.85) !important; /* 배경을 더 어둡게 해서 뒤를 완전히 가림 */
-    z-index: 999999 !important; /* 그 어떤 요소보다 위에 뜨도록 함 */
-    justify-content: center;
-    align-items: center;
-}
-
-/* JS에서 display: flex를 줄 때 강제 적용 */
-.modal[style*="display: flex"] {
-    display: flex !important;
-}
-
-/* 2. 모달 상자: 원하시던 회색 일체형 박스 */
-.modal-content {
-    background-color: #d9d9d9 !important; /* 원하셨던 그 회색 */
-    border: 1px solid #000 !important;
-    border-radius: 5px !important;       /* 로그인창과 동일한 느낌 */
-    width: 450px !important;             /* 가로 크기 고정 */
-    padding: 50px 40px !important;
-    position: relative;                  /* 내부 요소 정렬 기준 */
-    box-shadow: 0 20px 50px rgba(0,0,0,0.5); /* 입체감 부여 */
-    box-sizing: border-box;
-    text-align: center;
-}
-
-/* 3. 상단 탭 (아이디 찾기 | 비밀번호 찾기) */
-.modal-tabs {
-    margin-bottom: 30px;
-    font-size: 20px;
-    font-weight: bold;
-    color: #888;
-}
-.modal-tabs span { cursor: pointer; padding: 0 10px; }
-.modal-tabs span.active {
-    color: #000;
-    border-bottom: 2px solid #000;
-}
-
-/* 4. 안내 문구 (이미지 텍스트 반영) */
-.guide-text { text-align: left; margin-bottom: 20px; }
-.guide-text b { font-size: 20px; display: block; margin-bottom: 5px; color: #000; }
-.guide-text p { font-size: 14px; color: #333; margin: 0; }
-
-/* 5. 입력창 & 버튼 (시원한 55px 높이 통합) */
-.modal-input, .modal-btn, .result-box {
-    width: 100% !important;
-    height: 55px !important;
-    border: 1px solid #000 !important;
-    border-radius: 15px !important; /* 이미지와 동일한 둥근 모양 */
-    box-sizing: border-box !important;
-    font-size: 16px !important;
-    margin-bottom: 12px;
-}
-
-.modal-input {
-    background-color: #f8f9fa !important;
-    padding: 0 20px !important;
-}
-
-.modal-btn {
-    background-color: #e0e0e0 !important;
+/* 버튼 스타일 */
+.btn-submit, .modal-btn {
+    width: 100%;
+    padding: 16px;
+    background-color: #e0e0e0;
+    border: 1px solid #000;
+    border-radius: 12px;
+    font-size: 18px;
     font-weight: bold;
     cursor: pointer;
     margin-top: 10px;
 }
 
-.result-box {
-    display: none;
-    margin: 15px 0;
-    padding: 12px;
-    background-color: #f0fdf4;
-    border: 1px solid #22c55e;
-    border-radius: 8px;
-    color: #15803d;
-    font-weight: bold;
-    text-align: center;
-    font-size: 0.95rem;
+/* 1. 입력창 그룹 (아이콘의 기준점) */
+.input-group {
+    position: relative;
+    margin-bottom: 15px;
+    width: 100%;
 }
 
-.result-box b {
-    color: #166534;
-    margin: 0 3px;
+/* 2. 왼쪽 아이디/비밀번호 아이콘 */
+.input-icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    z-index: 2;
+    pointer-events: none;
 }
+
+/* 3. 입력창 자체 스타일 */
+.input-group input {
+    width: 100%;
+    padding: 15px 45px 15px 45px;
+    border: 1px solid #000;
+    border-radius: 12px;
+    box-sizing: border-box;
+    font-size: 16px;
+    background-color: #f8f9fa;
+}
+
+/* 4. 비밀번호 전용 그룹  */
+.password-group {
+    position: relative;
+}
+
+/* 5. 오른쪽 눈 아이콘 (비밀번호 보기 토글) */
+.toggle-password {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #666;
+    font-size: 18px;
+    z-index: 3;
+}
+
+/* 1. 하단 링크 영역  */
+/* 1. 하단 링크 */
+.links {
+    margin-top: 20px;
+    margin-bottom: 25px;
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    color: #888;
+}
+
+.links a {
+    /* 파란색/남색을 완전히 제거하고 이미지 속 색상 반영 */
+    text-decoration: none;
+    color: #666666 !important;
+    font-size: 14px;
+    font-weight: 400;
+}
+
+.links a:hover {
+    color: #333333 !important; /* 마우스를 올리면 조금 더 진해짐 */
+}
+
+/* 안내 문구 */
+.guide-text { text-align: left; margin-bottom: 20px; }
+.guide-text b { font-size: 18px; display: block; margin-bottom: 5px; }
+.guide-text p { font-size: 14px; color: #666; margin: 0; }
+
+.error-msg {
+    color: #ef4444 !important; /* 선명한 빨간색 */
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 20px;      /* 아래 입력창과의 간격 확보 */
+    margin-top: -10px;        /* 제목(로그인) 쪽으로 살짝 올림 */
+    text-align: center;
+    display: block;
+}
+
+/* (참고) 성공 메시지도 같은 위치라면 색상만 초록색으로 */
+.info-msg {
+    color: #16a34a !important;
+    font-size: 14px;
+    margin-bottom: 20px;
+    margin-top: -10px;
+    text-align: center;
+    display: block;
+}
+
+/* 관리자 공통 스크롤바 */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-thumb { background-color: rgba(0,0,0,0.1); border-radius: 10px; }

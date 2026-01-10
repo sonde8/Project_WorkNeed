@@ -3,17 +3,7 @@
 /* =========================================
    공통 디자인
    ========================================= */
-:root {
-    --color-bg: #F2F4F7;
-    --color-surface: #FFFFFF;
-    --color-primary: #2C3E50;
-    : #f0f4f8;
-    --color-text---color-primary-lightmain: #333333;
 
-    --border-radius: 12px;
-    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
-
-}
 
 /* =========================================
    Main Page

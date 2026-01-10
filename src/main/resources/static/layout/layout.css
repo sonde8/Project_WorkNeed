@@ -32,6 +32,8 @@
     --color-text-main: #1F2937;       /* 메인 본문색 */
     --color-text-sub: #6B7280;        /* 보조/설명 텍스트색 */
     --color-border: #E5E7EB;          /* 경계선 색상 */
+    --border-radius: 12px;
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
 
     /* 갭 */
     --gap-size1: 10px;
@@ -206,9 +208,12 @@ body {
 /* ====== Toast Notification======= */
 .chat-toast {
     position: fixed !important;
-    top: 20px !important;
-    right: -350px !important;
-    width: 300px !important;
+    /*top: 20px !important;*/
+    top: 25px !important;
+    /*right: -350px !important;*/
+    /*width: 300px !important;*/
+    right: -320px !important;
+    width: 260px !important;
     background-color: rgba(255, 255, 255, 0.9) !important;
     backdrop-filter: blur(10px) !important;
     border-radius: 8px !important;
@@ -222,13 +227,34 @@ body {
 
 .chat-toast.active { right: 25px !important; }
 
-.toast-inner { display: flex !important; padding: 16px !important; align-items: center !important; }
+.toast-inner {
+    display: flex !important;
+    /*padding: 16px !important; */
+    padding: 12px 14px !important;
+    align-items: center !important;
+}
 
-.toast-profile { width: 40px !important; height: 40px !important; margin-right: 12px !important; flex-shrink: 0 !important; }
+.toast-profile {
+    /*width: 40px !important;*/
+    /*height: 40px !important;*/
+    /*margin-right: 12px !important;*/
+    width: 34px !important; /* 40px -> 34px로 축소 */
+    height: 34px !important;
+    margin-right: 10px !important; /* 12px -> 10px로 줄여 텍스트와 가깝게 */
+    flex-shrink: 0 !important;
+}
 
-.toast-profile img { width: 100% !important; height: 100% !important; border-radius: 50% !important; object-fit: cover !important; }
+.toast-profile img {
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 50% !important;
+    object-fit: cover !important;
+}
 
-.toast-text-area { flex: 1 !important; min-width: 0 !important; }
+.toast-text-area {
+    flex: 1 !important;
+    min-width: 0 !important;
+}
 
 .toast-user-name { display: block !important; font-weight: 700 !important; font-size: 14px !important; color: var(--color-text-main) !important; margin-bottom: 2px !important; }
 
@@ -296,10 +322,10 @@ body {
    max-width: 240px !important;
 
     background: #ffffff;
-    border: 1px solid #000000;
+    border: none;
     border-radius: 12px;
     padding: 20px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
     z-index: 10000;
     box-sizing: border-box;
 }
@@ -345,13 +371,15 @@ body {
   text-overflow: ellipsis;
 }
 
-/* 버튼 (컴팩트) */
+/* ✅ 링크 2개를 이름이랑 같은 스타일로 */
 .modal-btn {
   display: block;
-  margin-bottom: 6px; /* ⬅ 간격 줄임 */
-  padding: 8px 10px;  /* ⬅ 높이 줄임 */
-  font-size: 13px;    /* ⬅ 줄임 */
-  border-radius: 6px;
-  text-decoration: none;
+  text-align: center;
+  font-weight: 700;
+  font-size: 13px !important;
+  color: #000;
+  text-decoration: none !important;
+  margin-top: 10px;
 }
+
 .toast-message { display: block !important; font-size: 13px !important; color: var(--color-text-sub) !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; }
