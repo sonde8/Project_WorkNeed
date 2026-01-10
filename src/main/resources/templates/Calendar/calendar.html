@@ -7,6 +7,7 @@
 <th:block layout:fragment="head">
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet"/>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"/>
+
     <link rel="stylesheet" th:href="@{/css/calendar.css}"/>
     <link rel="stylesheet" th:href="@{/css/calendar-modal.css}"/>
     <link rel="stylesheet" th:href="@{/css/calendar-detail-modal.css}"/>
@@ -34,14 +35,16 @@
 
                 <div class="preview-container">
                     <div class="preview-group">
-                        <span class="category-badge" style="background-color: #fee2e2; color: #b91c1c; font-size: 13px; padding: 4px 8px;">업무</span>
+                        <div class="preview-header-badge work">업무</div>
+
                         <ul class="preview-list">
                             <li>
-                                <span class="preview-label">오늘 마감</span>
-                                <div class="preview-right">
-                                    <span class="preview-count" id="workDueTodayCount">0건</span>
-                                    <span id="workDueWarning" class="warning-icon hidden">⚠️</span>
+                                <div class="preview-label-group">
+                                    <span class="preview-label">오늘 마감</span>
+                                    <span id="workDueWarning" class="warning-icon hidden" style="font-size: 12px;">⚠️</span>
                                 </div>
+
+                                <span class="preview-count" id="workDueTodayCount">0건</span>
                             </li>
                             <li>
                                 <span class="preview-label">이번 주 마감</span>
@@ -51,7 +54,8 @@
                     </div>
 
                     <div class="preview-group">
-                        <span class="category-badge" style="background-color: #dbeafe; color: #1d4ed8; font-size: 13px; padding: 4px 8px;">개인</span>
+                        <div class="preview-header-badge personal">개인</div>
+
                         <ul class="preview-list">
                             <li>
                                 <span class="preview-label">이번 주 일정</span>
@@ -72,28 +76,50 @@
             </section>
         </aside>
 
-        <section class="calendar-right">
-            <div class="calendar-inner">
-                <div id="calendar"></div>
-            </div>
-        </section>
+        <div class="calendar-right-container">
 
+            <section id="calendarViewSection" class="calendar-view-section">
+                <div class="calendar-inner">
+                    <div id="calendar"></div>
+                </div>
+            </section>
+
+            <section id="workListSection" class="work-list-section hidden">
+                <div class="work-list-header">
+                    <h3 class="work-list-title">
+                        📋 업무 스케줄
+                        <span id="workListRangeLabel" class="work-range-label"></span>
+                    </h3>
+                    <div class="work-list-controls">
+                    </div>
+                </div>
+
+                <div class="work-list-body">
+                    <ul id="workScheduleList" class="work-schedule-ul">
+                    </ul>
+                    <div id="workListEmptyMsg" class="work-empty-msg hidden">
+                        해당 기간에 예정된 업무 일정이 없습니다.
+                    </div>
+                </div>
+            </section>
+
+        </div>
     </div>
 
     <div class="modal-overlay hidden" id="calendarDailyListModalOverlay" aria-hidden="true">
-        <div class="modal-container" style="max-height: 500px; display: flex; flex-direction: column;">
+        <div class="modal-container daily-list-modal">
             <div class="modal-header">
                 <h2 id="dailyListTitle"></h2>
                 <button type="button" class="modal-close-btn" id="closeDailyListBtn">✕</button>
             </div>
-            <div class="modal-body" style="flex: 1; overflow-y: auto;">
+            <div class="modal-body">
                 <ul id="dailyEventList" class="daily-list-simple-ul"></ul>
-                <div id="dailyListEmptyMsg" class="hidden" style="text-align: center; color: #999; padding: 20px;">
+                <div id="dailyListEmptyMsg" class="hidden daily-empty">
                     등록된 일정이 없습니다.
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn-submit" id="dailyListAddBtn" style="width: 100%;">
+                <button type="button" class="btn-submit" id="dailyListAddBtn">
                     + 이 날짜에 일정 등록
                 </button>
             </div>
@@ -101,7 +127,6 @@
     </div>
 
     <div th:replace="~{Calendar/calendar-modal :: calendarCreateModal}"></div>
-
     <div th:replace="~{Calendar/calendar-detail-modal :: calendarDetailModal}"></div>
 
 </main>
@@ -118,6 +143,7 @@
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
     <script src='https://cdn.jsdelivr.net/npm/@fullcalendar/google-calendar@6.1.10/index.global.min.js'></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
     <script th:src="@{/js/calendar.js}"></script>
     <script th:src="@{/js/calendar-detail-modal.js}"></script>
     <script th:src="@{/js/calendar-modal.js}"></script>
