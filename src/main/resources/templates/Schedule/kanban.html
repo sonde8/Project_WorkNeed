@@ -22,7 +22,7 @@
                                          th:classappend="${item.endAt != null and item.endAt.isBefore(now)} ? 'is-overdue'">
                     <div class="title-event-type">
                         <span class="badge-expired" th:if="${item.endAt != null and item.endAt.isBefore(now)}">
-                            만료
+                            기간 만료
                         </span>
                         <div class="title" th:text="${item.title}">Title</div>
                         <div class="event-type" th:text="${item.eventType}">Event Type</div>

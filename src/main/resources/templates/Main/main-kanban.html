@@ -18,12 +18,13 @@
             <div class="mk-list">
 
                 <div class="mk-card" th:each="item : ${mainTodo}">
-                    <div class="mk-card-title" th:text="${item.scheduleTitle}">schedule 제목</div>
-
+                    <div class="mk-card-header">
+                        <div class="mk-card-title" th:text="${item.scheduleTitle}">schedule 제목</div>
+                        <span class="mk-card-eventType" th:text="${item.eventType}">type</span>
+                    </div>
                     <div class="mk-task-desc" th:text="${item.taskDescription}">task 내용</div>
 
                     <div class="mk-card-meta">
-                        <span th:text="${item.eventType}">type</span>
                         <div>
                             <span th:text="${#temporals.format(item.startAt, 'MM-dd')}">start</span>
                             <span> - </span>
@@ -43,12 +44,13 @@
             <div class="mk-list">
 
                 <div class="mk-card" th:each="item : ${mainDoing}">
-                    <div class="mk-card-title" th:text="${item.scheduleTitle}">schedule 제목</div>
-
+                    <div class="mk-card-header">
+                        <div class="mk-card-title" th:text="${item.scheduleTitle}">schedule 제목</div>
+                        <span class="mk-card-eventType" th:text="${item.eventType}">type</span>
+                    </div>
                     <div class="mk-task-desc" th:text="${item.taskDescription}">task 내용</div>
 
                     <div class="mk-card-meta">
-                        <span th:text="${item.eventType}">type</span>
                         <div>
                             <span th:text="${#temporals.format(item.startAt, 'MM-dd')}">start</span>
                             <span> - </span>
