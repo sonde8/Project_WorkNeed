@@ -32,6 +32,8 @@
     --color-text-main: #1F2937;       /* 메인 본문색 */
     --color-text-sub: #6B7280;        /* 보조/설명 텍스트색 */
     --color-border: #E5E7EB;          /* 경계선 색상 */
+    --border-radius: 12px;
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
 
     /* 갭 */
     --gap-size1: 10px;
