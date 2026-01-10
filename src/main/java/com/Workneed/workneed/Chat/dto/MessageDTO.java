@@ -31,4 +31,13 @@ public class MessageDTO {
 
     // 파일 원본명
     private String fileName;
+
+    // 프로필 이미지 불러오기용
+    private String roomProfileImage;
+
+    // 토스트 알림 프로필 이미지용
+    private String senderProfileImage;
+
+    // 채팅방 타입을 알아보기 위함
+    private String roomType;
 }

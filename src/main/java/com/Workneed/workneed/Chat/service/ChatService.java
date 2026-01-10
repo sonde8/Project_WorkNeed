@@ -97,7 +97,7 @@ public class ChatService {
     // 1-3. 특정 채팅방 상세 정보 조회
     // 방 ID로 상세 정보 조회, 이름이 없는 경우 자동 생성 로직
     public ChatRoomDTO getRoomDetail(Long roomId, Long userId) {
-        ChatRoomDTO room = chatRoomMapper.findRoomById(roomId);
+        ChatRoomDTO room = chatRoomMapper.findRoomById(roomId, userId);
         if (room != null && (room.getRoomName() == null || room.getRoomName().trim().isEmpty())) {
             // 자동 방 생성 로직 적용
             room.setRoomName(generateAutoRoomName(roomId, userId));
@@ -193,9 +193,34 @@ public class ChatService {
 
         // 2. [추가] 방 참여자 전원의 개인 채널로 메시지 전송 (방 외부에 있는 사람들 목록/배지 갱신용)
         List<Long> participantIds = chatRoomMapper.findAllParticipantIdsByRoomId(messageDTO.getRoomId());
+
         for (Long participantId : participantIds) {
-            // 본인이 보낸 메시지도 목록 상단 이동을 위해 전송하거나, 타인에게만 보낼지 선택 가능
-            // 여기서는 모든 참여자의 목록을 실시간으로 갱신하기 위해 전원에게 발송합니다.
+            // 1. 받는 사람(participantId) 기준의 최신 방 정보(안 읽은 개수 포함)를 DB에서 조회
+            ChatRoomDTO updatedRoomInfo = chatRoomMapper.findRoomById(messageDTO.getRoomId(), participantId);
+
+            // 토스트 메세지 발신자 최신 프로필 정보를 가져옴
+            UserDTO sender = chatUserMapper.findUserById(messageDTO.getSenderId());
+
+            if (updatedRoomInfo != null) {
+                // 2. MessageDTO에 해당 수신자의 정확한 unreadCount를 주입
+                messageDTO.setUnreadCount(updatedRoomInfo.getUnreadCount());
+
+                // 1:1 채팅이면 프로필사진이 출력되게 하는 코드
+                messageDTO.setRoomType(updatedRoomInfo.getRoomType());
+                messageDTO.setRoomProfileImage(updatedRoomInfo.getRoomProfileImage());
+
+                // 3. 1:1 채팅일 경우 상대방 이름이 정확히 나오도록 보정
+                if ("DIRECT".equals(updatedRoomInfo.getRoomType())) {
+                    messageDTO.setRoomName(updatedRoomInfo.getRoomName());
+                }
+            }
+
+            // 토스트알림용 프로필 이미지 출력을 위한 로직
+            if (sender != null) {
+                messageDTO.setSenderProfileImage(sender.getUserProfileImage());
+            }
+
+            // 4. 개별 참여자의 채널로 '개인화된' 메시지 정보 전송
             messagingTemplate.convertAndSend("/sub/user/" + participantId + "/rooms", messageDTO);
         }
 
@@ -207,7 +232,7 @@ public class ChatService {
     @Transactional
     public MessageDTO sendSystemMessage(Long roomId, Long userId, String type) {
         // 현재 방 정보를 조회하여 타입을 확인
-        ChatRoomDTO room = chatRoomMapper.findRoomById(roomId);
+        ChatRoomDTO room = chatRoomMapper.findRoomById(roomId,  userId);
 
         // 방이 존재하고 방 타입이 GROUP일 때만 시스템 메세지를 생성
         // 1:1인 경우에는 null 반환 or 로직 종료

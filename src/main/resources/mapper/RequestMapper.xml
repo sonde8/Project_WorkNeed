@@ -12,13 +12,19 @@
         WHERE request_id = #{requestId}
     </select>
 
-    <select id="findPendingAttendanceRequests"
-            resultType="RequestDTO">
-        SELECT *
-        FROM request
-        WHERE request_type = 'ATTENDANCE'
-        AND status = 'PENDING'
-        ORDER BY request_created_at ASC
+    <select id="findPendingAttendanceRequests" resultType="com.Workneed.workneed.Members.dto.RequestDTO">
+        SELECT
+        r.request_id         AS requestId,
+        r.user_id            AS userId,
+        u.user_name          AS userName,
+        d.dept_name          AS deptName,
+        rk.rank_name         AS rankName,
+        r.request_payload    AS requestPayload,
+        r.request_created_at AS requestCreatedAt,
+        r.status             AS status  FROM request r  JOIN user u ON r.user_id = u.user_id
+        LEFT JOIN dept d ON u.dept_id = d.dept_id
+        LEFT JOIN ranks rk ON u.rank_id = rk.rank_id
+        WHERE r.status = 'PENDING'  AND r.request_type = 'ATTENDANCE' ORDER BY r.request_id DESC
     </select>
 
     <update id="approve">
@@ -46,7 +52,6 @@
         #{userId}, #{requestType}, #{requestPayload}, #{status}
         )
     </insert>
-
 
 
 </mapper>

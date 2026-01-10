@@ -2,7 +2,7 @@ package com.Workneed.workneed.Members.controller;
 
 import com.Workneed.workneed.Members.dto.AdminUserDTO;
 import com.Workneed.workneed.Members.dto.RequestDTO;
-import com.Workneed.workneed.Members.service.AttendanceAdminService;
+import com.Workneed.workneed.Members.service.AttendanceAdminQueryService;
 import com.Workneed.workneed.Members.service.AttendanceApproveService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AdminAttendanceController {
 
-    private final AttendanceAdminService attendanceAdminService;
+    private final AttendanceAdminQueryService attendanceAdminQueryService;
     private final AttendanceApproveService attendanceApproveService;
 
     // 🔹 근태 요청 목록 (페이지)
@@ -27,7 +27,7 @@ public class AdminAttendanceController {
     public String pendingAttendanceList(Model model) {
 
         List<RequestDTO> requests =
-                attendanceAdminService.getPendingRequests();
+                attendanceAdminQueryService.getPendingRequests();
 
         model.addAttribute("requests", requests);
         return "Members/admin_attendance_list";

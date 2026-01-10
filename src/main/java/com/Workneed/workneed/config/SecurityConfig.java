@@ -52,51 +52,51 @@ public class SecurityConfig {
                                 "/upload/**"
                         ).permitAll()
 
-                // 🔽 여기부터 권한
-                .requestMatchers("/admin/dept/**")
-                .hasAnyAuthority(
-                        "DEPT_ASSIGN",
-                        "DEPT_CREATE",
-                        "DEPT_UPDATE",
-                        "DEPT_DELETE"
+                        // 🔽 여기부터 권한
+                        .requestMatchers("/admin/dept/**")
+                        .hasAnyAuthority(
+                                "DEPT_ASSIGN",
+                                "DEPT_CREATE",
+                                "DEPT_UPDATE",
+                                "DEPT_DELETE"
+                        )
+
+                        .requestMatchers("/admin/rank/**")
+                        .hasAnyAuthority(
+                                "RANK_ASSIGN",
+                                "RANK_CREATE",
+                                "RANK_UPDATE",
+                                "RANK_DELETE"
+                        )
+
+                        .requestMatchers("/admin/leave/**")
+                        .hasAnyAuthority(
+                                "LEAVE_APPROVE",
+                                "LEAVE_REJECT"
+                        )
+
+                        .requestMatchers("/admin/attend/**")
+                        .hasAnyAuthority(
+                                "ATTEND_APPROVE",
+                                "ATTEND_REJECT"
+                        )
+
+                        // ※ 관리자는 아직 세션 기반이므로 일단 permit
+                        .requestMatchers("/admin/**").authenticated()
+                        .requestMatchers("/main", "/main/**").authenticated()
+                        .anyRequest().authenticated()
                 )
 
-                .requestMatchers("/admin/rank/**")
-                .hasAnyAuthority(
-                        "RANK_ASSIGN",
-                        "RANK_CREATE",
-                        "RANK_UPDATE",
-                        "RANK_DELETE"
-                )
 
-                .requestMatchers("/admin/leave/**")
-                .hasAnyAuthority(
-                        "LEAVE_APPROVE",
-                        "LEAVE_REJECT"
-                )
-
-                .requestMatchers("/admin/attend/**")
-                .hasAnyAuthority(
-                        "ATTEND_APPROVE",
-                        "ATTEND_REJECT"
-                )
-
-                // ※ 관리자는 아직 세션 기반이므로 일단 permit
-                .requestMatchers("/admin/**").authenticated()
-                .requestMatchers("/main", "/main/**").authenticated()
-                .anyRequest().authenticated()
-                )
-
-
-                 // 일반 로그인 (HTML 구조에 맞춤)
+                // 일반 로그인 (HTML 구조에 맞춤)
                 .formLogin(form -> form
-                .loginPage("/login")
-                .loginProcessingUrl("/login-user")
-                .usernameParameter("loginId")
-                .passwordParameter("password")
-                .successHandler(loginSuccessHandler)
-                .failureHandler(loginFailureHandler)
-                .defaultSuccessUrl("/main", true)
+                        .loginPage("/login")
+                        .loginProcessingUrl("/login-user")
+                        .usernameParameter("loginId")
+                        .passwordParameter("password")
+                        .successHandler(loginSuccessHandler)
+                        .failureHandler(loginFailureHandler)
+                        .defaultSuccessUrl("/main", true)
                 )
 
 
@@ -112,8 +112,10 @@ public class SecurityConfig {
                         .loginPage("/login")
                         .userInfoEndpoint(userInfo -> userInfo
                                 .oidcUserService(customOidcUserService)
+                                .userService(customOAuth2UserService)
                         )
                         .successHandler(loginSuccessHandler)
+                        .failureHandler(loginFailureHandler)
                 )
 
 

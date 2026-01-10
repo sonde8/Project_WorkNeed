@@ -48,9 +48,11 @@ public interface AdminUserMapper {
     // 9 마지막 로그인 시간
     void updateLastLogin(@Param("adminId") Long adminId);
 
-    // 10
+    // 10 권한id로 조회
     List<String> findPermissionsByRoleId(@Param("roleId") Long roleId);
 
+    // 이메일중복검사
+    boolean existsByEmail(String adminEmail);
 
 
 

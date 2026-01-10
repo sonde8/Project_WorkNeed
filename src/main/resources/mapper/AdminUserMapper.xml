@@ -57,17 +57,17 @@
         ORDER BY a.admin_created_at DESC
     </select>
 
-    <select id="findAllActivityLogs" resultType="com.Workneed.workneed.Members.dto.AdminUserDTO">
+    <select id="findAllActivityLogs"
+            resultType="com.Workneed.workneed.Members.dto.AdminUserDTO">
         SELECT
         l.log_id AS logId,
         a.admin_name AS adminName,
         r.role_name AS roleName,
         l.log_action_type AS logActionType,
-        l.log_description AS logDescription,
+        '' AS logDescription,
         l.log_created_at AS logCreatedAt
         FROM adminactivitylog l
         JOIN adminuser a ON l.admin_id = a.admin_id
-        /* 여기도 Role에서 AdminRole로 수정 */
         LEFT JOIN adminrole r ON a.role_id = r.role_id
         ORDER BY l.log_created_at DESC
     </select>
@@ -94,21 +94,22 @@
         )
     </insert>
 
-    <insert id="insertActivityLog" parameterType="com.Workneed.workneed.Members.dto.AdminUserDTO">
+    <insert id="insertActivityLog"
+            parameterType="com.Workneed.workneed.Members.dto.AdminUserDTO">
         INSERT INTO adminactivitylog (
-        admin_id,
-        log_action_type,
-        log_target_type,
-        log_target_id,
-        log_description
+            admin_id,
+            log_action_type,
+            log_target_type,
+            log_target_id,
+            log_created_at
         )
         VALUES (
-        #{adminId},
-        #{logActionType},
-        #{logTargetType},
-        #{logTargetId},
-        #{logDescription}
-        )
+                   #{adminId},
+                   #{logActionType},
+                   #{logTargetType},
+                   #{logTargetId},
+                   NOW()
+               )
     </insert>
 
     <update id="updateMemberStatus" >

@@ -32,6 +32,8 @@
     --color-text-main: #1F2937;       /* 메인 본문색 */
     --color-text-sub: #6B7280;        /* 보조/설명 텍스트색 */
     --color-border: #E5E7EB;          /* 경계선 색상 */
+    --border-radius: 12px;
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
 
     /* 갭 */
     --gap-size1: 10px;
@@ -204,33 +206,73 @@ body {
 
 
 /* ====== Toast Notification======= */
+/* ====== layout.css 내의 Toast Notification 최종 확정본 ======= */
 .chat-toast {
     position: fixed !important;
-    top: 20px !important;
-    right: -350px !important;
-    width: 300px !important;
-    background-color: rgba(255, 255, 255, 0.9) !important;
+    top: 25px !important;
+    right: -320px !important; /* 화면 밖 대기 위치 */
+    width: 260px !important; /* 콤팩트한 너비 */
+    background-color: rgba(255, 255, 255, 0.95) !important;
     backdrop-filter: blur(10px) !important;
-    border-radius: 8px !important;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15) !important;
     z-index: 999999 !important;
-    transition: right 0.4s ease-out !important;
-    border: 1px solid rgba(255, 255, 255, 0.4) !important;
+    transition: right 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+    border: 1px solid rgba(255, 255, 255, 0.5) !important;
     cursor: pointer;
     overflow: hidden !important;
 }
 
-.chat-toast.active { right: 25px !important; }
+.chat-toast.active {
+    right: 25px !important; /* 등장 시 위치 */
+}
 
-.toast-inner { display: flex !important; padding: 16px !important; align-items: center !important; }
+.toast-inner {
+    display: flex !important;
+    flex-direction: row !important; /* 가로 정렬 강제 */
+    padding: 12px 14px !important;
+    align-items: center !important;
+    justify-content: flex-start !important; /* 왼쪽 정렬 강제 */
+    width: 100% !important;
+}
 
-.toast-profile { width: 40px !important; height: 40px !important; margin-right: 12px !important; flex-shrink: 0 !important; }
+.toast-profile {
+    width: 34px !important;
+    height: 34px !important;
+    margin-right: 12px !important; /* 이미지와 이름 사이 낭비 공간 제거 */
+    flex-shrink: 0 !important;
+    display: block !important;
+}
 
-.toast-profile img { width: 100% !important; height: 100% !important; border-radius: 50% !important; object-fit: cover !important; }
+.toast-profile img {
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 50% !important;
+    object-fit: cover !important;
+}
 
-.toast-text-area { flex: 1 !important; min-width: 0 !important; }
+.toast-text-area {
+    flex: 1 !important;
+    min-width: 0 !important;
+    text-align: left !important; /* 중앙 정렬 간섭 차단 */
+}
 
-.toast-user-name { display: block !important; font-weight: 700 !important; font-size: 14px !important; color: var(--color-text-main) !important; margin-bottom: 2px !important; }
+.toast-user-name {
+    display: block !important;
+    font-weight: 700 !important;
+    font-size: 13px !important;
+    color: #1F2937 !important;
+    margin-bottom: 2px !important;
+}
+
+.toast-message {
+    display: block !important;
+    font-size: 12px !important;
+    color: #6B7280 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
 
 /* 호버 시 살짝 반응 */
 .chat-toast:hover {
@@ -296,10 +338,10 @@ body {
    max-width: 240px !important;
 
     background: #ffffff;
-    border: 1px solid #000000;
+    border: none;
     border-radius: 12px;
     padding: 20px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
     z-index: 10000;
     box-sizing: border-box;
 }
@@ -345,13 +387,14 @@ body {
   text-overflow: ellipsis;
 }
 
-/* 버튼 (컴팩트) */
+/* ✅ 링크 2개를 이름이랑 같은 스타일로 */
 .modal-btn {
   display: block;
-  margin-bottom: 6px; /* ⬅ 간격 줄임 */
-  padding: 8px 10px;  /* ⬅ 높이 줄임 */
-  font-size: 13px;    /* ⬅ 줄임 */
-  border-radius: 6px;
-  text-decoration: none;
+  text-align: center;
+  font-weight: 700;
+  font-size: 13px !important;
+  color: #000;
+  text-decoration: none !important;
+  margin-top: 10px;
 }
-.toast-message { display: block !important; font-size: 13px !important; color: var(--color-text-sub) !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; }
+

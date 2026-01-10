@@ -127,11 +127,25 @@ function showToastNotification(data) {
     if (data.messageType === 'IMAGE') preview = "📷 사진을 보냈습니다.";
     else if (data.messageType === 'FILE') preview = "📎 파일을 보냈습니다.";
 
+    // 서버에서 보낸 발신자 프로필 이미지를 사용 (없으면 기본값)
+    const senderImg = data.senderProfileImage || '/images/profile300.svg';
+
     // 콤팩트한 카드 구조
+    // toast.innerHTML = `
+    //     <div class="toast-inner">
+    //         <div class="toast-profile">
+    //             <img src="/images/profile300.svg">
+    //         </div>
+    //         <div class="toast-text-area">
+    //             <div class="toast-user-name">${data.senderName}</div>
+    //             <div class="toast-message">${preview}</div>
+    //         </div>
+    //     </div>
+    // `;
     toast.innerHTML = `
         <div class="toast-inner">
             <div class="toast-profile">
-                <img src="/images/profile300.svg">
+                <img src="${senderImg}" onerror="this.src='/images/profile300.svg'">
             </div>
             <div class="toast-text-area">
                 <div class="toast-user-name">${data.senderName}</div>
@@ -199,6 +213,16 @@ function getKstDisplayTime(dateString) {
     return `${ampm} ${formattedHours}:${formattedMinutes}`;
 }
 
+function getRelativeTime() {
+    const now = new Date();
+    const hours = now.getHours();
+    const minutes = now.getMinutes();
+    const ampm = hours >= 12 ? "오후 " : "오전 ";
+    const formattedHours = hours % 12 || 12;
+    const formattedMinutes = minutes < 10 ? "0" + minutes : minutes;
+    return ampm + formattedHours + ":" + formattedMinutes;
+}
+
 /**
  * 실시간 메시지 수신 시 목록 갱신 함수 (주석 포함)
  */
@@ -220,8 +244,12 @@ function refreshRoomList(data) {
         displayImg = '/images/team2_300.svg';
     }
 
-    const type = data.messageType ? data.messageType.trim().toUpperCase() : 'TALK';
-    let previewText = data.content || "새로운 대화가 있습니다.";
+    // [추가] 메시지 타입 판별 로직 (data.lastMessageType이 있다면 우선 사용)
+    const msgType = data.messageType || data.lastMessageType || 'TALK';
+    const type = msgType.trim().toUpperCase();
+
+    // [추가] 프리뷰 텍스트 결정 (내용이 없으면 기본 문구 출력)
+    let previewText = data.content || data.lastMessageContent || "새로운 대화가 시작되었습니다.";
     if (type === 'IMAGE') previewText = "사진을 보냈습니다.";
     else if (type === 'FILE') previewText = "파일을 보냈습니다.";
 
@@ -245,7 +273,8 @@ function refreshRoomList(data) {
         if (badgeElement) {
             if (String(targetRoomId) !== String(window.roomId)) {
                 let currentCount = parseInt(badgeElement.textContent) || 0;
-                badgeElement.textContent = currentCount + 1;
+                badgeElement.textContent = (data.unreadCount !== undefined && data.unreadCount !== 0)
+                    ? data.unreadCount : currentCount + 1;
                 badgeElement.classList.remove('hidden');
             } else {
                 fetch(`/chat/room/${targetRoomId}/read`, {method: 'POST'});
@@ -253,14 +282,18 @@ function refreshRoomList(data) {
                 badgeElement.classList.add('hidden');
             }
         }
+        // [수정] 메시지가 온 방을 목록의 최상단으로 이동시킴
         roomListContainer.prepend(roomElement);
     } else {
         // 2. 목록에 없는 새 방 생성 시
         const userCountHtml = (data.roomType === 'GROUP' && data.userCount > 0)
             ? `<span class="user-count">${data.userCount}</span>` : '';
 
+        // [추가] 새 방 생성 시 active 클래스 조건 (현재 생성된 방으로 바로 이동한 경우 대비)
+        const activeClass = (String(window.roomId) === String(data.roomId)) ? 'active' : '';
+
         const roomHtml = `
-        <div id="room-${data.roomId}" class="room-card" data-room-id="${data.roomId}">
+        <div id="room-${data.roomId}" class="room-card ${activeClass}" data-room-id="${data.roomId}">
             <a href="/chat/room/${data.roomId}">
                 <div class="profile-img">
                     <img src="${displayImg}" alt="프로필">
@@ -278,9 +311,12 @@ function refreshRoomList(data) {
                 </div>
             </a>
         </div>`;
+
+        // [수정] 신규 방을 목록의 가장 위(afterbegin)에 삽입함
         roomListContainer.insertAdjacentHTML('afterbegin', roomHtml);
     }
 }
+
 /**
  * 실시간 숫자 차감 로직
  */

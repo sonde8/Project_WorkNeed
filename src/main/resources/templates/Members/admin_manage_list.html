@@ -7,16 +7,24 @@
 </head>
 <body>
 
-<div th:replace="~{Members/admin_user_list :: .admin-header}"></div>
 
-<div style="padding: 20px;">
-    <div style="display: flex; gap: 20px; border-bottom: 1px solid #ddd; margin-bottom: 20px;">
-        <a th:href="@{/admin/member/list}" class="btn-tab">직원 관리</a>
-        <a th:href="@{/admin/manage/list}" class="btn-tab active">관리자 설정</a>
-        <a th:href="@{/admin/log/list}" class="btn-tab">활동 로그</a>
-    </div>
+<div class="admin-header" th:if="${admin != null}">
+    <span>관리자: <b th:text="${admin.adminName}">관리자</b></span>
+    <form th:action="@{/logout}" method="post">
+        <button type="submit" class="btn-secondary">로그아웃</button>
+    </form>
+</div>
 
-    <h2>👤 시스템 관리자 목록</h2>
+<div class="admin-tabs">
+    <a th:href="@{/admin/member/list}" class="btn-tab">직원 관리</a>
+    <a th:href="@{/admin/attendance/list}" class="btn-tab">근태 요청 관리</a>
+    <a th:href="@{/admin/manage/list}" class="btn-tab active">관리자 설정</a>
+    <a th:href="@{/admin/log/list}" class="btn-tab ">활동 로그</a>
+</div>
+
+
+<div class="admin-content">
+    <h2> 시스템 관리자 목록</h2>
     <table>
         <thead>
         <tr>
@@ -61,21 +69,6 @@
     </table>
 </div>
 
-<script>
-    function changeAdminStatus(targetId, currentStatus) {
-        const nextStatus = (currentStatus === 'ACTIVE') ? 'SUSPENDED' : 'ACTIVE';
-        if(!confirm(`관리자 상태를 ${nextStatus}로 변경하시겠습니까?`)) return;
-
-        fetch('/admin/manage/status', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: new URLSearchParams({ targetId: targetId, status: nextStatus })
-        }).then(res => res.text()).then(result => {
-            if(result === "success") location.reload();
-            else if(result === "self_error") alert("본인 계정은 정지할 수 없습니다.");
-            else alert("오류가 발생했습니다.");
-        });
-    }
-</script>
+<script src="/js/admin_manage_list.js"></script>
 </body>
 </html>
