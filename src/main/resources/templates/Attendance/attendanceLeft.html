@@ -1,24 +1,26 @@
+<!-- 출 퇴근 버튼 -->
+<section class="rows" data-att-rows th:fragment="attendanceRows">
+
+    <div class="row"><span>출근 시간</span>
+        <span class="muted" data-checkin>미등록</span>
+        <button class="btn" data-action="checkin" type="button">출근하기</button>
+    </div>
+
+
+    <div class="row"><span>퇴근 시간</span>
+        <span class="muted" data-checkout>미등록</span>
+        <button class="btn" data-action="checkout" type="button">퇴근하기</button>
+    </div>
+
+</section>
+
+
 <!-- 근태관리 왼쪽 영역 -->
 <section class="att-left" th:fragment="attendanceLeft">
 
-    <div class="title">근태 관리</div>
-
     <div class="clock" data-clock>00 : 00 : 00</div>
 
-    <div class="rows">
-
-        <div class="row"><span>출근시간</span>
-                         <span class="muted" data-checkin>미등록</span>
-                         <button class="btn" data-action="checkin" type="button">출 근 하 기</button>
-        </div>
-
-
-        <div class="row"><span>퇴근시간</span>
-                         <span class="muted" data-checkout>미등록</span>
-                         <button class="btn" data-action="checkout" type="button">퇴 근 하 기</button>
-        </div>
-
-    </div>
+    <section th:replace="~{Attendance/attendanceLeft :: attendanceRows}"></section>
 
     <div class="rowMonth">
         <div class="row"><span>월간누적시간</span><span class="muted" data-monthtotal>미등록</span></div>

@@ -1,6 +1,7 @@
     function AtdLeft(){
 
-        const root = document.querySelector('.att-left');
+        const root = document.querySelector('.att-left') ||
+                             document.querySelector('[data-att-rows]');
         if(!root) return;
 
         // 왼쪽 엘리먼트
@@ -16,7 +17,7 @@
         const stateTextEl  = root.querySelector('[data-state-text]');
         const stateModal   = root.querySelector('[data-state-modal]');
 
-        if (!clockEl || !checkInBtn || !checkOutBtn || !stateBtn || !stateTextEl || !stateModal) return;
+        if (!checkInBtn || !checkOutBtn || !checkInEl || !checkOutEl) return;
 
         // 현재 시간
         function nowTimeString(){
@@ -31,25 +32,28 @@
         function updateClock(){
             clockEl.textContent = nowTimeString();
         }
-        updateClock();
-        setInterval(updateClock, 1000);
+
+        if(clockEl){
+            updateClock();
+            setInterval(updateClock, 1000);
+        }
 
         function setButtons(summary){
             const hasIn = !!summary.todayCheckIn;
             const hasOut = !!summary.todayCheckOut;
 
             checkInBtn.disabled = hasIn;
-            checkInBtn.textContent = hasIn ? '출 근 완 료' : '출 근 하 기';
+            checkInBtn.textContent = hasIn ? '출근' : '출근하기';
 
             if(!hasIn){
                 checkOutBtn.disabled = true;
-                checkOutBtn.textContent = '퇴 근';
+                checkOutBtn.textContent = '퇴근';
             } else if(hasOut){
                 checkOutBtn.disabled = true;
-                checkOutBtn.textContent = '퇴 근 완 료';
+                checkOutBtn.textContent = '퇴근';
             } else {
                 checkOutBtn.disabled = false;
-                checkOutBtn.textContent = '퇴 근 하 기';
+                checkOutBtn.textContent = '퇴근 하기';
             }
         }
 
@@ -60,8 +64,9 @@
 
             checkInEl.textContent = s.todayCheckIn ?? '미등록';
             checkOutEl.textContent = s.todayCheckOut ?? '미등록';
-            monthTotalEl.textContent = s.monthTotal ?? '0h 0m';
-            stateTextEl.textContent = s.todayStatusText ?? '업무 상태 변경하기';
+
+            if(monthTotalEl) monthTotalEl.textContent = s.monthTotal ?? '0h 0m';
+            if(stateTextEl)  stateTextEl.textContent  = s.todayStatusText ?? '업무 상태 변경하기';
 
             setButtons(s);
 
