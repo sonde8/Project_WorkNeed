@@ -1,6 +1,11 @@
 @charset "UTF-8";
 
 /* =========================================
+   공통 디자인
+   ========================================= */
+
+
+/* =========================================
    Main Page
    ========================================= */
 body {
@@ -34,6 +39,7 @@ body {
     height: 100%;
     background-color: var(--color-surface);
     border-radius: var(--border-radius);
+    border: 1px solid #ddd;
     box-shadow: var(--shadow-sm);
     padding: var(--gap-size2);
     box-sizing: border-box;
@@ -180,8 +186,8 @@ body {
     overflow: hidden;
 }
 
-.mini-kanban { grid-column: 1 / 2; grid-row: 1 / 2; }
-.main-borad { grid-column: 1 / 2; grid-row: 2 / 3; }
+.mini-kanban { grid-column: 1 / 2; grid-row: 1 / 2; border: 1px solid #ddd; }
+.main-board { grid-column: 1 / 2; grid-row: 2 / 3; }
 .mini-meetingroom { grid-column: 2 / 3; grid-row: 1 / 3; }
 
 /* =========================================
