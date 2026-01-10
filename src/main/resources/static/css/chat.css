@@ -14,7 +14,7 @@
 2. 왼쪽 채팅방 목록 사이드바
 ========================================== */
 .chat-sidebar {
-    width: 350px;             /* 캘린더 사이드바와 비슷하게 조정 */
+    width: 420px;             /* 캘린더 사이드바와 비슷하게 조정 */
     background-color: #ffffff;
     border: 1px solid #DEE2E6; /* --border-color */
     border-radius: 12px;       /* --border-radius-lg */
