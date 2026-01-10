@@ -2,7 +2,6 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.Workneed.workneed.Members.mapper.AdminUserMapper">
 
-    <!--관리자 기능중 근태만x-->
     <select id="findAllMembersForAdmin" resultType="com.Workneed.workneed.Members.dto.UserDTO">
         SELECT u.*, r.rank_name AS rankname, d.dept_name AS deptname
         FROM user u
@@ -58,14 +57,15 @@
         ORDER BY a.admin_created_at DESC
     </select>
 
-    <select id="findAllActivityLogs" resultType="com.Workneed.workneed.Members.dto.AdminUserDTO">
+    <select id="findAllActivityLogs"
+            resultType="com.Workneed.workneed.Members.dto.AdminUserDTO">
         SELECT
-        l.log_id            AS logId,
-        a.admin_name        AS adminName,
-        r.role_name         AS roleName,
-        l.log_action_type   AS logActionType,
-        l.log_target_type   AS logTargetType,  l.log_target_id     AS logTargetId,    l.log_description   AS logDescription,
-        l.log_created_at    AS logCreatedAt
+        l.log_id AS logId,
+        a.admin_name AS adminName,
+        r.role_name AS roleName,
+        l.log_action_type AS logActionType,
+        '' AS logDescription,
+        l.log_created_at AS logCreatedAt
         FROM adminactivitylog l
         JOIN adminuser a ON l.admin_id = a.admin_id
         LEFT JOIN adminrole r ON a.role_id = r.role_id
@@ -80,16 +80,9 @@
 
     <select id="findByAdminId" resultType="com.Workneed.workneed.Members.dto.AdminUserDTO">
         SELECT *
-        FROM adminuser
+        FROM adminUser
         WHERE admin_id = #{adminId}
     </select>
-
-    <select id="existsByEmail" resultType="boolean">
-        SELECT COUNT(*) > 0
-        FROM adminuser
-        WHERE admin_email = #{adminEmail}
-    </select>
-
 
     <insert id="insertAdmin" parameterType="com.Workneed.workneed.Members.dto.AdminUserDTO"
             useGeneratedKeys="true" keyProperty="adminId">
@@ -101,21 +94,22 @@
         )
     </insert>
 
-    <insert id="insertActivityLog" parameterType="com.Workneed.workneed.Members.dto.AdminUserDTO">
+    <insert id="insertActivityLog"
+            parameterType="com.Workneed.workneed.Members.dto.AdminUserDTO">
         INSERT INTO adminactivitylog (
-        admin_id,
-        log_action_type,
-        log_target_type,
-        log_target_id,
-        log_description
+            admin_id,
+            log_action_type,
+            log_target_type,
+            log_target_id,
+            log_created_at
         )
         VALUES (
-        #{adminId},
-        #{logActionType},
-        #{logTargetType},
-        #{logTargetId},
-        #{logDescription}
-        )
+                   #{adminId},
+                   #{logActionType},
+                   #{logTargetType},
+                   #{logTargetId},
+                   NOW()
+               )
     </insert>
 
     <update id="updateMemberStatus" >

@@ -113,6 +113,11 @@ body {
 .attendWidget {
     display: flex;
     flex-direction: column;
+    background-color: #ffffff;
+    border-radius: 16px;
+    border: 1px solid #f0f0f0;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    box-sizing: border-box;
 }
 
 /* (4) 결재 위젯 - 6개 한 줄 배치 */
@@ -193,9 +198,14 @@ body {
 /* =========================================
    4. Utility / Cleanups
    ========================================= */
-.pageMain .state-wrap,
-.pageMain .title,
-.pageMain .clock,
-.pageMain .click,
-.pageMain .rowMonth { display: none; }
+.pageMain .attendWidget{
+    flex: 0 0 auto;
+    min-height: auto;
+    display: block;
+}
+
+.pageMain .attendWidget .att-left{
+    flex: 0 0 auto;
+    min-height: auto;
+}
 

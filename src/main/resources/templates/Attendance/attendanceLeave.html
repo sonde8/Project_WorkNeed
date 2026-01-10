@@ -8,6 +8,7 @@
 
     <!-- 페이지 전용 CSS -->
     <th:block layout:fragment="head">
+        <link rel="stylesheet" th:href="@{/css/main.css}">
         <link rel="stylesheet" th:href="@{/css/attendanceLeft.css}">
         <link rel="stylesheet" th:href="@{/css/attendanceMain.css}">
         <link rel="stylesheet" th:href="@{/css/attendanceBook.css}">
@@ -32,7 +33,11 @@
     <div class="att-lv">
 
         <!-- 왼쪽 -->
-        <section th:replace="~{Attendance/attendanceLeft :: attendanceLeft}"></section>
+        <section class="leftPage">
+
+            <section th:replace="~{Attendance/attendanceLeft :: attendanceLeft}"></section>
+
+        </section>
 
         <!-- 오른쪽 -->
         <section class = "right_2">
