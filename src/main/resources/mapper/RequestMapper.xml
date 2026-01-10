@@ -21,7 +21,7 @@
         rk.rank_name         AS rankName,
         r.request_payload    AS requestPayload,
         r.request_created_at AS requestCreatedAt,
-        r.status             AS status  FROM Request r  JOIN user u ON r.user_id = u.user_id
+        r.status             AS status  FROM request r  JOIN user u ON r.user_id = u.user_id
         LEFT JOIN dept d ON u.dept_id = d.dept_id
         LEFT JOIN ranks rk ON u.rank_id = rk.rank_id
         WHERE r.status = 'PENDING'  AND r.request_type = 'ATTENDANCE' ORDER BY r.request_id DESC
