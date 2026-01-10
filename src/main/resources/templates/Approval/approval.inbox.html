@@ -109,7 +109,7 @@
                                 <a class="side-link"
                                    th:href="@{/approval/my/approved}"
                                    th:classappend="${active == 'myApproved'} ? ' active' : ''">
-                                    <span class="txt">승인</span>
+                                    <span class="txt">승인함</span>
                                     <span class="count-badge" th:text="${counts.drafterApprovedCount}">0</span>
                                 </a>
 
@@ -117,7 +117,7 @@
                                 <a class="side-link"
                                    th:href="@{/approval/my/rejected}"
                                    th:classappend="${active == 'myRejected'} ? ' active' : ''">
-                                    <span class="txt">반려</span>
+                                    <span class="txt">반려함</span>
                                     <span class="count-badge" th:text="${counts.drafterRejectedCount}">0</span>
                                 </a>
 
@@ -125,7 +125,7 @@
                                 <a class="side-link"
                                    th:href="@{/approval/my/reference}"
                                    th:classappend="${active == 'myReference'} ? ' active' : ''">
-                                    <span class="txt">참조됨</span>
+                                    <span class="txt">참조함</span>
                                     <span class="count-badge" th:text="${counts.drafterReferencedCount}">0</span>
                                 </a>
                             </div>

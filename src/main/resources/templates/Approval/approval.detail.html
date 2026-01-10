@@ -52,7 +52,7 @@
 
                     <ul class="line-list">
                         <li th:each="l : ${lines}" class="line-item">
-                            <span class="ord"><b th:text="${l.orderNum}"></b></span>
+                            <span class="ord"><b th:text="${l.orderNum}"></b>차</span>
                             <span class="name" th:text="${l.username}"></span>
                             <span class="status"
                                   th:classappend="' st-' + ${#strings.toLowerCase(l.status.name())}"
@@ -106,14 +106,39 @@
                             <span class="label">상태</span>
                             <span class="value badge strong"
                                   th:classappend="' st-' + ${#strings.toLowerCase(doc.status.name())}"
-                                  th:text="${doc.status}">
-
-              </span>
+                                  th:text="${doc.status.label}">
+                                DRAFT
+                            </span>
                         </div>
 
                         <div class="row">
                             <span class="label">문서 종류</span>
                             <span class="value" th:text="${doc.typeId}">-</span>
+                        </div>
+
+                        <!-- ✅ 휴가 정보: 휴가 문서일 때만 표시 (leave가 모델에 있을 때만) -->
+                        <div th:if="${leave != null}">
+
+                            <div class="row">
+                                <span class="label">휴가 종류</span>
+                                <span class="value" th:text="${leave.leaveType}">-</span>
+                            </div>
+
+                            <div class="row">
+                                <span class="label">시작일</span>
+                                <span class="value" th:text="${leave.startDate}">-</span>
+                            </div>
+
+                            <div class="row">
+                                <span class="label">마감일</span>
+                                <span class="value" th:text="${leave.endDate}">-</span>
+                            </div>
+
+                            <div class="row">
+                                <span class="label">일수</span>
+                                <span class="value" th:text="${leave.days}">-</span>
+                            </div>
+
                         </div>
 
                         <div class="row">
@@ -123,18 +148,14 @@
 
                         <div class="row-row-content">
                             <span class="label">내용</span>
-                            <pre class="content" th:text="${doc.content}">-</pre>
+                            <pre class="content-detail" th:text="${doc.content}">-</pre>
                         </div>
 
                         <div class="row">
                             <span class="label">작성일</span>
-                            <span class="value" th:text="${doc.createdAt}">-</span>
+                            <span th:text="${#temporals.format(doc.createdAt, 'yyyy년 MM월 dd일 HH:mm')}"></span>
                         </div>
 
-                        <div class="row">
-                            <span class="label">수정일</span>
-                            <span class="value" th:text="${doc.updatedAt}">-</span>
-                        </div>
                     </div>
                 </div>
 
@@ -181,7 +202,7 @@
 
                         <!-- 승인: IN_PROGRESS + 내 차례 -->
                         <form class="inline"
-                              th:if="${doc.status == 'IN_PROGRESS' and isMyTurn and !isReference}"
+                              th:if="${doc.status.name() == 'IN_PROGRESS' and isMyTurn and !isReference}"
                               method="post" th:action="@{/approval/approve}">
                             <input type="hidden" name="docId" th:value="${doc.docId}">
                             <button type="submit" class="btn primary"
