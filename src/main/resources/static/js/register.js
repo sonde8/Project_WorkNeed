@@ -21,28 +21,40 @@ document.addEventListener('DOMContentLoaded', function () {
        });
    }
 
-    // 🔹 비밀번호 확인 관련
-    const pwConfirmInput = document.getElementById('passwordConfirm');
-    const pwMsg = document.getElementById('passwordMatchMsg');
+   // 비밀번호 확인 관련
+   const pwConfirmInput = document.getElementById('passwordConfirm');
+   const pwMsg = document.getElementById('passwordMatchMsg');
 
-    function checkPasswordMatch() {
-        if (!pwInput.value || !pwConfirmInput.value) {
-            pwMsg.textContent = "";
-            pwMsg.className = "password-msg";
-            return;
-        }
+   function checkPasswordMatch() {
+       const pw = pwInput.value;
+       const confirm = pwConfirmInput.value;
 
-        if (pwInput.value === pwConfirmInput.value) {
-            pwMsg.textContent = "비밀번호가 일치합니다.";
-            pwMsg.className = "password-msg success";
-        } else {
-            pwMsg.textContent = "비밀번호가 일치하지 않습니다.";
-            pwMsg.className = "password-msg error";
-        }
-    }
+       if (!pw || !confirm) {
+           pwMsg.textContent = "";
+           pwMsg.className = "password-msg";
+           return;
+       }
 
-    pwInput.addEventListener('input', checkPasswordMatch);
-    pwConfirmInput.addEventListener('input', checkPasswordMatch);
+       // ✅ 비밀번호 정책 체크 먼저 (8자 + 영문 + 숫자 + 특수문자)
+       const pwRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
+       if (!pwRegex.test(pw)) {
+           pwMsg.textContent = "비밀번호는 영어, 숫자, 특수문자 포함 8자 이상이어야 합니다.";
+           pwMsg.className = "password-msg error";
+           return;
+       }
+
+       if (pw === confirm) {
+           pwMsg.textContent = "비밀번호가 일치합니다.";
+           pwMsg.className = "password-msg success";
+       } else {
+           pwMsg.textContent = "비밀번호가 일치하지 않습니다.";
+           pwMsg.className = "password-msg error";
+       }
+   }
+
+   pwInput.addEventListener('input', checkPasswordMatch);
+   pwConfirmInput.addEventListener('input', checkPasswordMatch);
+
 
 
     const phoneInput = document.getElementById('userPhone');
