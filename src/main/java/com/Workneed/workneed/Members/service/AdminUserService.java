@@ -20,7 +20,6 @@ import java.util.List;
 public class AdminUserService {
 
 
-
     private final AdminUserMapper adminUserMapper;
     private final UserMapper userMapper;
     private final DeptMapper deptMapper;
@@ -45,17 +44,42 @@ public class AdminUserService {
 
 
     // 관리자 생성 (SUPER만)
+    @Transactional
     public void createAdmin(AdminUserDTO newAdmin, AdminUserDTO actor) {
+
         if (!isSuper(actor)) {
             throw new SecurityException("관리자 생성 권한 없음");
         }
 
-        newAdmin.setAdminPassword(passwordEncoder.encode(newAdmin.getAdminPassword()));
+
+        // 1. 필수값 체크
+        if (newAdmin.getAdminEmail() == null || newAdmin.getAdminPassword() == null) {
+            throw new IllegalArgumentException("필수 정보 누락");
+        }
+
+        // 2. 이메일 중복 체크
+        if (adminUserMapper.existsByEmail(newAdmin.getAdminEmail())) {
+            throw new IllegalStateException("이미 사용 중인 이메일");
+        }
+
+        // 3. 비밀번호 암호화
+        newAdmin.setAdminPassword(
+                passwordEncoder.encode(newAdmin.getAdminPassword())
+        );
+
         newAdmin.setAdminStatus("ACTIVE");
+
+        // 4. 저장
         adminUserMapper.insertAdmin(newAdmin);
 
-        saveLog(actor.getAdminId(), "CREATE", "ADMIN",
-                newAdmin.getAdminId(), "관리자 생성");
+        // 5. 로그
+        saveLog(
+                actor.getAdminId(),
+                "CREATE",
+                "ADMIN",
+                newAdmin.getAdminId(),
+                "관리자 계정 생성"
+        );
     }
 
     public List<String> getPermissionsByRoleId(Long roleId) {
@@ -194,7 +218,6 @@ public class AdminUserService {
 
     /* =========================
         직원 상태/조직 변경
-       (SUPER / MANAGER / STAFF)
     ========================= */
     @Transactional
     public void updateMemberStatusWithLog(
@@ -204,38 +227,60 @@ public class AdminUserService {
             Long rankId,
             AdminUserDTO actor
     ) {
-
         if (actor == null || !"ACTIVE".equals(actor.getAdminStatus())) {
-            throw new SecurityException("비활성 관리자 접근");
+            throw new SecurityException("비활성 관리자 접근 권한이 없습니다.");
         }
 
+        // 1. 변경 전 데이터 조회 (JOIN 쿼리로 deptname, rankname 포함)
         UserDTO current = userMapper.findById(userId);
         if (current == null) {
-            throw new IllegalArgumentException("대상 직원 없음");
+            throw new IllegalArgumentException("대상 직원을 찾을 수 없습니다.");
         }
 
-        //  STAFF만 BANNED 금지
-        if (isStaff(actor) && "BANNED".equals(status)) {
-            throw new SecurityException("HR_STAFF는 BANNED 상태 변경 불가");
+        // 2. 로그 메시지 조립 시작
+        StringBuilder logDesc = new StringBuilder(String.format("[%s]님 정보 변경: ", current.getUserName()));
+        boolean isChanged = false;
+
+        // 상태 변경 확인
+        if (!current.getUserStatus().equals(status)) {
+            logDesc.append(String.format("상태(%s→%s) ", current.getUserStatus(), status));
+            isChanged = true;
         }
 
-        UserDTO update = new UserDTO();
-        update.setUserId(userId);
-        update.setUserStatus(status);
-        update.setDeptId(deptId);
-        update.setRankId(rankId);
+        // 부서 변경 확인 (실제 ID가 다를 때만 이름 조회)
+        if (!current.getDeptId().equals(deptId)) {
+            String newDeptName = deptMapper.findById(deptId).getDeptName();
+            logDesc.append(String.format("부서(%s→%s) ", current.getDeptName(), newDeptName));
+            isChanged = true;
+        }
 
+        // 직급 변경 확인 (실제 ID가 다를 때만 이름 조회)
+        if (!current.getRankId().equals(rankId)) {
+            String newRankName = rankMapper.findById(rankId).getRankName();
+            logDesc.append(String.format("직급(%s→%s) ", current.getRankName(), newRankName));
+            isChanged = true;
+        }
 
-        adminUserMapper.updateMemberStatus(update);
+        // 3. 변경 사항이 있을 때만 업데이트 및 로그 저장
+        if (isChanged) {
+            UserDTO update = new UserDTO();
+            update.setUserId(userId);
+            update.setUserStatus(status);
+            update.setDeptId(deptId);
+            update.setRankId(rankId);
 
-        saveLog(actor.getAdminId(),
-                "UPDATE_STATUS",
-                "USER",
-                userId,
-                "직원 상태/부서/직급 변경");
+            // 실제 DB 업데이트
+            adminUserMapper.updateMemberStatus(update);
 
-        if ("ACTIVE".equals(status) && current.getUserEmail() != null) {
-            mailService.sendWelcomeEmail(current.getUserEmail(), current.getUserName());
+            // 조립된 상세 메시지로 로그 저장
+            saveLog(actor.getAdminId(), "UPDATE_STATUS", "USER", userId, logDesc.toString());
+
+        }
+        //  활성화 시 메일 발송
+        if ("ACTIVE".equals(status) && !"ACTIVE".equals(current.getUserStatus())) {
+            if (current.getUserEmail() != null) {
+                mailService.sendWelcomeEmail(current.getUserEmail(), current.getUserName());
+            }
         }
     }
 

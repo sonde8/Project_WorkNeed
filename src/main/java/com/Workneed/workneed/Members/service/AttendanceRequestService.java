@@ -10,9 +10,9 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.Map;
 
+//직원이 요청하는 근태
 @Service
 @RequiredArgsConstructor
-
 public class AttendanceRequestService {
 
     private final RequestMapper requestMapper;
@@ -22,8 +22,8 @@ public class AttendanceRequestService {
 
         Map<String, Object> payload = new HashMap<>();
         payload.put("workDate", dto.getWorkDate());
-        payload.put("fromTime", dto.getFromTime());
-        payload.put("toTime", dto.getToTime());
+        payload.put("toTime", dto.getStartTime());
+        payload.put("fromTime", dto.getEndTime());
         payload.put("reason", dto.getReason());
 
         try {

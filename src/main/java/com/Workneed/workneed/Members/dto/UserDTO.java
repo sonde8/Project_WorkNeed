@@ -25,8 +25,6 @@ public class UserDTO implements Serializable {
     private LocalDateTime userUpdatedAt;
     private LocalDate userBirthday;
 
-
-
     private Long rankId;
     private Long deptId;
 

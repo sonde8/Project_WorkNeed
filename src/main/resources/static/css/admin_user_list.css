@@ -1,7 +1,9 @@
 .btn-tab { padding: 10px 20px; text-decoration: none; color: #666; border-bottom: 3px solid transparent; }
 .btn-tab.active { color: #3182ce; border-bottom: 3px solid #3182ce; font-weight: bold; }
+
 /* 작업 구분 배지 스타일 */
 .action-badge { background: #f7fafc; border: 1px solid #cbd5e0; padding: 2px 6px; border-radius: 4px; font-size: 0.85em; }
+
 /* 권한 배지 스타일 */
 .role-tag { font-size: 0.75em; color: #718096; background: #edf2f7; padding: 2px 5px; border-radius: 4px; margin-left: 5px; }
 
@@ -9,6 +11,7 @@
 .status-suspended { color: #e53e3e; font-weight: bold; }
 .btn-tab { padding: 10px 20px; text-decoration: none; color: #666; border-bottom: 3px solid transparent; }
 .btn-tab.active { color: #3182ce; border-bottom: 3px solid #3182ce; font-weight: bold; }
+
 /* 권한 배지 스타일 */
 .role-badge { background: #e2e8f0; color: #4a5568; padding: 3px 8px; border-radius: 6px; font-size: 0.85em; font-weight: 600; }
 
@@ -20,3 +23,151 @@ table { width: 100%; border-collapse: collapse; margin-top: 10px; background: wh
 th, td { border: 1px solid #eee; padding: 12px; text-align: left; }
 th { background-color: #f8f9fa; font-weight: bold; }
 .btn-delete-small { background: #e53e3e; color: white; border: none; padding: 2px 6px; border-radius: 4px; cursor: pointer; margin-left: 5px; font-size: 11px; }
+
+/* ===== 관리자 공통 콘텐츠 영역 ===== */
+.admin-content {
+    padding: 20px;
+}
+
+/* 제목 통일 */
+.admin-content h2 {
+    font-size: 20px;
+    font-weight: 100%;
+    margin-bottom: 16px;
+    color: #2d3748;
+}
+
+/* 설명 문구 통일 */
+.admin-content p {
+    font-size: 0.9em;
+    color: #718096;
+    margin-bottom: 15px;
+}
+
+/* 테이블 위 여백 */
+.admin-content table {
+    margin-top: 10px;
+}
+
+
+/*관리자 헤더 폼*/
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    background: #fff;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 20px;
+}
+
+.admin-header form {
+    margin: 0;
+}
+
+.admin-content {
+    margin: 0 auto;
+    h
+}
+
+.admin-header .btn-secondary {
+    background: transparent;
+    border: 1px solid #e5e7eb;
+    border-radius: 4px;
+    font-size: 12px;
+    padding: 6px 12px;
+    cursor: pointer;
+    color: #6b7280;
+    transition: all 0.2s ease;
+}
+
+.admin-header .btn-secondary:hover {
+    background: #f3f4f6;
+    color: #1f2937;
+}
+
+.admin-header .btn-primary {
+    background: transparent;
+    border: 1px solid #e5e7eb;
+    border-radius: 4px;
+    font-size: 12px;
+    padding: 6px 12px;
+    cursor: pointer;
+    color: #6b7280;
+    transition: all 0.2s ease;
+}
+
+.admin-header .btn-primary:hover {
+    background: #f3f4f6;
+    color: #1f2937;
+}
+
+/* 직원 관리 테이블 안의 secondary 버튼 */
+.admin-content table .btn-secondary {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    color: #374151;
+    font-size: 12px;
+    padding: 6px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.admin-content table .btn-secondary:hover {
+    background: #f3f4f6;
+        color: #1f2937;
+}
+
+/* 관리자 페이지 주요 액션 버튼 (일괄 적용, 저장 등) */
+.admin-content .btn-primary {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    color: #000000;
+    padding: 7px 15px;
+    font-size: 13px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+/* 비밀번호 아이콘 위치 조정 */
+#togglePw {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #718096;
+    font-size: 16px;
+    z-index: 10; /* 입력창보다 위에 오도록 */
+}
+
+
+
+/* 부서 컬럼 부분 */
+.dept-cell {
+    color: #2c5282;
+    font-weight: 500;
+}
+
+/* 요청 내용 셀 너비 제한 (데이터가 길어질 경우 대비) */
+.payload-cell {
+    max-width: 250px;
+    word-break: break-all;
+    font-size: 0.9em;
+}
+
+/* 버튼 그룹 간격 */
+.btn-group {
+    display: flex;
+    gap: 5px;
+}
+
+.btn-group button {
+    padding: 5px 10px;
+    font-size: 12px;
+    cursor: pointer;
+    border-radius: 4px;
+    border: none;
+}

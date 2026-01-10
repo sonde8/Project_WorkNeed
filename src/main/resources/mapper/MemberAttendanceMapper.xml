@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.Workneed.workneed.Members.mapper.MemberAttendanceMapper">
+
+    <!--실제 근태 데이터-->
+    <select id="findByUserAndDate" resultType="com.Workneed.workneed.Members.dto.MemberAttendanceDTO">
+        SELECT
+        attendance_id    AS attendanceId,
+        emp_id           AS userId,  work_date        AS workDate,
+        overtime_minutes AS overtimeMinutes
+        FROM attendance
+        WHERE emp_id = #{userId}
+        AND work_date = #{workDate}
+    </select>
+
+    <update id="updateOvertime">
+        UPDATE attendance
+        SET
+        overtime_minutes = #{minutes},
+        status_code = 'CORRECTED',
+        updated_at = NOW()
+        WHERE attendance_id = #{attendanceId}
+    </update>
+
+    <insert id="insertOvertime">
+        INSERT INTO attendance (
+        emp_id,
+        work_date,
+        overtime_minutes,
+        status_code,
+        created_at,
+        updated_at
+        ) VALUES (
+        #{userId},
+        #{workDate},
+        #{minutes},
+        'CORRECTED',
+        NOW(),
+        NOW()
+        )
+    </insert>
+
+</mapper>
