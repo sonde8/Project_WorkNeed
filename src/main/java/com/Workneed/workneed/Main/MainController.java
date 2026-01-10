@@ -42,14 +42,17 @@ public class MainController {
 
         Long userId = user.getUserId();
 
+        model.addAttribute("counts", approvalService.getCounts(userId));
 
-        model.addAttribute("counts", approvalService.getCounts(userId)); //
+        model.addAttribute("doingScheduleCount", scheduleMapper.countDoingSchedulesAll());
 
-        model.addAttribute("mainTodo",  scheduleMapper.selectByStatusForMain(userId, "TODO"));
-        model.addAttribute("mainDoing", scheduleMapper.selectByStatusForMain(userId, "DOING"));
+        model.addAttribute("mainTodo",
+                scheduleMapper.selectMainMyTaskCardsInDoingScheduleByStatus(userId, "TODO"));
+
+        model.addAttribute("mainDoing",
+                scheduleMapper.selectMainMyTaskCardsInDoingScheduleByStatus(userId, "DOING"));
 
         model.addAttribute("googleCalendarApiKey", googleCalendarApiKey);
-
 
         return "Main/main";
     }
