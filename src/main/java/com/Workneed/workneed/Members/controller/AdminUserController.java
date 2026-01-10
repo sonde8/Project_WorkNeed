@@ -99,16 +99,20 @@ public class AdminUserController {
     @PostMapping("/member/add-admin")
     @ResponseBody
     public String addAdminAccount(@RequestBody AdminUserDTO adminDto, HttpSession session) {
-        AdminUserDTO admin = (AdminUserDTO) session.getAttribute("admin"); // 세션에서 수행자 확인
-        if (admin == null) return "fail";
+        AdminUserDTO admin = (AdminUserDTO) session.getAttribute("admin");
+        if (admin == null) return "로그인이 필요합니다.";
 
         try {
-            // 기존 생성 로직 + 수행자 ID 전달
             adminUserService.createAdmin(adminDto, admin);
             return "success";
+        } catch (IllegalStateException e) {
+            return e.getMessage();   // 이메일 중복 등
+        } catch (SecurityException e) {
+            return "권한이 없습니다.";
+        } catch (IllegalArgumentException e) {
+            return e.getMessage();
         } catch (Exception e) {
-            e.printStackTrace();
-            return "fail";
+            return "서버 오류";
         }
     }
 
@@ -179,7 +183,7 @@ public class AdminUserController {
     }
 
 
-     // 6. 관리자 목록 조회
+    // 6. 관리자 목록 조회
     @GetMapping("/manage/list")
     public String adminManageList(HttpSession session, Model model) {
         AdminUserDTO admin = (AdminUserDTO) session.getAttribute("admin");
@@ -191,7 +195,7 @@ public class AdminUserController {
     }
 
 
-     // 6. 활동 로그 조회
+    // 6. 활동 로그 조회
     @GetMapping("/log/list")
     public String adminLogList(HttpSession session, Model model) {
         AdminUserDTO admin = (AdminUserDTO) session.getAttribute("admin");
@@ -203,7 +207,7 @@ public class AdminUserController {
     }
 
 
-     // 7. 관리자 상태 변경
+    // 7. 관리자 상태 변경
     @PostMapping("/manage/status")
     @ResponseBody
     public String changeAdminStatus(@RequestParam("targetId") Long targetId,

@@ -1,93 +1,83 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/layout}">
-
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <meta charset="UTF-8">
     <title>회원가입 - WORKNEED</title>
     <link rel="stylesheet" th:href="@{/css/register.css}">
     <script th:src="@{/js/register.js}" defer></script>
 </head>
-
 <body>
 
-<main layout:fragment="content">
-    <div class="register-wrapper">
-        <div class="register-container">
-            <h2>회원가입</h2>
+<div class="register-wrapper">
+    <div class="register-container">
 
-            <div th:if="${errorMessage}" class="error-msg" th:text="${errorMessage}"></div>
+        <img th:src="@{/images/logo5.svg}" class="main-logo" alt="로고">
 
-            <form th:action="@{/register}" method="post" th:object="${user}" id="registerForm">
+        <h2>회원가입</h2>
 
-                <div class="input-group">
-                    <img th:src="@{/images/person300.svg}" class="input-icon" alt="아이디">
-                    <input type="text" th:field="*{userLoginId}" placeholder="아이디" required>
-                </div>
+        <div th:if="${errorMessage}" class="error-msg" th:text="${errorMessage}"></div>
 
-                <div class="input-group">
-                    <img th:src="@{/images/lock300.svg}" class="input-icon" alt="비밀번호">
-                    <input type="password" th:field="*{userPassword}" placeholder="비밀번호 (8자 이상 영문/숫자/특수문자)"
-                           autocomplete="off" oncopy="return false" onpaste="return false" oncut="return false" required>
-                </div>
+        <form th:action="@{/register}" method="post" th:object="${user}" id="registerForm">
 
-                <div class="input-group">
-                    <img th:src="@{/images/lock300.svg}" class="input-icon" alt="비밀번호 확인">
-                    <input type="password"
-                           id="passwordConfirm"
-                           placeholder="비밀번호 확인"
-                           autocomplete="off"
-                           oncopy="return false"
-                           onpaste="return false"
-                           oncut="return false"
-                           required>
-                </div>
-
-                <p id="passwordMatchMsg" class="password-msg"></p>
-
-                <div class="input-group">
-                    <img th:src="@{/images/mail300.svg}" class="input-icon" alt="이메일">
-                    <input type="email" th:field="*{userEmail}" id="userEmail" placeholder="이메일 (인증 필요)" required>
-                </div>
-
-                <div id="authCodeGroup" class="input-group" style="display: none;">
-                    <img th:src="@{/images/lock300.svg}" class="input-icon" alt="인증번호">
-                    <input type="text" id="authCode" placeholder="인증번호 6자리">
-                </div>
-
-                <div class="input-group">
-                    <img th:src="@{/images/person300.svg}" class="input-icon" alt="이름">
-                    <input type="text" th:field="*{userName}" placeholder="이름" required>
-                </div>
-
-                <div class="input-group">
-                    <img th:src="@{/images/calendar300.svg}" class="input-icon" alt="생년월일">
-                    <input type="date" th:field="*{userBirthday}" id="userBirthday" required>
-                </div>
-
-                <div class="input-group">
-                    <img th:src="@{/images/phone300.svg}" class="input-icon" alt="전화번호">
-                    <input type="tel"
-                           id="userPhone"
-                           th:field="*{userPhone}"
-                           name="userPhone"
-                           placeholder="010-1234-5678"
-                           maxlength="11"
-                           pattern="^010\d{8}$"
-                           title="010으로 시작하는 숫자 11자리만 입력하세요"
-                           required>
-                    <small id="phoneMsg" style="font-size:12px;"></small>
-                </div>
-
-                <button type="button" id="mainBtn" class="btn-submit">인증번호 받기</button>
-            </form>
-
-            <div class="footer-links">
-                <a th:href="@{/login}">로그인으로 돌아가기</a>
+            <div class="input-group">
+                <img th:src="@{/images/person300.svg}" class="input-icon" alt="아이디">
+                <input type="text" th:field="*{userLoginId}" placeholder="아이디" required>
             </div>
+
+            <div class="input-group">
+                <img th:src="@{/images/lock300.svg}" class="input-icon" alt="비밀번호">
+                <input type="password" th:field="*{userPassword}" placeholder="비밀번호 (8자 이상 영문/숫자/특수문자)"
+                       autocomplete="off" oncopy="return false" onpaste="return false" oncut="return false"
+                       required>
+            </div>
+
+            <div class="input-group">
+                <img th:src="@{/images/lock300.svg}" class="input-icon" alt="비밀번호 확인">
+                <input type="password" id="passwordConfirm" placeholder="비밀번호 확인"
+                       autocomplete="off" oncopy="return false" onpaste="return false" oncut="return false"
+                       required>
+            </div>
+
+            <p id="passwordMatchMsg" class="password-msg"></p>
+
+            <div class="input-group">
+                <img th:src="@{/images/mail300.svg}" class="input-icon" alt="이메일">
+                <input type="email" th:field="*{userEmail}" id="userEmail" placeholder="이메일 (인증 필요)" required>
+            </div>
+            <p class="email-guide">* 구글 연동하려면 Gmail로 가입해야 합니다.</p>
+
+
+            <div id="authCodeGroup" class="input-group" style="display: none;">
+                <img th:src="@{/images/lock300.svg}" class="input-icon" alt="인증번호">
+                <input type="text" id="authCode" placeholder="인증번호 6자리">
+            </div>
+
+            <div class="input-group">
+                <img th:src="@{/images/person300.svg}" class="input-icon" alt="이름">
+                <input type="text" th:field="*{userName}" placeholder="이름" required>
+            </div>
+
+            <div class="input-group">
+                <img th:src="@{/images/calendar300.svg}" class="input-icon" alt="생년월일">
+                <input type="date" th:field="*{userBirthday}" id="userBirthday" required>
+            </div>
+
+            <div class="input-group">
+                <img th:src="@{/images/phone300.svg}" class="input-icon" alt="전화번호">
+                <input type="tel" id="userPhone" th:field="*{userPhone}" placeholder="010-1234-5678"
+                       maxlength="11" required>
+            </div>
+
+            <p id="phoneMsg"></p>
+
+            <button type="button" id="mainBtn" class="btn-submit">인증번호 받기</button>
+        </form>
+
+        <div class="footer-links">
+            <a th:href="@{/login}">로그인으로 돌아가기</a>
         </div>
     </div>
-</main>
+</div>
 
 </body>
 </html>

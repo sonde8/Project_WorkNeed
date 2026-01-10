@@ -160,38 +160,33 @@ document.addEventListener('DOMContentLoaded', () => {
        근태 수정 요청 등록 (로직 강화)
     =============================== */
     submitBtn.onclick = () => {
-        const type = typeSelect ? typeSelect.value : '';
+        const type = typeSelect ? typeSelect.value : '기본';
         const workDate = dateInput.value;
         const startTime = startTimeInput.value;
         const endTime = endTimeInput.value;
         const reason = reasonInput.value.trim();
 
-        if (!workDate || !reason) {
-            alert('날짜와 사유는 필수입니다.');
-            return;
-        }
-
-        // 필수 입력 체크
+        // 1. 필수 입력 체크
         if (!workDate || !startTime || !endTime || !reason) {
             alert('모든 항목을 입력해주세요.');
             return;
         }
 
-        // 날짜 제약
+        // 2. 날짜 제약 체크
         if (workDate < lastYearStr || workDate > todayStr) {
-
+            alert('날짜는 최근 1년 이내만 선택할 수 있습니다.');
             return;
         }
 
 
-        // 시간  체크
-        const getHour = (t) => parseInt(t.split(':')[0], 10);
-        const isNightBlocked = (t) => {
-            const h = getHour(t);
-            return (h >= 22 || h < 7);
-        };
 
-        // 야간 시간 제한 (22:00 ~ 07:00 차단)
+        // 3. 시간 선후 관계 체크
+        if (startTime >= endTime) {
+            alert('종료 시간은 시작 시간보다 늦어야 합니다.');
+            return;
+        }
+
+        // 4. 야간 시간 제한 (22:00 ~ 07:00 차단)
         const startHour = parseInt(startTime.split(':')[0], 10);
         const endHour = parseInt(endTime.split(':')[0], 10);
 
@@ -201,64 +196,26 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // 서버 전송 데이터 구성
-        const payload = { type, workDate, reason };
-
-        if (type === 'CHECK_IN') {
-            if (!startTime) {
-                alert('출근 시간을 입력해주세요.');
-                return;
-            }
-            if (isNightBlocked(startTime)) {
-                alert('22:00부터 07:00 사이의 시간은 선택할 수 없습니다.');
-                return;
-            }
-            payload.fromTime = startTime;
-        }
-        else if (type === 'CHECK_OUT') {
-            if (!endTime) {
-                alert('퇴근 시간을 입력해주세요.');
-                return;
-            }
-            if (isNightBlocked(endTime)) {
-                alert('22:00부터 07:00 사이의 시간은 선택할 수 없습니다.');
-                return;
-            }
-            payload.toTime = endTime;
-        }
-        else if (type === 'OVERTIME') {
-            if (!startTime || !endTime) {
-                alert('연장근무는 시작/종료 시간을 모두 입력해주세요.');
-                return;
-            }
-            if (startTime >= endTime) {
-                alert('종료 시간은 시작 시간보다 늦어야 합니다.');
-                return;
-            }
-            if (isNightBlocked(startTime) || isNightBlocked(endTime)) {
-                alert('22:00부터 07:00 사이의 시간은 선택할 수 없습니다.');
-                return;
-            }
-            payload.fromTime = startTime;
-            payload.toTime = endTime;
-        }
-        else {
-            alert('요청 유형을 선택해주세요.');
-            return;
-        }
-
+      const payload = {
+          type: type,
+          workDate: workDate,
+          startTime: startTime,
+          endTime: endTime,
+          reason: reason
+      };
 
         fetch('/api/attendance/request', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
         })
-            .then(res => {
-                if (!res.ok) throw new Error();
-                alert('요청 성공! 관리자 승인을 기다려주세요.');
-                hideModal();
-                location.reload();
-            })
-            .catch(() => alert('요청 실패. 내용을 확인하세요.'));
+        .then(res => {
+            if (!res.ok) throw new Error();
+            alert('요청 성공! 관리자 승인을 기다려주세요.');
+            hideModal();
+            location.reload();
+        })
+        .catch(() => alert('요청 실패. 내용을 확인하세요.'));
     };
 
     render();

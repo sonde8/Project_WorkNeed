@@ -101,24 +101,135 @@
     cursor: pointer;
 }
 
-/* 모달 배경 */
+
+/* =========================
+   모달 오버레이 (배경)
+========================= */
 .modal-overlay {
     position: fixed;
+    inset: 0;
     z-index: 9999;
-    left: 0; top: 0;
-    width: 100%; height: 100%;
-    background-color: rgba(0,0,0,0.5); /* 반투명 검정 */
+    background-color: rgba(0,0,0,0.45);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-/* 모달 본체 */
+/* hidden 속성 제어 */
+.modal-overlay[hidden] {
+    display: none;
+}
+
+
+/* =========================
+   근태 수정 요청 모달 본체
+   (leave 느낌 + book 사이즈)
+========================= */
 .attendance-modal {
-    background-color: #fefefe;
-    margin: 10% auto;
-    padding: 20px;
-    border: 1px solid #888;
-    width: 350px; /* 이미지의 세로형 폼에 맞춘 너비 */
-    border-radius: 15px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    width: 360px;              /* 핵심: 크기 축소 */
+    max-width: 90vw;
+    padding: 16px;
+
+    background: #fff;
+    border: 1px solid #111;
+    border-radius: 16px;
+    box-sizing: border-box;
+
+    box-shadow: 0 12px 30px rgba(0,0,0,0.35);
+
+    /* book 화면에 어울리게 살짝 컴팩트 */
+    transform: scale(0.95);
+}
+
+
+/* =========================
+   제목
+========================= */
+.attendance-modal .modal-header {
+    text-align: center;
+    font-size: 18px;
+    font-weight: 800;
+    margin-bottom: 12px;
+}
+
+
+/* =========================
+   본문 영역
+========================= */
+.attendance-modal .modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+
+/* =========================
+   입력 섹션
+========================= */
+.attendance-modal .input-section {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 13px;
+}
+
+
+/* input / textarea 공통 */
+.attendance-modal input,
+.attendance-modal textarea {
+    width: 100%;
+    padding: 8px 10px;
+    font-size: 13px;
+
+    border: 1px solid #111;
+    border-radius: 10px;
+    box-sizing: border-box;
+}
+
+/* textarea 높이 조정 */
+.attendance-modal textarea {
+    min-height: 64px;
+    resize: vertical;
+}
+
+
+/* =========================
+   하단 버튼 영역
+========================= */
+.attendance-modal .modal-footer {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+
+/* 버튼 공통 */
+.attendance-modal .reg-btn,
+.attendance-modal .cancel-btn {
+    flex: 1;
+    padding: 8px 0;
+    font-size: 13px;
+    font-weight: 700;
+
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+
+/* 등록 버튼 */
+.attendance-modal .reg-btn {
+    background: #111;
+    color: #fff;
+    border: 1px solid #111;
+}
+
+
+/* 취소 버튼 */
+.attendance-modal .cancel-btn {
+    background: #fff;
+    color: #111;
+    border: 1px solid #111;
 }
 
 .input-section { margin-bottom: 15px; }

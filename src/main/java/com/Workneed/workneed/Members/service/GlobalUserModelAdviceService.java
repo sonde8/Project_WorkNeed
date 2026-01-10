@@ -14,7 +14,7 @@ import java.io.IOException;
 
 
 @ControllerAdvice
-public class GlobalUserModelAdvice {
+public class GlobalUserModelAdviceService {
 
     @ModelAttribute("user")
     public UserDTO user(HttpSession session, HttpServletResponse response) throws IOException { // throws 추가
@@ -55,7 +55,7 @@ public class GlobalUserModelAdvice {
     public AdminUserDTO admin(HttpSession session) {
         AdminUserDTO admin = (AdminUserDTO) session.getAttribute("admin");
 
-        // 🔍 관리자 세션 복구 로직 추가
+        // 관리자 세션 복구 로직 추가
         if (admin == null) {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             if (auth != null && auth.getPrincipal() instanceof CustomUserDetails cud) {

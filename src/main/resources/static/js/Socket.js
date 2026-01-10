@@ -127,11 +127,25 @@ function showToastNotification(data) {
     if (data.messageType === 'IMAGE') preview = "📷 사진을 보냈습니다.";
     else if (data.messageType === 'FILE') preview = "📎 파일을 보냈습니다.";
 
+    // 서버에서 보낸 발신자 프로필 이미지를 사용 (없으면 기본값)
+    const senderImg = data.senderProfileImage || '/images/profile300.svg';
+
     // 콤팩트한 카드 구조
+    // toast.innerHTML = `
+    //     <div class="toast-inner">
+    //         <div class="toast-profile">
+    //             <img src="/images/profile300.svg">
+    //         </div>
+    //         <div class="toast-text-area">
+    //             <div class="toast-user-name">${data.senderName}</div>
+    //             <div class="toast-message">${preview}</div>
+    //         </div>
+    //     </div>
+    // `;
     toast.innerHTML = `
         <div class="toast-inner">
             <div class="toast-profile">
-                <img src="/images/profile300.svg">
+                <img src="${senderImg}" onerror="this.src='/images/profile300.svg'">
             </div>
             <div class="toast-text-area">
                 <div class="toast-user-name">${data.senderName}</div>
@@ -197,6 +211,16 @@ function getKstDisplayTime(dateString) {
     const formattedMinutes = minutes < 10 ? '0' + minutes : minutes;
 
     return `${ampm} ${formattedHours}:${formattedMinutes}`;
+}
+
+function getRelativeTime() {
+    const now = new Date();
+    const hours = now.getHours();
+    const minutes = now.getMinutes();
+    const ampm = hours >= 12 ? "오후 " : "오전 ";
+    const formattedHours = hours % 12 || 12;
+    const formattedMinutes = minutes < 10 ? "0" + minutes : minutes;
+    return ampm + formattedHours + ":" + formattedMinutes;
 }
 
 /**

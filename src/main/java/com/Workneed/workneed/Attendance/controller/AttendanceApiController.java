@@ -6,7 +6,6 @@ import com.Workneed.workneed.Attendance.dto.TeamAttendRowDTO;
 import com.Workneed.workneed.Attendance.service.AttendanceService;
 import com.Workneed.workneed.Members.dto.AttendanceRequestCreateDTO;
 import com.Workneed.workneed.Members.dto.UserDTO;
-import com.Workneed.workneed.Members.service.AttendanceRequestService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.apache.ibatis.annotations.Param;
@@ -21,8 +20,6 @@ import java.util.Map;
 public class AttendanceApiController {
 
     private final AttendanceService attendanceService;
-
-    private final AttendanceRequestService attendanceRequestService;
 
     private Long getEmpId(HttpSession session) {
         UserDTO user = (UserDTO) session.getAttribute("user");
@@ -113,7 +110,7 @@ public class AttendanceApiController {
         dto.setUserId(userId);
 
         // 서비스 호출 (DB 저장 로직)
-        attendanceRequestService.create(userId, dto);
+        attendanceService.createRequest(dto);
     }
 
 

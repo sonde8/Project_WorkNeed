@@ -8,7 +8,6 @@
 
     <!-- 페이지 전용 CSS -->
     <th:block layout:fragment="head">
-        <link rel="stylesheet" th:href="@{/css/main.css}">
         <link rel="stylesheet" th:href="@{/css/attendanceLeft.css}">
         <link rel="stylesheet" th:href="@{/css/attendanceMain.css}">
         <link rel="stylesheet" th:href="@{/css/attendanceBook.css}">
@@ -19,22 +18,20 @@
 
 <body>
 
-    <th:block layout:fragment="script">
-        <script th:src="@{/js/attendanceLeft.js}"></script>
-        <script th:src="@{/js/attendanceMain.js}"></script>
-        <script th:src="@{/js/attendanceBook.js}"></script>
-        <script th:src="@{/js/attendanceLeave.js}"></script>
-        <script th:src="@{/js/attendanceTeamAttend.js}"></script>
-    </th:block>
+<th:block layout:fragment="script">
+    <script th:src="@{/js/attendanceLeft.js}"></script>
+    <script th:src="@{/js/attendanceMain.js}"></script>
+    <script th:src="@{/js/attendanceBook.js}"></script>
+    <script th:src="@{/js/attendanceLeave.js}"></script>
+    <script th:src="@{/js/attendanceTeamAttend.js}"></script>
+</th:block>
 
-<main layout:fragment="content" class = "pageBook">
+<main layout:fragment="content" class="pageBook">
 
     <div class="att-bk">
 
         <!-- 왼쪽 -->
-        <section class="leftPage">
-            <section th:replace="~{Attendance/attendanceLeft :: attendanceLeft}"></section>
-        </section>
+        <section th:replace="~{Attendance/attendanceLeft :: attendanceLeft}"></section>
 
         <!-- 오른쪽 -->
         <section class="right_1">
@@ -45,16 +42,17 @@
                 <button type="button" id="nextMonth">&gt;</button>
             </div>
 
+
             <div class="tableWrap">
                 <table class="bookTable">
                     <thead>
                     <tr>
-                        <th> 일자</th>
-                        <th> 구분</th>
-                        <th> 출근시간</th>
-                        <th> 퇴근시간</th>
-                        <th> 연장근무시간</th>
-                        <th> 근로시간</th>
+                        <th>일자</th>
+                        <th>구분</th>
+                        <th>출근시간</th>
+                        <th>퇴근시간</th>
+                        <th>연장근무시간</th>
+                        <th>근로시간</th>
                     </tr>
                     </thead>
                     <tbody id="bookTbody"></tbody>
@@ -62,9 +60,8 @@
             </div>
 
             <div class="bookChange">
-                <button type="button" class="changeBtn" id="openRequestBtn"> 요청</button>
+                <button type="button" class="changeBtn" id="openRequestBtn">요청</button>
             </div>
-
 
             <div class="lv-modal" id="attendanceRequestModal" hidden>
                 <div class="lv-modal_back" id="closeModalBack"></div>
@@ -75,8 +72,8 @@
                     <form id="attendanceRequestForm" class="lv-form">
                         <label class="lv-label">유형
                             <select id="reqType" class="lv-input">
-                                <option value="CHECK_IN">출근수정요청</option>
-                                <option value="CHECK_OUT">퇴근수정요청</option>
+                                <option value="ATTEND_EDIT">출근수정요청</option>
+                                <option value="LEAVE_EDIT">퇴근수정요청</option>
                                 <option value="OVERTIME">연장근무요청</option>
                             </select>
                         </label>
@@ -105,9 +102,17 @@
                     </form>
                 </div>
             </div>
+
+
         </section>
     </div>
+    </section>
+
+    </div>
+
 </main>
+
+
 </body>
 </html>
 

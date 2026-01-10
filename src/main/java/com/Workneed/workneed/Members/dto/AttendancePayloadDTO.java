@@ -6,7 +6,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 @Data
-public class AttendancePayload {
+public class AttendancePayloadDTO {
     LocalDate workDate;
     LocalTime fromTime;
     LocalTime toTime;

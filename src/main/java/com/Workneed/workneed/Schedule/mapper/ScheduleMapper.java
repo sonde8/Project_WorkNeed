@@ -1,5 +1,6 @@
 package com.Workneed.workneed.Schedule.mapper;
 
+import com.Workneed.workneed.Schedule.dto.MainScheduleDTO;
 import com.Workneed.workneed.Schedule.dto.ScheduleDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -33,8 +34,16 @@ public interface ScheduleMapper {
                              @Param("fileStorageUrl") String fileStorageUrl);
     int deleteFileStorageUrl(Long scheduleId);
 
-    List<ScheduleDTO> selectByStatusForMain(
+
+//    메인 칸반
+
+    int countDoingSchedulesAll();
+
+
+    List<MainScheduleDTO> selectMainMyTaskCardsInDoingScheduleByStatus(
             @Param("userId") Long userId,
             @Param("status") String status
     );
+
+
 }

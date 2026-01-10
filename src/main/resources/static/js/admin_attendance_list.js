@@ -1,6 +1,3 @@
-/**
- * 1. 화면 로드 직후: JSON 데이터를 읽어서 사람이 보기 좋게 변환
- */
 document.addEventListener('DOMContentLoaded', () => {
     const cells = document.querySelectorAll('.payload-cell');
 

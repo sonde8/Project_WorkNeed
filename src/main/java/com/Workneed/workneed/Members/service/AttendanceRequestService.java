@@ -19,13 +19,11 @@ public class AttendanceRequestService {
     private final ObjectMapper objectMapper;
 
     public void create(Long userId, AttendanceRequestCreateDTO dto) {
+
         Map<String, Object> payload = new HashMap<>();
         payload.put("workDate", dto.getWorkDate());
-
-        payload.put("fromTime", dto.getStartTime());  // 시작시간
-        payload.put("toTime", dto.getEndTime());      // 종료시간
-
-        payload.put("type", dto.getType());
+        payload.put("toTime", dto.getStartTime());
+        payload.put("fromTime", dto.getEndTime());
         payload.put("reason", dto.getReason());
 
         try {
