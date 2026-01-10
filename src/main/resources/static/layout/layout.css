@@ -345,13 +345,15 @@ body {
   text-overflow: ellipsis;
 }
 
-/* 버튼 (컴팩트) */
+/* ✅ 링크 2개를 이름이랑 같은 스타일로 */
 .modal-btn {
   display: block;
-  margin-bottom: 6px; /* ⬅ 간격 줄임 */
-  padding: 8px 10px;  /* ⬅ 높이 줄임 */
-  font-size: 13px;    /* ⬅ 줄임 */
-  border-radius: 6px;
-  text-decoration: none;
+  text-align: center;
+  font-weight: 700;
+  font-size: 13px !important;
+  color: #000;
+  text-decoration: none !important;
+  margin-top: 10px;
 }
+
 .toast-message { display: block !important; font-size: 13px !important; color: var(--color-text-sub) !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; }
