@@ -1,200 +1,262 @@
+@charset "UTF-8";
+
+/* 1. 기본 배경 및 정렬 */
 body {
     margin: 0;
     padding: 0;
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh; /* 화면 꽉 채우기 */
-    background-color: #f8f9fa;
-    font-family: 'Pretendard', sans-serif;
+    min-height: 100vh;
+    background-color: #F6F8FB; /* 이미지의 맑은 배경색 */
+    font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
+    color: #1F2937;
 }
 
-.login-wrapper {
+/* 1. 최상위 부모: 너비와 박스 모델 강제 고정 */
+.login-container {
+    background-color: #ffffff !important;
+    border: 1px solid #E5E7EB !important;
+    border-radius: 20px !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4) !important;
+
+    /* 고정 수치 (이 부분이 흔들림을 막는 핵심입니다) */
+    width: 400px !important;
+    min-width: 400px !important;
+    max-width: 400px !important;
+
+    /* 패딩이 너비에 포함되도록 설정 */
+    padding: 45px 35px !important;
+    box-sizing: border-box !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    margin: 0 auto !important;
+
+    /* 내용이 넘쳐서 박스를 밀어내는 것 방지 */
+    overflow: hidden !important;
+    position: relative !important;
+}
+
+.login-wrapper, .register-wrapper, .pw-page-wrapper {
     display: flex;
     justify-content: center;
     align-items: center;
     width: 100%;
+    padding: 20px;
 }
 
-/* 2. 로그인 컨테이너 */
-.login-container {
+/* 2. 컨테이너 (비번창 카드 스타일) */
+.login-container, .register-container, .pw-change-container {
     background-color: #ffffff;
-    border: 1px solid #e0e0e0;
-    border-radius: 15px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-    width: 100%;
-    max-width: 450px;
-    padding: 30px 40px 50px;
-    text-align: center;
-    box-sizing: border-box;
-    transition: all 0.3s ease;
-}
+    /* 이미지 특유의 아주 연한 회색 테두리 */
+    border: 1px solid #E5E7EB; 
+    border-radius: 20px; /* 부드러운 곡률 */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4); /* 은은한 그림자 */
 
-/* 애니메이션 효과 */
-.auth-section {
+    width: 100%;
+    max-width: 400px;
+    padding: 45px 35px;
+    box-sizing: border-box;
     animation: fadeIn 0.4s ease-in-out;
 }
+
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* 로고 및 텍스트 간격 조절 */
-.main-logo { width: 130px; margin: 0 auto -20px; display: block; }
-h2 { margin-top: 0; margin-bottom: 25px; font-size: 24px; color: #333; }
-
-/* 입력창 공통 스타일 */
-.input-group { position: relative; margin-bottom: 12px; }
-.input-group input, .modal-input {
-    width: 100%;
-    padding: 15px 15px 15px 45px;
-    border: 1px solid #000;
-    border-radius: 12px;
-    box-sizing: border-box;
-    font-size: 16px;
-    background-color: #f8f9fa;
+/* 3. 로고 및 타이틀 */
+.main-logo {
+    width: 120px;
+    height: auto;
+    margin: 0 auto 25px;
+    display: block;
 }
 
-/* 구글 로그인 버튼 스타일 */
-.social-btn.google-btn {
-    width: 100%;
-    padding: 15px;
-    border: 1px solid #000;
-    border-radius: 12px;
-    margin-top: 15px;
-    background-color: #ffffff;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-decoration: none;
-    color: #000;
-    font-size: 18px;
-    font-weight: 500;
-    cursor: pointer;
-    box-sizing: border-box;
-    transition: background-color 0.2s;
+h2 {
+    margin-top: 0;
+    margin-bottom: 30px;
+    font-size: 22px;
+    font-weight: 700;
+    color: #111827;
+    text-align: center;
+    letter-spacing: -0.5px;
 }
 
-.social-btn.google-btn:hover {
-    background-color: #f1f1f1;
-}
-
-/* 구글 아이콘 크기 */
-.google-icon {
-    width: 24px;
-    height: 24px;
-    margin-right: 12px;
-}
-
-/* 아이디/비번 찾기용 입력창 */
-.modal-input { padding: 15px 20px !important; }
-
-/* 버튼 스타일 */
-.btn-submit, .modal-btn {
-    width: 100%;
-    padding: 16px;
-    background-color: #e0e0e0;
-    border: 1px solid #000;
-    border-radius: 12px;
-    font-size: 18px;
-    font-weight: bold;
-    cursor: pointer;
-    margin-top: 10px;
-}
-
-/* 1. 입력창 그룹 (아이콘의 기준점) */
+/* 4. 입력창 그룹 (비번창 스타일) */
 .input-group {
     position: relative;
-    margin-bottom: 15px;
-    width: 100%;
+    margin-bottom: 12px;
 }
 
-/* 2. 왼쪽 아이디/비밀번호 아이콘 */
+/* 1. 가이드 텍스트 전체 영역 (왼쪽 정렬로 변경) */
+.guide-text {
+    margin-bottom: 25px !important;
+    text-align: left !important;  /* 왼쪽 배치 */
+    padding-left: 5px;           /* 입력창 라인과 맞추기 위한 미세 여백 */
+    display: flex;
+    flex-direction: column;
+}
+
+/* 2. 상단 제목 (등록된 이메일로 찾기 등) */
+.guide-text b {
+    display: block;
+    font-size: 15px !important;
+    color: #111827 !important;
+    margin-bottom: 8px !important; /* 제목과 설명 사이 간격 띄움 */
+    font-weight: 700;
+}
+
+/* 3. 하단 설명 (가입 당시 입력하신...) */
+.guide-text p {
+    font-size: 13px !important;
+    color: #6B7280 !important;
+    line-height: 1.6 !important;  /* 줄 간격을 1.6으로 띄워서 가독성 확보 */
+    margin: 0 !important;         /* 왼쪽 정렬 유지를 위해 margin 초기화 */
+    word-break: keep-all;         /* 단어가 잘리지 않게 설정 */
+}
+
+
+/* 입력창 우측 눈 아이콘 */
+.toggle-password {
+    position: absolute;
+    right: 15px; /* 오른쪽 끝에서 여백 */
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #9CA3AF; /* 자물쇠 아이콘과 동일한 색상 */
+    font-size: 18px;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    transition: color 0.2s;
+}
+
+.toggle-password:hover {
+    color: #4B5563;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 15px 15px 15px 45px; /* 왼쪽 아이콘 공간 */
+    
+    /* 이미지 특유의 연한 테두리와 배경색 */
+    border: 1px solid #E2E8F0;
+    border-radius: 10px;
+    background-color: #F9FAFB;
+    
+    font-size: 14px;
+    color: #374151;
+    box-sizing: border-box;
+    transition: all 0.2s ease;
+}
+
+/* 입력창 포커스 시 */
+.input-group input:focus {
+    outline: none;
+    border-color: #9CA3AF; /* 테두리만 살짝 진하게 */
+    background-color: #ffffff;
+    box-shadow: 0 0 0 3px rgba(156, 163, 175, 0.05);
+}
+
+/* 아이콘 위치 고정 */
 .input-icon {
     position: absolute;
     left: 15px;
     top: 50%;
     transform: translateY(-50%);
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     z-index: 2;
+    opacity: 0.4;
     pointer-events: none;
 }
 
-/* 3. 입력창 자체 스타일 */
-.input-group input {
+/* 5. 버튼 스타일 (가장 중요: 이미지처럼 테두리 제거) */
+.btn-submit, .modal-btn {
     width: 100%;
-    padding: 15px 45px 15px 45px;
-    border: 1px solid #000;
-    border-radius: 12px;
-    box-sizing: border-box;
+    padding: 16px;
+    
+    /* 이미지처럼 테두리 없이 면으로만 구성 */
+    border: none !important; 
+    background-color: #D1D5DB; /* 비활성 회색톤 */
+    
+    color: #000;
+    border-radius: 10px;
     font-size: 16px;
-    background-color: #f8f9fa;
-}
-
-/* 4. 비밀번호 전용 그룹  */
-.password-group {
-    position: relative;
-}
-
-/* 5. 오른쪽 눈 아이콘 (비밀번호 보기 토글) */
-.toggle-password {
-    position: absolute;
-    right: 15px;
-    top: 50%;
-    transform: translateY(-50%);
+    font-weight: 700;
     cursor: pointer;
-    color: #666;
-    font-size: 18px;
-    z-index: 3;
+    margin-top: 15px;
+    transition: all 0.2s;
 }
 
-/* 1. 하단 링크 영역  */
-/* 1. 하단 링크 */
+
+/* 6. 소셜 버튼 (구글 등) */
+.social-btn.google-btn {
+   width: 100%;
+       max-width: 100%;
+       padding: 14px 0;
+       border: 1px solid #E5E7EB;
+       border-radius: 10px;
+       margin: 15px auto 0;
+       background-color: #ffffff;
+
+       display: flex;
+       justify-content: center;
+       align-items: center;
+
+       text-decoration: none;
+       color: #000;
+       font-size: 15px;
+       font-weight: 500;
+       box-sizing: border-box;
+       transition: background-color 0.2s;
+}
+
+.google-icon {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+}
+
+/* 7. 하단 링크 (구분선 및 링크 색상 강제 통일) */
 .links {
-    margin-top: 20px;
-    margin-bottom: 25px;
-    display: flex;
-    justify-content: center;
-    gap: 12px;
-    color: #888;
+    margin-top: 25px !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 10px !important;
+    width: 100% !important;
+    color: #D1D5DB !important;
+    font-size: 13px !important;
 }
 
-.links a {
-    /* 파란색/남색을 완전히 제거하고 이미지 속 색상 반영 */
-    text-decoration: none;
-    color: #666666 !important;
-    font-size: 14px;
-    font-weight: 400;
+.links a,
+.links a:link,
+.links a:visited,
+.links a:-webkit-any-link {
+    color: #1F2937 !important;
+    text-decoration: none !important;
+    font-size: 13px !important;
+    font-weight: 400 !important;
+    transition: color 0.2s ease;
 }
 
-.links a:hover {
-    color: #333333 !important; /* 마우스를 올리면 조금 더 진해짐 */
-}
 
-/* 안내 문구 */
-.guide-text { text-align: left; margin-bottom: 20px; }
-.guide-text b { font-size: 18px; display: block; margin-bottom: 5px; }
-.guide-text p { font-size: 14px; color: #666; margin: 0; }
-
+/* 8. 메시지 스타일 */
 .error-msg {
-    color: #ef4444 !important; /* 선명한 빨간색 */
-    font-size: 14px;
-    font-weight: 500;
-    margin-bottom: 20px;      /* 아래 입력창과의 간격 확보 */
-    margin-top: -10px;        /* 제목(로그인) 쪽으로 살짝 올림 */
+    color: #EF4444;
+    font-size: 13px;
+    margin: -5px 0 15px;
     text-align: center;
     display: block;
 }
 
-/* (참고) 성공 메시지도 같은 위치라면 색상만 초록색으로 */
-.info-msg {
-    color: #16a34a !important;
-    font-size: 14px;
-    margin-bottom: 20px;
-    margin-top: -10px;
-    text-align: center;
-    display: block;
+.match-msg {
+    font-size: 12px;
+    margin: -8px 0 10px 5px;
+    text-align: left;
 }
 
 /* 관리자 공통 스크롤바 */
