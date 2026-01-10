@@ -2,6 +2,7 @@ package com.Workneed.workneed.Schedule.service;
 
 import com.Workneed.workneed.Chat.service.S3StorageService;
 import com.Workneed.workneed.Meetingroom.mapper.MeetingRoomMapper;
+import com.Workneed.workneed.Schedule.dto.MainScheduleDTO;
 import com.Workneed.workneed.Schedule.dto.ScheduleFileDTO;
 import com.Workneed.workneed.Schedule.mapper.*;
 import lombok.RequiredArgsConstructor;
@@ -70,4 +71,13 @@ public class ScheduleService {
     public void deleteFileStorageUrl(Long scheduleId) {
         scheduleMapper.deleteFileStorageUrl(scheduleId);
     }
+
+    public int getDoingScheduleCountAll() {
+        return scheduleMapper.countDoingSchedulesAll();
+    }
+
+    public List<MainScheduleDTO> getMainTaskCardsByStatus(Long userId, String status) {
+        return scheduleMapper.selectMainMyTaskCardsInDoingScheduleByStatus(userId, status);
+    }
+
 }
