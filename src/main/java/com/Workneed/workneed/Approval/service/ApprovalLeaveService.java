@@ -10,6 +10,8 @@ import com.Workneed.workneed.Approval.mapper.LeaveApprovalMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+
 @Service
 public class ApprovalLeaveService {
 
@@ -44,8 +46,7 @@ public class ApprovalLeaveService {
         ApprovalDoc doc = new ApprovalDoc();
         // 작성자
         doc.setWriterId(userId);
-        // 제목(연차 종류)
-        doc.setTitle(dto.getLeaveType());
+
         //타입
         doc.setTypeId(2L); // 휴가
 

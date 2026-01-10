@@ -1,4 +1,5 @@
 package com.Workneed.workneed.Approval.controller;
+import org.springframework.beans.factory.annotation.Value;
 
 import com.Workneed.workneed.Approval.dto.ApprovalDocListItemDTO;
 import com.Workneed.workneed.Approval.dto.ApprovalSidebarCountDTO;
@@ -33,6 +34,9 @@ import java.util.List;
 @Controller
 @RequestMapping("/approval")
 public class ApprovalController {
+
+    @Value("${file.upload-dir}")
+    private String uploadDir;
 
     private final ApprovalService service;
 
@@ -115,13 +119,13 @@ public class ApprovalController {
        ========================================================== */
 
     @PostMapping("/save")
-    public String save(@ModelAttribute DocDTO dto, HttpSession session) {
+    public String save(@ModelAttribute ApprovalDoc doc, HttpSession session) {
 
         Long writerId = getLoginUserId(session);
         if (writerId == null) return redirectLogin();
 
-        dto.setWriterId(writerId);
-        Long docId = service.save(dto);
+        doc.setWriterId(writerId);
+        Long docId = service.save(doc);
 
         return "redirect:/approval/detail/" + docId;
     }
@@ -135,7 +139,7 @@ public class ApprovalController {
                          Model model,
                          HttpSession session) {
 
-        ApprovalDoc doc = service.findById(docId);
+        ApprovalDoc doc = service.findDocById(docId);
         if (doc == null) {
             model.addAttribute("doc", null);
             model.addAttribute("lines", List.of());
@@ -168,7 +172,7 @@ public class ApprovalController {
        ========================================================== */
 
     @PostMapping("/submit")
-    public String submit(@ModelAttribute DocDTO dto,
+    public String submit(@ModelAttribute ApprovalDoc doc,
                          HttpServletRequest request,
                          @RequestParam(required = false) List<MultipartFile> files,
                          @RequestParam(required = false, name = "approverIds") List<Long> approverIds,
@@ -177,7 +181,7 @@ public class ApprovalController {
                          HttpSession session) throws Exception {
 
         System.out.println("REQ typeId=" + request.getParameter("typeId"));
-        System.out.println("DTO typeId=" + dto.getTypeId());
+        System.out.println("DTO typeId=" + doc.getTypeId());
 
         Long writerId = getLoginUserId(session);
         if (writerId == null) return redirectLogin();
@@ -190,10 +194,10 @@ public class ApprovalController {
         }
 
         // 문서 저장(없으면 생성)
-        Long docId = dto.getDocId();
+        Long docId = doc.getDocId();
         if (docId == null) {
-            dto.setWriterId(writerId);
-            docId = service.save(dto);
+            doc.setWriterId(writerId);
+            docId = service.save(doc);
         }
 
         // ✅ 파일 저장(업로드) - 기존 로직 유지
@@ -229,7 +233,8 @@ public class ApprovalController {
         }
 
         // 2) 권한 체크(기본: 작성자만)
-        ApprovalDoc doc = service.findById(file.getDocId());
+        ApprovalDoc doc = service.findDocById(file.getDocId());
+
         if (doc == null) {
             return ResponseEntity.notFound().build();
         }

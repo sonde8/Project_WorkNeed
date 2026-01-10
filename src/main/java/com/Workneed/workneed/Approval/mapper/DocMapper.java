@@ -19,10 +19,11 @@ public interface DocMapper {
        =============================== */
 
     // 저장
-    int save(DocDTO dto);
+    int save(ApprovalDoc doc);
 
     // 단건 조회 (디테일)
     DocDTO findById(@Param("docId") Long docId);
+    ApprovalDoc findDocById(Long docId);
 
     // 참조자 조회
     String selectRefUserIdsByDocId(@Param("docId") Long docId);

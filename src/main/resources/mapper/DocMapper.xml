@@ -44,6 +44,21 @@
         FROM approval_doc
         WHERE approval_doc_id = #{docId}
     </select>
+    <select id="findDocById"
+            parameterType="long"
+            resultType="com.Workneed.workneed.Approval.entity.ApprovalDoc">
+        SELECT
+        approval_doc_id AS docId,
+        writer_id       AS writerId,
+        type_id         AS typeId,
+        title,
+        content,
+        status,
+        created_at      AS createdAt,
+        updated_at      AS updatedAt
+        FROM approval_doc
+        WHERE approval_doc_id = #{docId}
+    </select>
 
 
     <!-- 참조자 조회 -->

@@ -39,7 +39,7 @@ public class ApprovalService {
        =============================== */
 
     @Transactional
-    public Long save(DocDTO doc) {
+    public Long save(ApprovalDoc doc) {
 
         // ✅ 여기서 doc을 다시 dto로 덮어쓰지 않습니다.
         // doc은 Controller에서 이미 세팅되어 들어온다고 가정합니다.
@@ -63,6 +63,9 @@ public class ApprovalService {
 
     public DocDTO findById(Long docId) {
         return mapper.findById(docId);
+    }
+    public ApprovalDoc findDocById(Long docId) {
+        return mapper.findDocById(docId);
     }
 
     public List<ApprovalTypeDTO> getTypes() {
