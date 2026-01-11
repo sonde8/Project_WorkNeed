@@ -94,22 +94,21 @@
         )
     </insert>
 
-    <insert id="insertActivityLog"
-            parameterType="com.Workneed.workneed.Members.dto.AdminUserDTO">
+    <insert id="insertActivityLog" parameterType="com.Workneed.workneed.Members.dto.AdminUserDTO">
         INSERT INTO adminactivitylog (
             admin_id,
             log_action_type,
             log_target_type,
             log_target_id,
-            log_created_at
+            log_description,  log_created_at
         )
         VALUES (
-                   #{adminId},
-                   #{logActionType},
-                   #{logTargetType},
-                   #{logTargetId},
-                   NOW()
-               )
+                #{adminId},
+                #{logActionType},
+                #{logTargetType},
+                #{logTargetId},
+                #{logDescription}, NOW()
+            )
     </insert>
 
     <update id="updateMemberStatus" >
