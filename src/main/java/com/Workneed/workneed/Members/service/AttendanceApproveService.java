@@ -1,5 +1,6 @@
 package com.Workneed.workneed.Members.service;
 
+import com.Workneed.workneed.Attendance.mapper.AttendanceMapper;
 import com.Workneed.workneed.Members.dto.AdminUserDTO;
 import com.Workneed.workneed.Members.dto.MemberAttendanceDTO;
 import com.Workneed.workneed.Members.dto.AttendancePayloadDTO;
@@ -14,6 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Map;
 
 @Service
@@ -24,6 +27,7 @@ public class AttendanceApproveService {
     private final MemberAttendanceMapper memberAttendanceMapper;
     private final AdminUserMapper adminUserMapper;
     private final ObjectMapper objectMapper;
+    private final AttendanceMapper attendanceMapper;
 
     /* =========================
        ✅ 승인
@@ -50,26 +54,36 @@ public class AttendanceApproveService {
             // ⏱ 시간 정보가 있을 때만 계산
             if (payload.getFromTime() != null && payload.getToTime() != null) {
 
-                int minutes = (int) Duration
-                        .between(payload.getFromTime(), payload.getToTime())
-                        .toMinutes();
+                LocalTime from = payload.getFromTime();
+                LocalTime to = payload.getToTime();
 
-                if (minutes < 0) {
-                    throw new IllegalStateException("시간 계산 결과가 올바르지 않습니다.");
+                LocalDateTime inDt  = LocalDateTime.of(workDate, from);
+                LocalDateTime outDt = LocalDateTime.of(workDate, to);
+
+                int workMin = (int) Duration.between(inDt, outDt).toMinutes();
+                if (workMin < 0) throw new IllegalStateException("시간 계산 오류");
+
+                LocalTime OT_BASE = LocalTime.of(18, 10);
+                int otMin = 0;
+                if (to.isAfter(OT_BASE)) {
+                    otMin = (int) Duration.between(OT_BASE, to).toMinutes();
+                    if (otMin < 0) otMin = 0;
                 }
 
-                if (attendance == null) {
-                    memberAttendanceMapper.insertOvertime(
-                            req.getUserId(),
-                            workDate,
-                            minutes
-                    );
-                } else {
-                    memberAttendanceMapper.updateOvertime(
-                            attendance.getAttendanceId(),
-                            minutes
-                    );
-                }
+                String isLate = from.isAfter(LocalTime.of(9, 0)) ? "Y" : "N";
+                String isEarly = to.isBefore(LocalTime.of(18, 0)) ? "Y" : "N";
+
+                attendanceMapper.upsertCorrected(
+                        req.getUserId(),
+                        workDate,
+                        inDt,
+                        outDt,
+                        workMin,
+                        otMin,
+                        isLate,
+                        isEarly,
+                        "CORRECTED"
+                );
             }
 
             //요청 승인 처리

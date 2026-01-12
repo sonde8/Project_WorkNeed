@@ -19,7 +19,7 @@
     justify-content: flex-end;
     font-size: var(--font-size-14);
     font-weight: 600;
-    color: var(--color-secondary);
+    color: var( --color-primary);
 }
 .mk-doing-count b{
     font-weight: 800;
@@ -43,7 +43,7 @@
     padding-top: 1rem;
     font-weight: 800;
     font-size: var(--font-size-16);
-    color: var(--color-secondary);
+    color: var(--color-primary);
 }
 .mk-list{
     flex: 1;
