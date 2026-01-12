@@ -97,7 +97,7 @@
             // list
             try {
                 const rec = await fetchList(curYear);
-                tbody.innerHTML = '';
+                tbody.innerHTML = ' ';
 
                 if (!rec || rec.length === 0) {
                     const tr = document.createElement('tr');
@@ -126,7 +126,7 @@
                             <td>${t.start}</td>
                             <td>${t.end}</td>
                             <td>${minToDH(minutes)}</td>
-                            <td>${statusText}</td> `;
+                            <td class="leaveStatus">${statusText}</td> `;
                         tbody.appendChild(tr);
                     });
                 }
