@@ -24,6 +24,13 @@
                     <a class="btn" th:href="@{/approval}">결재함</a>
                 </div>
             </div>
+            <form th:if="${canRecall}" method="post" th:action="@{/approval/recall}" style="display:inline;">
+                <input type="hidden" name="docId" th:value="${docId}">
+                <button type="submit" class="btn danger"
+                        onclick="return confirm('아직 1차 결재 전인 문서만 회수할 수 있습니다. 회수하시겠습니까?');">
+                    회수
+                </button>
+            </form>
 
             <!-- 문서 없음 -->
             <div th:if="${doc == null}" class="card">
@@ -47,23 +54,39 @@
                 <div class="card">
                     <div class="card-head">
                         <h3>결재 라인</h3>
-                        <p class="meta">차수 / 결재자 / 상태</p>
+                        <p class="meta">검토 / 합의 / 결재</p>
                     </div>
 
                     <ul class="line-list">
                         <li th:each="l : ${lines}" class="line-item">
-                            <span class="ord"><b th:text="${l.orderNum}"></b></span>
-                            <span class="name" th:text="${l.username}"></span>
-                            <span class="status"
+
+                            <!-- 차수 라벨 -->
+                            <span class="ord"
+                                  th:text="${l.orderNum == 1 ? '검토' : (l.orderNum == 2 ? '합의' : '최종 결재')}">
+        </span>
+
+                            <!-- 이름 + 부서/직급 -->
+                            <span class="cand-name" th:text="${l.username}">이름</span>
+                            <span class="cand-meta">
+            (<span th:text="${l.deptName}">부서</span>
+            <span th:if="${l.rankName != null}"
+                  th:text="' / ' + ${l.rankName}"> / 직급</span>)
+        </span>
+
+                            <!-- 상태 배지 -->
+                            <span class="status badge"
                                   th:classappend="' st-' + ${#strings.toLowerCase(l.status.name())}"
-                                  th:text="${l.status}">
-              </span>
+                                  th:text="${l.status.label}">
+            상태
+        </span>
+
                         </li>
 
                         <li th:if="${#lists.isEmpty(lines)}" class="line-empty">
                             결재 라인이 없습니다.
                         </li>
                     </ul>
+
                 </div>
                 <!-- =========================
                      참조자
@@ -75,15 +98,26 @@
                     </div>
 
                     <ul class="line-list">
-                        <li th:each="u : ${refUsers}"
-                            th:text="${u.username}">
-                            이름
+                        <li th:each="u : ${refUsers}" class="line-item"
+                            th:attr="data-user-id=${u.userId},
+                 data-name=${u.username},
+                 data-dept=${u.deptName},
+                 data-rank=${u.rankName}">
+
+                            <span class="cand-name" th:text="${u.username}">이름</span>
+                            <span class="cand-meta">
+            (<span th:text="${u.deptName}">부서</span>
+            <span th:if="${u.rankName != null}"
+                  th:text="' / ' + ${u.rankName}"> / 직급</span>)
+        </span>
                         </li>
 
-                        <li th:if="${doc.refUserIds == null or #lists.isEmpty(doc.refUserIds)}" class="line-empty">
+                        <li th:if="${refUsers == null or #lists.isEmpty(refUsers)}"
+                            class="line-empty">
                             참조자가 없습니다.
                         </li>
                     </ul>
+
                 </div>
 
                 <!-- =========================
@@ -106,14 +140,24 @@
                             <span class="label">상태</span>
                             <span class="value badge strong"
                                   th:classappend="' st-' + ${#strings.toLowerCase(doc.status.name())}"
-                                  th:text="${doc.status}">
-
-              </span>
+                                  th:text="${doc.status.label}">
+                                DRAFT
+                            </span>
                         </div>
 
                         <div class="row">
                             <span class="label">문서 종류</span>
                             <span class="value" th:text="${doc.typeId}">-</span>
+                        </div>
+
+                        <!-- ✅ 휴가 정보: 휴가 문서일 때만 표시 (leave가 모델에 있을 때만) -->
+                        <div th:if="${leave != null}">
+
+                            <div class="row">
+                                <span class="label">휴가 종류</span>
+                                <span class="value" th:text="${leave.leaveType}">-</span>
+                            </div>
+
                         </div>
 
                         <div class="row">
@@ -123,18 +167,14 @@
 
                         <div class="row-row-content">
                             <span class="label">내용</span>
-                            <pre class="content" th:text="${doc.content}">-</pre>
+                            <pre class="content-detail" th:text="${doc.content}">-</pre>
                         </div>
 
                         <div class="row">
                             <span class="label">작성일</span>
-                            <span class="value" th:text="${doc.createdAt}">-</span>
+                            <span th:text="${#temporals.format(doc.createdAt, 'yyyy년 MM월 dd일 HH:mm')}"></span>
                         </div>
 
-                        <div class="row">
-                            <span class="label">수정일</span>
-                            <span class="value" th:text="${doc.updatedAt}">-</span>
-                        </div>
                     </div>
                 </div>
 
@@ -181,7 +221,7 @@
 
                         <!-- 승인: IN_PROGRESS + 내 차례 -->
                         <form class="inline"
-                              th:if="${doc.status == 'IN_PROGRESS' and isMyTurn and !isReference}"
+                              th:if="${doc.status.name() == 'IN_PROGRESS' and isMyTurn and !isReference}"
                               method="post" th:action="@{/approval/approve}">
                             <input type="hidden" name="docId" th:value="${doc.docId}">
                             <button type="submit" class="btn primary"

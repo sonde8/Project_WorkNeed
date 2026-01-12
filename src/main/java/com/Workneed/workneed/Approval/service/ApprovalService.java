@@ -18,6 +18,7 @@ import java.io.File;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -38,25 +39,34 @@ public class ApprovalService {
        문서: 임시저장/조회/타입
        =============================== */
 
-    public Long save(DocDTO dto) {
+    @Transactional
+    public Long save(ApprovalDoc doc) {
 
-        //Long writerId = 5L; // TODO: 나중에 session에서 받기
+        // ✅ 여기서 doc을 다시 dto로 덮어쓰지 않습니다.
+        // doc은 Controller에서 이미 세팅되어 들어온다고 가정합니다.
 
-        ApprovalDoc doc = new ApprovalDoc();
-        doc.setWriterId(dto.getWriterId()); // 세션에서 넘어온 값 그대로
-        doc.setTitle(dto.getTitle());
-        doc.setTypeId(dto.getTypeId());
-        doc.setContent(dto.getContent());
-        doc.setStatus(DocStatus.DRAFT);
-        doc.setCreatedAt(LocalDateTime.now());
-        doc.setUpdatedAt(LocalDateTime.now());
+        // 상태만 기본값 강제 (작성 중 문서)
+        if (doc.getStatus() == null) {
+            doc.setStatus(DocStatus.DRAFT);
+        }
+
+        // createdAt/updatedAt은 DB DEFAULT를 믿고 안 넣습니다.
+        // (만약 DTO에 필드가 있어도 mapper INSERT에 안 넣으면 DB가 자동 처리)
 
         mapper.save(doc);
+
+        if (doc.getDocId() == null) {
+            throw new IllegalStateException("docId 생성 실패 - useGeneratedKeys/keyProperty 확인 필요");
+        }
+
         return doc.getDocId();
     }
 
-    public ApprovalDoc findById(Long docId) {
+    public DocDTO findById(Long docId) {
         return mapper.findById(docId);
+    }
+    public ApprovalDoc findDocById(Long docId) {
+        return mapper.findDocById(docId);
     }
 
     public List<ApprovalTypeDTO> getTypes() {
@@ -94,6 +104,10 @@ public class ApprovalService {
     @Transactional
     public void submit(Long docId, List<Long> approverIds, List<Integer> orderNums, List<Long> referenceIds) {
 
+       if (approverIds == null || approverIds.isEmpty()) {
+            throw new IllegalArgumentException("결재자를 1명 이상 선택해야 상신할 수 있습니다.");
+        }
+
         // 1) 라인 insert (전부 PENDING)
         for (int i = 0; i < approverIds.size(); i++) {
             mapper.insertApprovalLine(
@@ -118,7 +132,7 @@ public class ApprovalService {
         mapper.submitDoc(DocStatus.IN_PROGRESS, docId);
 
         // 4) 첫 차수 WAITING 오픈
-        mapper.openFirstWaiting(LineStatus.WAITING, LineStatus.PENDING, docId);
+        mapper.openFirstWaiting(docId, LineStatus.PENDING, LineStatus.WAITING);
     }
 
 
@@ -327,5 +341,36 @@ public class ApprovalService {
         if (affected == 0) {
             throw new IllegalStateException("삭제할 임시저장 문서가 없거나 권한이 없습니다.");
         }
+    }
+    /*회수*/
+    public boolean canRecall(long docId, long userId) {
+
+        Map<String, Object> doc =
+                mapper.selectDocWriterAndStatusForRecall(docId);
+
+        if (doc == null) return false;
+
+        long writerId = ((Number) doc.get("writerId")).longValue();
+        String docStatus = String.valueOf(doc.get("docStatus"));
+
+        // 작성자 본인만
+        if (writerId != userId) return false;
+
+        // 진행중만 회수 가능
+        if (!"IN_PROGRESS".equals(docStatus)) return false;
+
+        // 승인/반려된 라인이 있으면 회수 불가
+        int processed = mapper.countProcessedLines(docId);
+        return processed == 0;
+    }
+
+    @Transactional
+    public void recall(long docId, long userId) {
+        if (!canRecall(docId, userId)) {
+            throw new IllegalStateException("회수 조건을 만족하지 않습니다.");
+        }
+
+        mapper.updateDocStatusToDraft(docId);
+        mapper.resetLinesToPending(docId);
     }
 }

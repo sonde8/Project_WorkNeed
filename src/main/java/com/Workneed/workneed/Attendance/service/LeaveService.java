@@ -1,5 +1,6 @@
 package com.Workneed.workneed.Attendance.service;
 
+import com.Workneed.workneed.Approval.LeaveType;
 import com.Workneed.workneed.Approval.dto.LeaveRequestDTO;
 import com.Workneed.workneed.Approval.service.ApprovalLeaveService;
 import com.Workneed.workneed.Attendance.dto.*;
@@ -25,39 +26,51 @@ public class LeaveService {
 
     // 신청(자동승인)
     @Transactional
-    public void applyLeave(Long userId, LeaveApplyDTO req){
+    public void applyLeave(Long userId, LeaveRequestDTO req) {
 
-        // 동일 날짜 신청 방지
-        int overlap = leaveMapper.countOver(userId, req.getStartDate(), req.getEndDate());
-
-        if (overlap > 0) {
-            throw new IllegalArgumentException("해당 날짜에 연차를 이미 사용했습니다");
+        // ====== 기본 방어 ======
+        if (userId == null) {
+            throw new IllegalArgumentException("유저 정보가 없습니다");
+        }
+        if (req == null) {
+            throw new IllegalArgumentException("요청 값이 없습니다");
+        }
+        if (req.getLeaveType() == null) {
+            throw new IllegalArgumentException("휴가 종류를 선택해주세요");
+        }
+        if (req.getStartDate() == null || req.getEndDate() == null) {
+            throw new IllegalArgumentException("시작일/종료일이 필요합니다");
+        }
+        if (req.getEndDate().isBefore(req.getStartDate())) {
+            throw new IllegalArgumentException("종료일은 시작일보다 빠를 수 없습니다");
         }
 
-        // 오전반차, 오후반차는 하루씩
-        if (("HALF_AM".equals(req.getLeaveType()) || "HALF_PM".equals(req.getLeaveType()))
-                && !req.getStartDate().equals(req.getEndDate())) {
+        // ====== 동일 날짜 신청 방지 ======
+        int overlap = leaveMapper.countOver(userId, req.getStartDate(), req.getEndDate());
+        if (overlap > 0) {
+            throw new IllegalArgumentException("해당 날짜에 이미 휴가를 사용했습니다");
+        }
+
+        // ====== 반차는 하루만 가능 ======
+        if (isHalf(req.getLeaveType()) && !req.getStartDate().equals(req.getEndDate())) {
             throw new IllegalArgumentException("반차는 하루만 사용 가능합니다");
         }
 
-        // 사유
+        // ====== 사유 ======
         String reason = req.getReason() == null ? "" : req.getReason().trim();
-
-        if(reason.isEmpty()){
+        if (reason.isEmpty()) {
             throw new IllegalArgumentException("사유를 꼭 적어주세요");
         }
-
         req.setReason(reason);
 
-        // 주말 신청 막기
-        LeaveWeekend(req.getStartDate(), req.getEndDate());
+        // ====== 주말 신청 막기 ======
+        leaveWeekend(req.getStartDate(), req.getEndDate());
 
-        // 연차 요청
+        // ====== 요청 분(min) 계산 ======
         int reqMin = requestMinutes(req.getLeaveType(), req.getStartDate(), req.getEndDate());
 
-        // 연차 잔여 확인
+        // ====== 잔여 확인 ======
         int year = req.getStartDate().getYear();
-
         LeaveSummaryCalc calc = summaryMinutes(userId, year);
 
         if (calc.remainMin <= 0) {
@@ -68,57 +81,58 @@ public class LeaveService {
             throw new IllegalArgumentException("잔여 연차가 적습니다");
         }
 
-        // 연차 요청
+        // ====== 요청 기록 ======
         LeaveRequestInsertDTO r = new LeaveRequestInsertDTO();
-
         r.setUserId(userId);
         r.setRequestType("LEAVE");
         r.setStatus("APPROVED");
 
-        // 연차 신청 정보 기록
-        String payload = String.format("{\"leaveType\":\"%s\",\"start\":\"%s\",\"end\":\"%s\",\"reason\":\"%s\"}",
-                req.getLeaveType(), req.getStartDate(), req.getEndDate(),
-                req.getReason() == null ? "" : req.getReason().replace("\"", "\\\""));
+        // payload에는 코드값(name) 저장을 권장합니다
+        String payload = String.format(
+                "{\"leaveType\":\"%s\",\"start\":\"%s\",\"end\":\"%s\",\"reason\":\"%s\"}",
+                req.getLeaveType().name(),
+                req.getStartDate(),
+                req.getEndDate(),
+                req.getReason().replace("\"", "\\\"")
+        );
 
         r.setRequestPayload(payload);
-
         leaveMapper.insertRequest(r);
 
-        // 연차 사용 내역
+        // ====== 사용 내역 ======
         double days = calcDays(req.getLeaveType(), req.getStartDate(), req.getEndDate());
 
         LeaveUsageInsertDTO u = new LeaveUsageInsertDTO();
+        u.setRequestId(r.getRequestId());
+        u.setUserId(userId);
 
-            u.setRequestId(r.getRequestId());
-            u.setUserId(userId);
-            u.setLeaveType(req.getLeaveType());
-            u.setStartDate(req.getStartDate());
-            u.setEndDate(req.getEndDate());
-            u.setDays(days);
-            u.setReason(req.getReason());
+        // ⚠️ 여기 중요:
+        // LeaveUsageInsertDTO.leaveType이 DB 컬럼(VARCHAR)일 가능성이 높아서 name()으로 저장합니다.
+        // 만약 LeaveUsageInsertDTO가 LeaveType을 받도록 되어 있다면 이 줄을 u.setLeaveType(req.getLeaveType()); 로 바꾸면 됩니다.
+        u.setLeaveType(req.getLeaveType().name());
+
+        u.setStartDate(req.getStartDate());
+        u.setEndDate(req.getEndDate());
+        u.setReason(req.getReason());
 
         leaveMapper.insertLeaveUsage(u);
 
-        // 전자결제
+        // ====== 전자결재 ======
         LeaveRequestDTO dto = new LeaveRequestDTO();
-
-        dto.setUserId(userId);
-        dto.setLeaveType(req.getLeaveType());
+        dto.setLeaveType(req.getLeaveType()); // enum 그대로 전달
         dto.setStartDate(req.getStartDate());
         dto.setEndDate(req.getEndDate());
         dto.setReason(req.getReason());
-        dto.setDays(days);
 
         approvalLeaveService.submitLeave(dto, userId);
     }
 
     // 주말엔 연차 금지
-    private void LeaveWeekend(LocalDate start, LocalDate end){
+    private void leaveWeekend(LocalDate start, LocalDate end) {
 
-        for(LocalDate d = start; !d.isAfter(end); d = d.plusDays(1)){
+        for (LocalDate d = start; !d.isAfter(end); d = d.plusDays(1)) {
             DayOfWeek dow = d.getDayOfWeek();
-
-            if(dow == DayOfWeek.SATURDAY || dow == DayOfWeek.SUNDAY){
+            if (dow == DayOfWeek.SATURDAY || dow == DayOfWeek.SUNDAY) {
                 throw new IllegalArgumentException("주말에는 연차를 신청할 수 없습니다");
             }
         }
@@ -161,7 +175,6 @@ public class LeaveService {
     private LeaveSummaryCalc summaryMinutes(Long userId, int year) {
 
         LocalDate joinDate = leaveMapper.selectUserJoinDate(userId);
-
         if (joinDate == null) joinDate = LocalDate.of(year, 1, 1);
 
         LocalDate today = LocalDate.now();
@@ -183,10 +196,11 @@ public class LeaveService {
         int remainMin = Math.max(0, totalMin - usedThisYearMin);
 
         LeaveSummaryCalc c = new LeaveSummaryCalc();
-            c.carryMin = carryMin;
-            c.totalMin = totalMin;
-            c.usedMin = usedThisYearMin;
-            c.remainMin = remainMin;
+        c.carryMin = carryMin;
+        c.totalMin = totalMin;
+        c.usedMin = usedThisYearMin;
+        c.remainMin = remainMin;
+
         return c;
     }
 
@@ -205,7 +219,6 @@ public class LeaveService {
 
         // 가입 시
         if (joinDate.getYear() == year) {
-
             if (!joinDate.isAfter(end)) {
                 total += DAY_MIN * 3;
             }
@@ -215,32 +228,24 @@ public class LeaveService {
         LocalDate startAccrue;
 
         if (year == joinDate.getYear()) {
-
             startAccrue = joinDate.plusMonths(1).withDayOfMonth(1);
-
         } else if (year > joinDate.getYear()) {
-
             startAccrue = LocalDate.of(year, 1, 1);
-
         } else {
-
             return 0;
         }
 
         for (int m = 1; m <= 12; m++) {
             LocalDate d = LocalDate.of(year, m, 1);
-
             if (d.isBefore(startAccrue)) continue;
-
             if (d.isAfter(end)) continue;
-
             total += DAY_MIN;
         }
 
         return total;
     }
 
-    // 사용
+    // 사용(여기는 DB에서 String으로 가져오는 구조라 그대로 둡니다)
     private int usedMinutesForYear(Long userId, int year) {
 
         LocalDate start = LocalDate.of(year, 1, 1);
@@ -261,7 +266,6 @@ public class LeaveService {
 
             LocalDate s = lv.getStartDate();
             LocalDate e = lv.getEndDate();
-
             if (s == null || e == null) continue;
 
             // 연도 범위로 clamp
@@ -277,38 +281,40 @@ public class LeaveService {
         return sum;
     }
 
-    // 신청 계산
-    private int requestMinutes(String leaveType, LocalDate start, LocalDate end) {
+    // ====== enum 기반 계산 메서드(여기가 이번 수정의 핵심) ======
 
-        if ("HALF_AM".equals(leaveType) || "HALF_PM".equals(leaveType)) return 4 * 60;
+    private boolean isHalf(LeaveType leaveType) {
+        return leaveType == LeaveType.HALF_AM || leaveType == LeaveType.HALF_PM;
+    }
+
+    // 신청 계산 (enum)
+    private int requestMinutes(LeaveType leaveType, LocalDate start, LocalDate end) {
+
+        if (isHalf(leaveType)) return 4 * 60;
 
         long days = Duration.between(start.atStartOfDay(), end.plusDays(1).atStartOfDay()).toDays();
-
         if (days <= 0) days = 1;
 
         return (int) days * DAY_MIN;
     }
 
-    // 오전 반차, 오후 반차 저장
-    private double calcDays(String leaveType, LocalDate start, LocalDate end) {
+    // 일수 계산 (enum)
+    private double calcDays(LeaveType leaveType, LocalDate start, LocalDate end) {
 
-        if ("HALF_AM".equals(leaveType) || "HALF_PM".equals(leaveType)) return 0.50;
+        if (isHalf(leaveType)) return 0.50;
 
         long d = Duration.between(start.atStartOfDay(), end.plusDays(1).atStartOfDay()).toDays();
-
         return Math.max(1, d);
     }
 
-    // 분
+    // 분 표시
     private String minToLabelDH(int min) {
 
         if (min <= 0) return "0d 0h";
 
         int d = min / DAY_MIN;
-
         int h = (min % DAY_MIN) / 60;
 
         return d + "d " + h + "h";
     }
-
 }
