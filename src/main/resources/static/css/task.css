@@ -31,6 +31,7 @@ main{
                         "etc comment";
     gap: 2rem;
 
+
 }
 #detail  { grid-area: detail; }
 #comment { grid-area: comment; }
@@ -46,10 +47,10 @@ main{
 #etc{
     display: flex;
     flex-direction: column;
+    overflow-y: scroll;
 }
 .etc-block {
-    padding: 1rem;
-    margin: 1rem;
+    margin: 0 1rem;
 }
 
 .btn-send-message-modal{
@@ -66,7 +67,7 @@ main{
 
 .btn-send-message-modal .goto-image{
     font-weight: 600;
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-12);
 }
 #etc-chart{
     display: flex;
@@ -88,12 +89,13 @@ canvas{
     display: block;
     margin-top: 1rem;
     font-weight: 600;
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-12);
 }
 
 #etc-file,
 #etc-git{
     padding: 2rem 1rem;
+    margin-bottom: 2rem;
     border-radius: 0.5rem;
     border: 1px solid rgba(0, 0, 0, 0.15);
 }
@@ -310,7 +312,8 @@ canvas{
 }
 .comment-list {
     flex: 1 1 auto;
-    display: grid;
+    display: flex;
+    flex-direction: column;
     gap: 1rem;
     min-height: 0;
     overflow-y: auto;
@@ -766,11 +769,13 @@ canvas{
 
 /* 스크롤바 커스텀 */
 .task-file-list::-webkit-scrollbar,
-.comment-list::-webkit-scrollbar{
+.comment-list::-webkit-scrollbar,
+#etc::-webkit-scrollbar{
     width: 4px;
 }
 .task-file-list::-webkit-scrollbar-thumb,
-.comment-list::-webkit-scrollbar-thumb{
+.comment-list::-webkit-scrollbar-thumb,
+#etc::-webkit-scrollbar-thumb{
     background-color: rgba(0, 0, 0, 0.1);
     border-radius: 10px;
 }
