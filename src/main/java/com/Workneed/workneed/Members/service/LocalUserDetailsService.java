@@ -52,16 +52,21 @@ public class LocalUserDetailsService implements UserDetailsService {
         AdminUserDTO admin = adminUserMapper.findByAdminEmail(loginInput);
         if (admin != null) {
 
-            // 1️⃣ role_id로 permission 코드 조회
+            //  ACTIVE 아니면 무조건 차단
+            if (!"ACTIVE".equals(admin.getAdminStatus())) {
+                throw new DisabledException("suspended");  // 고정
+            }
+
+            // role_id로 permission 코드 조회
             List<String> permissions =
                     adminUserMapper.findPermissionsByRoleId(admin.getRoleId());
 
-            // 2️⃣ permission → GrantedAuthority 변환
+            // permission → GrantedAuthority 변환
             List<GrantedAuthority> authorities = permissions.stream()
                     .map(SimpleGrantedAuthority::new)
                     .collect(Collectors.toList());
 
-            // 3️⃣ CustomUserDetails에 권한까지 태워서 반환
+            // CustomUserDetails에 권한까지 태워서 반환
             return new CustomUserDetails(admin, authorities);
         }
 
