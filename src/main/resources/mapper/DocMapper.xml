@@ -1,36 +1,146 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.Workneed.workneed.Approval.mapper.DocMapper">
 
+    <!-- =========================================================
+         1) 문서(approval_doc) 기본 CRUD
+         ========================================================= -->
+
+    <!-- ===============================
+         문서 임시저장
+         =============================== -->
     <insert id="save"
-            parameterType="com.Workneed.workneed.Approval.entity.ApprovalDoc"
+            parameterType="com.Workneed.workneed.Approval.dto.DocDTO"
             useGeneratedKeys="true"
             keyProperty="docId">
         INSERT INTO approval_doc
-            (writer_id, type_id, title, content, status)
+             (writer_id, type_id, title, content, status)
         VALUES
-            (#{writerId}, #{typeId}, #{title}, #{content}, #{status})
+        (#{writerId}, #{typeId}, #{title}, #{content}, #{status})
     </insert>
 
+
+    <!-- ===============================
+         문서 단건 조회
+         =============================== -->
     <select id="findById"
+            parameterType="long"
+            resultType="com.Workneed.workneed.Approval.dto.DocDTO">
+        SELECT
+            approval_doc_id AS docId,
+            title,
+            content,
+            writer_id AS writerId,
+            type_id AS typeId,
+            status,
+            leave_start_date AS leaveStartDate,
+            leave_end_date AS leaveEndDate,
+            created_at,
+            updated_at
+        FROM approval_doc
+        WHERE approval_doc_id = #{docId}
+    </select>
+    <select id="findDocById"
             parameterType="long"
             resultType="com.Workneed.workneed.Approval.entity.ApprovalDoc">
         SELECT
-            approval_doc_id AS docId,
-            writer_id       AS writerId,
-            type_id         AS typeId,
-            title           AS title,
-            content         AS content,
-            status          AS status,
-            created_at      AS createdAt,
-            updated_at      AS updatedAt
+        approval_doc_id AS docId,
+        writer_id       AS writerId,
+        type_id         AS typeId,
+        title,
+        content,
+        status,
+        created_at      AS createdAt,
+        updated_at      AS updatedAt
         FROM approval_doc
         WHERE approval_doc_id = #{docId}
     </select>
 
+
+    <!-- 참조자 조회 -->
+    <select id="selectUsersByIds" resultType="com.Workneed.workneed.Approval.dto.RefUserDTO">
+        SELECT
+        u.user_id    AS userId,
+        u.user_name  AS userName,
+        d.dept_name  AS deptName,
+        r.rank_name  AS rankName
+        FROM User u
+        LEFT JOIN dept d  ON d.dept_id = u.dept_id
+        LEFT JOIN ranks r ON r.rank_id = u.rank_id
+        WHERE u.user_id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
+
+    <select id="selectRefUserIdsByDocId" resultType="string">
+        SELECT ref_user_ids
+        FROM approval_doc
+        WHERE approval_doc_id = #{docId}
+    </select>
+
+    <!-- ===============================
+         문서 송신 (DRAFT → IN_PROGRESS)
+         =============================== -->
+    <update id="submitDoc">
+        UPDATE approval_doc
+        SET status = #{status}
+        WHERE approval_doc_id = #{docId}
+          AND status = 'DRAFT'
+    </update>
+
+    <!-- ===============================
+         문서 상태 변경
+         =============================== -->
+    <update id="updateDocStatus">
+        UPDATE approval_doc
+        SET status = #{status}
+        WHERE approval_doc_id = #{docId}
+    </update>
+
+
+    <!-- =========================================================
+         2) 결재 타입(approval_type)
+         ========================================================= -->
+
+    <!-- ===============================
+         결재 타입 목록
+         =============================== -->
+    <select id="findAllTypes"
+            resultType="com.Workneed.workneed.Approval.dto.ApprovalTypeDTO">
+        SELECT
+            approval_type_id AS typeId,
+            type_name        AS typeName
+        FROM approval_type
+        ORDER BY approval_type_id ASC
+    </select>
+    <!-- =========================================================
+             3-1) 참조자 저장(approval_doc)
+             ========================================================= -->
+
+    <!-- ===============================
+         참조장 저장
+         =============================== -->
+    <update id="updateRefUserIds">
+        UPDATE approval_doc
+        SET ref_user_ids = #{refUserIds}
+        WHERE approval_doc_id = #{docId}
+    </update>
+
+
+
+    <!-- =========================================================
+         3) 결재 라인(approval_line) 저장/초기화/오픈
+         ========================================================= -->
+
+    <!-- ===============================
+         결재 라인 저장
+         =============================== -->
     <insert id="insertApprovalLine"
             parameterType="com.Workneed.workneed.Approval.entity.ApprovalLine">
         INSERT INTO approval_line
@@ -39,43 +149,41 @@
             (#{docId}, #{approverId}, #{orderNum}, #{status})
     </insert>
 
-    <select id="findAllTypes"
-            resultType="com.Workneed.workneed.Approval.dto.ApprovalTypeDTO">
-        SELECT
-            approval_type_id AS approvalTypeId,
-            type_name        AS typeName
-        FROM approval_type
-        ORDER BY approval_type_id ASC
-    </select>
-
-    <update id="submitDoc">
-        UPDATE approval_doc
-        SET status = #{status}
-        WHERE approval_doc_id = #{docId}
-          AND status = 'DRAFT'
-    </update>
-
+    <!-- ===============================
+         결재 라인 전체 PENDING 처리
+         =============================== -->
     <update id="resetLinesToPending">
         UPDATE approval_line
-        SET status = #{status}
+        SET status = 'PENDING'
         WHERE approval_doc_id = #{docId}
     </update>
 
+
+    <!-- ===============================
+         첫 결재자 WAITING 오픈
+         =============================== -->
     <update id="openFirstWaiting">
-        UPDATE approval_line l
-            JOIN (
-            SELECT approval_doc_id, MIN(order_num) AS min_order
-            FROM approval_line
-            WHERE approval_doc_id = #{docId}
-            GROUP BY approval_doc_id
-            ) x
-        ON x.approval_doc_id = l.approval_doc_id
-            AND x.min_order = l.order_num
-            SET l.status = #{toStatus}
-        WHERE l.approval_doc_id = #{docId}
-          AND l.status = #{fromStatus}
+        UPDATE approval_line al
+        JOIN (
+        SELECT MIN(order_num) AS min_order
+        FROM approval_line
+        WHERE approval_doc_id = #{docId}
+        AND status = #{pendingStatus}
+        ) t ON al.order_num = t.min_order
+        SET al.status = #{toStatus}
+        WHERE al.approval_doc_id = #{docId}
+        AND al.status = #{pendingStatus}
     </update>
 
+
+
+    <!-- =========================================================
+         4) 로그인/유저 조회(User)
+         ========================================================= -->
+
+    <!-- ===============================
+         로그인 사용자 조회
+         =============================== -->
     <select id="findLoginUserByLoginId"
             resultType="com.Workneed.workneed.Approval.entity.User">
         SELECT
@@ -88,23 +196,40 @@
             LIMIT 1
     </select>
 
+
+    <!-- =========================================================
+         5) 결재 라인 조회/후보 조회
+         ========================================================= -->
+
+    <!-- ===============================
+         문서별 결재 라인 조회
+         =============================== -->
     <select id="findLinesByDocId"
             parameterType="long"
             resultType="com.Workneed.workneed.Approval.dto.ApprovalLineListDTO">
         SELECT
-            l.approval_line_id AS lineId,
-            l.approval_doc_id  AS docId,
-            l.approver_id      AS userId,
-            u.user_name        AS username,
-            l.order_num        AS orderNum,
-            l.status           AS status,
-            l.approved_at      AS approvedAt
+        l.approval_line_id AS lineId,
+        l.approval_doc_id  AS docId,
+        l.approver_id      AS userId,
+
+        u.user_name        AS username,
+        d.dept_name        AS deptName,
+        r.rank_name        AS rankName,
+
+        l.order_num        AS orderNum,
+        l.status           AS status,
+        l.approved_at      AS approvedAt
         FROM approval_line l
-                 JOIN user u ON u.user_id = l.approver_id
+        JOIN user u   ON u.user_id = l.approver_id
+        LEFT JOIN dept d  ON d.dept_id = u.dept_id
+        LEFT JOIN ranks r ON r.rank_id = u.rank_id
         WHERE l.approval_doc_id = #{docId}
         ORDER BY l.order_num ASC, l.approval_line_id ASC
     </select>
 
+    <!-- ===============================
+         결재자 후보 리스트
+         =============================== -->
     <select id="findApproverCandidates"
             resultType="com.Workneed.workneed.Approval.dto.ApprovalLineListDTO">
         SELECT
@@ -119,6 +244,11 @@
         WHERE u.user_status = 'ACTIVE'
         ORDER BY d.dept_name ASC, r.rank_id ASC, u.user_name ASC
     </select>
+
+
+    <!-- =========================================================
+         6) 결재 처리 로직용(카운트/승인/반려/차수 오픈)
+         ========================================================= -->
 
     <select id="countWaitingLineByUser" resultType="int">
         SELECT COUNT(*)
@@ -135,23 +265,17 @@
           AND status = 'APPROVED'
     </select>
 
-    <update id="rejectCurrentLine">
-        UPDATE approval_line
-        SET status = 'REJECTED',
-            approved_at = NOW()
-        WHERE approval_doc_id = #{docId}
-          AND status = 'WAITING'
-    </update>
-
     <update id="rejectMyWaitingLine">
         UPDATE approval_line
         SET status = 'REJECTED',
             comment = #{comment},
             approved_at = NOW()
         WHERE approval_doc_id = #{docId}
-          AND approver_id = #{userId}  AND status = 'WAITING'
+          AND approver_id = #{userId}
+          AND status = 'WAITING'
     </update>
 
+    <!-- 내 WAITING 라인의 orderNum -->
     <select id="findMyWaitingOrderNum" resultType="int">
         SELECT order_num
         FROM approval_line
@@ -161,6 +285,7 @@
             LIMIT 1
     </select>
 
+    <!-- 내 WAITING 라인 승인 -->
     <update id="approveMyWaitingLine">
         UPDATE approval_line
         SET status = 'APPROVED',
@@ -170,6 +295,7 @@
           AND status = 'WAITING'
     </update>
 
+    <!-- 같은 orderNum WAITING 남은 개수(병렬 체크) -->
     <select id="countWaitingByOrder" resultType="int">
         SELECT COUNT(*)
         FROM approval_line
@@ -178,6 +304,7 @@
           AND status = 'WAITING'
     </select>
 
+    <!-- 다음으로 열어야 할 차수(PENDING 중 최소) -->
     <select id="findNextPendingOrderNum" resultType="int">
         SELECT MIN(order_num)
         FROM approval_line
@@ -185,6 +312,7 @@
           AND status = 'PENDING'
     </select>
 
+    <!-- 특정 차수 전체를 WAITING으로 오픈 (병렬이면 여러 명이 동시에 열림) -->
     <update id="openOrderToWaiting">
         UPDATE approval_line
         SET status = 'WAITING'
@@ -193,26 +321,301 @@
           AND status = 'PENDING'
     </update>
 
-    <update id="updateDocStatus">
-        UPDATE approval_doc
-        SET status = #{status}
-        WHERE approval_doc_id = #{docId}
-    </update>
 
+    <!-- =========================================================
+         7) 파일(approval_file)
+         ========================================================= -->
+
+    <!--파일-->
     <select id="selectFilesByDocId" resultType="com.Workneed.workneed.Approval.dto.DocFileDTO">
         SELECT
-            file_id        AS fileId,
-            doc_id         AS docId,
-            original_name  AS originalName,
-            saved_name     AS savedName
+        file_id       AS fileId,
+        doc_id AS docId,
+        original_name AS originalName,
+        saved_name   AS savedName,
+        content_type  AS contentType,
+        file_size     AS fileSize,
+        created_at    AS createdAt
         FROM approval_file
         WHERE doc_id = #{docId}
         ORDER BY file_id DESC
     </select>
-
+    <select id="selectFileById" parameterType="long"
+            resultType="com.Workneed.workneed.Approval.dto.DocFileDTO">
+        SELECT
+        file_id       AS fileId,
+        doc_id        AS docId,
+        original_name AS originalName,
+        saved_name   AS savedName,
+        content_type  AS contentType,
+        file_size     AS fileSize,
+        created_at    AS createdAt
+        FROM approval_file
+        WHERE file_id = #{fileId}
+    </select>
     <insert id="insertFile" parameterType="com.Workneed.workneed.Approval.dto.DocFileDTO">
         INSERT INTO approval_file (doc_id, original_name, saved_name)
         VALUES (#{docId}, #{originalName}, #{savedName})
     </insert>
+
+    <delete id="deleteFileById">
+        DELETE FROM approval_file
+        WHERE file_id = #{fileId}
+    </delete>
+
+    <delete id="deleteFilesByDocId">
+        DELETE FROM approval_file
+        WHERE doc_id = #{docId}
+    </delete>
+
+    <!-- =========================================================
+            1) 기안자 문서함 (내가 작성한 문서) - "문서 상태" 기준
+            ========================================================= -->
+
+
+    <!-- [COUNT] 임시저장 -->
+    <select id="countMyDraft" resultType="int">
+        SELECT COUNT(*)
+        FROM approval_doc
+        WHERE writer_id = #{userId}
+        AND status = 'DRAFT'
+    </select>
+
+    <!-- [COUNT] 진행중 -->
+    <select id="countMyInProgress" resultType="int">
+        SELECT COUNT(*)
+        FROM approval_doc
+        WHERE writer_id = #{userId}
+        AND status = 'IN_PROGRESS'
+    </select>
+
+    <!-- [COUNT] 완료(승인됨) -->
+    <select id="countMyApproved" resultType="int">
+        SELECT COUNT(*)
+        FROM approval_doc
+        WHERE writer_id = #{userId}
+        AND status = 'APPROVED'
+    </select>
+
+    <!-- [COUNT] 반려됨 -->
+    <select id="countMyRejected" resultType="int">
+        SELECT COUNT(*)
+        FROM approval_doc
+        WHERE writer_id = #{userId}
+        AND status = 'REJECTED'
+    </select>
+
+    <!-- [COUNT] 참조됨 -->
+    <select id="countReferenceDocs" resultType="int">
+        SELECT COUNT(*)
+        FROM approval_doc
+        WHERE ref_user_ids IS NOT NULL
+        AND ref_user_ids LIKE CONCAT('%,', #{userId}, ',%')
+    </select>
+
+    <!-- [LIST] 임시저장 -->
+    <select id="selectMyDraftList" resultType="com.Workneed.workneed.Approval.dto.ApprovalDocListItemDTO">
+        SELECT
+        approval_doc_id AS docId,
+        title           AS title,
+        status          AS docStatus,
+        created_at      AS createdAt
+        FROM approval_doc
+        WHERE writer_id = #{userId}
+        AND status = 'DRAFT'
+        ORDER BY created_at DESC
+    </select>
+
+    <delete id="deleteMyDraft">
+        DELETE FROM approval_doc
+        WHERE approval_doc_id = #{docId}
+        AND writer_id = #{userId}
+        AND status = 'DRAFT'
+    </delete>
+
+
+    <!-- [LIST] 진행중 -->
+    <select id="selectMyInProgressList" resultType="com.Workneed.workneed.Approval.dto.ApprovalDocListItemDTO">
+        SELECT
+        d.approval_doc_id AS docId,
+        d.title           AS title,
+        d.status          AS docStatus,
+        d.created_at      AS createdAt,
+
+        u.user_name       AS writerUserName,
+        r.rank_name       AS rankName
+        FROM approval_doc d
+        LEFT JOIN user u ON u.user_id = d.writer_id
+        LEFT JOIN ranks r ON r.rank_id = u.rank_id
+        WHERE d.writer_id = #{userId}
+        AND d.status = 'IN_PROGRESS'
+        ORDER BY d.created_at DESC
+    </select>
+
+    <!-- [LIST] 완료(승인됨) -->
+    <select id="selectMyApprovedList" resultType="com.Workneed.workneed.Approval.dto.ApprovalDocListItemDTO">
+        SELECT
+        d.approval_doc_id AS docId,
+        d.title           AS title,
+        d.status          AS docStatus,
+        d.created_at      AS createdAt,
+
+        u.user_name       AS writerUserName,
+        r.rank_name       AS rankName
+        FROM approval_doc d
+        LEFT JOIN user u ON u.user_id = d.writer_id
+        LEFT JOIN ranks r ON r.rank_id = u.rank_id
+        WHERE d.writer_id = #{userId}
+        AND status = 'APPROVED'
+        ORDER BY created_at DESC
+    </select>
+
+    <!-- [LIST] 반려됨 -->
+    <select id="selectMyRejectedList"
+            resultType="com.Workneed.workneed.Approval.dto.ApprovalDocListItemDTO">
+        SELECT
+        d.approval_doc_id AS docId,
+        d.title           AS title,
+        d.status          AS docStatus,
+        d.created_at      AS createdAt,
+
+        u.user_name       AS writerUserName,
+        r.rank_name       AS rankName
+        FROM approval_doc d
+        LEFT JOIN user u ON u.user_id = d.writer_id
+        LEFT JOIN ranks r ON r.rank_id = u.rank_id
+        WHERE d.writer_id = #{userId}
+        AND d.status = 'REJECTED'
+        ORDER BY d.created_at DESC
+    </select>
+
+
+    <!-- [LIST] 참조됨 -->
+    <select id="selectReferenceList"
+            resultType="com.Workneed.workneed.Approval.dto.ApprovalDocListItemDTO">
+        SELECT
+        d.approval_doc_id AS docId,
+        d.title           AS title,
+        d.status          AS docStatus,
+        d.created_at      AS createdAt,
+
+        u.user_name       AS writerUserName,
+        r.rank_name       AS rankName
+        FROM approval_doc d
+        LEFT JOIN `user` u ON u.user_id = d.writer_id
+        LEFT JOIN ranks r  ON r.rank_id = u.rank_id
+        WHERE d.ref_user_ids IS NOT NULL
+        AND FIND_IN_SET(#{userId}, d.ref_user_ids) > 0
+        ORDER BY d.created_at DESC
+    </select>
+
+
+    <!-- =========================================================
+         2) 결재자 문서함 (내가 결재라인에 있는 문서) - "라인 상태" 기준
+         - 처리해야할 문서: 내 라인 WAITING
+         - 처리한 문서: 내 라인 APPROVED/REJECTED
+         ========================================================= -->
+
+    <!-- [COUNT] 처리해야할 문서 -->
+    <select id="countInboxWaiting" resultType="int">
+        SELECT COUNT(*)
+        FROM approval_line
+        WHERE approver_id = #{userId}
+        AND status = 'WAITING'
+    </select>
+
+    <!-- [COUNT] 처리한 문서 -->
+    <select id="countInboxDone" resultType="int">
+        SELECT COUNT(*)
+        FROM approval_line
+        WHERE approver_id = #{userId}
+        AND status IN ('APPROVED','REJECTED')
+    </select>
+
+    <!-- [LIST] 처리해야할 문서 (WAITING) -->
+    <select id="selectInboxWaitingList" resultType="com.Workneed.workneed.Approval.dto.ApprovalDocListItemDTO">
+        SELECT DISTINCT
+        d.approval_doc_id AS docId,
+        d.title           AS title,
+        d.status          AS docStatus,
+        d.created_at      AS createdAt,
+
+        u.user_name       AS writerUserName,
+        r.rank_name       AS rankName,
+
+        l.status          AS myLineStatus,
+        l.order_num       AS myOrderNum
+        FROM approval_line l
+        JOIN approval_doc d ON d.approval_doc_id = l.approval_doc_id
+        LEFT JOIN `user` u  ON u.user_id = d.writer_id
+        LEFT JOIN ranks r   ON r.rank_id = u.rank_id
+        WHERE l.approver_id = #{userId}
+        AND l.status = 'WAITING'
+        ORDER BY d.created_at DESC
+    </select>
+    <!-- [LIST] 처리한 문서 (APPROVED/REJECTED) -->
+    <select id="selectInboxDoneList" resultType="com.Workneed.workneed.Approval.dto.ApprovalDocListItemDTO">
+        SELECT DISTINCT
+        d.approval_doc_id AS docId,
+        d.title           AS title,
+        d.status          AS docStatus,
+        d.created_at      AS createdAt,
+
+        u.user_name       AS writerUserName,
+        r.rank_name       AS rankName,
+
+        l.status          AS myLineStatus,
+        l.order_num       AS myOrderNum
+        FROM approval_line l
+        JOIN approval_doc d ON d.approval_doc_id = l.approval_doc_id
+        LEFT JOIN user u  ON u.user_id = d.writer_id
+        LEFT JOIN ranks r   ON r.rank_id = u.rank_id
+        WHERE l.approver_id = #{userId}
+        AND l.status IN ('APPROVED','REJECTED')
+        ORDER BY d.created_at DESC
+    </select>
+<!--======================
+    폼작성시 유저 찾기/ 선택
+============================-->
+
+    <select id="searchUser" resultType="com.Workneed.workneed.Members.dto.UserDTO">
+        SELECT
+            u.user_id,
+            u.username,
+            d.dept_name,
+            r.rank_name
+        FROM user u
+            LEFT JOIN dept d
+                ON d.dept_id = u.dept_id
+            LEFT JOIN ranks r
+                ON r.rank_id = u.rank_id
+        WHERE u.username LIKE CONCAT('%', #{keyword}, '%');
+    </select>
+    <!-- 회수 -->
+    <!-- 1) 문서 작성자/상태 조회 -->
+    <select id="selectDocWriterAndStatusForRecall" resultType="map">
+        SELECT
+        writer_id AS writerId,
+        status    AS docStatus
+        FROM approval_doc
+        WHERE approval_doc_id = #{docId}
+    </select>
+
+    <!-- 2) 이미 처리(승인/반려)된 라인이 하나라도 있는지 -->
+    <select id="countProcessedLines" resultType="int">
+        SELECT COUNT(*)
+        FROM approval_line
+        WHERE approval_doc_id = #{docId}
+        AND status IN ('APPROVED', 'REJECTED')
+    </select>
+
+    <!-- 3) 회수 실행: 문서를 DRAFT로 -->
+    <update id="updateDocStatusToDraft">
+        UPDATE approval_doc
+        SET status = 'DRAFT'
+        WHERE approval_doc_id = #{docId}
+    </update>
+
+    <!-- 4) 회수 실행: 결재라인 상태 전부 PENDING으로 되돌림 -->
 
 </mapper>

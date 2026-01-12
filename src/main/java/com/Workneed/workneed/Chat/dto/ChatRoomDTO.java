@@ -21,6 +21,7 @@ public class ChatRoomDTO {
     private Long creatorId;
     private LocalDateTime createdAt;
     private int unreadCount;
+    private String roomProfileImage; // 이 필드가 반드시 있어야 위 room_profile_image가 매핑됩니다.
 
     // 현재 채팅방에 참여 중인 인원수
     private int userCount;

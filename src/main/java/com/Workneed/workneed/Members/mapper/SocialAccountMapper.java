@@ -22,9 +22,4 @@ public interface SocialAccountMapper {
     // 정보 추가하여 실제 연동저장 
     void insertSocialAccount(SocialAccountDTO account);
 
-    // 연동 해제 -추후 기능끝내고 추가할게용-
-    void deleteByUserIdAndProvider(
-            @Param("userId") Long userId,
-            @Param("provider") String provider
-    );
 }

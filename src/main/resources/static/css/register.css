@@ -1,89 +1,135 @@
-/* 1. 레이아웃 중앙 정렬 */
-.register-wrapper {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 40px 0;
-    min-height: 80vh;
-    width: 1340px;
+/* 1. 기본 레이아웃 */
+body {
+    margin: 0; padding: 0;
+    display: flex; justify-content: center; align-items: center;
+    min-height: 100vh; background-color: #F6F8FB;
+    font-family: 'Pretendard', sans-serif;
 }
 
-/* 회원가입 박스 컨테이너 */
 .register-container {
-    background-color: #d9d9d9; /* 이미지의 배경색 */
-    padding: 50px 40px;
-    border-radius: 5px;
-    width: 100%;
-    max-width: 500px; /* 로그인보다 약간 더 넓게 설정 */
-    text-align: center;
+    width: 500px;
+    padding: 30px 40px;
+    background: #fff; border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+    box-sizing: border-box;
 }
 
-.register-container h2 {
-    margin-bottom: 30px;
-    font-size: 24px;
-}
+.main-logo { width: 120px; margin: 0 auto 10px; display: block; }
+h2 { text-align: center; margin: 0 0 25px 0; font-size: 22px; color: #333; }
 
-/* 2. 입력창 및 SVG 아이콘 스타일 */
+/* 2. 입력창(Input) 스타일 - 슬림 버전 */
 .input-group {
     position: relative;
-    margin-bottom: 15px;
+    margin-bottom: 12px !important; /* 칸 사이의 표준 간격 */
+    width: 100%;
 }
 
-/* 입력창 내부 왼쪽 SVG 아이콘 */
+.input-group.no-margin {
+    margin-bottom: 0 !important; /* 문구가 붙는 칸은 여백 제거 */
+}
+
+.input-group input {
+    width: 100%;
+    padding: 12px 15px 12px 45px !important; /* 상하 12px로 슬림하게 조절 */
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    background-color: #fff;
+    font-size: 14px;
+    box-sizing: border-box;
+    transition: all 0.2s;
+    font-family: 'Pretendard', sans-serif;
+}
+
+
+.input-group input:focus {
+    outline: none;
+    border-color: #9CA3AF !important;
+    background-color: #ffffff;
+    box-shadow: 0 0 0 3px rgba(156, 163, 175, 0.1) !important;
+    transition: all 0.2s ease;
+}
+
 .input-icon {
     position: absolute;
     left: 15px;
     top: 50%;
     transform: translateY(-50%);
-    width: 22px;
-    height: 22px;
-    z-index: 10;
+    width: 18px;
+    opacity: 0.6;
 }
 
-/* 입력창 스타일 (아이디, 비번, 이메일, 날짜 공통) */
-.input-group input {
-    width: 100%;
-    padding: 15px 15px 15px 50px; /* 아이콘을 위한 왼쪽 여백 */
-    border: 1px solid #000;
-    border-radius: 15px;
-    box-sizing: border-box;
-    font-size: 16px;
-    background-color: #f8f9fa;
+/* 3. 안내 문구 (비밀번호 일치/가이드 문구 통합) */
+.compact-msg,
+.email-guide,
+#passwordMatchMsg {
+    display: block !important;
+    padding: 0 !important;
+    font-size: 11px !important;
+    letter-spacing: -0.5px !important;
+    font-weight: 500 !important;
+
+    /* 높이 및 간격 최적화 */
+    height: 12px !important;
+    line-height: 12px !important;
+    min-height: 12px !important;
+    margin-top: 3px !important;      /* 입력창 바로 아래 밀착 */
+    margin-bottom: 12px !important;   /* 다음 입력창과의 간격 */
+    margin-left: 15px !important;
+    text-align: left;
 }
 
-/* 날짜 선택(date) 입력창 특화 스타일 */
-input[type="date"] {
-    font-family: inherit;
-    color: #666;
+/* 4. 상태별 색상 */
+.success, .email-color { color: #16a34a !important; } /* 일치/가이드: 초록색 */
+.error { color: #dc2626 !important; }               /* 불일치: 빨간색 */
+
+/* 5. 특수 요소 (인증번호/캘린더) */
+#authCodeGroup {
+    margin-top: 5px !important;
+    margin-bottom: 15px !important;
 }
 
-/* 3. 인증 요청 (제출) 버튼 스타일 */
+input[type="date"] { color: #000; }
+
 .btn-submit {
     width: 100%;
-    padding: 15px;
-    background-color: #e0e0e0;
-    border: 1px solid #000;
-    border-radius: 15px;
-    font-size: 20px;
-    font-weight: bold;
+    padding: 18px 0 !important;
+    border: none !important;
+    background-color: #D1D5DB !important;
+
+    color: #000;
+    border-radius: 12px;
+    font-size: 17px !important;
+    font-weight: 700;
     cursor: pointer;
-    margin-top: 10px;
+    margin-top: 15px;
+    transition: all 0.2s ease;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-/* 하단 링크 */
+/* 2. 비활성화 상태 (11자리가 아닐 때 자동으로 적용됨) */
+.btn-submit:disabled {
+    background-color: #D1D5DB !important;
+    color: #888 !important;
+    cursor: not-allowed;
+    opacity: 0.8;
+    }
+
+/* 버튼 호버 효과 */
+.btn-submit:hover {
+    background-color: #C1C5CB !important;
+}
+
 .footer-links {
-    margin-top: 20px;
-    font-size: 14px;
+    margin-top: 25px;
+    display: flex;
+    justify-content: center; /* 가로 중앙 정렬 */
 }
 
 .footer-links a {
     text-decoration: none;
-    color: #555;
-}
-
-/* 에러 메시지 */
-.error-msg {
-    color: red;
-    margin-bottom: 15px;
-    font-weight: bold;
+    color: #1F2937;
+    font-size: 13px;
 }

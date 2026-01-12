@@ -4,27 +4,31 @@
       layout:decorate="~{layout/layout}">
 
 <head>
-    <title th:text="${pageTitle}"> 출석부 </title>
+    <title th:text="${pageTitle}"> 연차관리 </title>
 
     <!-- 페이지 전용 CSS -->
     <th:block layout:fragment="head">
+        <link rel="stylesheet" th:href="@{/css/main.css}">
         <link rel="stylesheet" th:href="@{/css/attendanceLeft.css}">
         <link rel="stylesheet" th:href="@{/css/attendanceMain.css}">
         <link rel="stylesheet" th:href="@{/css/attendanceBook.css}">
         <link rel="stylesheet" th:href="@{/css/attendanceLeave.css}">
+        <link rel="stylesheet" th:href="@{/css/attendanceTeamAttend.css}">
     </th:block>
+
+</head>
+
+<body>
 
     <th:block layout:fragment="script">
         <script th:src="@{/js/attendanceLeft.js}"></script>
         <script th:src="@{/js/attendanceMain.js}"></script>
         <script th:src="@{/js/attendanceBook.js}"></script>
         <script th:src="@{/js/attendanceLeave.js}"></script>
+        <script th:src="@{/js/attendanceTeamAttend.js}"></script>
     </th:block>
-</head>
 
-<body>
-
-<main layout:fragment="content">
+<main layout:fragment="content" class="pageLeave">
 
     <div class="att-lv">
 
@@ -35,9 +39,9 @@
         <section class = "right_2">
 
             <div class = "yearChart">
-                <button type="button" class = "yearBtn" id="prevYear">&lt;</button>
+                <button type="button" class = "yearBtn" id="prevYear"> &lt; </button>
                 <div class = "yearTxt"><span id = "leaveYear"></span></div>
-                <button type="button" class = "yearBtn" id="nextYear">&gt;</button>
+                <button type="button" class = "yearBtn" id="nextYear"> &gt; </button>
             </div>
 
             <div class = "leaveSummary">
@@ -76,14 +80,14 @@
                     <thead>
                     <tr>
                         <th class="colCheck">
-                            <input type="checkbox" id="leaveCheckAll" aria-label="전체선택">
+                            <input type="checkbox" id="leaveCheckAll" aria-label="전체 선택">
                         </th>
-                        <th>일자</th>
-                        <th>유형</th>
-                        <th>시작 시간</th>
-                        <th>종료 시간</th>
-                        <th>소요시간</th>
-                        <th>상태</th>
+                        <th> 일자 </th>
+                        <th> 유형 </th>
+                        <th> 시작 시간 </th>
+                        <th> 종료 시간 </th>
+                        <th> 소요시간 </th>
+                        <th> 상태 </th>
                     </tr>
                     </thead>
 
@@ -95,10 +99,44 @@
                 <button type="button" class = "footerBtn" id="approveLeave"> 요청 </button>
             </div>
 
+            <div class="lv-modal" id="leaveModal" hidden>
+                <div class="lv-modal_back" id="leaveModalBack"></div>
+
+                <div class="lv-modal_panel" role="dialog" aria-modal="true">
+                    <div class="lv-modal_title">연차 신청</div>
+
+                    <form id="leaveForm" class="lv-form">
+                        <label class="lv-label">유형
+
+                            <select id="lvType" class="lv-input">
+                                <option value="ANNUAL"> 연차 </option>
+                                <option value="HALF_AM"> 오전 반차 </option>
+                                <option value="HALF_PM"> 오후 반차 </option>
+                            </select>
+                        </label>
+
+                        <label class="lv-label"> 시작일
+                            <input type="date" id="lvStart" class="lv-input"/>
+                        </label>
+
+                        <label class="lv-label"> 종료일
+                            <input type="date" id="lvEnd" class="lv-input"/>
+                        </label>
+
+                        <label class="lv-label"> 사유
+                            <textarea id="lvReason" class="lv-textarea" rows="3" placeholder="사유를 입력하세요"></textarea> <!-- 수정 -->
+                        </label>
+
+                        <div class="lv-modal_actions">
+                            <button type="submit" class="lv-btn submit" id="lvSubmit">신청</button>
+
+                            <button type="button" class="lv-btn cancel" id="lvCancel">취소</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </section>
-
     </div>
-
 </main>
 
 

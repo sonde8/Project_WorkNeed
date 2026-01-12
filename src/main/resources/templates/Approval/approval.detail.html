@@ -13,153 +13,271 @@
 </head>
 
 <body>
-
-<!-- ✅ 반드시 content fragment -->
 <th:block layout:fragment="content">
 
-    <div class="wrap approval-detail">
+    <div class="approval-scope">
+        <div class="wrap approval-detail">
 
-        <h1 class="page-title">문서 상세</h1>
+            <div class="page-head">
+                <h1 class="page-title">문서 상세</h1>
+                <div class="page-actions">
+                    <a class="btn" th:href="@{/approval}">결재함</a>
+                </div>
+            </div>
+            <form th:if="${canRecall}" method="post" th:action="@{/approval/recall}" style="display:inline;">
+                <input type="hidden" name="docId" th:value="${docId}">
+                <button type="submit" class="btn danger"
+                        onclick="return confirm('아직 1차 결재 전인 문서만 회수할 수 있습니다. 회수하시겠습니까?');">
+                    회수
+                </button>
+            </form>
 
-        <!-- 결재라인 -->
-        <div class="card">
-            <div class="card-head">
-                <h3>결재 라인</h3>
-                <p class="meta">차수 / 결재자 / 상태</p>
+            <!-- 문서 없음 -->
+            <div th:if="${doc == null}" class="card">
+                <div class="card-head">
+                    <h3>오류</h3>
+                    <p class="meta">문서를 찾을 수 없습니다.</p>
+                </div>
+
+                <div class="empty">
+                    <p>문서를 찾을 수 없습니다.</p>
+                    <button type="button" class="btn" onclick="history.back()">뒤로가기</button>
+                </div>
             </div>
 
-            <ul class="line-list">
-                <li th:each="l : ${lines}" class="line-item">
-    <span class="ord">
-      <b th:text="${l.orderNum}"></b>차
-    </span>
+            <!-- 문서 있음 -->
+            <div th:if="${doc != null}">
 
-                    <!-- ✅ approverName 말고 username -->
-                    <span class="name" th:text="${l.username}"></span>
+                <!-- =========================
+                     결재 라인
+                     ========================= -->
+                <div class="card">
+                    <div class="card-head">
+                        <h3>결재 라인</h3>
+                        <p class="meta">검토 / 합의 / 결재</p>
+                    </div>
 
-                    <span class="status" th:text="${l.status}"></span>
-                </li>
+                    <ul class="line-list">
+                        <li th:each="l : ${lines}" class="line-item">
 
-                <li th:if="${#lists.isEmpty(lines)}" class="line-empty">
-                    결재 라인이 없습니다.
-                </li>
-            </ul>
+                            <!-- 차수 라벨 -->
+                            <span class="ord"
+                                  th:text="${l.orderNum == 1 ? '검토' : (l.orderNum == 2 ? '합의' : '최종 결재')}">
+        </span>
 
-        </div>
+                            <!-- 이름 + 부서/직급 -->
+                            <span class="cand-name" th:text="${l.username}">이름</span>
+                            <span class="cand-meta">
+            (<span th:text="${l.deptName}">부서</span>
+            <span th:if="${l.rankName != null}"
+                  th:text="' / ' + ${l.rankName}"> / 직급</span>)
+        </span>
 
-        <!-- 문서 존재 -->
-        <div th:if="${doc != null}" class="card">
+                            <!-- 상태 배지 -->
+                            <span class="status badge"
+                                  th:classappend="' st-' + ${#strings.toLowerCase(l.status.name())}"
+                                  th:text="${l.status.label}">
+            상태
+        </span>
 
-            <div class="card-head">
-                <h3>문서 정보</h3>
-                <p class="meta">문서 기본 정보</p>
-            </div>
+                        </li>
 
-            <div class="rows">
+                        <li th:if="${#lists.isEmpty(lines)}" class="line-empty">
+                            결재 라인이 없습니다.
+                        </li>
+                    </ul>
 
-                <div class="row">
-                    <span class="label">문서 ID</span>
-                    <span class="value" th:text="${doc.docId}"></span>
+                </div>
+                <!-- =========================
+                     참조자
+                     ========================= -->
+                <div class="card">
+                    <div class="card-head">
+                        <h3>참조자</h3>
+                        <p class="meta">열람만 가능 (승인/반려 불가)</p>
+                    </div>
+
+                    <ul class="line-list">
+                        <li th:each="u : ${refUsers}" class="line-item"
+                            th:attr="data-user-id=${u.userId},
+                 data-name=${u.username},
+                 data-dept=${u.deptName},
+                 data-rank=${u.rankName}">
+
+                            <span class="cand-name" th:text="${u.username}">이름</span>
+                            <span class="cand-meta">
+            (<span th:text="${u.deptName}">부서</span>
+            <span th:if="${u.rankName != null}"
+                  th:text="' / ' + ${u.rankName}"> / 직급</span>)
+        </span>
+                        </li>
+
+                        <li th:if="${refUsers == null or #lists.isEmpty(refUsers)}"
+                            class="line-empty">
+                            참조자가 없습니다.
+                        </li>
+                    </ul>
+
                 </div>
 
-                <div class="row">
-                    <span class="label">상태</span>
-                    <span class="value" th:text="${doc.status}">DRAFT</span>
+                <!-- =========================
+                     문서 정보
+                     ========================= -->
+                <div class="card">
+                    <div class="card-head">
+                        <h3>문서 정보</h3>
+                        <p class="meta">문서 기본 정보</p>
+                    </div>
+
+                    <div class="rows">
+
+                        <div class="row">
+                            <span class="label">문서 ID</span>
+                            <span class="value" th:text="${doc.docId}"></span>
+                        </div>
+
+                        <div class="row">
+                            <span class="label">상태</span>
+                            <span class="value badge strong"
+                                  th:classappend="' st-' + ${#strings.toLowerCase(doc.status.name())}"
+                                  th:text="${doc.status.label}">
+                                DRAFT
+                            </span>
+                        </div>
+
+                        <div class="row">
+                            <span class="label">문서 종류</span>
+                            <span class="value" th:text="${doc.typeId}">-</span>
+                        </div>
+
+                        <!-- ✅ 휴가 정보: 휴가 문서일 때만 표시 (leave가 모델에 있을 때만) -->
+                        <div th:if="${leave != null}">
+
+                            <div class="row">
+                                <span class="label">휴가 종류</span>
+                                <span class="value" th:text="${leave.leaveType}">-</span>
+                            </div>
+
+                        </div>
+
+                        <div class="row">
+                            <span class="label">제목</span>
+                            <span class="value" th:text="${doc.title}">-</span>
+                        </div>
+
+                        <div class="row-row-content">
+                            <span class="label">내용</span>
+                            <pre class="content-detail" th:text="${doc.content}">-</pre>
+                        </div>
+
+                        <div class="row">
+                            <span class="label">작성일</span>
+                            <span th:text="${#temporals.format(doc.createdAt, 'yyyy년 MM월 dd일 HH:mm')}"></span>
+                        </div>
+
+                    </div>
                 </div>
 
-                <div class="row">
-                    <span class="label">문서 종류</span>
-                    <span class="value" th:text="${doc.typeId}">TYPE</span>
-                </div>
-
-                <div class="row">
-                    <span class="label">제목</span>
-                    <span class="value" th:text="${doc.title}">TITLE</span>
-                </div>
-
-                <div class="row row-content">
-                    <span class="label">내용</span>
-                    <pre class="content" th:text="${doc.content}">CONTENT</pre>
-                </div>
-                <!-- 첨부 파일 -->
+                <!-- =========================
+                     첨부 파일
+                     ========================= -->
                 <div class="card">
                     <div class="card-head">
                         <h3>첨부 파일</h3>
                         <p class="meta">첨부된 파일 목록</p>
                     </div>
 
-                    <ul class="file-list">
-                        <li th:each="f : ${files}">
-                            <a th:href="@{/approval/file/{id}(id=${f.fileId})}"
-                               th:text="${f.originalName}">
-                            </a>
+                    <ul class="app-file-list">
+                        <li th:each="f : ${files}" class="app-file-item">
+
+                            <a th:href="@{/approval/file/{id}/download(id=${f.fileId})}"
+                               th:text="${f.originalName}"
+                               class="app-file-link">파일명.pdf</a>
+
+                            <form th:if="${isWriter}"
+                                  th:action="@{/approval/file/{id}/delete(id=${f.fileId})}"
+                                  method="post"
+                                  onsubmit="return confirm('파일을 삭제하시겠습니까?');">
+                                <button type="submit" class="app-btn-delete">삭제</button>
+                            </form>
                         </li>
 
-                        <li th:if="${#lists.isEmpty(files)}" class="empty">
+                        <li th:if="${#lists.isEmpty(files)}" class="app-file-empty">
                             첨부 파일이 없습니다.
                         </li>
                     </ul>
                 </div>
 
+                <!-- =========================
+                     액션 버튼
+                     ========================= -->
+                <div class="card">
+                    <div class="card-head">
+                        <h3>작업</h3>
+                        <p class="meta">현재 상태에 따라 가능한 작업만 표시됩니다.</p>
+                    </div>
 
-                <div class="row">
-                    <span class="label">작성일</span>
-                    <span class="value" th:text="${doc.createdAt}">-</span>
+                    <div class="btns">
+
+                        <!-- 승인: IN_PROGRESS + 내 차례 -->
+                        <form class="inline"
+                              th:if="${doc.status.name() == 'IN_PROGRESS' and isMyTurn and !isReference}"
+                              method="post" th:action="@{/approval/approve}">
+                            <input type="hidden" name="docId" th:value="${doc.docId}">
+                            <button type="submit" class="btn primary"
+                                    data-confirm="승인 처리하시겠습니까?">
+                                승인
+                            </button>
+                        </form>
+
+                        <!-- 반려: IN_PROGRESS + 내 차례 -->
+                        <div class="reject-wrap"
+                             th:if="${doc.status.name() == 'IN_PROGRESS' and isMyTurn and !isReference}">
+                            <button type="button" class="btn danger" id="btnToggleReject">
+                                반려 사유 입력
+                            </button>
+
+                            <form id="rejectForm"
+                                  class="reject-form"
+                                  method="post" th:action="@{/approval/reject}">
+                                <input type="hidden" name="docId" th:value="${doc.docId}">
+                                <textarea name="comment" placeholder="반려 사유를 입력하십시오" required></textarea>
+                                <div class="btns tight">
+                                    <button type="submit" class="btn danger"
+                                            data-confirm="반려 처리하시겠습니까?">
+                                        반려
+                                    </button>
+                                    <button type="button" class="btn" id="btnCancelReject">
+                                        취소
+                                    </button>
+                                </div>
+                            </form>
+
+
+                            <div style="padding:10px; border:1px solid #ddd; margin:10px 0;">
+                                <div>status = <span th:text="${doc.status}"></span></div>
+                                <div>isMyTurn = <span th:text="${isMyTurn}"></span></div>
+                                <div>isReference = <span th:text="${isReference}"></span></div>
+                                <div>isWriter = <span th:text="${isWriter}"></span></div>
+                            </div>
+                        </div>
+
+                    </div>
                 </div>
 
-                <div class="row">
-                    <span class="label">수정일</span>
-                    <span class="value" th:text="${doc.updatedAt}">-</span>
-                </div>
-            </div>
+                <!-- 서버에서 넣어둔 상태를 JS가 읽을 수 있게 -->
+                <input type="hidden" id="isMyTurn" th:value="${isMyTurn}">
+                <input type="hidden" id="docStatus" th:value="${doc.status.name()}">
 
-            <!-- 버튼 영역 -->
-            <div class="btns">
-
-                <!-- 승인/반려: IN_PROGRESS + 내 차례(isMyTurn) -->
-                <form th:if="${doc.status.name() == 'IN_PROGRESS' and isMyTurn}"
-                      method="post" th:action="@{/approval/approve}">
-                    <input type="hidden" name="docId" th:value="${doc.docId}">
-                    <button type="submit" class="primary">승인</button>
-                </form>
-
-                <form th:if="${doc.status.name() == 'IN_PROGRESS' and isMyTurn}"
-                      method="post" th:action="@{/approval/reject}">
-                    <input type="hidden" name="docId" th:value="${doc.docId}">
-                    <button type="submit" class="danger">반려</button>
-                </form>
-
-                <!-- 회수: IN_PROGRESS + 작성자 + canRecall -->
-                <form th:if="${doc.status.name() == 'IN_PROGRESS' and (canRecall == true)}"
-
-                      method="post" th:action="@{/approval/recall}">
-                    <input type="hidden" name="docId" th:value="${doc.docId}">
-                    <button type="submit">회수</button>
-                </form>
-
-
-            </div>
-
-
-            <!-- 문서 없음 -->
-        <div th:if="${doc == null}" class="card">
-            <div class="card-head">
-                <h3>오류</h3>
-                <p class="meta">문서를 찾을 수 없습니다.</p>
-            </div>
-
-            <div class="empty">
-                <p>문서를 찾을 수 없습니다.</p>
-                <button type="button"
-                        class="btn btn-ghost"
-                        onclick="history.back()">
-                    뒤로가기
-                </button>
             </div>
         </div>
-
     </div>
 
+</th:block>
+
+<!-- ✅ JS 분리 -->
+<th:block layout:fragment="script">
+    <script th:src="@{/js/approval.js}"></script>
 </th:block>
 
 </body>

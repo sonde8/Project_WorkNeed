@@ -81,7 +81,6 @@
             ORDER BY s.schedule_id DESC
     </select>
 
-
     <select id="selectById"
             parameterType="long"
             resultType="com.Workneed.workneed.Schedule.dto.ScheduleDTO">
@@ -149,4 +148,35 @@
         SET file_storage_url = NULL
         WHERE schedule_id = #{scheduleId}
     </update>
+
+<!--main page mini kanban-->
+    <select id="countDoingSchedulesAll" resultType="int">
+        SELECT COUNT(*)
+        FROM schedule
+        WHERE status = 'DOING'
+    </select>
+
+    <select id="selectMainMyTaskCardsInDoingScheduleByStatus"
+            resultType="com.Workneed.workneed.Schedule.dto.MainScheduleDTO">
+        SELECT
+            s.schedule_id      AS scheduleId,
+            s.title            AS scheduleTitle,
+            s.event_type       AS eventType,
+            s.start_at         AS startAt,
+            s.end_at           AS endAt,
+
+            t.task_id          AS taskId,
+            t.personal_status  AS taskStatus,
+            t.task_description AS taskDescription
+        FROM my_task t
+        JOIN schedule s ON s.schedule_id = t.schedule_id
+        WHERE t.user_id = #{userId}
+         AND t.personal_status = #{status}
+         AND s.status = 'DOING'
+        ORDER BY
+          s.start_at ASC,
+          t.task_id DESC
+    </select>
+
+
 </mapper>

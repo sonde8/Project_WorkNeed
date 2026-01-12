@@ -1,14 +1,18 @@
 package com.Workneed.workneed.Members.controller;
 
+import com.Workneed.workneed.Chat.service.StorageService;
 import com.Workneed.workneed.Members.dto.UserDTO;
 import com.Workneed.workneed.Members.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -21,73 +25,48 @@ import java.util.UUID;
 public class UserController {
 
     private final UserService userService;
+    // s3로 변경을 위한 서비스 주입
+    private final StorageService storageService;
 
-    // application.properties에서 file.upload-dir=uploads 값을 가져옵니다.
-    @Value("${file.upload-dir}")
-    private String uploadDir;
-
-    /**
-     * 프로필 이미지 업로드 처리
-     */
+     // 프로필 이미지 업로드 처리
     @PostMapping("/user/uploadProfile")
-    public String uploadProfile(@RequestParam("profileFile") MultipartFile file,
-                                HttpSession session) {
+    @ResponseBody
+    public ResponseEntity<String> uploadProfile(@RequestParam("profileFile") MultipartFile file,
+                                        HttpSession session) {
 
         // 1. 세션에서 로그인 유저 정보 가져오기
         UserDTO user = (UserDTO) session.getAttribute("user");
-        if (user == null) {
-            log.warn("로그인 세션이 만료되었습니다.");
-            return "redirect:/login";
-        }
+
+        if (user == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 
         if (!file.isEmpty()) {
             // 이미지 파일 여부 체크 (보안 강화)
             if (file.getContentType() == null || !file.getContentType().startsWith("image")) {
-                log.warn("이미지 파일만 업로드 가능합니다.");
-                return "redirect:/main?error=notImage";
+                log.warn("이미지 파일이 아닙니다: {}", file.getContentType());
+                return ResponseEntity.badRequest().body("이미지 파일만 업로드 가능합니다.");
             }
 
             try {
                 // 2. 파일 저장 물리 경로 설정 (상대 경로 기준)
-                // 프로젝트루트/uploads/profiles/ 구조가 됩니다.
-                String savePath = System.getProperty("user.dir") + File.separator + uploadDir + File.separator + "profiles" + File.separator;
+                String s3Url = storageService.store(file, "profile");
+                log.info("S3 프로필 업로드 완료: {}", s3Url);
 
-                File dir = new File(savePath);
-                if (!dir.exists()) {
-                    dir.mkdirs(); // 폴더가 없으면 생성 (uploads와 profiles 폴더 모두 생성)
-                    log.info("폴더를 생성했습니다: {}", savePath);
-                }
+                // 3. DB 업데이트
+                userService.updateProfileImage(user.getUserId(), s3Url);
 
-                // 3. 파일명 중복 방지를 위한 UUID 생성
-                String originalFileName = file.getOriginalFilename();
-                String extension = "";
-                if (originalFileName != null && originalFileName.contains(".")) {
-                    extension = originalFileName.substring(originalFileName.lastIndexOf("."));
-                }
-                String savedFileName = UUID.randomUUID().toString() + extension;
-
-                // 4. 서버 PC에 파일 물리적 저장
-                File saveFile = new File(savePath, savedFileName);
-                file.transferTo(saveFile);
-                log.info("파일 물리적 저장 완료: {}", saveFile.getAbsolutePath());
-
-                // 5. DB에 저장할 웹 경로 문자열 (UserWebConfig의 /upload/** 매핑과 일치해야 함)
-                String dbPath = "/upload/profiles/" + savedFileName;
-
-                // 6. DB 업데이트 (Service를 거쳐 Mapper 실행)
-                userService.updateProfileImage(user.getUserId(), dbPath);
-
-                // 7. 세션 객체 정보 갱신 (메인 페이지에 즉시 반영되도록)
-                user.setUserProfileImage(dbPath);
+                // 4. 세션 갱신
+                user.setUserProfileImage(s3Url);
                 session.setAttribute("user", user);
 
-                log.info("프로필 업데이트 성공! DB 경로: {}", dbPath);
+                // 성공 시 새로운 URL 반환
+                return ResponseEntity.status(HttpStatus.OK).header("Content-Type", "text/plain; charset=utf-8").body(s3Url);
 
-            } catch (IOException e) {
+            } catch (Exception e) {
                 log.error("파일 저장 중 에러 발생", e);
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류가 발생했습니다.");
             }
         }
 
-        return "redirect:/main";
+        return ResponseEntity.badRequest().body("파일이 비어있습니다.");
     }
 }

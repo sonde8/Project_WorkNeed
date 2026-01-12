@@ -12,19 +12,21 @@
         <link rel="stylesheet" th:href="@{/css/attendanceMain.css}">
         <link rel="stylesheet" th:href="@{/css/attendanceBook.css}">
         <link rel="stylesheet" th:href="@{/css/attendanceLeave.css}">
-    </th:block>
-
-    <th:block layout:fragment="script">
-        <script th:src="@{/js/attendanceLeft.js}"></script>
-        <script th:src="@{/js/attendanceMain.js}"></script>
-        <script th:src="@{/js/attendanceBook.js}"></script>
-        <script th:src="@{/js/attendanceLeave.js}"></script>
+        <link rel="stylesheet" th:href="@{/css/attendanceTeamAttend.css}">
     </th:block>
 </head>
 
 <body>
 
-<main layout:fragment="content">
+<th:block layout:fragment="script">
+    <script th:src="@{/js/attendanceLeft.js}"></script>
+    <script th:src="@{/js/attendanceMain.js}"></script>
+    <script th:src="@{/js/attendanceBook.js}"></script>
+    <script th:src="@{/js/attendanceLeave.js}"></script>
+    <script th:src="@{/js/attendanceTeamAttend.js}"></script>
+</th:block>
+
+<main layout:fragment="content" class="pageBook">
 
     <div class="att-bk">
 
@@ -32,37 +34,76 @@
         <section th:replace="~{Attendance/attendanceLeft :: attendanceLeft}"></section>
 
         <!-- 오른쪽 -->
-        <section class = "right_1">
+        <section class="right_1">
 
-            <div class = "month_chart">
+            <div class="month_chart">
                 <button type="button" id="prevMonth">&lt;</button>
                 <div class="bookWrap"><span id="bookYm"></span></div>
                 <button type="button" id="nextMonth">&gt;</button>
             </div>
 
-            <div class = "tableWrap">
+
+            <div class="tableWrap">
                 <table class="bookTable">
                     <thead>
-                        <tr>
-                            <th> 일자 </th>
-                            <th> 구분 </th>
-                            <th> 출근시간 </th>
-                            <th> 퇴근시간 </th>
-                            <th> 연장근무시간 </th>
-                            <th> 근로시간 </th>
-                        </tr>
+                    <tr>
+                        <th>일자</th>
+                        <th>구분</th>
+                        <th>출근시간</th>
+                        <th>퇴근시간</th>
+                        <th>연장근무시간</th>
+                        <th>근로시간</th>
+                    </tr>
                     </thead>
                     <tbody id="bookTbody"></tbody>
                 </table>
             </div>
 
-            <div class = "bookChange">
-            <button type="button" class="changeBtn" > 수정 </button>
+            <div class="bookChange">
+                <button type="button" class="changeBtn" id="openRequestBtn"> 수정 </button>
+            </div>
+
+            <div class="lv-modal" id="attendanceRequestModal" hidden>
+                <div class="lv-modal_back" id="closeModalBack"></div>
+
+                <div class="lv-modal_panel" role="dialog" aria-modal="true">
+                    <div class="lv-modal_title">근태 수정 요청</div>
+
+                    <form id="attendanceRequestForm" class="lv-form">
+                        <label class="lv-label">유형
+                            <select id="reqType" class="lv-input">
+                                <option value="ATTEND_EDIT">출근수정요청</option>
+                                <option value="LEAVE_EDIT">퇴근수정요청</option>
+                                <option value="OVERTIME">연장근무요청</option>
+                            </select>
+                        </label>
+
+                        <label class="lv-label">수정할 날짜
+                            <input type="date" id="reqWorkDate" class="lv-input"/>
+                        </label>
+
+                        <label class="lv-label">수정할 시간
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <input type="time" id="reqStartTime" class="lv-input" style="flex: 1;"/>
+                                <span style="color: #666;">~</span>
+                                <input type="time" id="reqEndTime" class="lv-input" style="flex: 1;"/>
+                            </div>
+                        </label>
+
+                        <label class="lv-label">사유
+                            <textarea id="reqReason" class="lv-textarea" rows="3"
+                                      placeholder="사유를 입력하세요 (예: 15시~20시 추가 근무)"></textarea>
+                        </label>
+
+                        <div class="lv-modal_actions">
+                            <button type="button" class="lv-btn submit" id="submitRequest">등록</button>
+                            <button type="button" class="lv-btn cancel" id="closeModal">취소</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </section>
-
     </div>
-
 </main>
 
 

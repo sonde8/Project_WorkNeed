@@ -17,13 +17,29 @@ public interface MeetingRoomMapper {
             @Param("endAt") LocalDateTime endAt
     );
 
-    // 2. 예약 중복 체크
+    // 2. 회의실 예약 중복 체크 (특정 회의실의 시간대 중복 확인)
     int countConflict(
             @Param("roomId") Long roomId,
             @Param("startAt") LocalDateTime startAt,
             @Param("endAt") LocalDateTime endAt
     );
 
-    // 3. 예약 저장
+    // 3. 업무 예약 중복 체크 (동일 업무가 이미 다른 회의실을 예약했는지 확인)
+    int countScheduleConflict(
+            @Param("scheduleId") Long scheduleId,
+            @Param("startAt") LocalDateTime startAt,
+            @Param("endAt") LocalDateTime endAt
+    );
+
+    // 4. 예약 저장
     int insertReservation(MeetingReservationDTO dto);
+
+    // 5. 예약 취소 (삭제)
+    int deleteReservation(@Param("reservationId") Long reservationId);
+
+    // 6. task에서 회의실 이름 조회
+    List<MeetingReservationDTO> selectReservationsByScheduleId(@Param("scheduleId") Long scheduleId);
+
+    // 7. task에서 회의실 예약 삭제
+    int deleteReservationsByScheduleIds(@Param("scheduleIds") List<Long> scheduleIds);
 }

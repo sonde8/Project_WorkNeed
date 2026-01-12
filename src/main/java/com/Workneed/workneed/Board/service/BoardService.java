@@ -17,4 +17,8 @@ public interface BoardService {
 
     // 4. 게시글 등록 (성공하면 true)
     boolean registerPost(BoardPostDTO postDTO);
+
+    // 5. 게시물 삭제
+    boolean deletePost(Long postId, Long loginUserId, boolean isAdmin);
+
 }

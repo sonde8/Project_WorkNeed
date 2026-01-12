@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+<head>
+    <title>휴가 신청</title>
+
+    <th:block layout:fragment="head">
+        <link rel="stylesheet" th:href="@{/css/approve.css}">
+    </th:block>
+</head>
+
+<body>
+
+<section layout:fragment="content">
+    <div class="approval-leave-scope">
+        <div class="wrap">
+            <h2 class="page-title">휴가 신청</h2>
+
+            <div class="card">
+                <!-- ✅ POST /approval/leave/submit -->
+                <form th:action="@{/approval/leave/submit}"
+                      th:object="${dto}"
+                      method="post">
+
+                    <div class="form-row">
+                        <label>휴가 종류</label>
+                        <select th:field="*{leaveType}">
+                            <option value="">선택</option>
+                            <option th:each="t : ${types}"
+                                    th:value="${t}"
+                                    th:text="${t.label}">
+                            </option>
+                            </select>
+                    </div>
+
+                    <div class="form-row">
+                        <label>시작일</label>
+                        <!-- ✅ LocalDate면 date가 제일 안전 -->
+                        <input type="date" th:field="*{startDate}" required>
+                    </div>
+
+                    <div class="form-row">
+                        <label>종료일</label>
+                        <input type="date" th:field="*{endDate}" required>
+                    </div>
+
+                    <div class="form-row">
+                        <label>일수</label>
+                        <!-- 사용자가 눈으로 보게만: 서버에서 최종 계산 권장 -->
+                        <input type="number" step="0.5" min="0.5" th:field="*{days}" placeholder="예: 1, 0.5" required>
+                    </div>
+
+                    <div class="form-row">
+                        <label>사유</label>
+                        <textarea th:field="*{reason}" rows="4" required></textarea>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">신청</button>
+                        <a th:href="@{/approval/inbox/waiting}" class="btn">취소</a>
+                    </div>
+
+                </form>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<th:block layout:fragment="script">
+    <script th:src="@{/js/approval.js}"></script>
+</th:block>
+
+</body>
+</html>

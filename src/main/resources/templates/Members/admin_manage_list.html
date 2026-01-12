@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>관리자 설정</title>
+    <link rel="stylesheet" th:href="@{/css/admin_user_list.css}">
+</head>
+<body>
+
+
+<div class="admin-header" th:if="${admin != null}">
+    <span>관리자: <b th:text="${admin.adminName}">관리자</b></span>
+    <form th:action="@{/logout}" method="post">
+        <button type="submit" class="btn-secondary">로그아웃</button>
+    </form>
+</div>
+
+<div class="admin-tabs">
+    <a th:href="@{/admin/member/list}" class="btn-tab">직원 관리</a>
+    <a th:href="@{/admin/attendance/list}" class="btn-tab">근태 요청 관리</a>
+    <a th:href="@{/admin/manage/list}" class="btn-tab active">관리자 설정</a>
+    <a th:href="@{/admin/log/list}" class="btn-tab ">활동 로그</a>
+</div>
+
+
+<div class="admin-content">
+    <h2> 시스템 관리자 목록</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>관리자 이름</th>
+            <th>권한(Role)</th>
+            <th>권한 설명</th>
+            <th>이메일(아이디)</th>
+            <th>마지막 접속 시간</th>
+            <th>상태</th>
+            <th>계정 제어</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="a : ${admins}">
+            <td><strong th:text="${a.adminName}">관리자이름</strong></td>
+
+            <td>
+                <span class="role-badge" th:text="${a.roleName}">SUPER_ADMIN</span>
+            </td>
+
+            <td>
+                <span th:text="${a.roleDescription}" style="color: #718096; font-size: 0.9em;">설명 내용</span>
+            </td>
+
+            <td th:text="${a.adminEmail}">admin@workneed.com</td>
+            <td th:text="${a.adminLastLoginAt != null ? #temporals.format(a.adminLastLoginAt, 'yyyy-MM-dd HH:mm:ss') : '미접속'}"></td>
+            <td>
+                <span th:text="${a.adminStatus}"
+                      th:class="${a.adminStatus == 'ACTIVE' ? 'status-active' : 'status-suspended'}">
+                </span>
+            </td>
+            <td>
+                <button th:if="${a.adminId != admin.adminId}"
+                        th:class="${a.adminStatus == 'ACTIVE' ? 'btn-secondary' : 'btn-primary'}"
+                        th:onclick="changeAdminStatus([[${a.adminId}]], [[${a.adminStatus}]])"
+                        th:text="${a.adminStatus == 'ACTIVE' ? '계정 정지' : '정지 해제'}">
+                </button>
+                <span th:if="${a.adminId == admin.adminId}" style="color: #999; font-size: 0.85em;">(본인)</span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<script src="/js/admin_manage_list.js"></script>
+</body>
+</html>

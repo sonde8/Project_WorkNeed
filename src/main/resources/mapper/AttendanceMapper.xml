@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.Workneed.workneed.Attendance.mapper.AttendanceMapper">
+
+    <!-- 출 퇴근 상태 조회 -->
+    <select id="findByEmpAndDate" resultType="com.Workneed.workneed.Attendance.dto.AttendanceDTO">
+        SELECT
+            attendance_id AS attendanceId,
+            emp_id AS empId,
+            work_date AS workDate,
+            check_in_time AS checkInTime,
+            check_out_time AS checkOutTime,
+            work_minutes AS workMinutes,
+            overtime_minutes AS overtimeMinutes,
+            is_late AS isLate,
+            is_early_leave AS isEarlyLeave,
+            status_code AS statusCode
+        FROM attendance
+        WHERE emp_id = #{empId}
+          AND work_date = #{workDate}
+    </select>
+
+    <!-- 출근 시간 -->
+    <insert id = "upsertCheckIn">
+        INSERT INTO attendance (emp_id, work_date, check_in_time, is_late, status_code)
+        VALUES (#{empId}, #{workDate}, #{checkInTime}, #{isLate}, #{statusCode})
+            ON DUPLICATE KEY UPDATE
+                                 check_in_time = IFNULL(check_in_time, VALUES(check_in_time)),
+                                 is_late = VALUES(is_late),
+                                 status_code = VALUES(status_code)
+    </insert>
+
+    <!--근태 요청-->
+    <insert id="insertAttendanceRequest"
+            parameterType="com.Workneed.workneed.Members.dto.AttendanceRequestCreateDTO">
+        INSERT INTO Request (
+        user_id,
+        request_type,
+        request_payload,
+        status,
+        request_created_at
+        ) VALUES (
+        #{userId},
+        'ATTENDANCE',
+        JSON_OBJECT(
+        'workDate', #{workDate},
+        'fromTime', #{startTime},
+        'toTime', #{endTime},
+        'type', #{type},
+        'reason', #{reason}
+        ),
+        'PENDING',
+        NOW()
+        )
+    </insert>
+
+    <!-- 퇴근 시간 -->
+    <update id = "updateCheckOut">
+        UPDATE attendance
+        SET
+            check_out_time = #{checkOutTime},
+            work_minutes = #{workMinutes},
+            overtime_minutes = #{overtimeMinutes},
+            is_early_leave = #{isEarlyLeave},
+            status_code = #{statusCode}
+        WHERE emp_id = #{empId}
+          AND work_date = #{workDate}
+    </update>
+
+    <!-- 주간, 월간 누적 시간 -->
+    <select id = "workMinutes" resultType="int">
+        SELECT COALESCE(SUM(work_minutes), 0)
+        FROM attendance
+        WHERE emp_id = #{empId}
+          AND work_date &gt;= #{startDate}
+          AND work_date &lt; #{endDate}
+          AND check_out_time IS NOT NULL
+    </select>
+
+    <!-- 휴일근무 -->
+    <select id = "holidayMinutes" resultType="int">
+        SELECT COALESCE(SUM(work_minutes), 0)
+        FROM attendance
+        WHERE emp_id = #{empId}
+          AND work_date &gt;= #{startDate}
+          AND work_date &lt; #{endDate}
+          AND check_out_time IS NOT NULL
+          AND DAYOFWEEK(work_date) IN (1, 7)
+    </select>
+
+    <!-- 출근부 조회 -->
+    <select id = "timeCard" resultType="com.Workneed.workneed.Attendance.dto.AttendanceDTO">
+        SELECT
+            attendance_id AS attendanceId,
+            emp_id AS empId,
+            work_date AS workDate,
+            check_in_time AS checkInTime,
+            check_out_time AS checkOutTime,
+            work_minutes AS workMinutes,
+            overtime_minutes AS overtimeMinutes,
+            is_late AS isLate,
+            is_early_leave AS isEarlyLeave,
+            status_code AS statusCode
+        FROM attendance
+        WHERE emp_id = #{empId}
+          AND work_date &gt;= #{startDate}
+          AND work_date &lt; #{endDate}
+        ORDER BY work_date ASC
+    </select>
+
+    <!-- 출근은 했지만 퇴근을 찍지 않았을 때 -->
+    <select id = "findCheckOut" resultType="com.Workneed.workneed.Attendance.dto.AttendanceDTO">
+        SELECT
+            emp_id AS empId,
+            check_in_time AS checkInTime
+        FROM attendance
+        WHERE work_date = #{workDate}
+          AND check_in_time IS NOT NULL
+          AND check_out_time IS NULL
+    </select>
+
+    <!-- 자정 지나면 자동 퇴근 -->
+    <update id = "autoCheckOut">
+        UPDATE attendance
+        SET
+            check_out_time = #{checkOutTime},
+            work_minutes = #{workMinutes},
+            overtime_minutes = #{overtimeMinutes},
+            is_early_leave = #{isEarlyLeave},
+            status_code = #{statusCode},
+            auto_checked = 'N'
+        WHERE emp_id = #{empId}
+          AND work_date = #{workDate}
+          AND check_out_time IS NULL
+    </update>
+
+    <!-- 자동퇴근 여부 -->
+    <select id="countAutoCheckout" resultType="int">
+        SELECT COUNT(*)
+        FROM attendance
+        WHERE emp_id = #{empId}
+          AND work_date = #{workDate}
+          AND status_code = 'AUTO_CHECKED_OUT'
+          AND auto_checked = 'N'
+    </select>
+
+    <!-- 다음날 자동퇴근 메세지 여부 확인 후 -->
+    <update id="markCheck">
+        UPDATE attendance
+        SET auto_checked = 'Y'
+        WHERE emp_id = #{empId}
+          AND work_date = #{workDate}
+          AND status_code = 'AUTO_CHECKED_OUT'
+          AND auto_checked = 'N'
+    </update>
+
+    <!-- 팀 근태 -->
+    <select id="aggTeam" resultType="com.Workneed.workneed.Attendance.dto.TeamAggDTO">
+        SELECT
+        emp_id AS empId,
+
+        COALESCE(SUM(work_minutes), 0) AS workMin,
+
+        /* 주말 근무 */
+        COALESCE(SUM(
+        CASE WHEN DAYOFWEEK(work_date) IN (1,7)
+        THEN COALESCE(work_minutes,0) ELSE 0 END
+        ), 0) AS holidayMin,
+
+        /* 평일 연장 */
+        COALESCE(SUM(
+        CASE WHEN DAYOFWEEK(work_date) NOT IN (1,7)
+        THEN COALESCE(overtime_minutes,0) ELSE 0 END
+        ), 0) AS overtimeMin,
+
+        /* 평일 정상  */
+        COALESCE(SUM(
+        CASE WHEN DAYOFWEEK(work_date) NOT IN (1,7)
+        THEN GREATEST(COALESCE(work_minutes,0) - COALESCE(overtime_minutes,0), 0)
+        ELSE 0 END
+        ), 0) AS normalMin,
+
+        /* 지각 */
+        COALESCE(SUM(
+        CASE WHEN DAYOFWEEK(work_date) NOT IN (1,7) AND is_late = 'Y'
+        THEN 1 ELSE 0 END
+        ), 0) AS lateCount
+
+        FROM attendance
+        WHERE work_date >= #{startDate}
+        AND work_date &lt;  #{endDate}
+        AND emp_id IN
+        <foreach collection="empIds" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        GROUP BY emp_id
+    </select>
+
+    <select id="countWorkDays" resultType="int">
+        SELECT COALESCE(COUNT(*), 0)
+        FROM attendance
+        WHERE emp_id = #{empId}
+          AND work_date &gt;= #{startDate}
+          AND work_date &lt;  #{endDate}
+          AND check_in_time IS NOT NULL
+    </select>
+
+    <!-- 지각 횟수 -->
+    <select id="countLate" resultType="int">
+        SELECT COALESCE(COUNT(*), 0)
+        FROM attendance
+        WHERE emp_id = #{empId}
+          AND work_date &gt;= #{startDate}
+          AND work_date &lt;  #{endDate}
+          AND is_late = 'Y'
+    </select>
+
+    <!-- 조퇴 횟수 -->
+    <select id="countEarlyLeave" resultType="int">
+        SELECT COALESCE(COUNT(*), 0)
+        FROM attendance
+        WHERE emp_id = #{empId}
+          AND work_date &gt;= #{startDate}
+          AND work_date &lt;  #{endDate}
+          AND is_early_leave = 'Y'
+    </select>
+
+    <!-- 연장근무 합계 -->
+    <select id="overtimeMinutes" resultType="int">
+        SELECT COALESCE(SUM(overtime_minutes), 0)
+        FROM attendance
+        WHERE emp_id = #{empId}
+          AND work_date &gt;= #{startDate}
+          AND work_date &lt;  #{endDate}
+          AND check_out_time IS NOT NULL
+    </select>
+
+    <!-- 업데이트 -->
+    <insert id="upsertCorrected">
+        INSERT INTO attendance (
+            emp_id, work_date,
+            check_in_time, check_out_time,
+            work_minutes, overtime_minutes,
+            is_late, is_early_leave,
+            status_code,
+            created_at, updated_at
+        ) VALUES (
+                     #{empId}, #{workDate},
+                     #{checkInTime}, #{checkOutTime},
+                     #{workMinutes}, #{overtimeMinutes},
+                     #{isLate}, #{isEarlyLeave},
+                     #{statusCode},
+                     NOW(), NOW()
+                 )
+            ON DUPLICATE KEY UPDATE
+                                 check_in_time = VALUES(check_in_time),
+                                 check_out_time = VALUES(check_out_time),
+                                 work_minutes = VALUES(work_minutes),
+                                 overtime_minutes = VALUES(overtime_minutes),
+                                 is_late = VALUES(is_late),
+                                 is_early_leave = VALUES(is_early_leave),
+                                 status_code = VALUES(status_code),
+                                 updated_at = NOW()
+    </insert>
+
+</mapper>

@@ -1,264 +1,277 @@
+@charset "UTF-8";
+
+/* =========================================
+    공통 디자인
+    var( ) 로 사용해주세요
+   ========================================= */
+:root {
+    --size-sidebar-width: 80px;
+    --size-header-height: 80px;
+
+    /* Font size */
+    --font-size-12: 1.2rem;   /* 12px - 캡션, 메타 */
+    --font-size-13: 1.3rem;   /* 13px - 보조 텍스트 */
+    --font-size-14: 1.4rem;   /* 14px - 기본 본문 (표준) */
+    --font-size-16: 1.6rem;   /* 16px - 강조 텍스트 */
+    --font-size-18: 1.8rem;   /* 18px - 섹션 타이틀 */
+    --font-size-20: 2.0rem;  /* 20px - 페이지 타이틀 */
+    --font-size-24: 2.4rem;  /* 24px - 메인 헤더 */
+
+
+    /*  메인/포인트 컬러 */
+    --color-primary: #0B2E4F;         /* 깊은 네이비 (메인 포인트) */
+    --color-primary-light: #F0F4F8;   /* 연한 푸른빛 배경 */
+    --color-secondary: #3A7BD5;       /* 밝은 블루 (보조 포인트) */
+
+    /*  배경  */
+    --color-bg: #F6F8FB;              /* 전체 페이지 배경 */
+    --color-surface: #FFFFFF;         /* 카드, 패널 등 표면 색상 */
+    --color-white: #FFFFFF;
+
+    /*  텍스트 및 테두리 */
+    --color-text-main: #1F2937;       /* 메인 본문색 */
+    --color-text-sub: #6B7280;        /* 보조/설명 텍스트색 */
+    --color-border: #DEE2E6;          /* 경계선 색상 */
+    --border-radius: 12px;
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+
+    /* 갭 */
+    --gap-size1: 10px;
+    --gap-size2: 20px;
+
+    /* 버튼 height */
+    --btn-height-sm: 28px;
+    --btn-height-md: 32px;
+    --btn-height-lg: 36px;
+
+    /* 버튼 padding */
+    --btn-padding-x-sm: 8px;
+    --btn-padding-x-md: 12px;
+    --btn-padding-x-lg: 16px;
+
+}
+
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
 }
 html {
-    font-size: 62.5%;        /* 1rem = 10px */
+    font-size: 62.5%;
     scroll-behavior: smooth;
 }
-.body{
-    margin: 0 auto;
+body {
+    font-family: 'Noto Sans KR', sans-serif;
+    color: var(--color-text-main);
+    background-color: var(--color-bg);
+    overflow-y: auto;
 }
-/*main-layout*/
+
+/* =====Main Layout ===== */
 .main-layout {
     width: 100%;
-    min-width: 1440px;
-    height: 100vh;
-    margin: 0 auto;
-
+    min-height: 100dvh;
     display: grid;
-    grid-template-columns: 80px 1360px;
-    grid-template-rows: 60px 1fr;
+    grid-template-columns: var(--size-sidebar-width) 1fr;
+    grid-template-rows: var(--size-header-height) 1fr;
     grid-template-areas:
-  "sidebar  header"
-  "sidebar  content";
+      "sidebar  header"
+      "sidebar  content";
 }
-.sidebar { grid-area: sidebar; border: 1px solid #aaa; }
-.header  { grid-area: header;  border: 1px solid #aaa; }
-.content { grid-area: content; border: 1px solid #aaa; margin-top: 10px;}
-           /*padding-right: 20px;}*/
+.sidebar { grid-area: sidebar; z-index: 100; }
+.header  { grid-area: header;  z-index: 90; }
+.content { grid-area: content; position: relative;
+}
 
-
-.sidebar { background: #f0f0f0; }
-.header  { background: #fafafa; }
-.content { background: #ffffff; }
-
-
-/* 사이드바 css */
-/* 사이드바 기본 설정 */
+/* =====Sidebar====== */
 .sidebar {
-    width: 80px;
-    background-color: #ffffff;
-    border-right: 1px solid #ddd;
-    height: 100vh;
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding-top: 60px;
+    height: 100vh;
+    width: var(--size-sidebar-width);
+    background-color: var(--color-white);
+    border-right: 1px solid var(--color-border);
+    position: sticky;
+    padding-top: var(--size-header-height);
 }
-
-.sidebar-nav ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
+.sidebar-nav {
     width: 100%;
 }
-
-/* 각 메뉴 항목 스타일 */
+.sidebar-nav ul {
+    list-style: none;
+    width: 100%;
+}
 .nav-item {
+    display: flex;
+    width: 100%;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.nav-item a {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 15px 0;
-    cursor: pointer;
-    transition: background 0.3s;
+    width: 100%;
+    padding: 20px 0;
+    text-decoration: none;
+    color:var(--color-text-main);
+    transition: all 0.2s;
 }
-
-/*.nav-item:hover {*/
-/*    background-color: #f0f0f0;*/
-/*}*/
-
-/* 아이콘 스타일 */
-.side-icon {
-    font-size: 24px;
-    margin-bottom: 5px;
-}
-
-/* 텍스트 스타일 */
-.side-text {
-    font-size: 12px;
-    font-weight: bold;
-    color: #333;
-}
-
-/* 링크 기본 스타일 제거 */
-.nav-item a {
-    text-decoration: none; /* 밑줄 제거 */
-    color: inherit;        /* 부모(li)의 글자색 상속 */
-    display: flex;         /* flex를 유지해야 정렬이 깨지지 않음 */
-    flex-direction: column;
-    align-items: center;
-    width: 100%;           /* 클릭 영역을 가로로 꽉 채움 */
-    padding: 10px 0;       /* li에 있던 패딩을 a로 옮기면 클릭 범위가 넓어짐 */
-}
-
-/* 마우스 올렸을 때 효과 (선택 사항) */
-/*.nav-item a:hover {*/
-/*    background-color: #f4f4f4;*/
-/*}*/
-
-/* 이미지 크기 조정 (이미지가 너무 크다면) */
 .side-icon img {
-    width: 24px;  /* 적절한 크기로 조절 */
-    height: 24px;
+    width: 26px;
+    height: 26px;
+    opacity: 1;
+    transition: transform 0.2s;
+}
+.side-text {
+    font-size:var(--font-size-12);
+    font-weight: 600;
+    margin-top: 8px;
+}
+.nav-item:hover {
+    background-color:var(--color-primary-light);
+}
+.nav-item:hover a,
+.nav-item.active a {
+    color: var(--color-primary);
+    border-left: 3px solid var(--color-primary);
+}
+.nav-item:hover .side-icon img {
+    transform: scale(1.1);
+    filter: brightness(0.5);
 }
 
-
-/* 헤더부분 css */
+/* =====Header====== */
+.header {
+    background-color: var(--color-white);
+    border-bottom: 1px solid var(--color-border);
+    position: sticky;
+    top: 0;
+}
 .header-container {
     display: flex;
-    justify-content: space-between; /* 양 끝 정렬 */
-    align-items: center;            /* 세로 중앙 정렬 */
-    padding: 0 40px;
-    height: 100%;                   /* 헤더 높이 설정 */
-    background-color: #f8f9fa;
-    border-bottom: 1px solid #ddd;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 30px;
+    height: 100%;
 }
-
-/* 로고 이미지 크기 조절 */
 .header-logo img {
-    height: 60px;
-    display: block;
+    height: 55px;
     width: auto;
-    image-rendering: crisp-edges;
-    image-rendering: pixelated;
+    object-fit: contain;
 }
-
-/* 프로필 영역 스타일 */
 .header-profile {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 15px;
 }
-
-.profile-info {
-    display: flex;            /* 내부 요소들을 flex로 배치 */
-    flex-direction: row;      /* 가로로 나열 */
-    align-items: center;      /* 이름과 아이콘의 세로 중앙 맞춤 */
-    gap: 12px;                /* 이름과 아이콘 사이 간격 */
-}
-
-.logout-btn {
-    cursor: pointer;
-    background: #f8f9fa;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 11px;
-    padding: 3px 8px;
-    color: #666;
-    transition: all 0.2s;
-}
-
-.logout-btn:hover {
-    background: #eeeeee;
-    color: #333;
-}
-
-/* 사용자 이름 스타일 */
 .profile-name {
-    font-size: 14px;
-    font-weight: 500;
-    color: #333;
-    white-space: nowrap;
+    font-size: var(--font-size-16);
+    font-weight: 600;
 }
-
-/* 프로필 이미지를 감싸는 원형 박스 (이미지처럼 보이게 함) */
-.profile-img-wrapper {
-    width: 35px;
-    height: 35px;
-    border-radius: 50%;
-    overflow: hidden; /* 영역 밖으로 나가는 이미지 숨김 */
-    border: 1px solid #ddd; /* 테두리 추가 */
+.profile-info {
     display: flex;
-    justify-content: center;
     align-items: center;
+    gap: 10px;
+}
+.profile-img-wrapper {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 1px solid var(--color-border);
     background-color: #f0f0f0;
 }
-
-.profile {
-    width: 100%;
-    height: 100%;
-    object-fit: cover; /* 이미지가 찌그러지지 않게 채움 */
+.profile { width: 100%;
+           height: 100%;
+           object-fit: cover;
+}
+.logout-btn {
+    cursor: pointer;
+    background: transparent;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    font-size: 12px;
+    padding: 8px 12px;
+    color: var(--color-text-sub);
+    transition: all 0.2s;
+}
+.logout-btn:hover {
+    background: #f3f4f6;
+    color: var(--color-text-main);
 }
 
-/* 알림 전체 컨테이너 */
-/* 전체 알림 컨테이너: 위치와 크기 고정 */
-/* 알림창 본체: 오른쪽 상단 작게 고정 */
+
+
+/* ====== Toast Notification======= */
+/* ====== layout.css 내의 Toast Notification 최종 확정본 ======= */
 .chat-toast {
     position: fixed !important;
-    top: 15px !important;
-    right: -350px !important; /* 화면 밖 대기 */
-    width: 280px !important; /* 너비 고정 */
-    max-width: 300px !important;
-    /* 1. 배경 투명도 대폭 수정 (0.7 -> 0.4) */
-    background-color: rgba(255, 255, 255, 0.3) !important;
-
-    /* 2. 블러 효과 (접두사 포함하여 확실하게 적용) */
-    backdrop-filter: blur(15px) saturate(150%) !important;
-    -webkit-backdrop-filter: blur(15px) !important;
-
-
+    top: 25px !important;
+    right: -320px !important; /* 화면 밖 대기 위치 */
+    width: 260px !important; /* 콤팩트한 너비 */
+    background-color: rgba(255, 255, 255, 0.95) !important;
+    backdrop-filter: blur(10px) !important;
     border-radius: 12px !important;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1) !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15) !important;
     z-index: 999999 !important;
-    transition: right 0.5s cubic-bezier(0.19, 1, 0.22, 1) !important;
-    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    transition: right 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+    border: 1px solid rgba(255, 255, 255, 0.5) !important;
     cursor: pointer;
     overflow: hidden !important;
 }
 
-/* 나타났을 때 */
 .chat-toast.active {
-    right: 20px !important;
+    right: 25px !important; /* 등장 시 위치 */
 }
 
-/* 내부 레이아웃 */
 .toast-inner {
     display: flex !important;
-    padding: 15px !important;
+    flex-direction: row !important; /* 가로 정렬 강제 */
+    padding: 12px 14px !important;
     align-items: center !important;
+    justify-content: flex-start !important; /* 왼쪽 정렬 강제 */
     width: 100% !important;
-    box-sizing: border-box !important;
 }
 
-/* 프로필 이미지 영역 */
 .toast-profile {
-    width: 42px !important;
-    height: 42px !important;
-    margin-right: 12px !important;
+    width: 34px !important;
+    height: 34px !important;
+    margin-right: 12px !important; /* 이미지와 이름 사이 낭비 공간 제거 */
     flex-shrink: 0 !important;
+    display: block !important;
 }
 
 .toast-profile img {
     width: 100% !important;
     height: 100% !important;
-    border-radius: 50% !important; /* 원형 프로필 */
+    border-radius: 50% !important;
     object-fit: cover !important;
 }
 
-/* 텍스트 영역 */
 .toast-text-area {
     flex: 1 !important;
-    min-width: 0 !important; /* 텍스트 생략 처리를 위한 필수 설정 */
+    min-width: 0 !important;
+    text-align: left !important; /* 중앙 정렬 간섭 차단 */
 }
 
 .toast-user-name {
     display: block !important;
     font-weight: 700 !important;
     font-size: 13px !important;
-    color: #1d1d1f !important;
+    color: #1F2937 !important;
     margin-bottom: 2px !important;
 }
 
 .toast-message {
     display: block !important;
-    font-size: 13px !important;
-    color: #3a3a3c !important;
+    font-size: 12px !important;
+    color: #6B7280 !important;
     white-space: nowrap !important;
     overflow: hidden !important;
-    text-overflow: ellipsis !important; /* 길면 ... 처리 */
+    text-overflow: ellipsis !important;
 }
 
 /* 호버 시 살짝 반응 */
@@ -266,3 +279,122 @@ html {
     background: #ffffff !important;
     box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15) !important;
 }
+
+/* 프로필 모달부분 */
+/* 1. 헤더 프로필 이미지 감싸는 영역 */
+.profile-img-wrapper {
+    width: 40px;      /* 원하는 헤더 이미지 크기 */
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden; /* 영역 밖으로 나가는 이미지 숨김 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: 1px solid #ddd; /* 선택사항: 테두리 */
+}
+
+.profile-info {
+    display: flex !important;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: nowrap !important;
+}
+
+/* 사진과 모달을 감싸는 박스 */
+.profile-dropdown-container {
+   position: relative;
+   display: inline-flex;
+   width: auto !important;
+}
+
+/* 로그아웃 버튼이 찌그러지지 않게 고정 */
+.logout-form {
+    flex-shrink: 0;
+    margin: 0;
+}
+
+/* 2. 헤더 프로필 이미지 실제 태그 */
+.profile-img-wrapper img {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    cursor: pointer;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+}
+
+/* 모달 본체 */
+.profile-modal-content {
+    display: none;
+    position: absolute;
+    top: 50px;
+    right: 0;
+
+    /* 중요: 다른 스타일이 침범하지 못하게 고정 */
+   width: 240px !important;
+   min-width: 240px !important;
+   max-width: 240px !important;
+
+    background: #ffffff;
+    border: none;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    z-index: 10000;
+    box-sizing: border-box;
+}
+
+/* 충돌 방지를 위해 클래스명 변경*/
+.profile-modal-content.modal-show {
+    display: block !important;
+}
+
+/* 프로필 이미지 */
+.modal-profile-circle {
+   width: 72px !important;
+       height: 72px !important;
+       margin: 0 auto 10px;
+       border-radius: 50%;
+       overflow: hidden;
+       display: flex;
+       align-items: center;
+       justify-content: center;
+       background: #eee;
+}
+
+/* 이미지 */
+.modal-profile-circle img {
+   width: 100% !important;
+   height: 100% !important;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+}
+
+
+
+/* 이름 (컴팩트) */
+.modal-user-name {
+  font-weight: 700;
+  font-size: 13px;    /* ⬅ 줄임 */
+  margin-bottom: 10px;
+  text-align: center;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ✅ 링크 2개를 이름이랑 같은 스타일로 */
+.modal-btn {
+  display: block;
+  text-align: center;
+  font-weight: 700;
+  font-size: 13px !important;
+  color: #000;
+  text-decoration: none !important;
+  margin-top: 10px;
+}
+

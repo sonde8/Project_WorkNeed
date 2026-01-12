@@ -1,70 +1,97 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/layout}">
-
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title layout:fragment="title">로그인 - WORKNEED</title>
+    <meta charset="UTF-8">
+    <title>로그인 - WORKNEED</title>
     <link rel="stylesheet" th:href="@{/css/login.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-
 <body>
 
-<main layout:fragment="content">
-    <div class="login-wrapper">
-        <div class="login-container">
-            <h2>로그인</h2>
+<div class="login-wrapper">
+    <div class="login-container">
+        <img th:src="@{/images/logo5.svg}" class="main-logo" alt="로고">
 
+        <div id="loginSection" class="auth-section">
+            <h2>로그인</h2>
             <div th:if="${infoMessage}" class="info-msg" th:text="${infoMessage}"></div>
             <div th:if="${loginError}" class="error-msg" th:text="${loginError}"></div>
 
             <form th:action="@{/login-user}" method="post">
                 <input type="hidden" name="userType" value="USER">
                 <div class="input-group">
-                    <img th:src="@{/images/person300.svg}" class="input-icon" alt="아이디 아이콘">
-                    <input type="text" name="loginId" placeholder="아이디" autocomplete="off" required>
+                    <img th:src="@{/images/person300.svg}" class="input-icon" alt="아이디">
+                    <input type="text" name="loginId" placeholder="아이디" required>
                 </div>
-
-                <div class="input-group">
-                    <img th:src="@{/images/lock300.svg}" class="input-icon" alt="비밀번호 아이콘">
-                    <input type="password" name="password" placeholder="비밀번호"
-                           oncopy="return false" onpaste="return false" oncut="return false" required>
+                <div class="input-group password-group">
+                    <img th:src="@{/images/lock300.svg}" class="input-icon" alt="비밀번호">
+                    <input type="password" name="password" id="loginPassword"
+                           placeholder="비밀번호" required
+                           oncopy="return false;"
+                           onpaste="return false;"
+                           oncut="return false;"
+                           oncontextmenu="return false;"> <i class="fa-solid fa-eye toggle-password" data-target="loginPassword"></i>
                 </div>
-
-                <div class="options-row">
-                    <label class="checkbox-container">
-                        <input type="checkbox" name="remember-me">
-                        <span class="checkmark"></span> 로그인 상태 유지
-                    </label>
-                </div>
-
                 <button type="submit" class="btn-submit">로그인</button>
             </form>
 
             <div class="links">
-                <a href="#">비밀번호 찾기</a> |
-                <a href="#">아이디 찾기</a> |
+                <a href="javascript:void(0)" onclick="showSection('findPwSection')">비밀번호 찾기</a>
+                |
+                <a href="javascript:void(0)" onclick="showSection('findIdSection')">아이디 찾기</a>
+                |
                 <a th:href="@{/register}">회원가입</a>
             </div>
 
             <a href="/oauth2/authorization/google" class="social-btn google-btn">
-                <img th:src="@{/images/google-icon.svg}" class="google-icon" alt="아이디 아이콘">
+                <img th:src="@{/images/google-icon.svg}" class="google-icon" alt="구글">
                 구글 로그인
             </a>
-
-            <a href="/admin/login" class="social-btn admin-btn"
-               onclick="return adminLoginNotice();">
-                <i class="fa-solid fa-user-lock"></i>
-                관리자 로그인
-            </a>
         </div>
+
+        <div id="findIdSection" class="auth-section" style="display: none;">
+            <h2>아이디 찾기</h2>
+            <div class="guide-text">
+                <b>등록된 이메일로 찾기</b>
+                <p>가입 당시 입력하신 이름과 이메일을 입력해주세요.</p>
+            </div>
+            <div class="input-group">
+                <input type="text" id="findIdName" class="modal-input" placeholder="이름을 입력해주세요.">
+            </div>
+            <div class="input-group">
+                <input type="email" id="findIdEmail" class="modal-input" placeholder="이메일을 입력해주세요.">
+            </div>
+            <div class="result-box" id="idResult"></div>
+            <button class="modal-btn" onclick="handleFindId()">아이디 찾기</button>
+
+            <div class="links">
+                <a href="javascript:void(0)" onclick="showSection('loginSection')">로그인으로 돌아가기</a>
+            </div>
+        </div>
+
+        <div id="findPwSection" class="auth-section" style="display: none;">
+            <h2>비밀번호 찾기</h2>
+            <div class="guide-text">
+                <b>임시 비밀번호 발급</b>
+                <p>가입하신 아이디와 이메일을 입력해주세요.</p>
+            </div>
+            <div class="input-group">
+                <input type="text" id="findPwId" class="modal-input" placeholder="아이디를 입력해주세요.">
+            </div>
+            <div class="input-group">
+                <input type="email" id="findPwEmail" class="modal-input" placeholder="이메일을 입력해주세요.">
+            </div>
+            <div class="result-box" id="pwResult"></div>
+            <button class="modal-btn" onclick="handleFindPw()">비밀번호 찾기</button>
+
+            <div class="links">
+                <a href="javascript:void(0)" onclick="showSection('loginSection')">로그인으로 돌아가기</a>
+            </div>
+        </div>
+
     </div>
-</main>
+</div>
 
-<th:block layout:fragment="script">
-    <script th:src="@{/js/login.js}"></script>
-</th:block>
-
+<script th:src="@{/js/login.js}"></script>
 </body>
 </html>

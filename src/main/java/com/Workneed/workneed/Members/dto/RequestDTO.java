@@ -18,4 +18,7 @@ public class RequestDTO {
     private LocalDateTime requestCreatedAt;
     private LocalDateTime requestUpdatedAt;
     private Long adminId;
+    private String userName;
+    private String deptName;
+    private String rankName;
 }

@@ -8,23 +8,27 @@
 
     <!-- 페이지 전용 CSS -->
     <th:block layout:fragment="head">
+        <link rel="stylesheet" th:href="@{/css/main.css}">
         <link rel="stylesheet" th:href="@{/css/attendanceLeft.css}">
         <link rel="stylesheet" th:href="@{/css/attendanceMain.css}">
         <link rel="stylesheet" th:href="@{/css/attendanceBook.css}">
         <link rel="stylesheet" th:href="@{/css/attendanceLeave.css}">
+        <link rel="stylesheet" th:href="@{/css/attendanceTeamAttend.css}">
     </th:block>
+
+</head>
+
+<body>
 
     <th:block layout:fragment="script">
         <script th:src="@{/js/attendanceLeft.js}"></script>
         <script th:src="@{/js/attendanceMain.js}"></script>
         <script th:src="@{/js/attendanceBook.js}"></script>
         <script th:src="@{/js/attendanceLeave.js}"></script>
+        <script th:src="@{/js/attendanceTeamAttend.js}"></script>
     </th:block>
-</head>
 
-<body>
-
-<main layout:fragment="content">
+<main layout:fragment="content" class = "pageAttendance">
 
     <div class="att-pg">
 
@@ -34,45 +38,153 @@
         <!-- 오른쪽 -->
         <section class="right">
 
-            <div class = "day" id = "yearMonth"> 날짜 </div>
+            <div class="dayChart">
+
+                <button type="button" id="prevDay"> &lt; </button>
+                <div class="day"><span id="yearMonth"></span></div>
+                <button type="button" id="nextDay"> &gt; </button>
+
+                <!-- 몇주차 -->
+                <div class="weekLabel"><span id="weekText"></span></div>
+
+            </div>
 
             <div class = "week-box">
-                <div class = "week-header">
-                    <span> 주 간 근 무 실 적 상 황 </span>
-                    <span class = "total"> 총 <b id = "weekTotal"> 0h 0m </b></span>
-                </div>
 
-                <div class = "week-bar">
+                <div class="package">
 
-                    <div class = "bar-chart" id = barTrack>
-
-                        <div class = "seg segNormal"></div>
-                        <div class = "seg segOt"></div>
-
-                        <div class = "week-fill" id = "weekFill"></div>
-
-                        <div class = "markStart" id = "mark52"></div>
-                        <div class = "markEnd" id = "mark70"></div>
-
-                        <div class = "bar-dot" id = "barDot"></div>
-
-                        <div class = "bar-label l52"> 52시간 </div>
-                        <div class = "bar-label l70"> 70시간 </div>
+                    <div class = "week-header">
+                        <span> 주 간 근 무 실 적 상 황 </span>
+                        <span class = "total"> 총 <b id = "weekTotal"> 0h 0m </b></span>
                     </div>
 
+
+                    <div class = "week-bar">
+
+                        <div class = "bar-chart" id = "barTrack">
+
+                            <div class = "bar-clip">
+                            <div class = "week-fill base" id="weekFillBase"></div>
+                            <div class = "week-fill ot" id="weekFillOt"></div>
+                            <div class = "week-fill holiday" id="weekFillHoliday"></div>
+                            </div>
+
+                            <div class="bar-dot" id="barDot" aria-hidden="true"></div>
+
+                            <div class = "mark" id="mark52"><span class="mark-text"> 52시간 </span></div>
+                            <div class = "mark" id="mark70"><span class="mark-text"> 70시간 </span></div>
+                        </div>
+
+                        <div class = "week-bottom">
+                            <div class = "week-info">
+                                <div> 남은 근무 시간 : <b id = "remainWork"> 52h 0m</b> </div>
+                                <div> 남은 연장 시간 : <b id = "remainOt"> 18h 0m </b> </div>
+                                <div> 휴일 근무 시간 : <b id = "holidayWork"> 0h 0m </b></div>
+                            </div>
+
+                            <div class="week-legend">
+                                <div class="lg-item"><span class="lg-dot normal"></span><span>정상 근무</span></div>
+                                <div class="lg-item"><span class="lg-dot ot"></span><span>연장 근무</span></div>
+                                <div class="lg-item"><span class="lg-dot holiday"></span><span>휴일 근무</span></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <div class = "week-info">
-                    <div> 남은 근무 시간 : <b id = "remainWork"> 52h 0m</b> </div>
-                    <div> 남은 연장 시간 : <b id = "remainOt"> 18h 0m </b> </div>
-                    <div> 휴일 근무 시간 : <b id = "holidayWork"> 0h 0m </b></div>
-                </div>
             </div>
 
             <div class="squ-row">
-                <div class = "squ"> 근태현황 </div>
-                <div class = "squ"> 잔여연차 </div>
-                <div class = "squ"> 연간근무 </div>
+
+                <div class = "squ card" id="attendCard">
+
+                    <div class="headCard">
+                        <span class="headTitle"> 근태 현황 </span>
+                        <span class="baseBadge" id="attBadge"></span>
+                    </div>
+
+                    <div class="cardBody">
+
+                        <div class="metric">
+                            <span class="metricLabel"> 출근일수 </span>
+                            <span class="metricValue"><b id="attWorkDays">0</b> / <span id="attWeekdays">0</span>일</span>
+                        </div>
+
+                        <div class="metric">
+                            <span class="metricLabel">지각</span>
+                            <span class="metricValue"><b id="attLate">0</b>회</span>
+                        </div>
+
+                        <div class="metric">
+                            <span class="metricLabel">조퇴</span>
+                            <span class="metricValue"><b id="attEarly">0</b>회</span>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class = "squ card" id="leaveCard">
+
+                    <div class="headCard">
+
+                        <span class="headTitle"> 잔여 연차 </span>
+                        <span class="sub" id="leaveRateText"> 0% </span>
+
+                    </div>
+
+                    <div class="cardBody">
+
+                        <div class="metric">
+                            <span class="metricLabel"> 총 연차 </span>
+                            <span class="metricValue"><b id="leaveTotal">0</b></span>
+                        </div>
+
+                        <div class="metric">
+                            <span class="metricLabel"> 사용 연차 </span>
+                            <span class="metricValue"><b id="leaveUsed">0</b></span>
+                        </div>
+
+                        <div class="metric">
+                            <span class="metricLabel"> 잔여 연차 </span>
+                            <span class="metricBig"><b id="leaveRemain">0</b></span>
+                        </div>
+
+                        <div class="progress">
+                            <div class="progress-bar" id="leaveRateBar" style="width:0"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class = "squ card" id="yearCard">
+
+                    <div class="headCard">
+                        <span class="headTitle"> 연간 근무 </span>
+                    </div>
+
+                    <div class="cardBody">
+
+                        <div class="metric">
+                            <span class="metricLabel"> 누적 근무 </span>
+                            <span class="metricValue"><b id="yearWork">0</b>h</span>
+                        </div>
+
+                        <div class="metric">
+                            <span class="metricLabel"> 연장 근무 </span>
+                            <span class="metricValue"><b id="yearOtt">0</b>h</span>
+                        </div>
+
+                        <div class="metric">
+                            <span class="metricLabel"> 휴일 근무 </span>
+                            <span class="metricBig"><b id="yearHoliday">0</b>h</span>
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+
+
+
             </div>
 
         </section>

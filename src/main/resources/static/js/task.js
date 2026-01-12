@@ -129,6 +129,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
     closeBtn?.addEventListener("click", closeModal);
 
+    // ESC 키로 모달 닫기
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && modal.classList.contains("is-open")) {
+            closeModal();
+        }
+    });
+
+    // 배경 클릭 시 닫기 (이벤트 전파 방지 적용)
+    modal.addEventListener("mousedown", (e) => {
+        // e.target이 modal 본체가 아닌 '배경'일 때만 닫기
+        if (e.target === modal) {
+            closeModal();
+        }
+    });
+
     //렌더링 함수(Owner / Members)
     function renderOwner(owner) {
         if (!ownerBox) return;
@@ -162,7 +177,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         memberBox.innerHTML = `
           <div class="member-title"></div>
-          <span class="member-img"><img src="/images/team2_300.svg"> </span>
           <ul class="member-list">${items}</ul>
         `;
     }
@@ -272,6 +286,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
     closeBtn?.addEventListener("click", closePerformanceModal);
 
+    // ESC 키로 모달 닫기
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && perfModal.classList.contains("is-open")) {
+            closePerformanceModal();
+        }
+    });
+
+    // 배경 클릭 시 닫기 (이벤트 전파 방지 적용)
+    perfModal.addEventListener("mousedown", (e) => {
+        // e.target이 modal 본체가 아닌 '배경'일 때만 닫기
+        if (e.target === perfModal) {
+            closePerformanceModal();
+        }
+    });
+
     document.addEventListener("click", (e) => {
         const btn = e.target.closest(".btn-member-performance-modal");
         if (!btn) return;
@@ -296,7 +325,7 @@ document.addEventListener("DOMContentLoaded", () => {
             data: {
                 datasets: [{
                     data: [value, 100 - value],
-                    backgroundColor: ["rgba(0,0,0,0.2)", "rgba(0,0,0,0.4)"],
+                    backgroundColor: ["#0B2E4F", "#6B7280"],
                     borderWidth: 0
                 }]
             },
@@ -455,6 +484,21 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     memberTasksCloseBtn?.addEventListener("click", closeMemberTasksModal);
+
+    // ESC 키로 모달 닫기
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && memberTasksModal.classList.contains("is-open")) {
+            closeMemberTasksModal();
+        }
+    });
+
+    // 배경 클릭 시 닫기 (이벤트 전파 방지 적용)
+    memberTasksModal.addEventListener("mousedown", (e) => {
+        // e.target이 modal 본체가 아닌 '배경'일 때만 닫기
+        if (e.target === memberTasksModal) {
+            closeMemberTasksModal();
+        }
+    });
 
     function renderTaskItem(t) {
         const taskId = t.taskId ?? "";
@@ -643,3 +687,75 @@ document.addEventListener("DOMContentLoaded", () => {
         loadPerformanceData(scheduleId);
     }
 });
+
+/**
+ *  업무 페이지 파일 업로드 및 렌더링 로직
+ */
+
+// 1. 파일 업로드 핸들러
+// 1. 파일 업로드 핸들러
+async function handleTaskFileUpload(input) {
+    if (!input.files || !input.files[0]) return;
+
+    const file = input.files[0];
+    const scheduleId = document.body.dataset.scheduleId;
+
+    if (!scheduleId) {
+        alert("업무 정보가 없습니다.");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("scheduleId", scheduleId);
+
+    try {
+        const response = await fetch('/api/task/files/upload', {
+            method: 'POST',
+            body: formData
+        });
+
+        if (!response.ok) throw new Error("업로드 실패");
+
+        const data = await response.json(); // 서버에서 준 ScheduleFileDTO 객체
+        console.log("업무 파일 업로드 성공 데이터:", data);
+
+        // ★ 핵심: 서버 응답 데이터를 그대로 전달
+        renderTaskFileItem(data);
+
+        input.value = ""; // 파일 선택창 초기화
+
+    } catch (error) {
+        console.error("Error:", error);
+        alert("파일 업로드 중 오류가 발생했습니다.");
+    }
+}
+
+// 2. 파일 목록 아이템 렌더링 함수
+// task.js 내 renderTaskFileItem 함수 수정
+function renderTaskFileItem(fileLog) {
+    const container = document.getElementById('taskFileList');
+    if (!container) return;
+
+    const id = fileLog.fileId;
+    const name = fileLog.originalName;
+
+    const fileItem = document.createElement('div');
+    fileItem.className = 'file-item';
+
+    // 📎 아이콘과 span 사이 여백 없이 바짝 붙임
+    fileItem.innerHTML = `<a href="/api/task/files/download/${id}" class="file-link">📎<span>${name}</span></a>`;
+
+    // 최신 파일을 목록 맨 위로 추가
+    container.prepend(fileItem);
+
+    // 스크롤을 맨 위로 올려서 방금 올린 파일을 보게 함
+    container.scrollTop = 0;
+
+    // '등록된 파일이 없습니다' 문구와 '기본 URL' 링크가 있다면 확실히 제거
+    const noUrlMsg = container.closest('.file-view').querySelector('.no-url');
+    if (noUrlMsg) noUrlMsg.remove();
+
+    const oldUrlLink = container.closest('.file-view').querySelector('.etc-url');
+    if (oldUrlLink) oldUrlLink.remove();
+}

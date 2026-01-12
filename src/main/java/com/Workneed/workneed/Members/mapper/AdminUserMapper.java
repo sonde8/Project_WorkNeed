@@ -28,10 +28,31 @@ public interface AdminUserMapper {
     // 3. 별도의 신규 관리자 계정 생성 (계정 발급용)
     void insertAdmin(AdminUserDTO adminDto);
 
-    // 4. 휴가/결재 요청 처리 (미처리)
-    void processRequest(@Param("requestId") Long requestId,
-                        @Param("status") String status,
-                        @Param("adminId") Long adminId);
+
+
+    AdminUserDTO findByAdminId(@Param("adminId") Long adminId);
+
+    // 5 관리자로그
+    void insertActivityLog(AdminUserDTO logDto);
+
+
+    // 6 관리자 전체 목록 조회
+    List<AdminUserDTO> findAllAdmins();
+
+    // 7 활동 로그 전체 조회
+    List<AdminUserDTO> findAllActivityLogs();
+
+    // 8 관리자 상태 변경
+    void updateAdminStatus(@Param("adminId") Long adminId, @Param("status") String status);
+
+    // 9 마지막 로그인 시간
+    void updateLastLogin(@Param("adminId") Long adminId);
+
+    // 10 권한id로 조회
+    List<String> findPermissionsByRoleId(@Param("roleId") Long roleId);
+
+    // 이메일중복검사
+    boolean existsByEmail(String adminEmail);
 
 
 

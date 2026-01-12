@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${title}">전자결재</title>
+
+    <th:block layout:fragment="head">
+        <link rel="stylesheet" th:href="@{/css/approve.css}">
+    </th:block>
+</head>
+
+<body>
+<th:block layout:fragment="content">
+
+    <div class="approval-scope">
+
+        <div class="wrap approval-inbox">
+
+            <!-- =========================
+                 PAGE HEAD
+                 ========================= -->
+            <!--
+            <div class="page-head">
+                <h1 class="page-title" th:text="${title}">전자결재</h1>
+            </div>
+            -->
+
+
+            <div class="inbox-layout">
+
+                <!-- =========================
+                     SIDEBAR
+                     ========================= -->
+                <aside class="inbox-side">
+                    <div class="card side-card">
+                        <div class="card-head">
+                            <h3>문서함</h3>
+
+
+
+                        </div>
+
+                        <nav class="side-menu">
+
+                            <!-- =========================
+                                 결재자 문서함
+                                 ========================= -->
+                            <div class="side-group">
+                                <div class="side-group-head">
+                                    <span class="group-title">결재자 문서함</span>
+
+                                </div>
+
+                                <!-- 처리 대기(내 차례 WAITING) -->
+                                <a class="side-link"
+                                   th:href="@{/approval/inbox/waiting}"
+                                   th:classappend="${active == 'waiting'} ? ' active' : ''">
+                                    <span class="txt">처리 대기</span>
+                                    <span class="count-badge" th:text="${counts.approverTodoCount}">0</span>
+                                </a>
+
+                                <!-- 처리 완료(내가 처리한 것: 승인/반려) -->
+                                <a class="side-link"
+                                   th:href="@{/approval/inbox/done}"
+                                   th:classappend="${active == 'done'} ? ' active' : ''">
+                                    <span class="txt">처리 완료</span>
+                                    <span class="count-badge" th:text="${counts.approverDoneCount}">0</span>
+                                </a>
+                            </div>
+
+                            <!-- =========================
+                                 기안자 문서함
+                                 ========================= -->
+                            <div class="side-group">
+                                <div class="side-group-head">
+                                    <span class="group-title">기안자 문서함</span>
+
+                                </div>
+
+                                <!-- 임시저장(DRAFT) -->
+                                <a class="side-link"
+                                   th:href="@{/approval/my/drafts}"
+                                   th:classappend="${active == 'myDrafts'} ? ' active' : ''">
+                                    <span class="txt">임시저장</span>
+                                    <span class="count-badge" th:text="${counts.drafterDraftCount}">0</span>
+                                </a>
+
+                                <!-- 진행중(IN_PROGRESS) -->
+                                <a class="side-link"
+                                   th:href="@{/approval/my/in-progress}"
+                                   th:classappend="${active == 'myInProgress'} ? ' active' : ''">
+                                    <span class="txt">진행중</span>
+                                    <span class="count-badge" th:text="${counts.drafterInProgressCount}">0</span>
+                                </a>
+
+                                <!-- 승인(APPROVED) -->
+                                <a class="side-link"
+                                   th:href="@{/approval/my/approved}"
+                                   th:classappend="${active == 'myApproved'} ? ' active' : ''">
+                                    <span class="txt">승인함</span>
+                                    <span class="count-badge" th:text="${counts.drafterApprovedCount}">0</span>
+                                </a>
+
+                                <!-- 반려(REJECTED) -->
+                                <a class="side-link"
+                                   th:href="@{/approval/my/rejected}"
+                                   th:classappend="${active == 'myRejected'} ? ' active' : ''">
+                                    <span class="txt">반려함</span>
+                                    <span class="count-badge" th:text="${counts.drafterRejectedCount}">0</span>
+                                </a>
+
+                                <!-- 참조됨(REFERENCE) -->
+                                <a class="side-link"
+                                   th:href="@{/approval/my/reference}"
+                                   th:classappend="${active == 'myReference'} ? ' active' : ''">
+                                    <span class="txt">참조함</span>
+                                    <span class="count-badge" th:text="${counts.drafterReferencedCount}">0</span>
+                                </a>
+                            </div>
+
+
+
+                        </nav>
+                    </div>
+                </aside>
+
+                <!-- =========================
+                     CONTENT
+                     ========================= -->
+                <section class="inbox-content">
+
+                    <div class="card">
+                        <div class="card-head">
+                            <h3 th:text="${title}">목록</h3>
+
+
+                            <div class="page-actions">
+                                <a class="btn primary" th:href="@{/approval/create}">결재 문서 작성</a>
+                            </div>
+                        </div>
+
+                        <div class="table-wrap">
+                            <table class="table">
+                                <thead>
+                                <tr>
+                                    <th class="col-title">제목</th>
+                                    <th class="col-writer">작성자</th>
+                                    <th class="col-status">상태</th>
+                                    <th class="col-date">작성일</th>
+                                    <th class="col-action" th:if="${active == 'myDrafts'}">관리</th>
+                                </tr>
+                                </thead>
+
+                                <tbody>
+                                <!-- empty -->
+                                <tr th:if="${#lists.isEmpty(list)}">
+                                    <td class="empty-row" th:attr="colspan=${active == 'myDrafts' ? 5 : 4}">
+                                        문서가 없습니다.
+                                    </td>
+                                </tr>
+
+                                <!-- rows -->
+                                <tr th:each="row : ${list}" class="doc-row">
+
+                                    <!-- 제목 -->
+                                    <td class="td-title">
+                                        <a class="doc-link"
+                                           th:href="@{/approval/detail/{id}(id=${row.docId})}"
+                                           th:text="${row.title}">
+                                            제목
+                                        </a>
+
+
+                                    </td>
+
+                                    <!-- 작성자 -->
+                                    <td class="td-writer">
+                                        <div class="writer">
+                                            <span class="name"
+                                                  th:text="${row.writerUserName == null ? '-'
+                                                   : (row.rankName != null ? row.writerUserName + ' ' + row.rankName
+                                                                           : row.writerUserName)}">-
+                                            </span>
+                                        </div>
+                                    </td>
+
+
+                                    <!--
+
+                                    <td class="td-writer">
+                                        <div class="writer">
+
+                                            <span class="name"
+                                                  th:text="${row.writer == null ? '-'
+                                                  : (row.writer.rankName != null
+                                                    ? row.writer.userName + ' ' + row.writer.rankName
+                                                    : row.writer.userName)}">
+                                                    작성자
+                                                </span>
+
+                                    <span class="meta"
+                                          th:if="${row.writer != null and row.writer.deptName != null}"
+                                          th:text="'(' + ${row.writer.deptName} + ')'">
+                                            </span>
+
+                        </div>
+                        </td>
+
+                                    -->
+                                    <!-- 상태 -->
+                                    <td class="td-status">
+                                        <span class="badge"
+                                              th:classappend="' st-' + ${#strings.toLowerCase(row.docStatus)}"
+                                              th:text="${row.docStatus}">
+                                            STATUS
+                                        </span>
+                                    </td>
+
+                                    <!-- 작성일 -->
+                                    <td class="td-date"
+                                        th:text="${row.createdAt != null ? #temporals.format(row.createdAt, 'yyyy년 MM월 dd일 HH:mm') : '-'}">
+                                        -
+                                    </td>
+
+                                    <!-- 임시저장함 관리 -->
+                                    <td class="td-action" th:if="${active == 'myDrafts'}">
+                                        <div class="actions">
+                                            <form method="post" th:action="@{/approval/my/drafts/delete}">
+                                                <input type="hidden" name="docId" th:value="${row.docId}">
+                                                <button type="submit" class="btn danger"
+                                                        onclick="return confirm('삭제하시겠습니까?');">
+                                                    삭제
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </section>
+
+            </div>
+        </div>
+    </div>
+
+</th:block>
+</body>
+</html>

@@ -3,6 +3,7 @@ package com.Workneed.workneed.Board.mapper;
 import com.Workneed.workneed.Board.dto.BoardCategoryDTO;
 import com.Workneed.workneed.Board.dto.BoardPostDTO;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -15,8 +16,11 @@ public interface BoardMapper {
     List<BoardPostDTO> selectPostList();
 
     // 3. 게시글 상세 조회
-    BoardPostDTO selectPostById(Long postId);
+    BoardPostDTO selectPostById(@Param("postId")Long postId);
 
     // 4. 게시글 등록
     int insertPost(BoardPostDTO postDTO);
+
+    // 5. 게시물 삭제
+    int deletePostById(Long postId);
 }

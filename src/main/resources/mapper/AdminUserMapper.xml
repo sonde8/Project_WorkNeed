@@ -5,41 +5,122 @@
     <select id="findAllMembersForAdmin" resultType="com.Workneed.workneed.Members.dto.UserDTO">
         SELECT u.*, r.rank_name AS rankname, d.dept_name AS deptname
         FROM user u
-                 LEFT JOIN ranks r ON u.rank_id = r.rank_id
-                 LEFT JOIN dept d ON u.dept_id = d.dept_id
+        LEFT JOIN ranks r ON u.rank_id = r.rank_id
+        LEFT JOIN dept d ON u.dept_id = d.dept_id
+        <where>
+            <if test="userName != null and userName != ''">
+                AND u.user_name LIKE CONCAT('%', #{userName}, '%')
+            </if>
+            <if test="userLoginId != null and userLoginId != ''">
+                AND u.user_login_id LIKE CONCAT('%', #{userLoginId}, '%')
+            </if>
+            <if test="deptId != null">
+                AND u.dept_id = #{deptId}
+            </if>
+            <if test="rankId != null">
+                AND u.rank_id = #{rankId}
+            </if>
+            <if test="userStatus != null and userStatus != ''">
+                AND u.user_status = #{userStatus}
+            </if>
+        </where>
+        ORDER BY u.user_id DESC
     </select>
 
     <select id="findByAdminEmail" resultType="com.Workneed.workneed.Members.dto.AdminUserDTO">
         SELECT
-            admin_id AS adminId,
-            admin_email AS adminEmail,
-            admin_password AS adminPassword,
-            admin_name AS adminName,
-            role_id AS roleId,
-            admin_status AS adminStatus,
-            admin_last_login_at AS adminLastLoginAt,
-            admin_created_at AS adminCreatedAt
+        admin_id AS adminId,
+        admin_email AS adminEmail,
+        admin_password AS adminPassword,
+        admin_name AS adminName,
+        role_id AS roleId,
+        admin_status AS adminStatus,
+        admin_last_login_at AS adminLastLoginAt,
+        admin_created_at AS adminCreatedAt
         FROM adminuser
         WHERE admin_email = #{adminEmail}
     </select>
 
-    <insert id="insertAdmin" parameterType="com.Workneed.workneed.Members.dto.AdminUserDTO">
+    <select id="findAllAdmins" resultType="com.Workneed.workneed.Members.dto.AdminUserDTO">
+        SELECT
+        a.admin_id AS adminId,
+        a.admin_email AS adminEmail,
+        a.admin_name AS adminName,
+        a.admin_status AS adminStatus,
+        a.admin_last_login_at AS adminLastLoginAt,
+        a.admin_created_at AS adminCreatedAt,
+        r.role_name AS roleName,
+        r.role_description AS roleDescription
+        FROM adminuser a
+        /* 테이블명을 Role에서 AdminRole로 수정 */
+        LEFT JOIN adminrole r ON a.role_id = r.role_id
+        ORDER BY a.admin_created_at DESC
+    </select>
+
+    <select id="existsByEmail" resultType="boolean">
+        SELECT COUNT(*)
+        FROM adminuser
+        WHERE admin_email = #{adminEmail}
+    </select>
+
+    <select id="findAllActivityLogs" resultType="com.Workneed.workneed.Members.dto.AdminUserDTO">
+        <![CDATA[
+        SELECT
+        l.log_id AS logId,
+        a.admin_name AS adminName,
+        r.role_name AS roleName,
+        l.log_action_type AS logActionType,
+        l.log_target_type AS logTargetType,
+        l.log_target_id AS logTargetId,
+        l.log_description AS logDescription,
+        l.log_created_at AS logCreatedAt
+        FROM adminactivitylog l
+        JOIN adminuser a ON l.admin_id = a.admin_id
+        LEFT JOIN adminrole r ON a.role_id = r.role_id
+        ORDER BY l.log_created_at DESC
+          ]]>
+    </select>
+
+    <select id="findPermissionsByRoleId" resultType="string">
+        SELECT permission_code
+        FROM adminpermission
+        WHERE role_id = #{roleId}
+    </select>
+
+    <select id="findByAdminId" resultType="com.Workneed.workneed.Members.dto.AdminUserDTO">
+        SELECT *
+        FROM adminUser
+        WHERE admin_id = #{adminId}
+    </select>
+
+    <insert id="insertAdmin" parameterType="com.Workneed.workneed.Members.dto.AdminUserDTO"
+            useGeneratedKeys="true" keyProperty="adminId">
         INSERT INTO adminuser (
-            admin_email,
-            admin_password,
-            admin_name,
-            role_id,
-            admin_status,
-            admin_created_at
+        admin_email, admin_password, admin_name, role_id, admin_status ) VALUES (
+        #{adminEmail}, #{adminPassword},
+        #{adminName},
+        #{roleId}, #{adminStatus}
+        )
+    </insert>
+
+    <insert id="insertActivityLog"
+            parameterType="com.Workneed.workneed.Members.dto.AdminUserDTO">
+        INSERT INTO adminactivitylog (
+        admin_id,
+        log_action_type,
+        log_target_type,
+        log_target_id,
+        log_description,
+        log_created_at
         )
         VALUES (
-                   #{adminEmail},
-                   #{adminPassword},
-                   #{adminName},
-                   #{roleId},
-                   #{adminStatus},
-                   NOW()
-               )
+        #{adminId},
+        #{logActionType},
+        #{logTargetType},
+        #{logTargetId},
+        #{logDescription},
+        NOW()
+        )
     </insert>
 
     <update id="updateMemberStatus">
@@ -57,9 +138,21 @@
     <update id="processRequest">
         UPDATE request
         SET status = #{status},
-            admin_id = #{adminId},
-            request_updated_at = NOW()
+        admin_id = #{adminId},
+        request_updated_at = NOW()
         WHERE request_id = #{requestId}
+    </update>
+
+    <update id="updateAdminStatus">
+        UPDATE adminuser
+        SET admin_status = #{status}
+        WHERE admin_id = #{adminId}
+    </update>
+
+    <update id="updateLastLogin">
+        UPDATE adminuser
+        SET admin_last_login_at = NOW()
+        WHERE admin_id = #{adminId}
     </update>
 
 </mapper>

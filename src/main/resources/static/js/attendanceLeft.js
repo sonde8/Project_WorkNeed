@@ -1,15 +1,25 @@
-    document.addEventListener('DOMContentLoaded', () => {
+    function AtdLeft(){
 
-        // 오늘 날짜 키
-        function todayKey(){
-            const da = new Date();
-            const yyyy = da.getFullYear();
-            const mm = String(da.getMonth() + 1).padStart(2, '0');
-            const dd = String(da.getDate()).padStart(2, '0');
-            return `${yyyy}-${mm}-${dd}`;
-        }
+        const root = document.querySelector('.att-left') ||
+                             document.querySelector('[data-att-rows]');
+        if(!root) return;
 
-        // 현재 시간 문자열
+        // 왼쪽 엘리먼트
+        const clockEl      = root.querySelector('[data-clock]');
+        const checkInEl    = root.querySelector('[data-checkin]');
+        const checkOutEl   = root.querySelector('[data-checkout]');
+        const monthTotalEl = root.querySelector('[data-monthtotal]');
+
+        const checkInBtn   = root.querySelector('[data-action="checkin"]');
+        const checkOutBtn  = root.querySelector('[data-action="checkout"]');
+
+        const stateBtn     = root.querySelector('[data-action="toggle-menu"]');
+        const stateTextEl  = root.querySelector('[data-state-text]');
+        const stateModal   = root.querySelector('[data-state-modal]');
+
+        if (!checkInBtn || !checkOutBtn || !checkInEl || !checkOutEl) return;
+
+        // 현재 시간
         function nowTimeString(){
             const now = new Date();
             const hh = String(now.getHours()).padStart(2, '0');
@@ -18,251 +28,142 @@
             return `${hh} : ${mm} : ${ss}`;
         }
 
-        // 출근부 저장용
-        function loadRecords(){
-            try{
-                return JSON.parse(localStorage.getItem('attendance.records')) || {};
-            } catch (e) {
-                return {};
-            }
-        }
-
-        function saveRecords(obj){
-            localStorage.setItem('attendance.records', JSON.stringify(obj));
-        }
-
-        function toHHMM(full){
-            return full.replaceAll(' ', '').slice(0, 5);
-        }
-
-        // HH:MM -> minutes
-        function toMin(hhmm){
-            const [h, m] = hhmm.split(':').map(Number);
-            return h * 60 + m;
-        }
-
-        function calcWork(inHHMM, outHHMM){
-            const inMin = toMin(inHHMM);
-            const outMin = toMin(outHHMM);
-
-            const workMin = Math.max(0, diff - lunch);
-
-            const otBase = toMin("18:00");
-            const otMin = Math.max(0, outMin - Math.max(otBase, inMin));
-
-            return { workMin, otMin };
-        }
-
-
-        // 왼쪽 엘리먼트
-        const clockEl = document.getElementById('clock');
-        const checkInEl = document.getElementById('checkIn');
-        const checkOutEl = document.getElementById('checkOut');
-        const monthTotalEl = document.getElementById('monthTotal');
-
-        const checkInBtn = document.getElementById('checkInBtn');
-        const checkOutBtn = document.getElementById('checkOutBtn');
-
-        const stateBtn = document.getElementById('stateBtn');
-        const stateWrap = document.getElementById('stateWrap');
-        const stateTextEl = document.getElementById('stateText');
-
-
-        if (!clockEl || !checkInBtn || !checkOutBtn || !stateBtn || !stateWrap || !stateTextEl) return;
-
-        // 시계
+        // 시간 업데이트
         function updateClock(){
             clockEl.textContent = nowTimeString();
         }
-        updateClock();
-        setInterval(updateClock, 1000);
 
-        // UI 초기화
-        function resetUI() {
-            if (checkInEl) checkInEl.textContent = '미등록';
-            if (checkOutEl) checkOutEl.textContent = '미등록';
-            if (monthTotalEl) monthTotalEl.textContent = '미등록';
-            stateTextEl.textContent = '업무 상태 변경하기';
-
-            checkInBtn.disabled = false;
-            checkInBtn.textContent = '출 근 하 기';
-
-            checkOutBtn.disabled = true;
-            checkOutBtn.textContent = '퇴 근 하 기';
+        if(clockEl){
+            updateClock();
+            setInterval(updateClock, 1000);
         }
 
-        // 하루 저장 제거 (DB 붙이면 여기 제거/교체)
-        function clearToday(){
-            localStorage.removeItem('attendanceDate');
-            localStorage.removeItem('checkInTime');
-            localStorage.removeItem('checkOutTime');
-            localStorage.removeItem('workStatus');
-        }
+        function setButtons(summary){
+            const hasIn = !!summary.todayCheckIn;
+            const hasOut = !!summary.todayCheckOut;
 
-        function ensureTodayStorage() {
-            const savedDate = localStorage.getItem('attendanceDate');
-            const today = todayKey();
+            checkInBtn.disabled = hasIn;
+            checkInBtn.textContent = hasIn ? '출근' : '출근하기';
 
-            if (savedDate !== today) {
-                clearToday();
-                resetUI();
-                localStorage.setItem('attendanceDate', today);
-            }
-        }
-
-        function setStatus(status){
-            stateTextEl.textContent = status;
-            localStorage.setItem('workStatus', status);
-        }
-
-        function setCheckInTime(t){
-            if(checkInEl) checkInEl.textContent = t;
-            localStorage.setItem('checkInTime', t);
-            localStorage.setItem('attendanceDate', todayKey());
-        }
-
-        function setCheckOutTime(t){
-            if(checkOutEl) checkOutEl.textContent = t;
-            localStorage.setItem('checkOutTime', t);
-            localStorage.setItem('attendanceDate', todayKey());
-        }
-
-        function buttonByState(){
-            const inTime = localStorage.getItem('checkInTime');
-            const outTime = localStorage.getItem('checkOutTime');
-
-            if(inTime){
-                checkInBtn.disabled = true;
-                checkInBtn.textContent = '출 근 완 료';
-            } else {
-                checkInBtn.disabled = false;
-                checkInBtn.textContent = '출 근 하 기';
-            }
-
-            if(!inTime){
+            if(!hasIn){
                 checkOutBtn.disabled = true;
-                checkOutBtn.textContent = '퇴 근';
-            } else if(outTime){
+                checkOutBtn.textContent = '퇴근';
+            } else if(hasOut){
                 checkOutBtn.disabled = true;
-                checkOutBtn.textContent = '퇴 근 완 료';
+                checkOutBtn.textContent = '퇴근';
             } else {
                 checkOutBtn.disabled = false;
-                checkOutBtn.textContent = '퇴 근 하 기';
+                checkOutBtn.textContent = '퇴근 하기';
             }
         }
 
-        // 복원
-        (function restore(){
-            ensureTodayStorage();
+        async function loadSummary() {
+            const res = await fetch('/api/attendance/summary');
+            if (!res.ok) return;
+            const s = await res.json();
 
-            const savedDate = localStorage.getItem('attendanceDate');
-            if(savedDate !== todayKey()) return;
+            checkInEl.textContent = s.todayCheckIn ?? '미등록';
+            checkOutEl.textContent = s.todayCheckOut ?? '미등록';
 
-            const saveStatus = localStorage.getItem('workStatus');
-            const saveIn = localStorage.getItem('checkInTime');
-            const saveOut = localStorage.getItem('checkOutTime');
+            if(monthTotalEl) monthTotalEl.textContent = s.monthTotal ?? '0h 0m';
+            if(stateTextEl)  stateTextEl.textContent  = s.todayStatusText ?? '업무 상태 변경하기';
 
-            stateTextEl.textContent = saveStatus ? saveStatus : '업무 상태 변경하기';
-            if(saveIn && checkInEl) checkInEl.textContent = saveIn;
-            if(saveOut && checkOutEl) checkOutEl.textContent = saveOut;
+            setButtons(s);
 
-            buttonByState();
-        })();
-
-        // 자정 리셋
-        function MidnightReset() {
-            const now = new Date();
-            const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 1);
-            const ms = midnight.getTime() - now.getTime();
-
-            setTimeout(() => {
-                clearToday();
-                resetUI();
-                localStorage.setItem('attendanceDate', todayKey());
-                buttonByState();
-                MidnightReset();
-            }, ms);
+            window.dispatchEvent(new CustomEvent('attendance:summary', { detail: s }));
         }
-        MidnightReset();
+
+        loadSummary().catch(console.error);
+
+        // 22:00 ~ 07:00 출근 버튼 차단
+        function blockCheckIn(){
+            const nD = new Date();
+            const nH = nD.getHours();
+
+            return (nH >= 22 || nH < 7);
+        }
+
+        // 자동 퇴근 후 알림
+        async function autoChekNotice() {
+            const res = await fetch('/api/attendance/auto');
+            if (!res.ok) return;
+
+            const data = await res.json();
+            if (data.show) {
+                alert('어제 자동퇴근 처리됐으니 출근부를 확인해주세요');
+
+                await fetch('/api/attendance/auto/notice', { method: 'POST' });
+            }
+        }
 
         // 출근
-        checkInBtn.addEventListener('click', () => {
-            ensureTodayStorage();
-            if(localStorage.getItem('checkInTime')) return;
+        checkInBtn.addEventListener('click', async () => {
 
-            const nt = nowTimeString();
-            setCheckInTime(nt);
-            setStatus('출근');
-            buttonByState();
+            if(blockCheckIn()){
+                alert( '07:00 이후에 눌러주세요 ');
+                return;
+            }
 
-            // 월간
-            const records = loadRecords();
-            records[key] = records[key] || {};
-            records[key].type = records[key].type || '정상';
-            records[key].checkIn = hhmm;
+            const res = await fetch('/api/attendance/checkin', { method:'POST' });
 
-            saveRecords(records);
+            if(!res.ok){
+                const msg = await res.text().catch(()=> '');
+                alert(msg || '출근 저장 실패');
+                return;
+            }
+
+            await autoChekNotice();
+
+            await loadSummary();
         });
 
         // 퇴근
-        checkOutBtn.addEventListener('click', () => {
-            ensureTodayStorage();
-            if(!localStorage.getItem('checkInTime')) return;
-            if(localStorage.getItem('checkOutTime')) return;
-
-            const nt = nowTimeString();
-            setCheckOutTime(nt);
-            setStatus('퇴근');
-            buttonByState();
-
-            // 월간
-            const key = todayKey();
-            const hhmm = toHHMM(nt);
-
-            const records = loadRecords();
-            records[key] = records[key] || {};
-            records[key].type = records[key].type || '정상';
-            records[key].checkOut = hhmm;
-
-            if(!records[key].checkIn){
-                const inFull = localStorage.getItem('checkInTime');
-                if(inFull) records[key].checkIn = toHHMM(inFull);
-            }
-
-            if(records[key].checkIn && records[key].checkOut){
-                const {workMin, otMin} = calcWork(records[key].checkIn, records[key].checkOut);
-                records[key].workMin = workMin;
-                records[key].otMin = otMin;
-            }
-
-            saveRecords(records);
+        checkOutBtn.addEventListener('click', async () => {
+            const res = await fetch('/api/attendance/checkout', { method:'POST' });
+            if(!res.ok){ alert('퇴근 저장 실패'); return; }
+            await loadSummary();
         });
 
-        // 상태 메뉴
-        function toggleStateMenu(){
-            stateWrap.classList.toggle('open');
-        }
-        function closeStateMenu(){
-            stateWrap.classList.remove('open');
-        }
+        // 모달
+        function openModal(){ stateModal.hidden = false; }
+        function closeModal(){ stateModal.hidden = true; }
 
         stateBtn.addEventListener('click', (e) => {
+            e.preventDefault();
             e.stopPropagation();
-            toggleStateMenu();
+            stateModal.hidden ? openModal() : closeModal();
         });
 
-        document.querySelectorAll('.state-item').forEach((item) => {
-            item.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const newState = item.dataset.state;
-                setStatus(newState);
-                closeStateMenu();
+        root.addEventListener('click', (e) => {
+            const act = e.target?.dataset?.action;
+
+            if(act === 'set-state'){
+                stateTextEl.textContent = e.target.dataset.state;
+                closeModal();
+                return;
+            }
+
+            if(act === 'close-state-modal'){
+                if (!stateModal.hidden) closeModal();
+                return;
+            }
+        });
+
+        if (!window.__atdLeftKeyBound) {
+            window.__atdLeftKeyBound = true;
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key !== 'Escape') return;
+                const modal = document.querySelector('.att-left [data-state-modal]');
+                if (modal) modal.hidden = true;
             });
-        });
+        }
+    }
 
-        document.addEventListener('click', closeStateMenu);
-        document.addEventListener('keydown', (e) => {
-            if(e.key === 'Escape') closeStateMenu();
-        });
+    //
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', AtdLeft);
+    } else {
+        AtdLeft();
+    }
 
-    });

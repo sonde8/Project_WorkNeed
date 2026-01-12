@@ -34,4 +34,18 @@
         ORDER BY file_log_id DESC
     </select>
 
+    <select id="selectFileLogById" parameterType="long" resultType="com.Workneed.workneed.Chat.dto.FileLogDTO">
+        SELECT
+            file_log_id AS fileLogId,
+            message_id AS messageId,
+            room_id AS roomId,
+            origin_name AS fileName,   stored_name AS storedName,
+            file_path AS filePath,
+            file_size AS fileSize,
+            file_type AS fileType,
+            created_at AS createdAt
+        FROM filelog
+        WHERE file_log_id = #{fileLogId}
+    </select>
+
 </mapper>

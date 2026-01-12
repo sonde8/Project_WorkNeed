@@ -5,95 +5,112 @@
 
 <mapper namespace="com.Workneed.workneed.Meetingroom.mapper.MeetingRoomMapper">
 
-    <!-- ===============================
-         예약 DTO 매핑
-    =============================== -->
     <resultMap id="ReservationMap"
                type="com.Workneed.workneed.Meetingroom.dto.MeetingReservationDTO">
-
         <id property="reservationId" column="reservation_id"/>
         <result property="roomId" column="room_id"/>
         <result property="scheduleId" column="schedule_id"/>
         <result property="reserverId" column="reserver_id"/>
-        <result property="title" column="title"/>
-        <result property="description" column="description"/>
         <result property="startAt" column="start_at"/>
         <result property="endAt" column="end_at"/>
     </resultMap>
 
-    <!-- ===============================
-         회의실 현황 매핑
-    =============================== -->
     <resultMap id="RoomStatusMap"
                type="com.Workneed.workneed.Meetingroom.dto.MeetingRoomStatusDTO">
-
         <id property="roomId" column="room_id"/>
         <result property="roomName" column="room_name"/>
-
-        <!-- ⭐ 핵심: 회의실 하나에 여러 예약 -->
+        <result property="imagePath" column="image_path"/>
         <collection property="reservations"
                     ofType="com.Workneed.workneed.Meetingroom.dto.MeetingReservationDTO"
                     resultMap="ReservationMap"/>
     </resultMap>
 
-    <!-- ===============================
-         회의실 현황 조회
-         (근무시간과 겹치는 예약만)
-    =============================== -->
     <select id="findMeetingRoomStatus" resultMap="RoomStatusMap">
         SELECT
             mr.room_id,
             mr.room_name,
-
-            r.reservation_id,
-            r.room_id       AS room_id,
+            mr.image_path,  r.reservation_id,
+            r.room_id       AS res_room_id,
             r.schedule_id,
             r.reserver_id,
-            r.title,
-            r.description,
             r.start_at,
             r.end_at
         FROM meeting_room mr
                  LEFT JOIN meeting_reservation r
                            ON mr.room_id = r.room_id
-                               AND r.status = 'RESERVED'
                                AND r.start_at &lt; #{endAt}
                                AND r.end_at   &gt; #{startAt}
         WHERE mr.is_active = 'Y'
         ORDER BY mr.room_id, r.start_at
     </select>
 
-    <!-- ===============================
-         예약 중복 체크
-    =============================== -->
     <select id="countConflict" resultType="int">
         SELECT COUNT(*)
         FROM meeting_reservation
         WHERE room_id = #{roomId}
-          AND status = 'RESERVED'
           AND start_at &lt; #{endAt}
           AND end_at   &gt; #{startAt}
     </select>
 
-    <!-- ===============================
-         예약 저장
-    =============================== -->
     <insert id="insertReservation" parameterType="com.Workneed.workneed.Meetingroom.dto.MeetingReservationDTO">
-        INSERT INTO MEETING_RESERVATION (
+        INSERT INTO meeting_reservation (
             room_id,
-            schedule_id, reserver_id,
-            title,
-            description,
+            schedule_id,
+            reserver_id,
             start_at,
             end_at
         ) VALUES (
                      #{roomId},
-                     #{scheduleId}, #{reserverId},
-                     #{title},
-                     #{description},
+                     #{scheduleId},
+                     #{reserverId},
                      #{startAt},
                      #{endAt}
                  )
     </insert>
+
+    <delete id="deleteReservation">
+        DELETE FROM meeting_reservation
+        WHERE reservation_id = #{reservationId}
+    </delete>
+
+    <!-- ===============================
+     일정(schedule)로 회의실 이름 조회
+=============================== -->
+    <select id="selectReservationsByScheduleId"
+            parameterType="long"
+            resultType="com.Workneed.workneed.Meetingroom.dto.MeetingReservationDTO">
+        SELECT
+            r.reservation_id AS reservationId,
+            r.room_id        AS roomId,
+            r.schedule_id    AS scheduleId,
+            r.reserver_id    AS reserverId,
+            r.start_at       AS startAt,
+            r.end_at         AS endAt,
+            mr.room_name     AS roomName
+        FROM meeting_reservation r
+                 JOIN meeting_room mr ON mr.room_id = r.room_id
+        WHERE r.schedule_id = #{scheduleId}
+        ORDER BY r.start_at
+    </select>
+
+    <!-- ===============================
+     일정 삭제 시 예약 먼저 삭제
+=============================== -->
+    <delete id="deleteReservationsByScheduleIds">
+        DELETE FROM meeting_reservation
+        WHERE schedule_id IN
+        <foreach collection="scheduleIds" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="countScheduleConflict" resultType="int">
+        SELECT COUNT(*)
+        FROM meeting_reservation
+        WHERE schedule_id = #{scheduleId}
+          AND start_at &lt; #{endAt}
+          AND end_at   &gt; #{startAt}
+    </select>
+
 
 </mapper>

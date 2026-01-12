@@ -1,19 +1,29 @@
+<!-- 출 퇴근 버튼 -->
+<section class="rows" data-att-rows th:fragment="attendanceRows">
+
+    <div class="row"><span>출근 시간</span>
+        <span class="muted" data-checkin>미등록</span>
+        <button class="btn" data-action="checkin" type="button">출근하기</button>
+    </div>
+
+
+    <div class="row"><span>퇴근 시간</span>
+        <span class="muted" data-checkout>미등록</span>
+        <button class="btn" data-action="checkout" type="button">퇴근하기</button>
+    </div>
+
+</section>
+
+
 <!-- 근태관리 왼쪽 영역 -->
 <section class="att-left" th:fragment="attendanceLeft">
 
-    <div class="title">근태 관리</div>
-
     <div class="clock" data-clock>00 : 00 : 00</div>
 
-    <div class="rows">
-        <div class="row"><span>출근시간</span><span class="muted" data-checkin>미등록</span></div>
-        <div class="row"><span>퇴근시간</span><span class="muted" data-checkout>미등록</span></div>
-        <div class="row"><span>월간누적시간</span><span class="muted" data-monthtotal>미등록</span></div>
-    </div>
+    <section th:replace="~{Attendance/attendanceLeft :: attendanceRows}"></section>
 
-    <div class="active">
-        <button class="btn" data-action="checkin" type="button">출 근 하 기</button>
-        <button class="btn" data-action="checkout" type="button">퇴 근 하 기</button>
+    <div class="rowMonth">
+        <div class="row"><span>월간누적시간</span><span class="muted" data-monthtotal>미등록</span></div>
     </div>
 
     <div class="state-wrap">
@@ -32,10 +42,9 @@
                 <ul class="state-modal_list">
                     <li class="state-item" data-action="set-state" data-state="출근">출근</li>
                     <li class="state-item" data-action="set-state" data-state="퇴근">퇴근</li>
-                    <li class="state-item" data-action="set-state" data-state="출장">출장</li>
                     <li class="state-item" data-action="set-state" data-state="연차">연차</li>
-                    <li class="state-item" data-action="set-state" data-state="병가">병가</li>
-                    <li class="state-item" data-action="set-state" data-state="휴가">휴가</li>
+                    <li class="state-item" data-action="set-state" data-state="오전 연차">오전 연차</li>
+                    <li class="state-item" data-action="set-state" data-state="오후 연차">오후 연차</li>
                 </ul>
 
                 <button class="state-modal_close" data-action="close-state-modal" type="button"> 닫기 </button>
@@ -44,11 +53,18 @@
     </div>
 
     <div class="click">
-        <a class="cli" th:href="@{/attendance}">근 태 관 리</a>
-        <a class="cli" th:href="@{/attendance/month}">출 근 부</a>
-        <a class="cli" th:href="@{/attendance/leave}">연 차 관 리</a>
-        <a class="cli" th:href="@{/attendance/team}">부 서 근 태</a>
-        <a class="cli" th:href="@{/attendance/position}">직 급 수 정</a>
+
+        <div class="menuGroup">
+            <a class="cli" th:href="@{/attendance}">근 태 관 리</a>
+            <a class="cli" th:href="@{/attendance/month}">출 근 부</a>
+            <a class="cli" th:href="@{/attendance/leave}">연 차 관 리</a>
+        </div>
+
+        <div class="menuGroupTeam" th:if="${teamOwner}">
+            <a class="cli" th:href="@{/attendance/teamAttend}">부 서 근 태</a>
+            <a class="cli" th:href="@{/attendance/teamLeave}">부 서 연 차</a>
+        </div>
+
     </div>
 
 </section>

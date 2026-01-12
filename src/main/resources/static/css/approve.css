@@ -1,576 +1,767 @@
-/* =========================
-   APPROVAL CREATE - COPY/PASTE CSS
-   (기능 안 깨지게: id/class 그대로 사용)
-   ========================= */
+/* ==========================================================
+   APPROVE (Chat.css 기반 심플 버전)
+   - .approval-scope 내부만 적용
+   - chat.css 톤: 연한 회색 라인 + 심플 카드 + 과한 컴포넌트 없음
+   ========================================================== */
 
-/* 페이지 스코프 */
-.wrap.approval-create{
-    --bg:#f7f8fa;
-    --card:#ffffff;
-    --text:#111827;
-    --muted:#6b7280;
-    --line:#e5e7eb;
-    --line2:#f0f0f0;
-    --shadow:0 10px 30px rgba(0,0,0,0.06);
+.approval-scope {
+    color: #333333;
+    height: 70vh;
 
-    max-width: 980px;
-    margin: 0 auto;
-    color: var(--text);
+
 }
 
-/* 타이틀 */
-.wrap.approval-create .page-title{
-    margin: 0 0 14px;
-    font-size: 22px;
-    font-weight: 900;
-    letter-spacing: -0.2px;
-}
-
-/* ===== 박스(현재 HTML의 .box) ===== */
-.wrap.approval-create .box{
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-radius: 16px;
-    box-shadow: var(--shadow);
-    padding: 16px;
-    margin: 14px 0;
-}
-
-.wrap.approval-create .box h3{
-    margin: 0 0 8px;
-    font-size: 16px;
-    font-weight: 900;
-}
-
-/* 안내 텍스트 */
-.wrap.approval-create .meta{
-    margin: 6px 0 12px;
-    color: var(--muted);
-    font-size: 13px;
-    font-weight: 700;
-}
-
-/* ===== row(라벨/입력) ===== */
-.wrap.approval-create .row{
-    display: grid;
-    grid-template-columns: 110px 1fr;
-    gap: 12px;
-    padding: 12px 0;
-    border-top: 1px solid var(--line2);
-}
-
-.wrap.approval-create .row:first-of-type{
-    border-top: none;
-    padding-top: 0;
-}
-
-.wrap.approval-create .row label{
-    color: var(--muted);
-    font-weight: 900;
-    font-size: 13px;
-    padding-top: 10px;
-}
-
-/* 입력 공통 */
-.wrap.approval-create input[type="text"],
-.wrap.approval-create select,
-.wrap.approval-create textarea{
+/* ========== Layout ========== */
+.approval-scope .wrap {
     width: 100%;
-    padding: 10px 12px;
-    border: 1px solid var(--line);
-    border-radius: 12px;
-    background: #fff;
-    outline: none;
-    font-size: 14px;
-    box-sizing: border-box;
+    /* max-width: 1340px; */
+    margin: 0 auto;
+    padding: 20px 20px 40px;
 }
 
-.wrap.approval-create textarea{
-    min-height: 160px;
-    resize: vertical;
-    line-height: 1.6;
-}
-
-/* ===== 후보 리스트(.list 내부) ===== */
-.wrap.approval-create .list > div{
-    padding: 10px 0;
-    border-top: 1px solid var(--line2);
-}
-
-.wrap.approval-create .list > div:first-child{
-    border-top: none;
-}
-
-.wrap.approval-create .list label{
+.approval-scope .page-head {
     display: flex;
+    justify-content: space-between;
     align-items: center;
     gap: 10px;
-    font-size: 14px;
-    cursor: pointer;
+    margin-bottom: 14px;
 }
 
-.wrap.approval-create .candChk{
-    width: 16px;
-    height: 16px;
+.approval-scope .page-title {
+    font-size: 22px;
+    font-weight: 800;
+    margin: 0;
 }
 
-/* ===== 버튼 영역(.btns) ===== */
-.wrap.approval-create .btns{
-    margin-top: 12px;
+.approval-scope .page-actions {
     display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    align-items: center;
-}
-
-/* 버튼 기본 모양(효과 X, 모양만) */
-.wrap.approval-create .btns button{
-    appearance: none;
-    border: 1px solid var(--line);
-    background: #fff;
-    color: var(--text);
-
-    padding: 10px 14px;
-    border-radius: 12px;
-    font-weight: 900;
-    font-size: 14px;
-    cursor: pointer;
-}
-
-/* primary 클래스(제출 버튼용) */
-.wrap.approval-create .btns button.primary{
-    border-color: #bfdbfe;
-    background: #eff6ff;
-}
-
-/* 모달 내부 버튼도 동일하게 */
-.wrap.approval-create .modal button.btn{
-    appearance: none;
-    border: 1px solid var(--line);
-    background: #fff;
-    color: var(--text);
-
-    padding: 10px 14px;
-    border-radius: 12px;
-    font-weight: 900;
-    font-size: 14px;
-    cursor: pointer;
-}
-
-.wrap.approval-create .modal button.btn.primary{
-    border-color: #bfdbfe;
-    background: #eff6ff;
-}
-
-/* ===== 프리뷰 영역 ===== */
-.wrap.approval-create #linePreview{
-    margin-top: 10px;
-}
-
-/* JS가 만드는 차수 박스 */
-.wrap.approval-create .order-box{
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    padding: 12px;
-    margin-top: 10px;
-    background: #fff;
-}
-
-.wrap.approval-create .order-header{
-    display: flex;
-    align-items: baseline;
     gap: 8px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid var(--line2);
-    margin-bottom: 8px;
-    font-weight: 900;
-}
-
-.wrap.approval-create .order-header.active-order{
-    border-left: 4px solid #111827;
-    padding-left: 10px;
-}
-
-.wrap.approval-create .order-list .item{
-    display: flex;
-    justify-content: space-between;
     align-items: center;
-    padding: 9px 0;
-    border-top: 1px solid var(--line2);
 }
 
-.wrap.approval-create .order-list .item:first-child{
-    border-top: none;
+.approval-scope .divider {
+    height: 1px;
+    background: #eeeeee;
+    margin: 16px 0;
 }
 
-.wrap.approval-create .order-list .meta{
-    color: var(--muted);
-    font-weight: 800;
-    font-size: 13px;
-    margin-left: 8px;
+/* ========== Card ========== */
+.approval-scope .card {
+    background: #ffffff;
+    border: 1px solid #dddddd;
+    border-radius: 8px;
+    padding: 25px;
 }
 
-/* 삭제 버튼 모양 */
-.wrap.approval-create .order-list .btnRemove{
-    appearance: none;
-    border: 1px solid var(--line);
-    background: #fff;
-    color: var(--text);
-
-    padding: 8px 12px;
-    border-radius: 12px;
-    font-weight: 900;
-    font-size: 13px;
-    cursor: pointer;
-}
-
-/* ===== 모달 ===== */
-.wrap.approval-create .modal{
-    display: none;
-    position: fixed;
-    inset: 0;
-    z-index: 9999;
-}
-
-.wrap.approval-create .modal.is-open{
-    display: block;
-}
-
-.wrap.approval-create .modal__backdrop{
-    position: absolute;
-    inset: 0;
-    background: rgba(0,0,0,0.35);
-}
-
-.wrap.approval-create .modal__panel{
-    position: relative;
-    width: min(560px, calc(100% - 28px));
-    margin: 10vh auto 0;
-    background: #fff;
-    border: 1px solid var(--line);
-    border-radius: 16px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.18);
-    overflow: hidden;
-}
-
-.wrap.approval-create .modal__head{
-    padding: 14px 16px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid var(--line2);
-}
-
-.wrap.approval-create .modal__head h3{
-    margin: 0;
-    font-size: 16px;
-    font-weight: 900;
-}
-
-.wrap.approval-create .modal__x{
-    border: 0;
-    background: transparent;
-    font-size: 18px;
-    cursor: pointer;
-}
-
-.wrap.approval-create .modal__body{
-    padding: 14px 16px;
-}
-
-.wrap.approval-create .modal__desc{
-    margin: 0 0 12px;
-    color: var(--muted);
-    font-weight: 700;
-    font-size: 13px;
-}
-
-.wrap.approval-create .modal__summary{
-    border: 1px solid var(--line);
-    border-radius: 12px;
-    padding: 10px 12px;
-    background: #f9fafb;
-}
-
-.wrap.approval-create .modal__summary .sum-row{
-    display: grid;
-    grid-template-columns: 70px 1fr;
-    gap: 10px;
-    padding: 8px 0;
-    border-top: 1px solid #eee;
-}
-
-.wrap.approval-create .modal__summary .sum-row:first-child{
-    border-top: none;
-}
-
-.wrap.approval-create .modal__summary .empty{
-    color: var(--muted);
-    font-weight: 800;
-}
-
-.wrap.approval-create .modal__foot{
-    padding: 14px 16px;
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    border-top: 1px solid var(--line2);
-}
-
-/* 제출 전 결재선 없을 때 강조(선택) */
-.wrap.approval-create .highlight{
-    outline: 3px solid #111827;
-    outline-offset: 4px;
-    border-radius: 16px;
-}
-
-/* 반응형 */
-@media (max-width: 700px){
-    .wrap.approval-create{
-        max-width: 760px;
-    }
-    .wrap.approval-create .row{
-        grid-template-columns: 1fr;
-        gap: 6px;
-    }
-    .wrap.approval-create .row label{
-        padding-top: 0;
-    }
-}
-
-/* =========================
-   APPROVAL DETAIL - COPY/PASTE CSS
-   (기능 안 깨지게: 스코프 기반)
-   ========================= */
-
-/* 페이지 스코프 */
-.wrap.approval-detail{
-    --bg:#f7f8fa;
-    --card:#ffffff;
-    --text:#111827;
-    --muted:#6b7280;
-    --line:#e5e7eb;
-    --line2:#f0f0f0;
-    --shadow:0 10px 30px rgba(0,0,0,0.06);
-
-    max-width: 980px;
-    margin: 0 auto;
-    color: var(--text);
-}
-
-/* 타이틀 */
-.wrap.approval-detail .page-title{
-    margin: 0 0 14px;
-    font-size: 22px;
-    font-weight: 900;
-    letter-spacing: -0.2px;
-}
-
-/* 공통 카드(박스) */
-.wrap.approval-detail .box,
-.wrap.approval-detail .card{
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-radius: 16px;
-    box-shadow: var(--shadow);
-    padding: 16px;
-    margin: 14px 0;
-}
-
-.wrap.approval-detail .box h3,
-.wrap.approval-detail .card h3{
-    margin: 0 0 8px;
-    font-size: 16px;
-    font-weight: 900;
-}
-
-/* 안내/메타 */
-.wrap.approval-detail .meta{
-    margin: 6px 0 12px;
-    color: var(--muted);
-    font-size: 13px;
-    font-weight: 700;
-}
-
-/* ====== 문서 정보 row ====== */
-.wrap.approval-detail .row{
-    display: grid;
-    grid-template-columns: 110px 1fr;
-    gap: 12px;
-    padding: 12px 0;
-    border-top: 1px solid var(--line2);
-}
-.wrap.approval-detail .row:first-of-type{
-    border-top: none;
-    padding-top: 0;
-}
-.wrap.approval-detail .row .label,
-.wrap.approval-detail .row label{
-    color: var(--muted);
-    font-weight: 900;
-    font-size: 13px;
-    padding-top: 4px;
-}
-.wrap.approval-detail .row .value{
-    font-size: 14px;
-    font-weight: 800;
-    line-height: 1.6;
-}
-
-/* pre / content 표시 */
-.wrap.approval-detail pre,
-.wrap.approval-detail .content{
-    margin: 0;
-    padding: 12px 14px;
-    border: 1px solid var(--line);
-    border-radius: 12px;
-    background: #fff;
-    white-space: pre-wrap;
-    word-break: break-word;
-    line-height: 1.65;
-    font-size: 14px;
-}
-
-/* ====== 상태 배지 ====== */
-.wrap.approval-detail .badge{
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 6px 10px;
-    border-radius: 999px;
-    border: 1px solid var(--line);
-    background: #fff;
-    font-size: 12px;
-    font-weight: 900;
-}
-.wrap.approval-detail .badge.is-draft{ background:#f9fafb; }
-.wrap.approval-detail .badge.is-progress{ background:#eff6ff; border-color:#bfdbfe; }
-.wrap.approval-detail .badge.is-approved{ background:#ecfdf5; border-color:#a7f3d0; }
-.wrap.approval-detail .badge.is-rejected{ background:#fef2f2; border-color:#fecaca; }
-
-/* ====== 결재선 테이블/리스트 ====== */
-/* 테이블을 쓰는 경우 */
-.wrap.approval-detail table{
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    overflow: hidden;
-    background: #fff;
-}
-.wrap.approval-detail th,
-.wrap.approval-detail td{
-    padding: 12px 12px;
-    font-size: 13px;
-    border-bottom: 1px solid var(--line2);
-}
-.wrap.approval-detail th{
-    text-align: left;
-    color: var(--muted);
-    font-weight: 900;
-    background: #f9fafb;
-}
-.wrap.approval-detail tr:last-child td{
-    border-bottom: none;
-}
-
-/* 리스트(div/li)로 뿌리는 경우 */
-.wrap.approval-detail .list > div,
-.wrap.approval-detail .line-list > div,
-.wrap.approval-detail .line-list li{
-    padding: 10px 0;
-    border-top: 1px solid var(--line2);
-}
-.wrap.approval-detail .list > div:first-child,
-.wrap.approval-detail .line-list > div:first-child,
-.wrap.approval-detail .line-list li:first-child{
-    border-top: none;
-}
-.wrap.approval-detail .line-item{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 12px;
-}
-.wrap.approval-detail .line-item .who{
-    font-weight: 900;
-    font-size: 14px;
-}
-.wrap.approval-detail .line-item .sub{
-    color: var(--muted);
-    font-weight: 800;
-    font-size: 13px;
-}
-
-/* 결재선 상태 pill */
-.wrap.approval-detail .pill{
-    display:inline-flex;
-    align-items:center;
-    padding:6px 10px;
-    border-radius: 999px;
-    border:1px solid var(--line);
-    background:#fff;
-    font-size:12px;
-    font-weight:900;
-}
-.wrap.approval-detail .pill.waiting{ background:#eff6ff; border-color:#bfdbfe; }
-.wrap.approval-detail .pill.pending{ background:#f9fafb; }
-.wrap.approval-detail .pill.approved{ background:#ecfdf5; border-color:#a7f3d0; }
-.wrap.approval-detail .pill.rejected{ background:#fef2f2; border-color:#fecaca; }
-
-/* ====== 버튼 영역 ====== */
-.wrap.approval-detail .btns{
+.approval-scope .card + .card {
     margin-top: 12px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    align-items: center;
 }
-.wrap.approval-detail .btns button,
-.wrap.approval-detail .btns a{
-    appearance: none;
-    border: 1px solid var(--line);
-    background: #fff;
-    color: var(--text);
 
-    padding: 10px 14px;
-    border-radius: 12px;
-    font-weight: 900;
-    font-size: 14px;
-    cursor: pointer;
-    text-decoration: none;
+.approval-scope .card-head {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eeeeee;
+    margin-bottom: 12px;
+}
+
+.approval-scope .card-head h3 {
+    font-size: 16px;
+    font-weight: 800;
+    margin: 0;
+}
+
+.approval-scope .meta {
+    font-size: 12px;
+    color: #888888;
+    margin: 2px 0 0;
+}
+
+/* ========== Buttons ========== */
+.approval-scope .btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-}
-.wrap.approval-detail .btns .primary{
-    border-color: #bfdbfe;
-    background: #eff6ff;
-}
-.wrap.approval-detail .btns .danger{
-    border-color: #fecaca;
-    background: #fef2f2;
-}
-
-/* 비활성 */
-.wrap.approval-detail button[disabled],
-.wrap.approval-detail .is-disabled{
-    opacity: .55;
-    cursor: not-allowed;
+    height: 27px;
+    padding: 0 12px;
+    border: 1px solid #cccccc;
+    background: #ffffff;
+    color: #333333;
+    font-size: 12px;
+    font-weight: 700;
+    border-radius: 6px;
+    cursor: pointer;
+    text-decoration: none;
 }
 
-/* ====== 반응형 ====== */
-@media (max-width: 700px){
-    .wrap.approval-detail{
-        max-width: 760px;
+.approval-scope .btn:hover {
+    background: #f0f0f0;
+}
+
+.approval-scope .btn.primary {
+    background: #333333;
+    border-color: #333333;
+    color: #ffffff;
+}
+
+.approval-scope .btn.primary:hover {
+    background: #111111;
+    border-color: #111111;
+}
+
+.approval-scope .btn.danger {
+    background: #ff4d4d;
+    border-color: #ff4d4d;
+    color: #ffffff;
+}
+
+.approval-scope .btn.danger:hover {
+    background: #e43c3c;
+    border-color: #e43c3c;
+}
+
+/* ========== Form ========== */
+.approval-scope .form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.approval-scope .row {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    gap: 12px;
+    align-items: center;
+}
+
+.approval-scope .row-content {
+    align-items: start;
+}
+
+.approval-scope .label {
+    font-size: 13px;
+    font-weight: 800;
+    color: #333333;
+}
+
+.approval-scope .control {
+    width: 100%;
+    border: 1px solid #dddddd;
+    border-radius: 6px;
+    padding: 10px 12px;
+    font-size: 13px;
+    outline: none;
+    background: #ffffff;
+}
+
+.approval-scope .control:focus {
+    border-color: #999999;
+}
+
+.approval-scope .textarea {
+    resize: vertical;
+    min-height: 180px;
+}
+
+/* ========== Inbox Layout ========== */
+.approval-scope .approval-inbox .inbox-layout {
+    display: grid;
+    grid-template-columns: 420px 1fr;
+    gap: 14px;
+    height: calc(100vh - 120px); /* 상단 header + padding 고려 */
+        min-height: 0;               /* ⭐ flex/grid 스크롤 필수 */
+}
+
+.approval-scope .inbox-side .side-card {
+    border: 1px solid #dddddd;
+    border-radius: 8px;
+    background: #ffffff;
+    padding: 25px;
+    position: sticky;
+    top: 12px;
+}
+
+.approval-scope .side-title {
+    font-size: 13px;
+    font-weight: 800;
+    margin: 0 0 10px;
+    color: #333333;
+}
+
+.approval-scope .side-links {
+
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.approval-scope .side-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding : 5px 3px;
+    border-radius: 6px;
+    text-decoration: none;
+    color: #333333;
+    border: 1px solid transparent;
+}
+
+.approval-scope .side-link:hover {
+    background: #f0f0f0;
+    border-color: #dddddd;
+}
+
+.approval-scope .side-link.active {
+    background: #ffffff;
+    border-color: #333333;
+}
+
+.approval-scope .side-link .txt {
+    font-size: 13px;
+    font-weight: 700;
+}
+
+/* 뱃지(카운트) */
+.approval-scope .count-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 24px;
+    height: 20px;
+    padding: 0 7px;
+    border-radius: 10px;
+    background: #333333;
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+/* 테이블 */
+.approval-scope .table-wrap {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.approval-scope table.table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 760px;
+}
+
+.approval-scope table.table th,
+.approval-scope table.table td {
+    border-bottom: 1px solid #eeeeee;
+    padding: 12px 10px;
+    text-align: left;
+    font-size: 13px;
+    vertical-align: middle;
+}
+
+.approval-scope table.table thead th {
+    background: #f7f7f7;
+    color: #666666;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.approval-scope .doc-row:hover td {
+    background: #f9f9f9;
+}
+
+.approval-scope .empty-row {
+    text-align: center;
+    color: #888888;
+    padding: 18px 10px;
+}
+
+.approval-scope .doc-link {
+    font-weight: 800;
+    color: #333333;
+    text-decoration: none;
+}
+
+.approval-scope .doc-link:hover {
+    text-decoration: underline;
+}
+
+/* 상태 뱃지(간단하게) */
+.approval-scope .badge {
+    display: inline-flex;
+    align-items: center;
+    height: 22px;
+    padding: 0 10px;
+    border-radius: 11px;
+    font-size: 12px;
+    font-weight: 800;
+    border: 1px solid #dddddd;
+    background: #ffffff;
+    color: #333333;
+}
+.approval-scope .badge.strong {
+    background: #333333;
+    border-color: #333333;
+    color: #ffffff;
+    width: 150px;
+    justify-content: center;
+}
+
+/* ========== Create: Approver UI ========== */
+.approval-scope .approver-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+.approval-scope .approver-box {
+    border: 1px solid #dddddd;
+    border-radius: 8px;
+    background: #ffffff;
+    overflow: hidden;
+}
+
+.approval-scope .approver-box .box-head {
+    padding: 12px 12px;
+    background: #f7f7f7;
+    border-bottom: 1px solid #eeeeee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+.approval-scope .box-title {
+    font-weight: 800;
+    font-size: 13px;
+}
+
+.approval-scope .box-meta {
+    font-size: 12px;
+    color: #888888;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.approval-scope .candidate-list {
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 320px;
+    overflow-y: auto;
+}
+
+.approval-scope .candidate {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.approval-scope .candidate:hover {
+    background: #f0f0f0;
+}
+
+.approval-scope .cand-name {
+    font-weight: 800;
+    font-size: 13px;
+}
+
+.approval-scope .cand-meta {
+    font-size: 12px;
+    color: #888888;
+}
+
+/* 결재선 구성 컨트롤 */
+.approval-scope .line-controls {
+    padding: 10px 12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    border-bottom: 1px solid #eeeeee;
+}
+
+.approval-scope .line-preview {
+    padding: 12px;
+    min-height: 120px;
+}
+
+.approval-scope .line-preview .empty {
+    color: #888888;
+    font-size: 13px;
+    padding: 10px 0;
+}
+
+/* JS에서 만든 .item 대응 (현재 preview에 추가되는 구조) */
+.approval-scope .line-preview .item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 10px;
+    border: 1px solid #eeeeee;
+    border-radius: 6px;
+    background: #ffffff;
+    margin-bottom: 8px;
+}
+
+.approval-scope .line-preview .item .meta {
+    margin-left: auto;
+    font-size: 12px;
+    color: #888888;
+}
+
+/* ========== Create: Line Builder (검토/합의/최종결재/참조 4칸) ========== */
+.approval-scope .line-builder-actions{
+    padding: 10px 12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    border-bottom: 1px solid #eeeeee;
+}
+.approval-scope .line-builder-actions button{
+    height: 34px;
+    padding: 0 12px;
+    border: 1px solid #cccccc;
+    background: #ffffff;
+    color: #333333;
+    font-size: 13px;
+    font-weight: 700;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease, transform 0.05s ease;
+}
+.approval-scope .line-builder-actions button:hover{
+    background: rgba(0,0,0,0.03);
+    border-color: #bbbbbb;
+}
+.approval-scope .line-builder-actions button:active{
+    transform: translateY(1px);
+}
+
+/* 4칸 레이아웃: 기본은 2x2, 넓으면 4열 */
+.approval-scope .line-builder-grid{
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    padding: 12px;
+}
+@media (min-width: 1200px){
+    .approval-scope .line-builder-grid{
+        grid-template-columns: repeat(4, minmax(0, 1fr));
     }
-    .wrap.approval-detail .row{
+}
+
+.approval-scope .lane{
+    border: 1px solid #e6e6e6;
+    border-radius: 14px;
+    background: rgba(0,0,0,0.03);
+    overflow: hidden;
+    min-height: 160px;
+}
+.approval-scope .lane-head{
+    padding: 12px 12px;
+    font-size: 13px;
+    font-weight: 800;
+    color: #333333;
+    background: #ffffff;
+    border-bottom: 1px solid #eeeeee;
+}
+.approval-scope .lane-body{
+    padding: 10px 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-height: 120px;
+    max-height: 240px;
+    overflow-y: auto;
+}
+.approval-scope .lane-body::-webkit-scrollbar{
+    width: 4px;
+}
+.approval-scope .lane-body::-webkit-scrollbar-thumb{
+    background: rgba(0,0,0,0.10);
+    border-radius: 10px;
+}
+
+/* JS에서 넣는 아이템(추천 클래스: .lane-item) */
+.approval-scope .lane-body .lane-item{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 10px 10px;
+    border-radius: 12px;
+    background: #ffffff;
+    border: 1px solid rgba(0,0,0,0.06);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.06);
+}
+.approval-scope .lane-body .lane-item .name{
+    font-size: 13px;
+    font-weight: 800;
+    color: #222222;
+    min-width: 0;
+    word-break: break-word;
+}
+.approval-scope .lane-body .lane-item .sub{
+    font-size: 12px;
+    color: #888888;
+    margin-left: 6px;
+    white-space: nowrap;
+}
+.approval-scope .lane-body .lane-item .del{
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    font-weight: 900;
+    font-size: 14px;
+    line-height: 1;
+    padding: 6px 8px;
+    border-radius: 10px;
+    color: #666666;
+}
+.approval-scope .lane-body .lane-item .del:hover{
+    background: rgba(0,0,0,0.05);
+    color: #333333;
+}
+
+.approval-scope .lane-body .empty{
+    padding: 10px 6px;
+    color: #888888;
+    font-size: 12px;
+}
+
+/*========== Detail: Content / Reject ==========*/
+.approval-scope .approval-detail pre.content{
+    margin: 0;
+    padding: 12px;
+    border: 1px solid #eeeeee;
+    border-radius: 6px;
+    background: #fcfcfc;
+    white-space: pre-wrap;
+    line-height: 1.6;
+    font-size: 13px;
+}
+.content-detail {
+    background: #f8f9fa;        /* 아주 연한 회색 */
+    border: 1px solid #e1e4e8;  /* 기본 보더 */
+    border-radius: 6px;
+
+    padding: 12px 14px;
+
+    font-size: 14px;
+    line-height: 1.6;
+    color: #333;
+
+    white-space: pre-wrap;      /* 줄바꿈 유지 */
+    word-break: break-word;     /* 긴 문장 깨짐 방지 */
+    margin-top: 20px;
+}
+/*
+.row-row-content .pre.content{
+    margin: 0;
+    padding: 12px !important ;
+    border: 1px solid #eeeeee  ;
+    border-radius: 6px;
+    background: #fcfcfc;
+    white-space: pre-wrap;
+    line-height: 1.6;
+    font-size: 13px; }*/
+
+.approval-scope .reject-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.approval-scope .reject-form {
+    display: none; /* JS 토글 전제 */
+    padding: 10px;
+    border: 1px solid #eeeeee;
+    border-radius: 6px;
+    background: #fcfcfc;
+}
+
+.approval-scope .btns.tight {
+    margin-top: 8px;
+}
+
+/* ========== Responsive ========== */
+@media (max-width: 1024px) {
+    .approval-scope .approval-inbox .inbox-layout {
         grid-template-columns: 1fr;
-        gap: 6px;
     }
-    .wrap.approval-detail .row .label,
-    .wrap.approval-detail .row label{
-        padding-top: 0;
+    .approval-scope .inbox-side .side-card {
+        position: static;
     }
+    .approval-scope .approver-layout {
+        grid-template-columns: 1fr;
+    }
+    .approval-scope table.table {
+        min-width: 680px;
+    }
+}
+
+/* 8) 결재 라인/참조자 리스트 깨짐 방지 */
+.approval-scope .line-list{
+    list-style: none;
+    margin: 0;
+    padding: 14px 1px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex-direction: row;
+}
+.approval-scope .line-item{
+    display: grid;
+    gap: 10px;
+    align-items: center;
+    padding: 10px;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    background: #fff;
+}
+.approval-scope .line-item .ord{
+    color: #444;
+    font-size: 13px;
+    white-space: nowrap;
+}
+.approval-scope .line-item .name{
+    min-width: 0;
+    word-break: break-word;
+}
+.approval-scope .line-empty{
+    padding: 12px;
+    border: 1px dashed #ddd;
+    border-radius: 12px;
+    background: #fafafa;
+    color: #777;
+}
+
+/* 9) 파일 리스트 */
+.approval-scope .file-list{
+    list-style: none;
+    margin: 0;
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.approval-scope .file-list a{
+    text-decoration: none;
+}
+.approval-scope .file-list a:hover{
+    text-decoration: underline;
+}
+
+/* 10) 버튼 영역 깨짐 방지 */
+.approval-scope .btns{
+    padding: 10px 5px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+}
+.approval-scope form.inline{
+    display: inline-flex;
+}
+
+/* 11) 반려 폼 UI 정리 */
+.approval-scope .reject-wrap{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    max-width: 520px;
+}
+.approval-scope .reject-form{
+    display: none; /* 기본 숨김(버튼 누르면 JS로 열도록) */
+    flex-direction: column;
+    gap: 10px;
+    padding: 12px;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    background: #fafafa;
+}
+.approval-scope .reject-form textarea{
+    width: 100%;
+    min-height: 100px;
+    resize: vertical;
+    padding: 10px 12px;
+    border-radius: 12px;
+    border: 1px solid #ddd;
+    background: #fff;
+    outline: none;
+}
+.approval-scope .btns.tight{
+    display: flex;
+    gap: 8px;
+}
+
+/* 12) 모바일 대응 */
+@media (max-width: 768px){
+    .approval-scope .wrap.approval-detail{
+        padding: 14px 10px;
+    }
+
+    .approval-scope .row,
+    .approval-scope .row-row-content{
+        grid-template-columns: 92px 1fr;
+    }
+
+    .approval-scope .line-item{
+        grid-template-columns: 54px 1fr;
+        grid-template-rows: auto auto;
+    }
+    .approval-scope .line-item .status{
+        grid-column: 1 / -1;
+        justify-self: start;
+    }
+
+}
+.side-group {
+    margin: 15px 0px;
+}
+
+
+.hint {
+    padding-left: 20px;
+}
+.rows {
+    display: flex;
+    gap: 20px;
+    flex-direction: column;
+}
+
+li.app-file-empty {
+    list-style-type: none;
+}
+/* inbox-content : 내부 스크롤 */
+.approval-scope .inbox-content {
+    min-height: 0;          /* grid 안에서 스크롤 필수 */
+    overflow-y: auto;       /* 스크롤은 됨 */
+    overflow-x: hidden;
+     /* 스크롤바 숨김 */
+        scrollbar-width: none;      /* Firefox */
+        -ms-overflow-style: none;   /* IE */
+}
+/* ===== 스크롤바 숨기기 ===== */
+
+/* Chrome, Edge, Safari */
+.approval-scope .inbox-content::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+}
+
+/* Firefox */
+.approval-scope .inbox-content {
+    scrollbar-width: none;
+}
+
+/* IE (거의 안 쓰지만 안전) */
+.approval-scope .inbox-content {
+    -ms-overflow-style: none;
 }

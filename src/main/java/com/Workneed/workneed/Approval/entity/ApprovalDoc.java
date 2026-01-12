@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @AllArgsConstructor
@@ -15,6 +16,7 @@ public class ApprovalDoc {
     private Long docId; // PK (APPROVAL_DOC.approval_doc_id)
     private Long writerId; // FK (USER.user_id)
     private Long typeId;  // FK (APPROVAL_TYPE.type_id)
+    private String refUserIds; //참조자
 
     private String title;
     private String content;
@@ -22,4 +24,5 @@ public class ApprovalDoc {
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
 }

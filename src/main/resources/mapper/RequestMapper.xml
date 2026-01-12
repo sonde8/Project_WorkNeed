@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.Workneed.workneed.Members.mapper.RequestMapper">
+
+    <select id="findById"
+            parameterType="long"
+            resultType="com.Workneed.workneed.Members.dto.RequestDTO">
+        SELECT *
+        FROM request
+        WHERE request_id = #{requestId}
+    </select>
+
+    <select id="findPendingAttendanceRequests" resultType="com.Workneed.workneed.Members.dto.RequestDTO">
+        SELECT
+        r.request_id         AS requestId,
+        r.user_id            AS userId,
+        u.user_name          AS userName,
+        d.dept_name          AS deptName,
+        rk.rank_name         AS rankName,
+        r.request_payload    AS requestPayload,
+        r.request_created_at AS requestCreatedAt,
+        r.status             AS status  FROM request r  JOIN user u ON r.user_id = u.user_id
+        LEFT JOIN dept d ON u.dept_id = d.dept_id
+        LEFT JOIN ranks rk ON u.rank_id = rk.rank_id
+        WHERE r.status = 'PENDING'  AND r.request_type = 'ATTENDANCE' ORDER BY r.request_id DESC
+    </select>
+
+    <update id="approve">
+        UPDATE request
+        SET status = 'APPROVED',
+        admin_id = #{adminId},
+        request_updated_at = NOW()
+        WHERE request_id = #{requestId}
+    </update>
+
+    <update id="reject">
+        UPDATE request
+        SET status = 'REJECTED',
+        admin_id = #{adminId},
+        request_payload = #{payload},
+        request_updated_at = NOW()
+        WHERE request_id = #{requestId}
+    </update>
+
+    <insert id="insert" parameterType="RequestDTO"
+            useGeneratedKeys="true" keyProperty="requestId">
+        INSERT INTO request (
+        user_id, request_type, request_payload, status
+        ) VALUES (
+        #{userId}, #{requestType}, #{requestPayload}, #{status}
+        )
+    </insert>
+
+
+</mapper>

@@ -1,78 +1,157 @@
 .att-pg{
+    width: 100%;
+    height: calc(100dvh - 80px);
     display : flex;
+    padding: var(--gap-size2);
     gap: 20px;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.pageAttendance{
+    height: calc(100dvh - 80px);
+    overflow: visible;
 }
 
 /* 오른쪽 */
 .right{
-    width: 870px;
-    height: 845px;
-    border: 1px solid black;
+    height: 100%;
+    min-height: 0;
+    flex-direction: column;
+    display: flex;
+    background: var(--color-surface);
+    border: 1px solid #ddd;
+    border-radius: var(--border-radius);
     box-sizing: border-box;
+    overflow: hidden;
+    gap: clamp(10px, 2vh, 22px);
+    padding: var(--gap-size2);
+    flex: 1;
+    width: auto;
+    min-width: 0;
 }
 
 /* 날짜 */
-.day{
-    border: 1px solid black;
-    text-align: center;
-    margin: 70px 0 30px 0;
-    font-size: 23px;
+.dayChart{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 65px;
+    margin: 0;
+    padding: 20px 20px 0 20px;
+    font-size: 22px;
+    flex: 0 0 auto;
+
+    position: relative;
 }
+
+.dayChart button{
+    border: none;
+    background: transparent;
+    font-size: 25px;
+    cursor: pointer;
+}
+
+.dayChart .day{
+    font-weight: 700;
+    margin: 0;
+    text-align: center;
+}
+
+.navBtn{
+    border: none;
+    background: transparent;
+    font-size: 25px;
+    cursor: pointer;
+}
+
+.dayCenter{
+    text-align: center;
+    font-weight: 700;
+}
+
+.day{
+    text-align: center;
+    margin: 0;
+    font-size: inherit;
+}
+
+
+
+.weekLabel{
+    position: absolute;
+    right: 20px;
+    top: 65px;
+    padding: 5px 10px;
+    border-radius: 10px;
+
+    font-size: 13px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
 
 /* 주간 실적 상황 박스 */
 .week-box{
-    border: 1px solid black;
-    border-radius: 18px;
-    padding: 15px;
-    margin:  0 15px;
+    border-radius: var(--border-radius);
+    margin-top: 22px;
+    flex: 1;
+    min-height: 0;
+
+    display: flex;
+    flex-direction: column;
 }
 
 .week-header{
-    border: 1px solid black;
+    flex: 0 0 auto;
     display: flex;
     justify-content: space-between;
     font-size: 24px;
     font-weight: bold;
-    margin-bottom: 15px;
+    margin: 0 10px 10px 10px;
     padding: 10px;
+
 }
 
 .total{
     font-size: 18px;
-    margin-top: 10px;
+}
+
+.package{
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: var(--color-bg);
+    border-radius: var(--border-radius);
+
 }
 
 /* 게이지 */
 .week-bar{
-    border: 1px solid black;
+    width: 100%;
+    box-sizing: border-box;
     border-radius: 20px;
-    padding: 18px;
-    margin: 30px 0 20px 0;
+    padding: 8px;
+    margin-top: 18px;
+
+
+
 }
 
 .bar-chart{
     position: relative;
-    width: 100px;
-    height: 60px;
-    border-radius: 800px;
-    overflow: hidden;
-    border: 1px solid black;
+    width: 100%;
+    height: 35px;
+    border-radius: 999px;
+    overflow: visible;
+    background: #EEEEEE;
 }
 
-.seg{
+.bar-clip{
     position: absolute;
-    top: 0;
-    bottom: 0;
-}
-
-.segNormal{
-    left: 0;
-    width:calc(52 / 70 * 100%);
-}
-
-.segOt{
-    left: calc(52 / 70 * 100%);
-    width: calc((70 - 52) / 70 * 100%);
+    inset: 0;
+    border-radius: 999px;
+    overflow: hidden;
 }
 
 .week-fill{
@@ -81,85 +160,227 @@
     top: 0;
     bottom: 0;
     width: 0;
-    transition: width .2s ease;
+    border-radius: 999px;
+    transition: width .25s ease;
 }
 
-.markStart{
+.week-fill.base{
+    background: #DCCBFF;
+    z-index: 1;
+}
+
+.week-fill.ot{
+    left: calc(52/70 * 100%);
+    background: #F4C56A;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    z-index: 2;
+}
+
+.week-fill.holiday{
+    background: #7FBF9A;
+    z-index: 3;
+}
+
+.mark{
     position: absolute;
-    top: 0;
-    bottom: 0;
-    width: 2px;
+    top: -38px;
+    width: 0;
+    z-index: 6;
 }
 
-.markEnd{
-    right: 0;
+#mark52{
+    left: calc(52/70 * 100%);
 }
+
+#mark70{
+    left: 100%
+}
+
+.mark::after{
+    content: "";
+    position: absolute;
+    top: 30px;
+    left: -2px;
+    width: 0;
+    height: 60px;
+    background: #dddddd;
+    border-radius: 4px;
+    border-left: 2px dashed #dddddd;
+}
+
+.mark-text{
+    position: absolute;
+    left: -43px;
+    top: 20px;
+    font-size: 12px;
+    font-weight: 800;
+    white-space: nowrap;
+    color: #777;
+    transform: translateY(-4px);
+}
+
+#mark70 .mark-text{
+    left: -43px;
+    top: 20px
+}
+
+.week-bottom{
+    display: grid;
+    grid-template-columns: 1fr 105px;
+    gap: 16px;
+    margin-top: 16px;
+    align-items: start;
+}
+
+.bar-clip::before{
+    content:'';
+    position:absolute;
+    inset:0;
+    background:#F3F3F3;
+    border-radius:12px;
+}
+
 
 .week-info{
-    border: 1px solid black;
-    font-size: 18px;
+    margin-top: 10px;
+    font-size: 15px;
+    line-height: 2.5;
+}
+
+.week-legend{
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 14px;
+    align-items: flex-start;
+    font-size: 15px;
+    margin: 25px 0 0 30px
 }
 
-.bar-dot{
-    position: absolute;
-    top: 50%;
-    width: 10px;
-    height: 10px;
-    border-radius: 800px;
-    transform: translate(-50%, -50%);
-    background: #2f6bff;
-    border: 2px solid black;
-    transition: left .2s ease, background .2s ease;
-}
-
-/* 52시간 초과시 경고 */
-.bar-chart.over52 .bar-dot{ background: #ff7a00; }
-.bar-chart.over52 .week-fill{ background: rgba(255,122,0,0.25); }
-
-/* 70시간 도달 */
-.bar-chart.over70 .bar-dot{ background: #e00000; }
-.bar-chart.over70 .week-fill{ background: rgba(224,0,0,0.25); }
-
-.bar-label{
-    position: absolute;
-    bottom: 6px;
-    transform: translateX(-50%);
-    font-size: 12px;
-    padding: 2px 6px;
-    border-radius: 800px;
-}
-
-.bar-label.l70{
-    right: 8px;
-    transform: translateX(0);
-}
-
-.bar-text{
-    margin-top: 10px;
-    text-align: center;
+.lg-item{
+    display:flex;
+    align-items:center;
+    gap: 5px;
     font-size: 14px;
+
 }
+
+.lg-dot{
+    width: 14px;
+    height: 14px;
+    border-radius: 999px;
+    display:inline-block;
+}
+
+.lg-dot.normal{ background: #DCCBFF; }
+.lg-dot.ot{ background: #F4C56A; }
+.lg-dot.holiday{ background: #7FBF9A; }
+
 
 /* 밑에 3개의 현황*/
-.squ-row{
-    border: 1px solid black;
+.squ-row{   /* 전체 */
     display: flex;
     gap: 30px;
-    margin-top: 40px;
-    text-align: center;
-    align-content: center;
-    justify-content: center;
+    margin-top: 12px;
 }
 
 .squ{
-    border: 1px solid black;
-    width: 230px;
-    height: 220px;
-    font-size: 20px;
+    flex: 1;
+    border-radius: 16px;
+    background: var(--color-bg);
+    padding: 15px;
+    margin-top: 10px;
+    box-sizing: border-box;
 }
+/* 근태현황, 잔여연차, 연차근무 글씨 */
+.headCard{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.headTitle{
+    font-size: 18px;
+    font-weight: 750;
+    color: #111;
+}
+
+.baseBadge{
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: inline-block;
+    border: 1px solid #cfcfcf;
+    background: #e5e5e5;
+}
+
+/* 색상 */
+.badge-ok{
+    background: #22c55e;
+}
+
+.badge-warn{
+    background: #facc15;
+}
+
+.badge-danger{
+    background: #ef4444;
+}
+
+/* 항목 */
+.cardBody .metric{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 10px 0;
+}
+
+.metricLabel{
+    font-size: 15px;
+    color: #666;
+}
+
+.metricValue{
+    font-size: 15px;
+    font-weight: 800;
+    color: #111;
+}
+
+.metricBig{
+    font-size: 15px;
+    font-weight: 800;
+    color: #111;
+}
+
+/* 잔여연차 사용률 */
+.sub{
+    font-size: 15px;
+    font-weight: 800;
+    color: #111;
+    opacity: .8;
+}
+
+/* 잔여연차 밑 */
+.progress{
+    margin-top: 25px;
+    height: 13px;
+    border: 1px solid #ddd;
+    border-radius: 999px;
+    overflow: hidden;
+    background: #f6f6f6;
+}
+
+.progress-bar{
+    height: 100%;
+    width: 0;
+    background: aquamarine;
+    border-radius: 999px;
+    transition: width .25s ease;
+}
+
+
+
 
 
 

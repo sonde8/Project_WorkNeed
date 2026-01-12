@@ -23,6 +23,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const typeGroup = document.getElementById("typeGroup");
     const typeInput = document.getElementById("type");
 
+    const startInput = document.getElementById("startAt");
+    const endInput   = document.getElementById("endAt");
+
     /* ======================================================
      * Helpers
      * ====================================================== */
@@ -47,6 +50,7 @@ document.addEventListener("DOMContentLoaded", () => {
         taskModal.hidden = false;
         lockScroll(true);
         syncActiveFromHidden();
+        initTaskPickersOnce();
     }
 
     function closeTaskModal() {
@@ -90,6 +94,70 @@ document.addEventListener("DOMContentLoaded", () => {
             if (btn) setActive(typeGroup, ".scope-btn", btn);
         }
     }
+
+/* ======================================================
+* Flatpickr
+* ====================================================== */
+    let startPicker, endPicker;
+
+    function initTaskPickersOnce() {
+        if (startPicker || endPicker) return;
+        if (typeof flatpickr !== "function") return;
+        if (!startInput || !endInput) return;
+
+        const STEP_MIN = 30;
+
+        startPicker = flatpickr(startInput, {
+            disableMobile: true,
+            enableTime: true,
+            time_24hr: true,
+            minuteIncrement: STEP_MIN,
+            // 서버로 보내는 값
+            dateFormat: "Y-m-d\\TH:i",
+
+            // 화면에 보이는 값
+            altInput: true,
+            altFormat: "Y-m-d H:i",
+
+            allowInput: false,
+
+            onChange(selectedDates) {
+                if (!selectedDates.length) return;
+
+                const start = selectedDates[0];
+
+                endPicker.set("minDate", start);
+
+                const end = endPicker.selectedDates?.[0];
+                if (end && end < start) {endPicker.setDate(start, true);}
+            }
+        });
+
+
+        endPicker = flatpickr(endInput, {
+            disableMobile: true,
+            enableTime: true,
+            time_24hr: true,
+            minuteIncrement: STEP_MIN,
+
+            dateFormat: "Y-m-d\\TH:i",
+
+            altInput: true,
+            altFormat: "Y-m-d H:i",
+
+            allowInput: false,
+
+            onChange(selectedDates) {
+                if (!selectedDates.length) return;
+
+                const end = selectedDates[0];
+                const start = startPicker.selectedDates?.[0];
+
+                if (start && end < start) {endPicker.setDate(start, true); }
+            }
+        });
+    }
+
 
     /* ======================================================
      * Add Task
@@ -300,6 +368,40 @@ document.addEventListener("DOMContentLoaded", () => {
     /* ======================================================
      * Drag & Drop
      * ====================================================== */
+    function ensureDoneSelectCheckbox(cardEl, isDone) {
+        if (!cardEl) return;
+
+        // DONE이면 체크박스 → 없으면 생성
+        let label = cardEl.querySelector("label.done-check");
+        if (isDone) {
+            if (!label) {
+                label = document.createElement("label");
+                label.className = "done-check";
+
+                const chk = document.createElement("input");
+                chk.type = "checkbox";
+                chk.className = "done-select";
+
+                // 체크박스 클릭 상세페이지 이동에 먹히지 않게
+                label.addEventListener("click", (e) => e.stopPropagation());
+                chk.addEventListener("click", (e) => e.stopPropagation());
+
+                label.appendChild(chk);
+
+                // 카드 맨 앞에 DONE 체크박스 영역 삽입
+                cardEl.insertBefore(label, cardEl.firstChild);
+            } else {
+                // 숨김 상태일 때 대비
+                const chk = label.querySelector("input.done-select");
+                if (chk) chk.checked = false;
+            }
+            return;
+        }
+
+        // DONE이 아니면 체크박스 영역 제거
+        if (label) label.remove();
+    }
+
     document.querySelectorAll(".kanban-cards").forEach(list => {
         new Sortable(list, {
             group: "kanban",
@@ -332,9 +434,18 @@ document.addEventListener("DOMContentLoaded", () => {
                     body: params.toString()
                 });
 
+                // 실패 시
                 if (!res.ok) {
                     evt.from.insertBefore(evt.item, evt.from.children[evt.oldIndex] || null);
+                    ensureDoneSelectCheckbox(evt.item, evt.from.dataset.status === "DONE");
+                    updateDoneDeleteUI();
+                    return;
                 }
+
+                // 성공 시
+                ensureDoneSelectCheckbox(evt.item, evt.to.dataset.status === "DONE");
+                updateDoneDeleteUI();
+
             }
         });
     });
