@@ -12,4 +12,6 @@ public class AttendancePayloadDTO {
     LocalTime toTime;
     String reason;
     String rejectReason;
+
+    String type;
 }

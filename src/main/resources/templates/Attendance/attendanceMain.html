@@ -8,6 +8,7 @@
 
     <!-- 페이지 전용 CSS -->
     <th:block layout:fragment="head">
+        <link rel="stylesheet" th:href="@{/css/main.css}">
         <link rel="stylesheet" th:href="@{/css/attendanceLeft.css}">
         <link rel="stylesheet" th:href="@{/css/attendanceMain.css}">
         <link rel="stylesheet" th:href="@{/css/attendanceBook.css}">
@@ -45,6 +46,7 @@
                     <span class = "total"> 총 <b id = "weekTotal"> 0h 0m </b></span>
                 </div>
 
+
                 <div class = "week-bar">
 
                     <div class = "bar-chart" id = "barTrack">
@@ -60,21 +62,22 @@
 
                     </div>
 
-                </div>
+                    <div class = "week-bottom">
+                        <div class = "week-info">
+                            <div> 남은 근무 시간 : <b id = "remainWork"> 52h 0m</b> </div>
+                            <div> 남은 연장 시간 : <b id = "remainOt"> 18h 0m </b> </div>
+                            <div> 휴일 근무 시간 : <b id = "holidayWork"> 0h 0m </b></div>
+                        </div>
 
-                <div class = "week-bottom">
-                    <div class = "week-info">
-                        <div> 남은 근무 시간 : <b id = "remainWork"> 52h 0m</b> </div>
-                        <div> 남은 연장 시간 : <b id = "remainOt"> 18h 0m </b> </div>
-                        <div> 휴일 근무 시간 : <b id = "holidayWork"> 0h 0m </b></div>
+                        <div class="week-legend">
+                            <div class="lg-item"><span class="lg-dot normal"></span><span>정상 근무</span></div>
+                            <div class="lg-item"><span class="lg-dot ot"></span><span>연장 근무</span></div>
+                            <div class="lg-item"><span class="lg-dot holiday"></span><span>휴일 근무</span></div>
+                        </div>
                     </div>
 
-                    <div class="week-legend">
-                        <div class="lg-item"><span class="lg-dot normal"></span><span>정상 근무</span></div>
-                        <div class="lg-item"><span class="lg-dot ot"></span><span>연장 근무</span></div>
-                        <div class="lg-item"><span class="lg-dot holiday"></span><span>휴일 근무</span></div>
-                    </div>
                 </div>
+
 
             </div>
 

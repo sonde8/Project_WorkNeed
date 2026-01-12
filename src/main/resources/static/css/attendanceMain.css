@@ -1,19 +1,24 @@
 .att-pg{
+    width: 100%;
+    height: calc(100dvh - 80px);
     display : flex;
+    padding: var(--gap-size2);
     gap: 20px;
 }
 
 /* 오른쪽 */
 .right{
-    width: 900px;
-    height: 845px;
-    border: 1px solid black;
+    width: 100%;
+
     box-sizing: border-box;
+
+    background: var(--color-surface);
+    border-radius: var(--border-radius);
 }
 
 /* 날짜 */
 .day{
-    border: 1px solid black;
+
     text-align: center;
     margin: 70px 0 30px 0;
     font-size: 23px;
@@ -21,14 +26,13 @@
 
 /* 주간 실적 상황 박스 */
 .week-box{
-    border: 1px solid black;
-    border-radius: 18px;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: var(--border-radius);
     padding: 15px;
     margin:  0 15px;
 }
 
 .week-header{
-    border: 1px solid black;
     display: flex;
     justify-content: space-between;
     font-size: 24px;
@@ -185,7 +189,7 @@
 
 .squ{
     flex: 1;
-    border: 1px dashed #cfcfcf;
+    border: 1px solid rgba(0, 0, 0, 0.12);
     border-radius: 16px;
     background: #fff;
     padding: 16px 18px;

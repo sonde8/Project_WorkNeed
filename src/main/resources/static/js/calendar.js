@@ -11,6 +11,10 @@
     let calendar = null;
     let allEventsCache = [];
     let currentFilter = "ALL";
+    let currentViewType = "dayGridMonth"; // 현재 뷰 상태 추적
+    let currentViewStart = null;          // 현재 뷰 시작일
+    let currentViewEnd = null;            // 현재 뷰 종료일
+
 
     /* ================= Utils ================= */
 
@@ -131,27 +135,6 @@
         return "#3b82f6";
     }
 
-    function getTypeEmoji(dto) {
-        const type = (dto?.type || "").toUpperCase();
-        const source = getSource(dto); // CALENDAR | SCHEDULE
-
-        // 1. 칸반에서 온 모든 일정
-        if (source === "SCHEDULE") {
-            return "👥";
-        }
-
-        // 2. 캘린더에서 등록한 회사 일정
-        if (source === "CALENDAR" && type === "COMPANY") {
-            return "🏢";
-        }
-
-        // 3. 캘린더에서 등록한 개인 일정
-        if (source === "CALENDAR" && type === "PERSONAL") {
-            return "👤";
-        }
-
-        return "📌";
-    }
     function getCategoryInfo(dto) {
         const type = (dto?.type || "").toUpperCase();
         const source = getSource(dto);
@@ -218,68 +201,60 @@
         return res.ok;
     }
 
-    /* ================= Normalize for FullCalendar ================= */
-
     function normalizeEvent(dto) {
         const { start, end } = normalizeDtoDates(dto);
         if (!start) return null;
 
         const source = getSource(dto);
         const type = (dto?.type || "").toString().toUpperCase();
-        const isCompany = type === "COMPANY";
         const isSchedule = source === "SCHEDULE";
-
-        // 공통 ID
         const id = getDtoId(dto);
         if (!id) return null;
 
-        /* ================= COMPANY (캘린더 "회사전체 일정"은 종일 블록 + 편집 불가 유지) ================= */
-        // 단, 업무 스케줄의 COMPANY는 '회사전체 캘린더'와 의미가 다를 수 있으니 "업무 스케줄"은 아래 일반 로직으로 처리
-        if (!isSchedule && isCompany) {
-            const s = new Date(
-                start.getFullYear(),
-                start.getMonth(),
-                start.getDate(),
-                0, 0, 0
-            );
+        // 기간 계산
+        const diffTime = end ? (end.getTime() - start.getTime()) : 0;
+        const diffDays = diffTime / (1000 * 3600 * 24);
 
-            let endExclusive;
+        // 1. 회사(COMPANY) 일정은 무조건 종일
+        // 2. 날짜가 달라지면(1/8~1/10) 종일로 처리
+        let forceAllDay = (type === "COMPANY" && !isSchedule);
+        if (end && start.getDate() !== end.getDate()) {
+            forceAllDay = true;
+        }
+
+        /* ================= 공통 색상 가져오기 (이 부분이 핵심 수정!) ================= */
+        // 기존에는 forceAllDay 내부에서 색상을 따로 계산해서 파란색으로 덮어씌워졌습니다.
+        // 이제는 위에서 만든 getEventColor 함수를 무조건 따르도록 합니다.
+        const color = getEventColor(dto);
+
+        /* ================= 종일 일정 (상단 바) ================= */
+        if (forceAllDay) {
+            const s = new Date(start); s.setHours(0,0,0,0);
+            let e = end ? new Date(end) : new Date(s);
 
             if (end) {
-                const ed = new Date(end);
-                const isMidnight =
-                    ed.getHours() === 0 &&
-                    ed.getMinutes() === 0 &&
-                    ed.getSeconds() === 0;
-
-                endExclusive = isMidnight
-                    ? ed
-                    : new Date(ed.getFullYear(), ed.getMonth(), ed.getDate() + 1, 0, 0, 0);
+                e = new Date(e.getFullYear(), e.getMonth(), e.getDate() + 1, 0, 0, 0);
             } else {
-                endExclusive = new Date(s);
-                endExclusive.setDate(endExclusive.getDate() + 1);
+                e.setDate(e.getDate() + 1);
             }
 
             return {
                 id: String(id),
                 title: dto.title || "(제목 없음)",
                 start: s,
-                end: endExclusive,
+                end: e,
                 allDay: true,
-                backgroundColor: "#8b5cf6",
+                // [수정] 여기서 하드코딩된 색상 대신 getEventColor(dto)를 사용합니다.
+                backgroundColor: color,
+                borderColor: "transparent",
                 textColor: "#ffffff",
-                editable: false,
-                startEditable: false,
-                durationEditable: false,
+                editable: !isSchedule,
                 extendedProps: { raw: dto },
             };
         }
 
-        /* ================= PERSONAL / TEAM / COMPANY(업무) ================= */
-        const color = getEventColor(dto);
+        /* ================= 시간 일정 (Time Grid) ================= */
         const fixedEnd = end ? new Date(end) : addMinutes(start, 30);
-
-        // 업무 스케줄은 읽기 전용 (드래그/리사이즈 불가)
         const editable = !isSchedule;
 
         return {
@@ -287,15 +262,18 @@
             title: dto.title || "(제목 없음)",
             start,
             end: fixedEnd,
+            allDay: false,
+            // 여기는 이미 잘 되어 있었습니다.
             backgroundColor: color,
-            borderColor: color,
+            borderColor: "white",
+            textColor: "#ffffff",
             editable,
-            startEditable: editable,
-            durationEditable: editable,
             extendedProps: { raw: dto },
         };
     }
     /* ================= Daily List Modal Logic ================= */
+
+    /* ================= Daily List Modal Logic (이모지 제거됨) ================= */
 
     function openDailyListModal(targetDate) {
         const overlay = document.getElementById("calendarDailyListModalOverlay");
@@ -339,7 +317,7 @@
 
             dailyEvents.forEach(e => {
                 const li = document.createElement("li");
-                const emoji = getTypeEmoji(e);
+                // [삭제됨] const emoji = getTypeEmoji(e);
                 const category = getCategoryInfo(e);
 
                 const sTime = new Date(e.start);
@@ -350,7 +328,6 @@
                 const timeRange = `${startStr} ~ ${endStr}`;
 
                 li.innerHTML = `
-                <span style="font-size:1.4rem; margin-right: 8px;">${emoji}</span>
                 <span class="category-badge" style="background-color: ${category.bg}; color: ${category.color};">
                     ${category.text}
                 </span>
@@ -361,8 +338,6 @@
                 `;
 
                 li.onclick = () => {
-                    // 리스트 아이템 클릭 시 상세 모달로 바로 넘어가므로 포커스 이슈가 적으나,
-                    // 안전을 위해 닫기 로직을 통일합니다.
                     hideDailyListModal();
                     safeOpenDetailModal(e);
                 };
@@ -370,36 +345,27 @@
             });
         }
 
-        // [핵심 수정 부분] 모달 닫기 함수
         const hideDailyListModal = () => {
-            // 1. [먼저 수행] 포커스를 모달 외부의 '일정 등록' 버튼으로 강제 이동
-            // 이렇게 하면 aria-hidden="true"가 붙기 전에 포커스가 숨겨질 영역을 탈출합니다.
             const externalAddBtn = document.getElementById("openCalendarCreateModal");
             if (externalAddBtn) {
                 externalAddBtn.focus();
             } else if (document.activeElement instanceof HTMLElement) {
-                // 외부 버튼을 찾지 못할 경우 최소한 현재 버튼의 포커스를 해제
                 document.activeElement.blur();
             }
-
-            // 2. 그 다음 모달을 숨김 처리
             overlay.classList.add("hidden");
             overlay.setAttribute("aria-hidden", "true");
         };
 
-        // 닫기 버튼 클릭 시
         closeBtn.onclick = () => {
             hideDailyListModal();
         };
 
-        // 등록 버튼 클릭 시
         addBtn.onclick = () => {
             const startAt = new Date(baseDate);
             startAt.setHours(9, 0, 0);
             const endAt = new Date(startAt);
             endAt.setMinutes(30);
 
-            // 포커스 이슈 해결을 위해 먼저 닫고(포커스 이동시키고) 등록 모달 실행
             hideDailyListModal();
 
             safeOpenCreateModal({
@@ -408,11 +374,9 @@
             });
         };
 
-        // 모달 표시 시 aria-hidden 해제
         overlay.classList.remove("hidden");
         overlay.setAttribute("aria-hidden", "false");
 
-        // ESC 키 감지
         const handleEsc = (e) => {
             if (e.key === "Escape" && !overlay.classList.contains("hidden")) {
                 hideDailyListModal();
@@ -421,7 +385,6 @@
         };
         document.addEventListener("keydown", handleEsc);
 
-        // 배경(오버레이) 클릭 시 닫기
         overlay.onclick = (e) => {
             if (e.target === overlay) {
                 hideDailyListModal();
@@ -429,8 +392,167 @@
             }
         };
     }
+    /* ================= Split View Logic (New) ================= */
 
-    /* ================= Calendar Init ================= */
+    // 1. 화면 모드 전환 (Month <-> Week/Day) [수정: Month 전환 시 즉시 변경]
+    function toggleSplitView(viewType) {
+        currentViewType = viewType;
+        const container = document.querySelector('.calendar-right-container');
+        const calendarSection = document.getElementById('calendarViewSection'); // ID 확인 필요 (HTML에 id="calendarViewSection" 있는지) 혹은 클래스로 선택
+        const workSection = document.getElementById('workListSection');
+        const rangeLabel = document.getElementById('workListRangeLabel');
+
+        // 만약 ID가 없다면 클래스로 선택 (안전장치)
+        const targetCalSection = calendarSection || document.querySelector('.calendar-view-section');
+
+        if (viewType === 'dayGridMonth') {
+            /* [CASE 1: Month 뷰] -> 애니메이션 없이 즉시(Instant) 전환
+            */
+
+            // 1. 애니메이션 끄기 (no-transition 추가)
+            if (targetCalSection) targetCalSection.classList.add('no-transition');
+            if (workSection) workSection.classList.add('no-transition');
+
+            // 2. 클래스 즉시 변경 (레이아웃 원복)
+            if (container) container.classList.remove('split-mode');
+            if (workSection) workSection.classList.add('hidden');
+
+            // 3. 캘린더 크기 즉시 재계산 (딜레이 없음)
+            if (calendar) calendar.updateSize();
+
+            // 4. 다음번 애니메이션을 위해 0.05초 뒤에 no-transition 제거
+            setTimeout(() => {
+                if (targetCalSection) targetCalSection.classList.remove('no-transition');
+                if (workSection) workSection.classList.remove('no-transition');
+            }, 50);
+
+        } else {
+            /* [CASE 2: Week/Day 뷰] -> 부드럽게(0.4s) 전환
+            */
+
+            // 애니메이션 켜져 있는지 확인 (혹시 모르니 no-transition 제거)
+            if (targetCalSection) targetCalSection.classList.remove('no-transition');
+            if (workSection) workSection.classList.remove('no-transition');
+
+            if (container) container.classList.add('split-mode');
+            if (workSection) workSection.classList.remove('hidden');
+
+            // 날짜 텍스트 업데이트
+            if (currentViewStart && currentViewEnd && rangeLabel) {
+                const s = currentViewStart;
+                const e = new Date(currentViewEnd);
+                e.setDate(e.getDate() - 1);
+
+                const sStr = `${s.getMonth()+1}.${s.getDate()}`;
+                const eStr = `${e.getMonth()+1}.${e.getDate()}`;
+
+                if (viewType === 'timeGridDay') {
+                    rangeLabel.textContent = `(${sStr})`;
+                } else {
+                    rangeLabel.textContent = `(${sStr} ~ ${eStr})`;
+                }
+            }
+
+            // 애니메이션(0.4s)이 끝난 직후 크기 재계산
+            setTimeout(() => {
+                if (calendar) calendar.updateSize();
+            }, 420);
+        }
+    }
+
+    // 2. 하단 업무 리스트 렌더링 (디자인 회색 통일)
+    function renderWorkScheduleList() {
+        const ul = document.getElementById('workScheduleList');
+        const emptyMsg = document.getElementById('workListEmptyMsg');
+
+        if (currentViewType === 'dayGridMonth' || !ul) return;
+
+        ul.innerHTML = "";
+
+        // 1) 필터링
+        const workEvents = allEventsCache.filter(e => {
+            if (currentFilter === 'PERSONAL') return false;
+            const isWork = isScheduleSource(e) || (e.type === 'COMPANY');
+            if (!isWork) return false;
+
+            const s = new Date(e.start);
+            const ed = e.end ? new Date(e.end) : addMinutes(s, 30);
+            return s < currentViewEnd && ed > currentViewStart;
+        });
+
+        // 2) 정렬
+        workEvents.sort((a, b) => new Date(a.start) - new Date(b.start));
+
+        // 3) 렌더링
+        if (workEvents.length === 0) {
+            if (emptyMsg) emptyMsg.classList.remove('hidden');
+        } else {
+            if (emptyMsg) emptyMsg.classList.add('hidden');
+
+            const days = ['일','월','화','수','목','금','토'];
+
+            workEvents.forEach(e => {
+                const li = document.createElement('li');
+                li.className = 'work-item';
+
+                const startObj = new Date(e.start);
+                const endObj = e.end ? new Date(e.end) : addMinutes(startObj, 30);
+
+                const sMonth = startObj.getMonth() + 1;
+                const sDate = startObj.getDate();
+                const sDay = days[startObj.getDay()];
+                const sTime = `${pad(startObj.getHours())}:${pad(startObj.getMinutes())}`;
+
+                const eMonth = endObj.getMonth() + 1;
+                const eDate = endObj.getDate();
+                const eDay = days[endObj.getDay()];
+                const eTime = `${pad(endObj.getHours())}:${pad(endObj.getMinutes())}`;
+
+                let dateHtml = "";
+
+                // 디자인 통일: 위아래 모두 w-date 스타일 적용
+                // A. 당일 일정 (1.5(월) / 12:00 ~ 14:00)
+                if (sMonth === eMonth && sDate === eDate) {
+                    dateHtml = `
+                        <span class="w-date">${sMonth}.${sDate}(${sDay})</span>
+                        <span class="w-date">${sTime} ~ ${eTime}</span>
+                    `;
+                }
+                // B. 다일 일정 (1.5(월) 12:00 ~ / 1.7(수) 14:00)
+                else {
+                    dateHtml = `
+                        <span class="w-date">${sMonth}.${sDate}(${sDay}) ${sTime} ~</span>
+                        <span class="w-date">${eMonth}.${eDate}(${eDay}) ${eTime}</span>
+                    `;
+                }
+
+                // 뱃지 설정
+                let badgeClass = 'personal';
+                let badgeText = '개인';
+                const cat = getCategoryInfo(e);
+
+                if (cat.text.includes('전사') || cat.text.includes('공지')) {
+                    badgeClass = 'company'; badgeText = '전사';
+                } else if (cat.text.includes('팀')) {
+                    badgeClass = 'team'; badgeText = '팀';
+                }
+
+                li.innerHTML = `
+                    <div class="work-time-box"> 
+                        ${dateHtml}
+                    </div>
+                    <div class="work-info-box">
+                        <span class="w-badge ${badgeClass}">${badgeText}</span>
+                        <span class="w-title">${e.title || '(제목 없음)'}</span>
+                    </div>
+                `;
+
+                li.onclick = () => safeOpenDetailModal(e);
+                ul.appendChild(li);
+            });
+        }
+    }
+    /* ================= Calendar Init (Modified) ================= */
 
     function initCalendar() {
         const el = document.getElementById("calendar");
@@ -444,18 +566,17 @@
             initialView: "dayGridMonth",
             googleCalendarApiKey: window.GOOGLE_CALENDAR_API_KEY,
 
-            /* ================= 레이아웃 설정 ================= */
             height: '100%',
-            expandRows: true,      // 행 높이 균등
-            dayMaxEvents: true,    // 자동 +more 처리
-            fixedWeekCount: false, // 빈 줄 제거
-
-            /* [중요] 모든 이벤트를 블록(Bar) 형태로 통일 */
+            expandRows: true,
+            dayMaxEvents: true,
+            fixedWeekCount: false,
             eventDisplay: 'block',
 
-            /* ============================================== */
+            slotEventOverlap: false, // false: 일정이 겹치면 너비를 나눠서 나란히 표시 (가독성 UP)
+            slotMinWidth: 100,       // 일정이 너무 찌그러지지 않게 최소 너비 보장 (선택사항)
+            eventBorderColor: '#fff',
 
-            // 공휴일
+            // [공휴일 설정 유지]
             eventSources: [
                 {
                     googleCalendarId: 'ko.south_korea#holiday@group.v.calendar.google.com',
@@ -466,13 +587,10 @@
                     display: 'block'
                 }
             ],
-
-            // 공휴일 스타일
             eventDataTransform: function(eventDef) {
                 if (eventDef.url || (eventDef.source && eventDef.source.googleCalendarId)) {
                     const notRedDays = ["어버이날", "스승의날", "제헌절", "국군의 날", "식목일", "발렌타인", "화이트", "할로윈", "빼빼로", "동지", "초복", "중복", "말복", "입춘", "소한", "대한", "칠석", "단오", "근로자의 날"];
                     const title = eventDef.title || "";
-
                     eventDef.className = "holiday-event";
                     if (notRedDays.some(keyword => title.includes(keyword))) {
                         eventDef.textColor = '#10b981';
@@ -481,24 +599,39 @@
                 return eventDef;
             },
 
-            // more 링크 클릭 -> 리스트 모달
+            // [뷰 변경 감지 - 핵심 수정 부분]
+            datesSet: function(info) {
+                // 1. 현재 뷰 정보 저장
+                currentViewType = info.view.type;
+                currentViewStart = info.start;
+                currentViewEnd = info.end;
+
+                // 2. 레이아웃 전환 (Month vs Split)
+                toggleSplitView(currentViewType);
+
+                // 3. 데이터 재렌더링
+                // (loadCalendarEvents 내부에서 currentViewType을 보고 캘린더/리스트에 분배함)
+                if (allEventsCache.length > 0) {
+                    renderCalendarEventsOnly(); // 캘린더 이벤트 갱신
+                    renderWorkScheduleList();   // 하단 리스트 갱신
+                }
+            },
+
+            // [기존 이벤트 핸들러 유지]
             moreLinkClick: function(info) {
                 openDailyListModal(info.date);
                 return "void";
             },
             dayCellDidMount: function(info) {
-                if (info.date.getDay() === 0) { // 0은 일요일
+                if (info.date.getDay() === 0) {
                     const numberEl = info.el.querySelector('.fc-daygrid-day-number');
-                    if (numberEl) {
-                        numberEl.style.color = '#e03131';
-                    }
+                    if (numberEl) numberEl.style.color = '#e03131';
                 }
             },
-
             selectable: true,
             selectMirror: true,
             editable: true,
-            allDaySlot: false,
+            allDaySlot: true,
 
             headerToolbar: {
                 left: "prev,next today",
@@ -506,39 +639,23 @@
                 right: "dayGridMonth,timeGridWeek,timeGridDay",
             },
 
-            /* [핵심 수정] 날짜 선택 로직 분기 */
             select(info) {
-                // Month 뷰일 때만 적용
                 if (calendar.view.type === "dayGridMonth") {
-
                     const diffTime = info.end.getTime() - info.start.getTime();
                     const diffDays = diffTime / (1000 * 60 * 60 * 24);
-
-                    // 1일 초과 선택(드래그) -> 바로 등록 모달 (다일 일정 등록)
                     if (diffDays > 1) {
-                        // 종료일이 exclusive하므로 -1일 처리 안 하고 그대로 둬야
-                        // 모달에서 00:00 기준으로 처리하거나, 사용자가 원하는 대로
-                        // 여기서 -1일 해서 inclusive로 넘겨도 됨.
-                        // FullCalendar 드래그는 종료일이 다음날 00시임.
-                        // 보통 등록 모달에서는 종료일 전날까지로 보정해주는게 UX상 좋음.
-
                         const endDateInclusive = new Date(info.end);
                         endDateInclusive.setDate(endDateInclusive.getDate() - 1);
-
                         safeOpenCreateModal({
                             start: toDtoDateTime(info.start),
-                            end: toDtoDateTime(info.end), // 또는 info.end 그대로
+                            end: toDtoDateTime(info.end),
                         });
-                    }
-                    // 딱 하루 클릭 -> 리스트 모달
-                    else {
+                    } else {
                         openDailyListModal(info.start);
                     }
-
                     calendar.unselect();
                     return;
                 }
-
                 // 주간/일간 뷰
                 const start = info.start;
                 let end = info.end ? new Date(info.end) : null;
@@ -547,22 +664,21 @@
                 calendar.unselect();
             },
 
-            // 일정 클릭
             eventClick(info) {
                 if (info.event.url) {
                     info.jsEvent.preventDefault();
                     return;
                 }
-
                 const raw = info.event.extendedProps?.raw;
                 if (raw) {
+                    // Month뷰에서는 리스트 모달, Week/Day에서는 바로 상세 모달이 UX상 자연스러움
+                    // 하지만 통일성을 위해 일단 Daily List로 유지하거나 바로 Detail로 가도 됨.
+                    // 기존 로직 유지:
                     const targetDate = info.event.start;
-
                     openDailyListModal(targetDate);
                 }
             },
 
-            // 드래그/리사이즈
             eventDrop(info) {
                 const raw = info.event.extendedProps?.raw;
                 if (checkReadOnly(raw)) { info.revert(); return; }
@@ -634,10 +750,13 @@
 
     /* ================= Load ================= */
 
+    /* ================= Load & Render (Modified) ================= */
+
+    // 1. 서버에서 데이터 가져오기 (Entry Point)
     async function loadCalendarEvents() {
         if (!calendar) return;
 
-        // 캘린더 + 업무 스케줄을 한 번에 로드해서 합침
+        // 캘린더 + 업무 스케줄 로드
         const [calendarData, scheduleData] = await Promise.all([
             apiGetEvents(),
             apiGetScheduleEvents(),
@@ -646,51 +765,80 @@
         const calArr = Array.isArray(calendarData) ? calendarData : [];
         const schArr = Array.isArray(scheduleData) ? scheduleData : [];
 
-        // source 보정 (서버가 내려주면 그대로, 없으면 보정)
-        const normalizedCalendarDtos = calArr.map((e) => ({ ...e, source: getSource(e) })); // CALENDAR
-        const normalizedScheduleDtos = schArr.map((e) => ({ ...e, source: "SCHEDULE" }));  // SCHEDULE
+        // source 보정
+        const normalizedCalendarDtos = calArr.map((e) => ({ ...e, source: getSource(e) }));
+        const normalizedScheduleDtos = schArr.map((e) => ({ ...e, source: "SCHEDULE" }));
 
+        // 캐시 업데이트
         allEventsCache = [...normalizedCalendarDtos, ...normalizedScheduleDtos];
 
+        // 뷰 렌더링 실행
+        renderCalendarEventsOnly(); // FullCalendar 안에 이벤트 넣기
+        renderWorkScheduleList();   // (Week/Day일 경우) 하단 리스트 넣기
+        renderTodayList();          // 좌측 오늘 일정
+        renderWeekPreview();        // 좌측 프리뷰
+    }
+
+    // 2. FullCalendar 내부 이벤트 렌더링 전용
+    function renderCalendarEventsOnly() {
+        if (!calendar) return;
+
+        // 기존 이벤트 제거 (구글 공휴일 등 외부 소스 제외)
         const currentEvents = calendar.getEvents();
         currentEvents.forEach(ev => {
-            // extendedProps.raw가 있는 것은 우리가 DB에서 넣어준 이벤트임
             if (ev.extendedProps && ev.extendedProps.raw) {
                 ev.remove();
             }
         });
 
-        allEventsCache
-            .filter((e) => matchFilter(e))
+        // 캘린더에 표시할 이벤트 필터링
+        const eventsToShow = allEventsCache.filter(e => {
+            // [공통 필터] 삭제된 일정 등 기본 체크가 필요하다면 여기서 수행
+
+            // [View 타입에 따른 분기]
+            if (currentViewType === 'dayGridMonth') {
+                // Month 뷰: 기존 필터(All/Work/Personal)를 따름
+                return matchFilter(e);
+            } else {
+                // Week/Day 뷰:
+                // 캘린더 영역에는 '개인' 일정만 표시 (업무는 하단 리스트로 빠짐)
+
+                // 만약 사용자가 필터에서 'WORK'(업무만 보기)를 찍었다면? -> 캘린더는 비어야 함
+                if (currentFilter === 'WORK') return false;
+
+                // 그 외(ALL, PERSONAL)의 경우:
+                // 업무 일정(SCHEDULE 소스이거나 type=COMPANY)은 캘린더에서 숨김
+                const isWork = isScheduleSource(e) || (e.type === 'COMPANY');
+                if (isWork) return false;
+
+                // 순수 개인 일정만 통과
+                return true;
+            }
+        });
+
+        // FullCalendar 형식으로 변환 후 추가
+        eventsToShow
             .map(normalizeEvent)
             .filter(Boolean)
             .forEach((ev) => calendar.addEvent(ev));
-
-        renderTodayList();
-        renderWeekPreview()
     }
 
     /* ================= Today List (수정됨) ================= */
+
+    /* ================= Today List (이모지 제거됨) ================= */
 
     function renderTodayList() {
         const ul = document.getElementById("todayList");
         const emptyMsg = document.getElementById("todayEmptyMsg");
 
-        // 1. [날짜 표시 로직] Week Preview와 스타일 100% 동일하게
         const headerTitle = document.getElementById("today-title");
         if (headerTitle) {
             const now = new Date();
             const year = now.getFullYear();
-            const month = String(now.getMonth() + 1).padStart(2, "0"); // 01, 02...
-            const day = String(now.getDate()).padStart(2, "0");       // 01, 02...
-
-            // 날짜 포맷: 2026.01.02
+            const month = String(now.getMonth() + 1).padStart(2, "0");
+            const day = String(now.getDate()).padStart(2, "0");
             const dateStr = `${year}.${month}.${day}`;
-
-            // 중복 추가 방지 (이미 날짜가 있으면 텍스트만 업데이트, 없으면 태그 추가)
             const existingSuffix = headerTitle.querySelector(".today-date-suffix");
-
-            // Week Preview와 동일한 스타일: font-size:0.8em; color:#888; font-weight:normal;
             const suffixHtml = ` <span class="today-date-suffix" style="font-size:0.8em; color:#888; font-weight:normal;">(${dateStr})</span>`;
 
             if (existingSuffix) {
@@ -704,14 +852,12 @@
 
         ul.innerHTML = "";
 
-        // 오늘 날짜 범위 설정
         const todayStart = new Date();
         todayStart.setHours(0, 0, 0, 0);
 
         const todayEnd = new Date();
         todayEnd.setHours(23, 59, 59, 999);
 
-        // 오늘 날짜에 해당하는 일정 필터링
         const todayEvents = allEventsCache
             .filter((e) => {
                 const s = e.start ? new Date(e.start) : null;
@@ -723,7 +869,6 @@
             })
             .sort((a, b) => new Date(a.start) - new Date(b.start));
 
-        // 리스트 렌더링
         if (todayEvents.length === 0) {
             if (emptyMsg) emptyMsg.classList.remove("hidden");
         } else {
@@ -732,12 +877,10 @@
             todayEvents.forEach((e) => {
                 const li = document.createElement("li");
 
-                const emoji = getTypeEmoji(e);
+                // [삭제됨] const emoji = getTypeEmoji(e);
                 const category = getCategoryInfo(e);
 
                 li.innerHTML = `
-                <span style="margin-right:4px;">${emoji}</span> 
-                
                 <span class="category-badge" style="background-color: ${category.bg}; color: ${category.color};">
                     ${category.text}
                 </span>

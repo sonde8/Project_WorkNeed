@@ -559,6 +559,13 @@ li.other-msg { justify-content: flex-start; display: flex; width: 100%; }
     object-fit: cover;
 }
 
+.close-btn {
+    border: none;
+    background: none;
+    font-size: 20px;
+    cursor: pointer;
+}
+
 /* 오른쪽 선택된 유저 프로필 원형 */
 .selected-profile-circle {
     width: 26px;

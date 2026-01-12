@@ -39,7 +39,6 @@ body {
     height: 100%;
     background-color: var(--color-surface);
     border-radius: var(--border-radius);
-    border: 1px solid #ddd;
     box-shadow: var(--shadow-sm);
     padding: var(--gap-size2);
     box-sizing: border-box;
@@ -113,6 +112,11 @@ body {
 .attendWidget {
     display: flex;
     flex-direction: column;
+    background-color: #ffffff;
+    border-radius: 16px;
+    border: 1px solid #f0f0f0;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    box-sizing: border-box;
 }
 
 /* =====================
@@ -324,9 +328,14 @@ body {
 /* =========================================
    4. Utility / Cleanups
    ========================================= */
-.pageMain .state-wrap,
-.pageMain .title,
-.pageMain .clock,
-.pageMain .click,
-.pageMain .rowMonth { display: none; }
+.pageMain .attendWidget{
+    flex: 0 0 auto;
+    min-height: auto;
+    display: block;
+}
+
+.pageMain .attendWidget .att-left{
+    flex: 0 0 auto;
+    min-height: auto;
+}
 
