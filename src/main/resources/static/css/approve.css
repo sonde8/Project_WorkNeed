@@ -121,6 +121,25 @@
     border-color: #e43c3c;
 }
 
+.app-btn-delete {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 27px;
+    padding: 0 12px;
+    border: 1px solid #cccccc;
+    background: #ffffff;
+    color: #333333;
+    font-size: 12px;
+    font-weight: 700;
+    border-radius: 6px;
+    cursor: pointer;
+    text-decoration: none;
+    background: #ff4d4d;
+    border-color: #ff4d4d;
+    color: #ffffff;
+}
+
 /* ========== Form ========== */
 .approval-scope .form {
     display: flex;
@@ -642,7 +661,7 @@
 }
 
 /* 9) 파일 리스트 */
-.approval-scope .file-list{
+.app-file-list{
     list-style: none;
     margin: 0;
     padding: 14px 16px;
@@ -650,10 +669,11 @@
     flex-direction: column;
     gap: 8px;
 }
-.approval-scope .file-list a{
+.app-file-list a{
     text-decoration: none;
+    color: black;
 }
-.approval-scope .file-list a:hover{
+.app-file-list a:hover{
     text-decoration: underline;
 }
 
