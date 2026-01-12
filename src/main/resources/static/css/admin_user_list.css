@@ -1,177 +1,163 @@
-.btn-tab { padding: 10px 20px; text-decoration: none; color: #666; border-bottom: 3px solid transparent; }
-.btn-tab.active { color: #3182ce; border-bottom: 3px solid #3182ce; font-weight: bold; }
-
-/* 작업 구분 배지 스타일 */
-.action-badge { background: #f7fafc; border: 1px solid #cbd5e0; padding: 2px 6px; border-radius: 4px; font-size: 0.85em; }
-
-/* 권한 배지 스타일 */
-.role-tag { font-size: 0.75em; color: #718096; background: #edf2f7; padding: 2px 5px; border-radius: 4px; margin-left: 5px; }
-
-.status-active { color: #3182ce; font-weight: bold; }
-.status-suspended { color: #e53e3e; font-weight: bold; }
-.btn-tab { padding: 10px 20px; text-decoration: none; color: #666; border-bottom: 3px solid transparent; }
-.btn-tab.active { color: #3182ce; border-bottom: 3px solid #3182ce; font-weight: bold; }
-
-/* 권한 배지 스타일 */
-.role-badge { background: #e2e8f0; color: #4a5568; padding: 3px 8px; border-radius: 6px; font-size: 0.85em; font-weight: 600; }
-
-#editModal, .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:9999; }
-.modal-content { background:#fff; margin:10% auto; padding:25px; width:400px; border-radius:12px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
-.admin-controls { background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #ddd; }
-.flex-container { display: flex; gap: 15px; flex-wrap: wrap; align-items: center; }
-table { width: 100%; border-collapse: collapse; margin-top: 10px; background: white; }
-th, td { border: 1px solid #eee; padding: 12px; text-align: left; }
-th { background-color: #f8f9fa; font-weight: bold; }
-.btn-delete-small { background: #e53e3e; color: white; border: none; padding: 2px 6px; border-radius: 4px; cursor: pointer; margin-left: 5px; font-size: 11px; }
-
-/* ===== 관리자 공통 콘텐츠 영역 ===== */
-.admin-content {
-    padding: 20px;
-}
-
-/* 제목 통일 */
-.admin-content h2 {
-    font-size: 20px;
-    font-weight: 100%;
-    margin-bottom: 16px;
-    color: #2d3748;
-}
-
-/* 설명 문구 통일 */
-.admin-content p {
-    font-size: 0.9em;
-    color: #718096;
-    margin-bottom: 15px;
-}
-
-/* 테이블 위 여백 */
-.admin-content table {
-    margin-top: 10px;
-}
-
-
-/*관리자 헤더 폼*/
+/* ================================================= */
+/* 1. 상단 레이아웃 (로그아웃 버튼 우측 끝 + 너비 확장) */
+/* ================================================= */
 .admin-header {
-    display: flex;
-    justify-content: space-between;
+    display: flex !important;
+    justify-content: space-between !important;
     align-items: center;
-    padding: 15px;
+    padding: 15px 40px; /* 좌우 여백 확대 */
     background: #fff;
     border-bottom: 1px solid #ddd;
-    margin-bottom: 20px;
 }
 
-.admin-header form {
-    margin: 0;
-}
+.admin-header form { margin: 0; }
 
+/* [핵심 수정] 화면을 좌우로 꽉 채우도록 변경 */
 .admin-content {
-    margin: 0 auto;
+    padding: 20px 40px 50px 40px; /* 본문 여백 확보 */
+    margin: 0;
+    width: 100%;       /* 100% 확장 */
+    max-width: none;    /* 최대 너비 제한 해제 */
+    box-sizing: border-box;
 }
 
-.admin-header .btn-secondary {
-    background: transparent;
-    border: 1px solid #e5e7eb;
-    border-radius: 4px;
-    font-size: 12px;
-    padding: 6px 12px;
-    cursor: pointer;
-    color: #6b7280;
-    transition: all 0.2s ease;
-}
+.admin-content h2 { font-size: 22px; margin-bottom: 20px; color: #1a202c; }
 
-.admin-header .btn-secondary:hover {
-    background: #f3f4f6;
-    color: #1f2937;
-}
-
-.admin-header .btn-primary {
-    background: transparent;
-    border: 1px solid #e5e7eb;
-    border-radius: 4px;
-    font-size: 12px;
-    padding: 6px 12px;
-    cursor: pointer;
-    color: #6b7280;
-    transition: all 0.2s ease;
-}
-
-.admin-header .btn-primary:hover {
-    background: #f3f4f6;
-    color: #1f2937;
-}
-
-/* 직원 관리 테이블 안의 secondary 버튼 */
-.admin-content table .btn-secondary {
-    background: #ffffff;
-    border: 1px solid #e5e7eb;
-    color: #374151;
-    font-size: 12px;
-    padding: 6px 10px;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: all 0.15s ease;
-}
-
-.admin-content table .btn-secondary:hover {
-    background: #f3f4f6;
-        color: #1f2937;
-}
-
-/* 관리자 페이지 주요 액션 버튼 (일괄 적용, 저장 등) */
-.admin-content .btn-primary {
-    background: #ffffff;
-    border: 1px solid #e5e7eb;
-    color: #000000;
-    padding: 7px 15px;
-    font-size: 13px;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.15s ease, box-shadow 0.15s ease;
-}
-
-/* 비밀번호 아이콘 위치 조정 */
-#togglePw {
-    position: absolute;
-    right: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    cursor: pointer;
-    color: #718096;
-    font-size: 16px;
-    z-index: 10; /* 입력창보다 위에 오도록 */
-}
-
-
-
-/* 부서 컬럼 부분 */
-.dept-cell {
-    color: #2c5282;
-    font-weight: 500;
-}
-
-/* 요청 내용 셀 너비 제한 (데이터가 길어질 경우 대비) */
-.payload-cell {
-    max-width: 250px;
-    word-break: break-all;
-    font-size: 0.9em;
-}
-
-/* 버튼 그룹 간격 */
-.btn-group {
+/* ================================================= */
+/* 2. 탭 메뉴 (화면 너비에 맞춰 정렬) */
+/* ================================================= */
+.admin-tabs, .nav-tabs {
     display: flex;
-    gap: 5px;
+    gap: 15px;
+    padding: 0 40px;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 25px;
 }
 
-.btn-group button {
-    padding: 5px 10px;
-    font-size: 12px;
-    cursor: pointer;
+.btn-tab {
+    padding: 12px 25px;
+    text-decoration: none;
+    color: #666;
+    border-bottom: 4px solid transparent;
+    font-size: 15px;
+    transition: 0.2s;
+}
+
+.btn-tab.active {
+    color: #3182ce !important;
+    border-bottom: 4px solid #3182ce !important;
+    font-weight: bold;
+}
+
+/* ================================================= */
+/* 3. 테이블 */
+/* ================================================= */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    table-layout: auto !important;
+}
+
+th, td {
+    border: 1px solid #edf2f7;
+    padding: 15px 12px;
+    text-align: left;
+    color: #111827;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+th { background-color: #f7fafc; font-weight: bold; color: #4a5568; }
+
+/* [중요] 권한 설명 글자색 보정 (인라인 무시) */
+td span[style*="color: #718096"], .role-description-cell {
+    color: #111827 !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+}
+
+/* ================================================= */
+/* 4. 버튼 및 입력창 (35px 높이 및 삭제 빨간색) */
+/* ================================================= */
+input, select, .admin-controls input, .admin-controls select {
+    border: 1px solid #e2e8f0 !important;
     border-radius: 4px;
+    height: 35px; /* 모든 입력창 35px 통일 */
+    padding: 0 12px;
+    font-size: 13px;
+    box-sizing: border-box;
+    color: #111827;
+}
+
+.btn-primary, .btn-secondary, .btn-reset-red, .admin-content button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    height: 35px; /* 모든 버튼 35px 통일 */
+    padding: 0 18px;
+    cursor: pointer;
     border: none;
 }
 
-/* 관리자 공통 스크롤바 */
-::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-thumb { background-color: rgba(0,0,0,0.1); border-radius: 10px; }
+.btn-secondary { background: #fff !important; border: 1px solid #e2e8f0 !important; color: #111827 !important; }
+.btn-primary { background: #3182ce !important; color: white !important; }
+.btn-reset-red { background: #e53e3e !important; color: white !important; }
 
+/* 하단 검정 버튼 */
+button[onclick*='AddModal'], .btn-manage-black { background: #2d3748 !important; color: white !important; }
+
+/* [핵심] 삭제 버튼 빨간색 */
+.btn-delete-small, button[onclick*='Delete'] {
+    background: #e53e3e !important;
+    color: white !important;
+    height: 28px !important; /* 리스트 내 삭제 버튼은 조금 더 작게 */
+    padding: 0 10px !important;
+    font-size: 12px !important;
+}
+
+/* ================================================= */
+/* 5. 모달창 (정중앙 고정 & 레이아웃) */
+/* ================================================= */
+#editModal, .modal { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.5); z-index: 9999; }
+.modal-content {
+    background: #fff; padding: 30px; width: 450px; border-radius: 12px;
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.modal-content .input-group, .modal-content div[style*="display: flex"] {
+    display: flex !important; gap: 8px; margin-bottom: 20px;
+}
+
+.modal-content input[type="text"] { height: 40px !important; flex: 1; }
+.modal-content .btn-primary { height: 40px !important; }
+
+/* ================================================= */
+/* 6. 부가 스타일 */
+/* ================================================= */
+.role-badge { background: #e2e8f0; color: #4a5568; padding: 4px 10px; border-radius: 6px; font-weight: 600; }
+.status-active { color: #3182ce; font-weight: bold; }
+.status-suspended { color: #e53e3e; font-weight: bold; }
+.admin-controls { background: #f8fafc; padding: 25px; border-radius: 10px; border: 1px solid #e2e8f0; margin-bottom: 30px; }
+.flex-container { display: flex; gap: 15px; align-items: center; }
+
+
+/* 모든 관리자 페이지 버튼의 기본 테두리 제거 */
+.admin-content button, .modal-content button {
+    border: none !important;
+    outline: none !important;
+}
+
+/* 다만, 흰색 버튼(secondary)은 테두리가 있어야 구분이 되므로 제외 */
+.btn-secondary {
+    border: 1px solid #e2e8f0 !important;
+}
+
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-thumb { background-color: rgba(0,0,0,0.1); border-radius: 10px; }
