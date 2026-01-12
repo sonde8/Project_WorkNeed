@@ -10,6 +10,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface DocMapper {
@@ -49,9 +50,10 @@ public interface DocMapper {
                   @Param("docId") Long docId);
 
     // 첫 결재자 WAITING 열기
-    int openFirstWaiting(@Param("toStatus") LineStatus toStatus,
-                         @Param("fromStatus") LineStatus fromStatus,
-                         @Param("docId") Long docId);
+    int openFirstWaiting(@Param("docId") Long docId,
+                         @Param("pendingStatus") LineStatus pendingStatus,
+                         @Param("toStatus") LineStatus toStatus);
+
 
 
     /* ===============================
@@ -189,6 +191,15 @@ public interface DocMapper {
     int deleteMyDraft(@Param("docId") Long docId,
                       @Param("userId") Long userId);
 
+        /* =========================================================
+        유저 검색 기능 (디벨롭) + 회수
+       ========================================================== */
+    Map<String, Object> selectDocWriterAndStatusForRecall(@Param("docId") long docId);
 
+    int countProcessedLines(@Param("docId") long docId);
+
+    int updateDocStatusToDraft(@Param("docId") long docId);
+
+    int resetLinesToPending(@Param("docId") long docId);
 
 }

@@ -51,10 +51,7 @@
                             <div class="side-group">
                                 <div class="side-group-head">
                                     <span class="group-title">결재자 문서함</span>
-                                    <span class="count-badge"
-                                          th:text="${counts.approverTodoCount + counts.approverDoneCount}">
-                                        0
-                                    </span>
+
                                 </div>
 
                                 <!-- 처리 대기(내 차례 WAITING) -->
@@ -80,13 +77,7 @@
                             <div class="side-group">
                                 <div class="side-group-head">
                                     <span class="group-title">기안자 문서함</span>
-                                    <span class="count-badge"
-                                          th:text="${counts.drafterDraftCount
-                                                    + counts.drafterInProgressCount
-                                                    + counts.drafterApprovedCount
-                                                    + counts.drafterRejectedCount}">
-                                        0
-                                    </span>
+
                                 </div>
 
                                 <!-- 임시저장(DRAFT) -->
@@ -182,12 +173,7 @@
                                             제목
                                         </a>
 
-                                        <!-- 결재자 문서함에서만 보여줄만한 보조 정보(있을 때만) -->
-                                        <div class="mini" th:if="${row.myOrderNum != null}">
-                                            <span th:text="|내 차수: ${row.myOrderNum}차|"></span>
-                                            <span th:if="${row.myLineStatus != null}"
-                                                  th:text="' / 라인상태: ' + ${row.myLineStatus}"></span>
-                                        </div>
+
                                     </td>
 
                                     <!-- 작성자 -->
@@ -234,7 +220,10 @@
                                     </td>
 
                                     <!-- 작성일 -->
-                                    <td class="td-date" th:text="${row.createdAt}">-</td>
+                                    <td class="td-date"
+                                        th:text="${row.createdAt != null ? #temporals.format(row.createdAt, 'yyyy년 MM월 dd일 HH:mm') : '-'}">
+                                        -
+                                    </td>
 
                                     <!-- 임시저장함 관리 -->
                                     <td class="td-action" th:if="${active == 'myDrafts'}">

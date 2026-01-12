@@ -18,6 +18,7 @@ import java.io.File;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -103,6 +104,10 @@ public class ApprovalService {
     @Transactional
     public void submit(Long docId, List<Long> approverIds, List<Integer> orderNums, List<Long> referenceIds) {
 
+       if (approverIds == null || approverIds.isEmpty()) {
+            throw new IllegalArgumentException("결재자를 1명 이상 선택해야 상신할 수 있습니다.");
+        }
+
         // 1) 라인 insert (전부 PENDING)
         for (int i = 0; i < approverIds.size(); i++) {
             mapper.insertApprovalLine(
@@ -127,7 +132,7 @@ public class ApprovalService {
         mapper.submitDoc(DocStatus.IN_PROGRESS, docId);
 
         // 4) 첫 차수 WAITING 오픈
-        mapper.openFirstWaiting(LineStatus.WAITING, LineStatus.PENDING, docId);
+        mapper.openFirstWaiting(docId, LineStatus.PENDING, LineStatus.WAITING);
     }
 
 
@@ -336,5 +341,36 @@ public class ApprovalService {
         if (affected == 0) {
             throw new IllegalStateException("삭제할 임시저장 문서가 없거나 권한이 없습니다.");
         }
+    }
+    /*회수*/
+    public boolean canRecall(long docId, long userId) {
+
+        Map<String, Object> doc =
+                mapper.selectDocWriterAndStatusForRecall(docId);
+
+        if (doc == null) return false;
+
+        long writerId = ((Number) doc.get("writerId")).longValue();
+        String docStatus = String.valueOf(doc.get("docStatus"));
+
+        // 작성자 본인만
+        if (writerId != userId) return false;
+
+        // 진행중만 회수 가능
+        if (!"IN_PROGRESS".equals(docStatus)) return false;
+
+        // 승인/반려된 라인이 있으면 회수 불가
+        int processed = mapper.countProcessedLines(docId);
+        return processed == 0;
+    }
+
+    @Transactional
+    public void recall(long docId, long userId) {
+        if (!canRecall(docId, userId)) {
+            throw new IllegalStateException("회수 조건을 만족하지 않습니다.");
+        }
+
+        mapper.updateDocStatusToDraft(docId);
+        mapper.resetLinesToPending(docId);
     }
 }

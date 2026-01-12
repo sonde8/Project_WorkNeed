@@ -53,10 +53,7 @@ public class ApprovalLeaveService {
         // 제목: 휴가 종류로 가도 되고, "휴가 신청" + 종류로 가도 됩니다.
         doc.setTitle(dto.getLeaveType().getLabel());             // 휴가 타입
         doc.setContent(dto.getReason());
-        //시작일
-        doc.setLeaveStartDate(dto.getStartDate());
-        //마감일
-        doc.setLeaveEndDate(dto.getEndDate());
+
         //
         doc.setStatus(DocStatus.APPROVED); // 또는 WAITING
 

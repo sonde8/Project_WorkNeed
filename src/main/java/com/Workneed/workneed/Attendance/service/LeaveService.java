@@ -113,7 +113,6 @@ public class LeaveService {
 
         u.setStartDate(req.getStartDate());
         u.setEndDate(req.getEndDate());
-        u.setDays(days);
         u.setReason(req.getReason());
 
         leaveMapper.insertLeaveUsage(u);
@@ -124,7 +123,6 @@ public class LeaveService {
         dto.setStartDate(req.getStartDate());
         dto.setEndDate(req.getEndDate());
         dto.setReason(req.getReason());
-        dto.setDays(days);
 
         approvalLeaveService.submitLeave(dto, userId);
     }

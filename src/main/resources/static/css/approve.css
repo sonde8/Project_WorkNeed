@@ -6,6 +6,9 @@
 
 .approval-scope {
     color: #333333;
+    height: 70vh;
+
+
 }
 
 /* ========== Layout ========== */
@@ -13,7 +16,7 @@
     width: 100%;
     /* max-width: 1340px; */
     margin: 0 auto;
-    padding: 20px 16px 40px;
+    padding: 20px 20px 40px;
 }
 
 .approval-scope .page-head {
@@ -47,7 +50,7 @@
     background: #ffffff;
     border: 1px solid #dddddd;
     border-radius: 8px;
-    padding: 16px;
+    padding: 25px;
 }
 
 .approval-scope .card + .card {
@@ -56,7 +59,6 @@
 
 .approval-scope .card-head {
     display: flex;
-    justify-content: space-between;
     align-items: flex-start;
     gap: 10px;
     padding-bottom: 10px;
@@ -81,12 +83,12 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    height: 34px;
+    height: 27px;
     padding: 0 12px;
     border: 1px solid #cccccc;
     background: #ffffff;
     color: #333333;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 700;
     border-radius: 6px;
     cursor: pointer;
@@ -119,130 +121,79 @@
     border-color: #e43c3c;
 }
 
-/* create/detail에서 button이 .btn 없이 들어오는 케이스 대비 */
-.approval-scope .btns button {
-    height: 34px;
-    padding: 0 12px;
-    border: 1px solid #cccccc;
-    background: #ffffff;
-    color: #333333;
-    font-size: 13px;
-    font-weight: 700;
-    border-radius: 6px;
-    cursor: pointer;
-}
-.approval-scope .btns button:hover { background: #f0f0f0; }
-.approval-scope .btns .primary { background:#333; border-color:#333; color:#fff; }
-.approval-scope .btns .primary:hover { background:#111; border-color:#111; }
-.approval-scope .btns .danger { background:#ff4d4d; border-color:#ff4d4d; color:#fff; }
-.approval-scope .btns .danger:hover { background:#e43c3c; border-color:#e43c3c; }
-
-/* ========== Form / Rows ========== */
-.approval-scope .rows {
+/* ========== Form ========== */
+.approval-scope .form {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
 }
 
 .approval-scope .row {
     display: grid;
     grid-template-columns: 120px 1fr;
-    gap: 10px;
+    gap: 12px;
+    align-items: center;
+}
+
+.approval-scope .row-content {
     align-items: start;
 }
 
 .approval-scope .label {
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 800;
-    color: #666666;
-    padding-top: 8px;
+    color: #333333;
 }
 
-.approval-scope .control,
-.approval-scope input[type="text"],
-.approval-scope input[type="number"],
-.approval-scope input[type="date"],
-.approval-scope select,
-.approval-scope textarea,
-.approval-scope input[type="file"] {
+.approval-scope .control {
     width: 100%;
-    border: 1px solid #cccccc;
-    background: #ffffff;
+    border: 1px solid #dddddd;
     border-radius: 6px;
-    padding: 9px 10px;
+    padding: 10px 12px;
     font-size: 13px;
     outline: none;
+    background: #ffffff;
 }
 
-.approval-scope textarea {
-    resize: vertical;
-}
-
-.approval-scope .control:focus,
-.approval-scope input:focus,
-.approval-scope select:focus,
-.approval-scope textarea:focus {
+.approval-scope .control:focus {
     border-color: #999999;
 }
 
-.approval-scope .hint {
-    margin-top: 8px;
-    font-size: 12px;
-    color: #888888;
-}
-
-/* 버튼 영역 */
-.approval-scope .btns {
-    margin-top: 14px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    align-items: center;
+.approval-scope .textarea {
+    resize: vertical;
+    min-height: 180px;
 }
 
 /* ========== Inbox Layout ========== */
 .approval-scope .approval-inbox .inbox-layout {
     display: grid;
-    grid-template-columns: 280px 1fr;
+    grid-template-columns: 420px 1fr;
     gap: 14px;
-    align-items: start;
+    height: calc(100vh - 120px); /* 상단 header + padding 고려 */
+        min-height: 0;               /* ⭐ flex/grid 스크롤 필수 */
 }
 
 .approval-scope .inbox-side .side-card {
+    border: 1px solid #dddddd;
+    border-radius: 8px;
+    background: #ffffff;
+    padding: 25px;
     position: sticky;
-    top: 16px;
+    top: 12px;
 }
 
-.approval-scope .side-menu {
+.approval-scope .side-title {
+    font-size: 13px;
+    font-weight: 800;
+    margin: 0 0 10px;
+    color: #333333;
+}
+
+.approval-scope .side-links {
+
     display: flex;
     flex-direction: column;
     gap: 6px;
-}
-
-.approval-scope .side-group {
-    padding-top: 10px;
-    margin-top: 10px;
-    border-top: 1px solid #eeeeee;
-}
-
-.approval-scope .side-group:first-child {
-    padding-top: 0;
-    margin-top: 0;
-    border-top: none;
-}
-
-.approval-scope .side-group-head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 8px;
-    padding: 10px 3px;
-}
-
-.approval-scope .group-title {
-    font-size: 12px;
-    font-weight: 800;
-    color: #888888;
 }
 
 .approval-scope .side-link {
@@ -353,6 +304,7 @@
     border-color: #333333;
     color: #ffffff;
     width: 150px;
+    justify-content: center;
 }
 
 /* ========== Create: Approver UI ========== */
@@ -462,7 +414,127 @@
     color: #888888;
 }
 
- /*========== Detail: Content / Reject ==========*/
+/* ========== Create: Line Builder (검토/합의/최종결재/참조 4칸) ========== */
+.approval-scope .line-builder-actions{
+    padding: 10px 12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    border-bottom: 1px solid #eeeeee;
+}
+.approval-scope .line-builder-actions button{
+    height: 34px;
+    padding: 0 12px;
+    border: 1px solid #cccccc;
+    background: #ffffff;
+    color: #333333;
+    font-size: 13px;
+    font-weight: 700;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease, transform 0.05s ease;
+}
+.approval-scope .line-builder-actions button:hover{
+    background: rgba(0,0,0,0.03);
+    border-color: #bbbbbb;
+}
+.approval-scope .line-builder-actions button:active{
+    transform: translateY(1px);
+}
+
+/* 4칸 레이아웃: 기본은 2x2, 넓으면 4열 */
+.approval-scope .line-builder-grid{
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    padding: 12px;
+}
+@media (min-width: 1200px){
+    .approval-scope .line-builder-grid{
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+}
+
+.approval-scope .lane{
+    border: 1px solid #e6e6e6;
+    border-radius: 14px;
+    background: rgba(0,0,0,0.03);
+    overflow: hidden;
+    min-height: 160px;
+}
+.approval-scope .lane-head{
+    padding: 12px 12px;
+    font-size: 13px;
+    font-weight: 800;
+    color: #333333;
+    background: #ffffff;
+    border-bottom: 1px solid #eeeeee;
+}
+.approval-scope .lane-body{
+    padding: 10px 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-height: 120px;
+    max-height: 240px;
+    overflow-y: auto;
+}
+.approval-scope .lane-body::-webkit-scrollbar{
+    width: 4px;
+}
+.approval-scope .lane-body::-webkit-scrollbar-thumb{
+    background: rgba(0,0,0,0.10);
+    border-radius: 10px;
+}
+
+/* JS에서 넣는 아이템(추천 클래스: .lane-item) */
+.approval-scope .lane-body .lane-item{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 10px 10px;
+    border-radius: 12px;
+    background: #ffffff;
+    border: 1px solid rgba(0,0,0,0.06);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.06);
+}
+.approval-scope .lane-body .lane-item .name{
+    font-size: 13px;
+    font-weight: 800;
+    color: #222222;
+    min-width: 0;
+    word-break: break-word;
+}
+.approval-scope .lane-body .lane-item .sub{
+    font-size: 12px;
+    color: #888888;
+    margin-left: 6px;
+    white-space: nowrap;
+}
+.approval-scope .lane-body .lane-item .del{
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    font-weight: 900;
+    font-size: 14px;
+    line-height: 1;
+    padding: 6px 8px;
+    border-radius: 10px;
+    color: #666666;
+}
+.approval-scope .lane-body .lane-item .del:hover{
+    background: rgba(0,0,0,0.05);
+    color: #333333;
+}
+
+.approval-scope .lane-body .empty{
+    padding: 10px 6px;
+    color: #888888;
+    font-size: 12px;
+}
+
+/*========== Detail: Content / Reject ==========*/
 .approval-scope .approval-detail pre.content{
     margin: 0;
     padding: 12px;
@@ -486,6 +558,7 @@
 
     white-space: pre-wrap;      /* 줄바꿈 유지 */
     word-break: break-word;     /* 긴 문장 깨짐 방지 */
+    margin-top: 20px;
 }
 /*
 .row-row-content .pre.content{
@@ -496,8 +569,7 @@
     background: #fcfcfc;
     white-space: pre-wrap;
     line-height: 1.6;
-    font-size: 13px;
-}*/
+    font-size: 13px; }*/
 
 .approval-scope .reject-wrap {
     display: flex;
@@ -533,238 +605,21 @@
     }
 }
 
-.side-btn{
-  display:block;
-  padding:12px 14px;
-  margin:8px 0;
-  border:2px solid #ddd;
-  border-radius:10px;
-  font-size: 13px;
-  font-weight: 700;
-  text-decoration:none;
-  color: #333333;
-}
-.side-btn:hover{
-  background:#f5f5f5;
-}
-/* ==========================================================
-   LEAVE (휴가 신청) - 페이지 전용
-   - 기존 .approval-scope 절대 수정/영향 없음
-   - approval.leave.html 구조 기준(.wrap/.page-title/.card/.form-row/.form-actions)
-   ========================================================== */
-
-.approval-leave-scope {
-    color: #333333;
-}
-
-/* Layout: approval-scope와 동일한 톤 */
-.approval-leave-scope .wrap {
-    width: 40%;
-    max-width: 1340px;
-    padding: 20px 40px 40px;
-}
-
-.approval-leave-scope .page-title {
-    font-size: 22px;
-    font-weight: 800;
-    margin: 0 0 14px;
-}
-
-/* Card: 동일 톤 */
-.approval-leave-scope .card {
-    background: #ffffff;
-    border: 1px solid #dddddd;
-    border-radius: 8px;
-    padding: 16px;
-}
-
-/* Form row */
-.approval-leave-scope .form-row {
-    margin-bottom: 12px;
-}
-
-.approval-leave-scope .form-row label {
-    display: block;
-    font-size: 12px;
-    font-weight: 800;
-    color: #666666;
-    margin-bottom: 6px;
-}
-
-/* Controls */
-.approval-leave-scope input[type="date"],
-.approval-leave-scope select,
-.approval-leave-scope textarea {
-    width: 100%;
-    border: 1px solid #cccccc;
-    background: #ffffff;
-    border-radius: 6px;
-    padding: 9px 10px;
-    font-size: 13px;
-    outline: none;
-    box-sizing: border-box;
-}
-
-.approval-leave-scope textarea {
-    resize: vertical;
-}
-
-.approval-leave-scope input:focus,
-.approval-leave-scope select:focus,
-.approval-leave-scope textarea:focus {
-    border-color: #999999;
-}
-
-/* Actions */
-.approval-leave-scope .form-actions {
-    margin-top: 14px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    align-items: center;
-}
-
-/* Buttons: leave 페이지는 btn / btn-primary 사용 */
-.approval-leave-scope .btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    height: 34px;
-    padding: 0 12px;
-    border: 1px solid #cccccc;
-    background: #ffffff;
-    color: #333333;
-    font-size: 13px;
-    font-weight: 700;
-    border-radius: 6px;
-    cursor: pointer;
-    text-decoration: none;
-}
-
-.approval-leave-scope .btn:hover {
-    background: #f0f0f0;
-}
-
-.approval-leave-scope .btn-primary {
-    background: #333333;
-    border-color: #333333;
-    color: #ffffff;
-}
-
-.approval-leave-scope .btn-primary:hover {
-    background: #111111;
-    border-color: #111111;
-}
-/* =========================================
-   approval.detail UI 안정화 패치
-   (클래스명 변경 없이 덮어쓰기만)
-   ========================================= */
-
-/* 1) 기본 박스 사이즈 통일 */
-.approval-scope, .approval-scope *{
-    box-sizing: border-box;
-}
-
-/* 2) 페이지 폭/여백 */
-.approval-scope .wrap.approval-detail{
-    width: 100%;
-    margin: 0 auto;
-    padding: 18px 14px;
-}
-
-/* 3) 카드 간격/테두리/그림자 살짝 */
-.approval-scope .card{
-    margin-top: 14px;
-    border-radius: 14px;
-    border: 1px solid #e6e6e6;
-    background: #fff;
-    overflow: hidden;
-}
-
-/* 4) 카드 헤더 정리 */
-.approval-scope .card .card-head{
-    padding: 14px 16px;
-    border-bottom: 1px solid #efefef;
-}
-.approval-scope .card .card-head h3{
-    margin: 0;
-    font-size: 16px;
-}
-.approval-scope .card .card-head .meta{
-    margin: 6px 0 0;
-    font-size: 12px;
-    color: #777;
-}
-
-/* 5) rows 레이아웃(문서 정보) 깨짐 방지 */
-.approval-scope .rows{
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    padding: 14px 16px;
-}
-.approval-scope .row{
-    display: grid;
-    grid-template-columns: 120px 1fr;
-    gap: 10px;
-    align-items: center;
-}
-.approval-scope .row .label{
-    color: #666;
-    font-size: 13px;
-}
-.approval-scope .row .value{
-    font-size: 14px;
-    min-width: 0;
-    word-break: break-word;
-}
-
-/* 6) 내용(pre) 영역이 튀어나오는 문제 방지 */
-.approval-scope .row-row-content{
-    display: grid;
-    grid-template-columns: 120px 1fr;
-    gap: 10px;
-    align-items: start;
-}
-.approval-scope pre.content{
-    margin: 0;
-    padding: 12px;
-    border: 1px solid #eee;
-    border-radius: 12px;
-    background: #fafafa;
-    white-space: pre-wrap;
-    word-break: break-word;
-    overflow: auto;
-    max-height: 280px;
-}
-
-/* 7) badge 줄바꿈/정렬 */
-.approval-scope .badge{
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 6px 10px;
-    border-radius: 999px;
-    font-size: 12px;
-    line-height: 1;
-    white-space: nowrap;
-}
-
 /* 8) 결재 라인/참조자 리스트 깨짐 방지 */
 .approval-scope .line-list{
     list-style: none;
     margin: 0;
-    padding: 14px 16px;
+    padding: 14px 1px;
     display: flex;
     flex-direction: column;
     gap: 10px;
+    flex-direction: row;
 }
 .approval-scope .line-item{
     display: grid;
-    grid-template-columns: 64px 1fr auto;
     gap: 10px;
     align-items: center;
-    padding: 10px 12px;
+    padding: 10px;
     border: 1px solid #eee;
     border-radius: 12px;
     background: #fff;
@@ -804,7 +659,7 @@
 
 /* 10) 버튼 영역 깨짐 방지 */
 .approval-scope .btns{
-    padding: 14px 16px;
+    padding: 10px 5px;
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
@@ -866,66 +721,47 @@
         justify-self: start;
     }
 
-    .approval-scope .btns{
-        flex-direction: column;
-        align-items: stretch;
-    }
-    .approval-scope .btns .btn,
-    .approval-scope .btns button{
-        width: 100%;
-    }
+}
+.side-group {
+    margin: 15px 0px;
 }
 
-/* 전자결재 첨부파일 전용 스타일 */
-.app-file-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
 
-.app-file-item {
+.hint {
+    padding-left: 20px;
+}
+.rows {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px;
-    border-bottom: 1px solid #eee;
+    gap: 20px;
+    flex-direction: column;
 }
 
-.app-file-item:last-child {
-    border-bottom: none;
+li.app-file-empty {
+    list-style-type: none;
+}
+/* inbox-content : 내부 스크롤 */
+.approval-scope .inbox-content {
+    min-height: 0;          /* grid 안에서 스크롤 필수 */
+    overflow-y: auto;       /* 스크롤은 됨 */
+    overflow-x: hidden;
+     /* 스크롤바 숨김 */
+        scrollbar-width: none;      /* Firefox */
+        -ms-overflow-style: none;   /* IE */
+}
+/* ===== 스크롤바 숨기기 ===== */
+
+/* Chrome, Edge, Safari */
+.approval-scope .inbox-content::-webkit-scrollbar {
+    width: 0;
+    height: 0;
 }
 
-.app-file-link {
-    text-decoration: none;
-    color: #333;
-    font-size: 0.95rem;
+/* Firefox */
+.approval-scope .inbox-content {
+    scrollbar-width: none;
 }
 
-.app-file-link:hover {
-    text-decoration: underline;
-    color: #007bff;
-}
-
-/* 요청하신 빨간색 삭제 버튼 스타일 */
-.app-btn-delete {
-    background-color: #ef5350;
-    color: white;
-    border: none;
-    padding: 6px 14px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: bold;
-    font-size: 0.85rem;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    transition: background-color 0.2s;
-}
-
-.app-btn-delete:hover {
-    background-color: #d32f2f;
-}
-
-.app-file-empty {
-    padding: 20px;
-    text-align: center;
-    color: #999;
+/* IE (거의 안 쓰지만 안전) */
+.approval-scope .inbox-content {
+    -ms-overflow-style: none;
 }

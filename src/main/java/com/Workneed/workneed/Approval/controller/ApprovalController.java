@@ -163,6 +163,8 @@ public class ApprovalController {
         boolean isReference = service.isReferenceUser(doc.getRefUserIds(), loginUserId);
         model.addAttribute("isReference", isReference);
 
+        boolean canRecall = (loginUserId != null) && service.canRecall(docId, loginUserId);
+        model.addAttribute("canRecall", canRecall);
 
         return "Approval/approval.detail";
     }
@@ -428,6 +430,17 @@ public class ApprovalController {
         service.deleteMyDraft(docId, userId);
 
         return "redirect:/approval/my/drafts";
+    }
+    @PostMapping("/recall")
+    public String recall(@RequestParam("docId") long docId,
+                         HttpSession session) {
+
+        Long userId = getLoginUserId(session);
+        if (userId == null) return redirectLogin();
+
+        service.recall(docId, userId);
+
+        return "redirect:/approval/detail/" + docId;
     }
 
 }
