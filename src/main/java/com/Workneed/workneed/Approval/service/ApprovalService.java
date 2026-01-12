@@ -336,8 +336,19 @@ public class ApprovalService {
         return mapper.selectReferenceList(userId);
     }
 
+    /* [임시저장 문서 삭제 로직] */
+    @Transactional // ✅ 여러 테이블을 건드리므로 트랜잭션 필수
     public void deleteMyDraft(Long docId, Long userId) {
+        // 1. 문서에 연결된 결재선(자식) 먼저 삭제
+        mapper.deleteLinesByDocId(docId);
+
+        // 2. 문서에 연결된 파일 정보(자식) 삭제
+        // (S3 실제 파일까지 지우려면 별도 로직이 필요하지만, DB 제약 조건 해결이 우선이면 이 매퍼 호출)
+        mapper.deleteFilesByDocId(docId);
+
+        // 3. 마지막으로 부모 데이터인 문서 삭제
         int affected = mapper.deleteMyDraft(docId, userId);
+
         if (affected == 0) {
             throw new IllegalStateException("삭제할 임시저장 문서가 없거나 권한이 없습니다.");
         }
