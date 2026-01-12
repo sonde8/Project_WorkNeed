@@ -235,4 +235,33 @@
           AND work_date &lt;  #{endDate}
           AND check_out_time IS NOT NULL
     </select>
+
+    <!-- 업데이트 -->
+    <insert id="upsertCorrected">
+        INSERT INTO attendance (
+            emp_id, work_date,
+            check_in_time, check_out_time,
+            work_minutes, overtime_minutes,
+            is_late, is_early_leave,
+            status_code,
+            created_at, updated_at
+        ) VALUES (
+                     #{empId}, #{workDate},
+                     #{checkInTime}, #{checkOutTime},
+                     #{workMinutes}, #{overtimeMinutes},
+                     #{isLate}, #{isEarlyLeave},
+                     #{statusCode},
+                     NOW(), NOW()
+                 )
+            ON DUPLICATE KEY UPDATE
+                                 check_in_time = VALUES(check_in_time),
+                                 check_out_time = VALUES(check_out_time),
+                                 work_minutes = VALUES(work_minutes),
+                                 overtime_minutes = VALUES(overtime_minutes),
+                                 is_late = VALUES(is_late),
+                                 is_early_leave = VALUES(is_early_leave),
+                                 status_code = VALUES(status_code),
+                                 updated_at = NOW()
+    </insert>
+
 </mapper>

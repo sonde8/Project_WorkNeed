@@ -33,19 +33,15 @@
     <div class="att-lv">
 
         <!-- 왼쪽 -->
-        <section class="leftPage">
-
-            <section th:replace="~{Attendance/attendanceLeft :: attendanceLeft}"></section>
-
-        </section>
+        <section th:replace="~{Attendance/attendanceLeft :: attendanceLeft}"></section>
 
         <!-- 오른쪽 -->
         <section class = "right_2">
 
             <div class = "yearChart">
-                <button type="button" class = "yearBtn" id="prevYear">&lt;</button>
+                <button type="button" class = "yearBtn" id="prevYear"> &lt; </button>
                 <div class = "yearTxt"><span id = "leaveYear"></span></div>
-                <button type="button" class = "yearBtn" id="nextYear">&gt;</button>
+                <button type="button" class = "yearBtn" id="nextYear"> &gt; </button>
             </div>
 
             <div class = "leaveSummary">
