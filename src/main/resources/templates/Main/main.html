@@ -98,7 +98,7 @@
 
             <!-- Left attendWidget -->
             <div class = "attendWidget">
-                <section th:replace="~{Attendance/attendanceLeft :: attendanceLeft}"></section>
+                <section th:replace="~{Attendance/attendanceLeft :: attendanceRows}"></section>
             </div>
 
             <!-- Left mini-calendar -->
@@ -119,8 +119,8 @@
             </div>
 
             <!--main-borad-->
-            <div class="main-board">
-                <div class="mini-board">
+            <div class="mini-board">
+                <div class="main-board">
                     <div class="mb-header">
                         <h3 class="mb-head">게시판</h3>
                         <button class="mb-write-btn" id="boardWriteBtn">+ 작성</button>
@@ -162,7 +162,7 @@
 
                             <textarea id="writeContent" placeholder="Content"></textarea>
                         </div>
-                        <div class="modal-actions">
+                        <div class="modal-board-actions">
                             <button id="writeSubmitBtn">등록</button>
                         </div>
                     </div>

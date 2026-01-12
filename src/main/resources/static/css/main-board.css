@@ -1,13 +1,13 @@
-.mini-board {
+.main-board{
     display: flex;
     flex-direction: column;
     height:100%;
     width: 100%;
     padding: 2rem;
     border-radius: var(--border-radius);
+    background: var(--color-bg);
     cursor: pointer;
     overflow: hidden;
-    border: 1px solid #ddd;
     min-height: 0;
 }
 .mb-header {
@@ -22,15 +22,11 @@
 .mb-write-btn{
     padding: 1rem;
     border: none;
-    border-radius: var(--border-radius);
-    font-size: var(--font-size-12);
+    color: var( --color-primary);
+    font-size: var(--font-size-14);
     font-weight: 600;
     background: transparent;
     cursor: pointer;
-}
-.mb-write-btn:hover{
-    background-color:#F0F4F8 ;
-    opacity: 0.4;
 }
 .mb-list {
     flex: 1;
@@ -40,7 +36,7 @@
     overflow-y: auto;
     min-height: 0;
     list-style: none;
-    margin-top: 3rem;
+    margin: 2rem;
 }
 .mb-list::-webkit-scrollbar {
     width: 4px;
@@ -77,14 +73,13 @@
 .board-modal-panel {
     width: 50rem;
     min-height: 30rem;
-    transform: translateY(-6rem);
     border-radius: var(--border-radius);
     padding: 2rem;
     background: #fff;
     box-shadow: 0 1.8rem 5rem rgba(0, 0, 0, .25);
     position: relative;
 }
-.board-modal-header h4{
+.board-modal-header{
     padding: 1.8rem 1.5rem;
     font-size: var(--font-size-18);
     font-weight: 700;
@@ -92,8 +87,9 @@
 .modal-meta{
     display: flex;
     justify-content: space-between;
-    padding: 1.5rem 1.8rem;
+    padding: 0 1.8rem;
     font-weight: 700;
+    font-size: var(--font-size-12);
 }
 .modal-close {
     position: absolute;
@@ -111,8 +107,8 @@
     padding: 2rem;
     margin: 1rem;
     display: grid;
-    background: rgba(0, 0, 0, .05);
-    border-radius: 0.5rem;
+    background: var(--color-primary-light);
+    border-radius: 1rem;
     gap: 1.7rem;
 }
 #writeCategory{
@@ -141,35 +137,38 @@
     outline: none;
     font-size: 1.4rem;
 }
-.modal-actions{
+.modal-board-actions{
     display: flex;
-    justify-content: flex-end;
+    justify-content: flex-end; !important;
+    padding: 0 2rem 1.5rem;
 }
 #writeSubmitBtn{
-    padding: 0.5rem 0.8rem;
-    margin: 0.5rem 1rem 0;
-    border: .1rem solid rgba(0, 0, 0, .16);
-    background: rgba(0, 0, 0, .03);
+    padding: 0.4rem 1rem;
+    min-width: 6rem;
+
+    border: .1rem solid rgba(0, 0, 0, .2);
+    background: #F0F4F8;
+    border-radius: 0.5rem;
+
+    font-size: 1.2rem;
+    font-weight: 600;
+
     cursor: pointer;
-    font-size: 1.3rem;
-    font-weight: 500;
 }
 
 .board-modal-content{
     padding: 1.8rem;
     font-size: 1.3rem;
-    border: 1px solid #0B2E4F;
-    border-radius: var(--border-radius);
-    margin-top: 1rem;
+    border: .1rem solid rgba(0, 0, 0, .3);
     min-height: 200px;
+    margin: 1.8rem;
 }
 #detailDeleteBtn{
-    position: absolute;
-    bottom: 1rem;
-    right: 1rem;
-    opacity: 0.5;
+    display: flex !important;
+    margin: 0rem 1.8rem 0 auto;
+    opacity: 0.6;
     padding: 0.2rem;
-    font-size: 0.9rem;
+    font-size: 1rem;
     font-weight: 500;
 }
 #detailDeleteBtn :hover{

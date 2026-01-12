@@ -15,6 +15,88 @@
     <a th:href="@{/schedule/kanban}" class="back">← Back to Kanban</a>
 
     <div class="frame">
+        <div class="block" id="etc">
+            <div class="etc-block" id="etc-image">
+                <button type="button" class="btn-send-message-modal" th:attr="data-schedule-id=${schedule.scheduleId}">
+                    <div class="etc-images">
+                        <img src="/images/person300.svg">
+                        <img src="/images/team2_300.svg">
+                    </div>
+                    <span class="goto-image">채팅하러 가기 ➜</span>
+
+                </button>
+            </div>
+
+            <div class="etc-block"id="etc-chart">
+                <button type="button" class="btn-member-performance-modal" th:attr="data-schedule-id=${schedule.scheduleId}">
+                    <div class="progress-widget">
+                        <canvas id="scheduleProgressChart"></canvas>
+                        <div class="progress-header">
+                            진행률
+                            <span class="progress-percent" id="scheduleProgressText">0%</span>
+                        </div>
+                        <span class="goto-progress">개인 진행률 보러가기 ➜</span>
+                    </div>
+                </button>
+            </div>
+
+            <div class="etc-block" id="etc-file">
+                <div class="file-view etc-view">
+                    <div class="etc-label">File 보관함</div>
+
+                    <div id="taskFileList" class="task-file-list" th:if="${not #lists.isEmpty(fileList)}">
+                        <th:block th:each="f : ${fileList}">
+                            <div class="file-item">
+                                <a th:href="@{/api/task/files/download/{id}(id=${f.fileId})}" class="file-link">
+                                    📎<span th:text="${f.originalName}"></span>
+                                </a>
+                            </div>
+                        </th:block>
+                    </div>
+
+                    <span class="no-url" th:if="${#lists.isEmpty(fileList)}">등록된 파일이 없습니다.</span>
+
+                    <input type="file" id="taskFileInput" style="display:none;" onchange="handleTaskFileUpload(this)">
+                    <button type="button" class="btn-etc-edit" onclick="document.getElementById('taskFileInput').click()">Upload</button>
+                </div>
+            </div>
+
+            <div class="etc-block"id="etc-git">
+
+                <div class="git-view etc-view">
+                    <div class="etc-label">Git 저장소</div>
+
+                    <a class="etc-url" th:if="${schedule.gitUrl != null}"
+                       th:href="${#strings.startsWith(schedule.gitUrl,'http://') or #strings.startsWith(schedule.gitUrl,'https://')
+                                ? schedule.gitUrl : 'https://' + schedule.gitUrl}"
+                       target="_blank"
+                       th:text="${schedule.gitUrl}">
+                    </a>
+                    <span class="no-url" th:if="${schedule.gitUrl == null}">등록된 Git 저장소가 없습니다</span>
+                    <button type="button" class="btn-etc-edit">Edit</button>
+
+                    <form th:if="${schedule.gitUrl != null}"
+                          th:action="@{/schedule/{id}/git/delete(id=${schedule.scheduleId})}"
+                          method="post" class="etc-delete-form">
+                        <button type="submit" class="btn-etc-delete"> X </button>
+                    </form>
+                </div>
+                <div class="git-edit etc-edit">
+                    <form th:action="@{/schedule/{id}/git/update(id=${schedule.scheduleId})}" method="post">
+                        <input type="text"
+                               name="gitUrl"
+                               placeholder="Git URL"
+                               th:value="${schedule.gitUrl}"
+                               th:attr="data-original=${schedule.gitUrl}" />
+                        <button type="submit" class="btn-etc-save">Save</button>
+                        <button type="button" class="btn-etc-cancel">Cancel</button>
+                    </form>
+                </div>
+
+            </div>
+
+        </div>
+
         <div class="block" id="detail">
             <div class="title-event-type">
                 <div class="title" th:text="${schedule.title}">Title</div>
@@ -96,89 +178,6 @@
                 <input class="comment-input" type="text" name="content" placeholder="add a comment" />
                 <button class="comment-add-btn" type="submit">add</button>
             </form>
-
-        </div>
-
-        <div class="block" id="etc">
-            <div class="etc-block" id="etc-image">
-                <button type="button" class="btn-send-message-modal" th:attr="data-schedule-id=${schedule.scheduleId}">
-                    <!--임시 이미지-->
-                    <div class="etc-images">
-                        <img src="/images/person300.svg">
-                        <img src="/images/team2_300.svg">
-                    </div>
-                    <span class="goto-image">채팅하러 가기 ➜</span>
-
-                </button>
-            </div>
-
-            <div class="etc-block"id="etc-chart">
-                <button type="button" class="btn-member-performance-modal" th:attr="data-schedule-id=${schedule.scheduleId}">
-                <div class="progress-widget">
-                    <canvas id="scheduleProgressChart"></canvas>
-                    <div class="progress-header">
-                        진행률
-                        <span class="progress-percent" id="scheduleProgressText">0%</span>
-                    </div>
-                    <span class="goto-progress">개인 진행률 보러가기 ➜</span>
-                </div>
-                </button>
-            </div>
-
-            <div class="etc-block" id="etc-file">
-                <div class="file-view etc-view">
-                    <div class="etc-label">File 보관함</div>
-
-                    <div id="taskFileList" class="task-file-list" th:if="${not #lists.isEmpty(fileList)}">
-                        <th:block th:each="f : ${fileList}">
-                            <div class="file-item">
-                                <a th:href="@{/api/task/files/download/{id}(id=${f.fileId})}" class="file-link">
-                                    📎<span th:text="${f.originalName}"></span>
-                                </a>
-                            </div>
-                        </th:block>
-                    </div>
-
-                    <span class="no-url" th:if="${#lists.isEmpty(fileList)}">등록된 파일이 없습니다.</span>
-
-                    <input type="file" id="taskFileInput" style="display:none;" onchange="handleTaskFileUpload(this)">
-                    <button type="button" class="btn-etc-edit" onclick="document.getElementById('taskFileInput').click()">Upload</button>
-                </div>
-            </div>
-
-            <div class="etc-block"id="etc-git">
-
-                <div class="git-view etc-view">
-                    <div class="etc-label">Git 저장소</div>
-
-                    <a class="etc-url" th:if="${schedule.gitUrl != null}"
-                       th:href="${#strings.startsWith(schedule.gitUrl,'http://') or #strings.startsWith(schedule.gitUrl,'https://')
-                                ? schedule.gitUrl : 'https://' + schedule.gitUrl}"
-                       target="_blank"
-                       th:text="${schedule.gitUrl}">
-                    </a>
-                    <span class="no-url" th:if="${schedule.gitUrl == null}">등록된 Git 저장소가 없습니다</span>
-                    <button type="button" class="btn-etc-edit">Edit</button>
-
-                    <form th:if="${schedule.gitUrl != null}"
-                          th:action="@{/schedule/{id}/git/delete(id=${schedule.scheduleId})}"
-                          method="post" class="etc-delete-form">
-                        <button type="submit" class="btn-etc-delete"> X </button>
-                    </form>
-                </div>
-                <div class="git-edit etc-edit">
-                    <form th:action="@{/schedule/{id}/git/update(id=${schedule.scheduleId})}" method="post">
-                        <input type="text"
-                               name="gitUrl"
-                               placeholder="Git URL"
-                               th:value="${schedule.gitUrl}"
-                               th:attr="data-original=${schedule.gitUrl}" />
-                        <button type="submit" class="btn-etc-save">Save</button>
-                        <button type="button" class="btn-etc-cancel">Cancel</button>
-                    </form>
-                </div>
-
-            </div>
 
         </div>
     </div>

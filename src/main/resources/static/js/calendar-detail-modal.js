@@ -1,7 +1,6 @@
 (function () {
 
     /* ================= DOM ================= */
-
     const overlay = document.getElementById("calendarDetailModalOverlay");
 
     const titleEl = document.getElementById("detailTitle");
@@ -22,11 +21,9 @@
     }
 
     /* ================= State ================= */
-
     let currentDetail = null;
 
     /* ================= Auth / Permission ================= */
-
     function isAdminUser() {
         if (window.IS_ADMIN === true || window.isAdmin === true) return true;
 
@@ -61,7 +58,6 @@
     }
 
     /* ================= Utils ================= */
-
     function formatDate(startAt, endAt) {
         const start = new Date(startAt);
         const end = new Date(endAt);
@@ -112,7 +108,6 @@
     }
 
     /* ================= External Open ================= */
-
     window.openCalendarDetailModal = function (dto) {
         if (!dto) return;
 
@@ -129,7 +124,6 @@
     };
 
     /* ================= Events ================= */
-
     // 업무 상세 페이지로 이동
     goScheduleBtn.addEventListener("click", () => {
         if (!currentDetail || !isScheduleSource(currentDetail)) return;

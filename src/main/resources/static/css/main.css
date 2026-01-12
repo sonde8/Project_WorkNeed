@@ -39,7 +39,6 @@ body {
     height: 100%;
     background-color: var(--color-surface);
     border-radius: var(--border-radius);
-    border: 1px solid #ddd;
     box-shadow: var(--shadow-sm);
     padding: var(--gap-size2);
     box-sizing: border-box;
@@ -113,9 +112,18 @@ body {
 .attendWidget {
     display: flex;
     flex-direction: column;
+    background-color: #ffffff;
+    border-radius: 16px;
+    border: 1px solid #f0f0f0;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    box-sizing: border-box;
 }
 
-/* (4) 결재 위젯 - 6개 한 줄 배치 */
+/* =====================
+
+(4) 결재 위젯 - 6개 한 줄 배치
+
+========================*/
 .main-kpi-approval {
     display: flex;
     justify-content: space-between; /* 한 줄 꽉 차게 배치 */
@@ -162,6 +170,133 @@ body {
 .main-kpi-approval .kpi--danger .kpi-num {
     color: #b00020;
 }
+/* =========================================================
+   KPI 영역 기본 레이아웃 (PC)
+   - 기존 KPI 카드(.kpi) 스타일은 건드리지 않고 "배치"만 잡음
+   ========================================================= */
+
+/* KPI 컨테이너 */
+.main-kpi-approval {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: stretch;
+}
+
+/* KPI 타일: 기존 디자인 유지, 배치만 안정화 */
+.main-kpi-approval .kpi {
+    flex: 1 1 110px; /* 최소 폭 110px 정도로 줄어듦 */
+    min-width: 110px;
+}
+
+/* =========================================================
+   "더보기" Hover/Click 드롭다운
+   - 더보기 트리거는 a가 아니라 div로 감싸져 있어야 안전함
+   ========================================================= */
+
+.kpi-more-trigger {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex: 0 0 auto;
+    min-width: 110px;
+    padding: 0 14px;
+
+    border: 1px dashed #d9d9d9;
+    border-radius: 12px;
+    background: #fafafa;
+    cursor: pointer;
+    user-select: none;
+}
+
+.kpi-more-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #555;
+}
+
+/* 숨김 패널 */
+.kpi-more {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+
+    display: grid;
+    grid-template-columns: repeat(2, minmax(110px, 1fr));
+    gap: 10px;
+
+    padding: 12px;
+    border: 1px solid #e5e5e5;
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 10px 24px rgba(0,0,0,0.10);
+
+    opacity: 0;
+    transform: translateY(-6px);
+    pointer-events: none;
+    z-index: 999;
+}
+
+/* PC: hover로 열림 */
+.kpi-more-trigger:hover .kpi-more {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+/* 모바일/터치: JS로 class 토글 시 열리도록 */
+.kpi-more.is-open {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+/* 패널 안 KPI 타일도 기존 스타일 유지 + 폭 안정화 */
+.kpi-more .kpi {
+    min-width: 110px;
+}
+
+/* =========================================================
+   모바일 대응
+   - KPI가 너무 작아지지 않게 2열/1열로 정리
+   - 더보기 패널은 화면을 넘치지 않게 좌측 정렬로 변경
+   ========================================================= */
+
+@media (max-width: 768px) {
+    .main-kpi-approval {
+        gap: 8px;
+    }
+
+    /* 모바일에서는 2열 느낌으로 안정적으로 */
+    .main-kpi-approval .kpi,
+    .kpi-more-trigger {
+        flex: 1 1 calc(50% - 8px);
+        min-width: 0;
+    }
+
+    /* 더보기 패널: 좌측 정렬 + 1열로 */
+    .kpi-more {
+        left: 0;
+        right: auto;
+        grid-template-columns: 1fr;
+        min-width: 220px;
+        max-width: calc(100vw - 24px);
+    }
+}
+
+@media (max-width: 420px) {
+    /* 아주 작은 화면은 1열로 */
+    .main-kpi-approval .kpi,
+    .kpi-more-trigger {
+        flex: 1 1 100%;
+    }
+
+    .kpi-more {
+        min-width: 200px;
+    }
+}
 
 /* =========================================
    3. Right Page (오른쪽 그리드 영역)
@@ -171,8 +306,9 @@ body {
     height: 100%;
     display: grid;
     grid-template-columns: 1fr 220px;
-    grid-template-rows: 65% 35%;
+    grid-template-rows: 60% 40%;
     gap: var(--gap-size2);
+    padding-bottom: var(--gap-size2);
 }
 
 .rightPage > div {
@@ -184,18 +320,24 @@ body {
     flex-direction: column;
     min-height: 0;
     overflow: hidden;
+    border: 1px solid var(--color-border);
 }
 
-.mini-kanban { grid-column: 1 / 2; grid-row: 1 / 2; border: 1px solid #ddd; }
-.main-board { grid-column: 1 / 2; grid-row: 2 / 3; }
+.mini-kanban { grid-column: 1 / 2; grid-row: 1 / 2;}
+.mini-board { grid-column: 1 / 2; grid-row: 2 / 3; }
 .mini-meetingroom { grid-column: 2 / 3; grid-row: 1 / 3; }
 
 /* =========================================
    4. Utility / Cleanups
    ========================================= */
-.pageMain .state-wrap,
-.pageMain .title,
-.pageMain .clock,
-.pageMain .click,
-.pageMain .rowMonth { display: none; }
+.pageMain .attendWidget{
+    flex: 0 0 auto;
+    min-height: auto;
+    display: block;
+}
+
+.pageMain .attendWidget .att-left{
+    flex: 0 0 auto;
+    min-height: auto;
+}
 

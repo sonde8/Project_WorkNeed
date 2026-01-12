@@ -1,30 +1,21 @@
 @charset "UTF-8";
 
-/* =========================================
-   0. Variables (디자인 토큰)
-   ========================================= */
+/* =============================================================================
+   1. Variables
+   ============================================================================= */
 :root {
-    --color-primary: #2C3E50;
-    --color-primary-dark: #1a252f;
-    --color-secondary: #3A7BD5;
-    --color-bg: #F2F4F7;
-    --color-surface: #FFFFFF;
-    --color-surface-hover: #F8F9FA;
-    --color-text-main: #333333;
-    --color-text-sub: #666666;
-    --border-color: #DEE2E6;
-    --color-work: #d63384;
-    --color-work-bg: #ffeef6;
-    --color-personal: #4f46e5;
-    --color-personal-bg: #eef2ff;
+    /* 캘린더 전용 컬러 */
+    --color-primary-dark: #07223b;
+
+    /* 컴포넌트 사이즈 */
     --border-radius-lg: 12px;
     --border-radius-md: 8px;
     --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
-/* =========================================
-   1. Global Layout (레이아웃 설정)
-   ========================================= */
+/* =============================================================================
+   2. Global Layout & Utilities
+   ============================================================================= */
 body {
     background-color: var(--color-bg);
     font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
@@ -43,49 +34,74 @@ body {
     gap: 20px;
 }
 
-/* =========================================
-   2. Left Sidebar (사이드바)
-   ========================================= */
+/* 유틸리티 (JS 제어용) */
+.hidden {
+    display: none !important;
+}
+
+/* 커스텀 스크롤바 디자인 (통합) */
+.calendar-left::-webkit-scrollbar,
+.today-list::-webkit-scrollbar,
+.work-list-body::-webkit-scrollbar,
+.fc-scroller::-webkit-scrollbar {
+    width: 4px;
+}
+
+.calendar-left::-webkit-scrollbar-thumb,
+.today-list::-webkit-scrollbar-thumb,
+.work-list-body::-webkit-scrollbar-thumb,
+.fc-scroller::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+.calendar-left::-webkit-scrollbar-track,
+.today-list::-webkit-scrollbar-track,
+.work-list-body::-webkit-scrollbar-track,
+.fc-scroller::-webkit-scrollbar-track {
+    background-color: transparent;
+}
+
+/* =============================================================================
+   3. Left Sidebar Area
+   ============================================================================= */
 .calendar-left {
     width: 420px;
     flex-shrink: 0;
     height: 100%;
     background-color: var(--color-surface);
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--color-border);
     border-radius: var(--border-radius-lg);
     box-shadow: var(--shadow-sm);
-    padding: 30px;
+    padding: 25px;
     display: flex;
     flex-direction: column;
-    gap: 28px;
+    gap: 24px;
     overflow-y: auto;
 }
-
-.calendar-left::-webkit-scrollbar { width: 6px; }
-.calendar-left::-webkit-scrollbar-thumb { background-color: #ddd; border-radius: 4px; }
-.calendar-left::-webkit-scrollbar-track { background-color: transparent; }
 
 .left-title {
     font-size: 15px;
     font-weight: 800;
-    color: #222;
+    color: var(--color-text-main);
     margin: 0 0 12px 0;
     display: flex;
     align-items: center;
     justify-content: space-between;
 }
 
+/* 일정 등록 버튼 */
 .schedule-add-btn {
     width: 100%;
-    padding: 15px;
-    font-size: 16px;
+    padding: 14px;
+    font-size: 15px;
     font-weight: 700;
     cursor: pointer;
     background-color: var(--color-primary);
     color: #fff;
     border: none;
     border-radius: var(--border-radius-md);
-    box-shadow: 0 4px 6px rgba(44, 62, 80, 0.2);
+    box-shadow: 0 4px 6px rgba(11, 46, 79, 0.2);
     transition: all 0.2s ease;
 }
 
@@ -94,20 +110,21 @@ body {
     transform: translateY(-2px);
 }
 
+/* Today's Schedule 리스트 */
 .today-list {
     list-style: none;
     padding: 0;
     margin: 0;
-    max-height: 250px;
+    max-height: 150px;
     overflow-y: auto;
 }
 
 .today-list li {
-    padding: 12px;
-    margin-bottom: 8px;
+    padding: 10px;
+    margin: 0 5px 8px 0;
     border-radius: var(--border-radius-md);
-    background-color: var(--color-surface-hover);
-    font-size: 14px;
+    background-color: var(--color-surface);
+    font-size: 13px;
     display: flex;
     align-items: center;
     gap: 10px;
@@ -118,122 +135,381 @@ body {
 
 .today-list li:hover {
     background-color: #fff;
-    border-color: var(--color-secondary);
+    border-color: var(--color-text-sub);
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 
 .today-empty-msg {
-    font-size: 14px;
-    color: #888;
+    font-size: 13px;
+    color: var(--color-text-sub);
     text-align: center;
     padding: 15px 0;
 }
 
+/* Week Preview */
 .preview-container {
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 12px;
+}
+
+.preview-header-badge {
+    display: block;
+    padding: 0 0 0 10px;
+    margin-bottom: 12px;
+
+    font-size: 14px;
+    font-weight: 800;
+    line-height: 1.2;
+
+    color: var(--color-primary);
+    border-left: 4px solid var(--color-primary);
 }
 
 .preview-group {
     background-color: #fff;
     border: 1px solid #eee;
     border-radius: var(--border-radius-md);
-    padding: 14px;
+    padding: 12px;
 }
 
 .preview-list {
     list-style: none;
     padding: 0;
-    margin: 10px 0 0 0;
+    margin: 8px 0 0 0;
 }
 
 .preview-list li {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 14px;
-    color: #555;
-    padding: 4px 0;
+    font-size: 13px;
+    color: var(--color-text-sub);
+    padding: 3px 0;
 }
 
-.preview-count { font-weight: 700; color: #222; }
+.preview-count {
+    font-weight: 700;
+    color: var(--color-text-main);
+}
+
+.preview-label-group {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.warning-icon {
+    font-size: 12px;
+    margin-bottom: 2px;
+}
 
 .category-badge {
     display: inline-block;
-    padding: 3px 8px;
+    padding: 3px 6px;
     border-radius: 4px;
     font-size: 11px;
     font-weight: 700;
     line-height: 1.4;
 }
 
-.category-badge.work { background-color: var(--color-work-bg); color: var(--color-work); }
-.category-badge.personal { background-color: var(--color-personal-bg); color: var(--color-personal); }
-
-.filter-radio-group { display: flex; flex-direction: column; gap: 10px; }
+/* 캘린더 필터 */
+.filter-radio-group { display: flex; flex-direction: column; gap: 8px; }
 .filter-radio {
-    cursor: pointer; font-size: 14px; color: #444;
+    cursor: pointer; font-size: 13px; color: var(--color-text-main);
     display: flex; align-items: center; gap: 8px;
 }
 .filter-radio input[type="radio"] {
     accent-color: var(--color-primary);
-    width: 18px; height: 18px; margin: 0;
+    width: 16px; height: 16px; margin: 0;
 }
 
-/* =========================================
-   3. Main Calendar Area (오른쪽 캘린더)
-   ========================================= */
-.calendar-right {
+/* =============================================================================
+   4. Main Right Area (Calendar & Work List)
+   ============================================================================= */
+.calendar-right-container {
     flex: 1;
     height: 100%;
-    background-color: var(--color-surface);
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius-lg);
-    box-shadow: var(--shadow-sm);
-    padding: 40px 50px;
     display: flex;
     flex-direction: column;
+    gap: 20px;
     overflow: hidden;
+}
+
+/* 4-1. Top Section: FullCalendar */
+.calendar-view-section {
+    flex: 1;
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-sm);
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
     position: relative;
+    overflow: hidden;
+    transition: flex 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), height 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .calendar-inner { width: 100%; height: 100%; display: flex; flex-direction: column; }
 #calendar { width: 100%; height: 100%; font-size: 13px; }
 
-/* =========================================
-   4. FullCalendar Custom Styling
-   ========================================= */
-.fc .fc-header-toolbar { margin-bottom: 24px !important; padding: 0 5px; }
-.fc .fc-toolbar-title { font-size: 26px !important; font-weight: 800; color: var(--color-primary); letter-spacing: -0.5px; }
-.fc .fc-button {
-    background-color: #fff !important;
-    border: 1px solid #ced4da !important;
-    color: #555 !important;
-    padding: 8px 18px !important;
-    font-size: 13px !important;
-    font-weight: 600 !important;
-    border-radius: 6px !important;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important;
+/* 4-2. Split Mode (Week/Day View) */
+.calendar-right-container.split-mode .calendar-view-section {
+    flex: none;
+    height: 60%;
 }
-.fc .fc-button:hover { background-color: #f1f3f5 !important; color: #222 !important; }
-.fc .fc-button-active, .fc .fc-today-button { background-color: var(--color-primary) !important; border-color: var(--color-primary) !important; color: #fff !important; }
-.fc-theme-standard th { background-color: #F8F9FA; border: 1px solid #DEE2E6 !important; border-bottom: 2px solid #CED4DA !important; padding: 10px 0 !important; }
-.fc-col-header-cell-cushion { font-size: 14px; font-weight: 700; color: #495057; text-decoration: none !important; }
-.fc-daygrid-day-top { flex-direction: row; padding: 6px 8px !important; }
-.fc-daygrid-day-number { font-size: 13px; color: #666; font-weight: 600; text-decoration: none !important; padding: 4px !important; }
-.fc-day-today { background-color: rgba(58, 123, 213, 0.03) !important; }
-.fc-day-today .fc-daygrid-day-number {
-    border-radius: 12px !important; padding: 4px 10px !important;
-    background-color: var(--color-secondary); color: #fff;
-    display: inline-flex !important; align-items: center; justify-content: center;
-}
-.fc-event { border: none !important; border-radius: 3px !important; padding: 3px 6px !important; font-size: 11px !important; font-weight: 600 !important; cursor: pointer; }
-.fc-daygrid-more-link { font-size: 11px !important; color: #888 !important; background: #f1f3f5; padding: 2px 6px; border-radius: 4px; text-decoration: none !important; }
 
-/* =========================================
-   5. Modals (모든 모달 블러 통일)
-   ========================================= */
+/* 4-3. Bottom Section: Work List */
+.work-list-section {
+    height: calc(40% - 20px);
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-direction: column;
+    padding: 20px 30px;
+    overflow: hidden;
+    animation: slideUp 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.work-list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #eee;
+    flex-shrink: 0;
+}
+
+.work-list-title {
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--color-primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+}
+
+.work-range-label {
+    font-size: 13px;
+    color: var(--color-text-sub);
+    font-weight: 500;
+}
+
+.work-list-body {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+.work-schedule-ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.work-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 10px;
+    border-bottom: 1px solid #f8f9fa;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+.work-item:hover { background-color: #f1f3f5; }
+.work-item:last-child { border-bottom: none; }
+
+.work-time-box {
+    width: 120px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-right: 2px solid #eee;
+    margin-right: 15px;
+    padding-right: 12px;
+    text-align: right;
+    flex-shrink: 0;
+}
+
+.w-date, .w-time {
+    display: block;
+    font-size: 12px;
+    color: #999;
+    font-weight: 500;
+    line-height: 1.4;
+    letter-spacing: -0.3px;
+}
+
+.work-info-box {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    overflow: hidden;
+}
+
+.w-badge {
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+.w-badge.team { background-color: #dcfce7; color: #15803d; }
+.w-badge.company { background-color: #fee2e2; color: #b91c1c; }
+.w-badge.personal { background-color: #dbeafe; color: #1d4ed8; }
+
+.w-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-text-main);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.work-empty-msg {
+    text-align: center;
+    padding: 40px 0;
+    color: var(--color-text-sub);
+    font-size: 14px;
+}
+
+/* =============================================================================
+   5. FullCalendar Overrides (Custom Style)
+   ============================================================================= */
+
+/* Toolbar */
+.calendar-view-section .fc .fc-header-toolbar {
+    margin-bottom: 24px;
+    padding: 0 5px;
+}
+
+.calendar-view-section .fc .fc-toolbar-title {
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--color-primary);
+    letter-spacing: -0.5px;
+}
+
+/* Buttons */
+.calendar-view-section .fc .fc-button {
+    background-color: #fff;
+    border: 1px solid #ced4da;
+    color: #555;
+    padding: 8px 18px;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 6px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    transition: all 0.1s ease-in-out;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.calendar-view-section .fc .fc-button:hover {
+    background-color: #f1f3f5;
+    color: #333;
+    border-color: #b1b3b5;
+    transform: translateY(-1px);
+}
+
+.calendar-view-section .fc .fc-button:active,
+.calendar-view-section .fc .fc-button-active {
+    background-color: var(--color-primary) !important;
+    border-color: var(--color-primary) !important;
+    color: #fff !important;
+    box-shadow: inset 0 3px 5px rgba(0,0,0,0.125);
+}
+
+.calendar-view-section .fc .fc-button:active {
+    transform: translateY(1px);
+}
+
+.calendar-view-section .fc .fc-today-button:disabled {
+    background-color: var(--color-primary) !important;
+    border-color: var(--color-primary) !important;
+    color: #fff !important;
+    opacity: 1;
+    cursor: default;
+    box-shadow: none;
+    transform: none;
+}
+
+/* Grid Table */
+.calendar-view-section .fc-theme-standard th {
+    background-color: #F8F9FA;
+    border: 1px solid var(--color-border);
+    border-bottom: 2px solid #CED4DA;
+    padding: 8px 0;
+}
+
+.calendar-view-section .fc-col-header-cell-cushion {
+    font-size: 13px;
+    font-weight: 700;
+    color: #495057;
+    text-decoration: none;
+}
+
+.calendar-view-section .fc-daygrid-day-top {
+    flex-direction: row;
+    padding: 4px 6px;
+}
+
+.calendar-view-section .fc-daygrid-day-number {
+    font-size: 12px;
+    color: var(--color-text-sub);
+    font-weight: 600;
+    text-decoration: none;
+    padding: 4px;
+}
+
+/* Today Cell */
+.calendar-view-section .fc-day-today {
+    background-color: rgba(58, 123, 213, 0.03);
+}
+
+.calendar-view-section .fc-day-today .fc-daygrid-day-number {
+    border-radius: 12px;
+    padding: 3px 8px;
+    background-color: var(--color-secondary);
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Events */
+.calendar-view-section .fc-event {
+    border: none;
+    border-radius: 3px;
+    padding: 2px 4px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.calendar-view-section .fc-daygrid-more-link {
+    font-size: 11px;
+    color: #888;
+    background: #f1f3f5;
+    padding: 2px 6px;
+    border-radius: 4px;
+    text-decoration: none;
+}
+
+/* =============================================================================
+   6. Modals (Blur Backdrop)
+   ============================================================================= */
 .modal-overlay {
     position: fixed !important;
     top: 0;
@@ -252,21 +528,21 @@ body {
     border-radius: 12px !important;
     box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important;
     border: none !important;
-    background: #fff;
+    background: var(--color-surface);
     width: 500px;
     max-width: 90%;
 }
 
 .modal-header { border-bottom: 1px solid #eee; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; }
-.modal-header h2 { font-size: 18px; font-weight: 700; margin: 0; }
+.modal-header h2 { font-size: 18px; font-weight: 700; margin: 0; color: var(--color-text-main); }
 .modal-body { padding: 24px; }
 .modal-footer { padding: 16px 24px; background-color: #f8f9fa; border-top: 1px solid #eee; }
 
-/* 일정 리스트 모달 스타일 */
+/* Daily List Modal */
 .daily-list-simple-ul { list-style: none; padding: 0; margin: 0; }
 .daily-list-simple-ul li {
     padding: 14px 18px;
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--color-border);
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -278,6 +554,7 @@ body {
 .daily-list-simple-ul li:hover { background-color: rgba(58, 123, 213, 0.05); }
 .daily-list-simple-ul li:last-child { border-bottom: none; }
 .event-title { font-weight: 500; flex: 1; }
+
 .btn-submit#dailyListAddBtn {
     width: 100%;
     padding: 12px;
@@ -289,3 +566,9 @@ body {
     cursor: pointer;
 }
 .btn-submit#dailyListAddBtn:hover { background-color: var(--color-primary-dark); }
+
+.no-transition,
+.no-transition * {
+    transition: none !important;
+    animation: none !important;
+}

@@ -8,6 +8,7 @@
 
     <!-- 페이지 전용 CSS -->
     <th:block layout:fragment="head">
+        <link rel="stylesheet" th:href="@{/css/main.css}">
         <link rel="stylesheet" th:href="@{/css/attendanceLeft.css}">
         <link rel="stylesheet" th:href="@{/css/attendanceMain.css}">
         <link rel="stylesheet" th:href="@{/css/attendanceBook.css}">
@@ -38,9 +39,9 @@
         <section class = "right_2">
 
             <div class = "yearChart">
-                <button type="button" class = "yearBtn" id="prevYear">&lt;</button>
+                <button type="button" class = "yearBtn" id="prevYear"> &lt; </button>
                 <div class = "yearTxt"><span id = "leaveYear"></span></div>
-                <button type="button" class = "yearBtn" id="nextYear">&gt;</button>
+                <button type="button" class = "yearBtn" id="nextYear"> &gt; </button>
             </div>
 
             <div class = "leaveSummary">

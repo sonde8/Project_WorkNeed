@@ -25,6 +25,4 @@ public class ApprovalDoc {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    private LocalDate leaveStartDate;
-    private LocalDate leaveEndDate;
 }

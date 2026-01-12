@@ -37,18 +37,25 @@ function approve(btn) {
     fetch("/admin/attendance/approve", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: "requestId=" + requestId
+        body: "requestId=" + encodeURIComponent(requestId)
     })
-    .then(res => res.text())
-    .then(result => {
-        if (result === "success") {
-            alert("정상적으로 승인되었습니다.");
-            location.reload();
-        } else {
-            alert("승인 처리 중 오류가 발생했습니다.");
-        }
-    })
-    .catch(err => console.error("Error:", err));
+        .then(async (res) => {
+            const text = await res.text(); // ✅ 500이어도 본문 읽음
+
+            if (!res.ok) {
+                // ✅ 서버에서 터진 실제 원인 일부가 여기 찍힘
+                alert(`서버 오류 ${res.status}\n\n${text}`);
+                return;
+            }
+
+            if (text.trim() === "success") {
+                alert("정상적으로 승인되었습니다.");
+                location.reload();
+            } else {
+                alert("승인 실패: " + text);
+            }
+        })
+        .catch(err => alert("네트워크 오류: " + err));
 }
 
 /**

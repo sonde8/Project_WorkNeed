@@ -7,9 +7,10 @@ import java.time.LocalTime;
 
 @Data
 public class AttendancePayloadDTO {
-    LocalDate workDate;
-    LocalTime fromTime;
-    LocalTime toTime;
-    String reason;
-    String rejectReason;
+    private LocalDate workDate;
+    private LocalTime fromTime;
+    private LocalTime toTime;
+    private String reason;
+    private String rejectReason;
+    private String type;
 }
