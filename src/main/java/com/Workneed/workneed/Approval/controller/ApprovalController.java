@@ -36,9 +36,9 @@ public class ApprovalController {
     private final ApprovalService service;
     private final DocMapper docMapper;
     private final StorageService storageService;
-    private final AmazonS3 amazonS3; // ✅ S3 직접 접근을 위해 주입
+    private final AmazonS3 amazonS3; // S3 직접 접근을 위해 주입
 
-    @Value("${cloud.aws.s3.bucket}") // ✅ S3 버킷명 주입
+    @Value("${cloud.aws.s3.bucket}") // S3 버킷명 주입
     private String bucket;
 
     /* ==========================================================
@@ -46,7 +46,7 @@ public class ApprovalController {
        ========================================================== */
 
     private UserDTO getLoginUser(HttpSession session) {
-        return (UserDTO) session.getAttribute("user"); // ✅ UserDTO
+        return (UserDTO) session.getAttribute("user"); // UserDTO
     }
 
     private Long getLoginUserId(HttpSession session) {
@@ -257,35 +257,28 @@ public class ApprovalController {
     }
 
     @PostMapping("/file/{fileId}/delete")
-    public String deleteFile(@PathVariable Long fileId,
-                             HttpSession session) {
-
+    public String deleteFile(@PathVariable Long fileId, HttpSession session) {
         Long loginUserId = getLoginUserId(session);
         if (loginUserId == null) return redirectLogin();
 
-        // 1) 파일 메타 조회
+        // 1) 파일 정보 조회
         DocFileDTO file = docMapper.selectFileById(fileId);
-        if (file == null) {
-            return "redirect:/approval/inbox/waiting";
+        if (file == null) return "redirect:/approval/inbox/waiting";
+
+        // 2) 권한 체크 (에러 유발하는 findById 대신 findDocById 사용)
+        ApprovalDoc doc = service.findDocById(file.getDocId());
+        if (doc == null || !loginUserId.equals(doc.getWriterId())) {
+            return "redirect:/approval/detail/" + file.getDocId();
         }
 
-        // 2) 권한 체크(기본: 작성자만)
-        DocDTO doc = service.findById(file.getDocId());
-        if (doc == null) {
-            return "redirect:/approval/inbox/waiting";
-        }
-        if (!loginUserId.equals(doc.getWriterId())) {
-            throw new IllegalStateException("파일 삭제 권한이 없습니다.");
-        }
-
-        // 3) S3 실제 파일 삭제 (URL 기반 삭제 로직 호출)
+        // 3) S3 실제 파일 삭제 (URL 기반 Key 추출 로직 활용)
         try {
             storageService.delete(file.getSavedName());
         } catch (Exception e) {
-            System.err.println("S3 파일 삭제 실패: " + e.getMessage());
+            System.err.println("S3 삭제 실패: " + e.getMessage());
         }
 
-        // 4) DB 메타 데이터 삭제
+        // 4) DB 정보 삭제
         docMapper.deleteFileById(fileId);
 
         return "redirect:/approval/detail/" + file.getDocId();
