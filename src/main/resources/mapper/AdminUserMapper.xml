@@ -64,7 +64,9 @@
         a.admin_name        AS adminName,
         r.role_name         AS roleName,
         l.log_action_type   AS logActionType,
-        l.log_target_type   AS logTargetType,  l.log_target_id     AS logTargetId,    l.log_description   AS logDescription,
+        l.log_target_type   AS logTargetType,
+        l.log_target_id     AS logTargetId,
+        l.log_description   AS logDescription,
         l.log_created_at    AS logCreatedAt
         FROM adminactivitylog l
         JOIN adminuser a ON l.admin_id = a.admin_id
