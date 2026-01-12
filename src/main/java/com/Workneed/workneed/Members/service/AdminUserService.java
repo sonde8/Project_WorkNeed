@@ -145,6 +145,7 @@ public class AdminUserService {
                 targetAdminId,
                 desc
         );
+        System.out.println("상태 변경 시작 - 대상: " + targetAdminId + ", 수행자 RoleId: " + actor.getRoleId());
     }
 
 

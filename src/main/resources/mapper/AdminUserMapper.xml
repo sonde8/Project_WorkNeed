@@ -57,6 +57,12 @@
         ORDER BY a.admin_created_at DESC
     </select>
 
+    <select id="existsByEmail" resultType="boolean">
+        SELECT COUNT(*)
+        FROM adminuser
+        WHERE admin_email = #{adminEmail}
+    </select>
+
     <select id="findAllActivityLogs"
             resultType="com.Workneed.workneed.Members.dto.AdminUserDTO">
         SELECT
@@ -64,7 +70,9 @@
         a.admin_name AS adminName,
         r.role_name AS roleName,
         l.log_action_type AS logActionType,
-        '' AS logDescription,
+        l.log_target_type   AS logTargetType,
+        l.log_target_id     AS logTargetId,
+        l.log_description AS logDescription,
         l.log_created_at AS logCreatedAt
         FROM adminactivitylog l
         JOIN adminuser a ON l.admin_id = a.admin_id
@@ -80,7 +88,7 @@
 
     <select id="findByAdminId" resultType="com.Workneed.workneed.Members.dto.AdminUserDTO">
         SELECT *
-        FROM adminUser
+        FROM adminuser
         WHERE admin_id = #{adminId}
     </select>
 
@@ -94,22 +102,23 @@
         )
     </insert>
 
-    <insert id="insertActivityLog"
-            parameterType="com.Workneed.workneed.Members.dto.AdminUserDTO">
+    <insert id="insertActivityLog" parameterType="com.Workneed.workneed.Members.dto.AdminUserDTO">
         INSERT INTO adminactivitylog (
             admin_id,
             log_action_type,
             log_target_type,
             log_target_id,
+            log_description,
             log_created_at
         )
         VALUES (
-                   #{adminId},
-                   #{logActionType},
-                   #{logTargetType},
-                   #{logTargetId},
-                   NOW()
-               )
+                #{adminId},
+                #{logActionType},
+                #{logTargetType},
+                #{logTargetId},
+                #{logDescription},
+                NOW()
+            )
     </insert>
 
     <update id="updateMemberStatus" >

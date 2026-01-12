@@ -25,7 +25,8 @@
                 </div>
             </div>
 
-            <form class="card form-card" method="post"
+            <form class="card form-card"
+                  method="post"
                   th:action="@{/approval/submit}"
                   enctype="multipart/form-data">
 
@@ -65,23 +66,23 @@
                     <div class="row">
                         <label class="label">첨부 파일</label>
                         <input class="control" type="file" id="fileInput" name="files" multiple onchange="handleFileSelection(this)">
-                        <div class="hint">여러 번 선택하여 파일을 추가할 수 있습니다.</div>
+                        <div class="hint"></div>
 
-                        <div id="fileListContainer" style="margin-top: 10px; border: 1px dashed #ccc; padding: 10px; min-height: 50px;">
-                            <p class="placeholder" style="color: #999; font-size: 0.9rem;">선택된 파일이 없습니다.</p>
+                        <div id="fileListContainer">
+                            <p class="placeholder">선택된 파일이 없습니다.</p>
                         </div>
                     </div>
 
                 </div>
 
                 <!-- =========================
-                     결재자 선택 영역
+                     결재선 구성 영역 (후보 + 4칸)
                      ========================= -->
                 <div class="divider"></div>
 
                 <div class="card-head">
-                    <h3>결재자 선택</h3>
-                    <p class="meta">체크 → 현재 차수에 추가</p>
+                    <h3>결재선 구성</h3>
+                    <p class="meta">후보 체크 → 버튼(검토/합의/최종결재/참조)으로 배치</p>
                 </div>
 
                 <div class="approver-layout">
@@ -89,7 +90,7 @@
                     <!-- 후보 리스트 -->
                     <div class="approver-box">
                         <div class="box-head">
-                            <div class="box-title">결재자 후보</div>
+                            <div class="box-title">사용자 후보</div>
                             <div class="box-meta">ACTIVE 사용자</div>
                         </div>
 
@@ -109,90 +110,54 @@
                         </div>
 
                         <div class="hint">
-                            체크 후 우측에서 “현재 차수에 추가”를 누르십시오.
+
+                            최종결재는 1명만 가능합니다.
                         </div>
                     </div>
 
                     <!-- 구성/미리보기 -->
                     <div class="approver-box">
                         <div class="box-head">
-                            <div class="box-title">결재선 구성</div>
-                            <div class="box-meta">
-                                <span class="badge">현재 차수:</span>
-                                <span id="orderBadge" class="badge strong">1</span>
+                            <div class="box-title">결재선 미리보기</div>
+                            <div class="box-meta">검토/합의 병렬 · 최종결재 1명</div>
+                        </div>
+
+                        <div class="line-builder-actions">
+                            <button type="button" id="btnAddReview">검토 추가</button>
+                            <button type="button" id="btnAddAgreement">합의 추가</button>
+                            <button type="button" id="btnAddFinal">최종결재 추가</button>
+                            <button type="button" id="btnAddReference">참조 추가</button>
+                            <button type="button" id="btnReset">전체 초기화</button>
+                        </div>
+
+                        <!-- 4칸 -->
+                        <div class="line-builder-grid">
+                            <div class="lane">
+                                <div class="lane-head">1단계 · 검토</div>
+                                <div id="reviewBox" class="lane-body"></div>
+                            </div>
+
+                            <div class="lane">
+                                <div class="lane-head">2단계 · 합의</div>
+                                <div id="agreementBox" class="lane-body"></div>
+                            </div>
+
+                            <div class="lane">
+                                <div class="lane-head">3단계 · 최종결재</div>
+                                <div id="finalBox" class="lane-body"></div>
+                            </div>
+
+                            <div class="lane">
+                                <div class="lane-head">참조</div>
+                                <div id="referenceBox" class="lane-body"></div>
                             </div>
                         </div>
 
-                        <div class="line-controls">
-                            <button type="button" class="btn" id="btnMinus">-</button>
-                            <button type="button" class="btn" id="btnPlus">+</button>
-                            <button type="button" class="btn primary" id="btnAddToOrder">현재 차수에 추가</button>
-                            <button type="button" class="btn danger" id="btnReset">전체 초기화</button>
-                        </div>
-
-                        <div class="line-preview" id="linePreview">
-                            <div class="empty">아직 추가된 결재자가 없습니다.</div>
-                        </div>
-
-                        <!-- ✅ 서버 전송용 hidden -->
+                        <!-- JS가 submit용 hidden input 생성 -->
                         <div id="hiddenContainer"></div>
 
                         <div class="hint">
-                            동일 차수는 병렬 결재, 차수가 증가하면 순차 결재로 처리됩니다.
-                        </div>
-                    </div>
 
-                </div>
-
-                <!-- =========================
-                     참조자 선택 영역
-                     (읽기 전용 / 결재 불가)
-                     ========================= -->
-                <div class="divider"></div>
-
-                <div class="card-head">
-                    <h3>참조자 선택</h3>
-                    <p class="meta">체크 → 문서 열람만 가능 (승인/반려 불가)</p>
-                </div>
-
-                <div class="approver-layout">
-
-                    <!-- 후보 리스트 -->
-                    <div class="approver-box">
-                        <div class="box-head">
-                            <div class="box-title">참조자 후보</div>
-                            <div class="box-meta">ACTIVE 사용자</div>
-                        </div>
-
-                        <div class="candidate-list">
-                            <!-- ✅ referenceIds 로 전송 -->
-                            <label class="candidate" th:each="u : ${approvers}">
-                                <input type="checkbox"
-                                       name="referenceIds"
-                                       th:value="${u.userId}">
-                                <span class="cand-name" th:text="${u.username}">이름</span>
-                                <span class="cand-meta">
-                  (<span th:text="${u.deptName}">부서</span>
-                  <span th:if="${u.rankName != null}" th:text="' / ' + ${u.rankName}">/ 직급</span>)
-                </span>
-                            </label>
-                        </div>
-
-                        <div class="hint">
-                            체크한 사용자는 “참조자”로 저장되며, 문서 열람만 가능합니다.
-                        </div>
-                    </div>
-
-                    <!-- 안내/미리보기(선택 사항: JS 없이 정적 안내만) -->
-                    <div class="approver-box">
-                        <div class="box-head">
-                            <div class="box-title">참조자 안내</div>
-                            <div class="box-meta">Read Only</div>
-                        </div>
-
-                        <div class="hint">
-                            참조자는 결재선(approval_line)에 저장되지 않습니다.<br>
-                            문서 상세는 동일하게 볼 수 있으나 승인/반려 버튼은 노출되지 않습니다.
                         </div>
                     </div>
 
@@ -222,11 +187,9 @@
 
 </th:block>
 
-<!-- ✅ JS는 외부 파일로 로드 -->
 <th:block layout:fragment="script">
     <script th:src="@{/js/Approval.js}"></script>
 </th:block>
 
 </body>
 </html>
-
