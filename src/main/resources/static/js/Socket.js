@@ -128,7 +128,7 @@ function showToastNotification(data) {
     else if (data.messageType === 'FILE') preview = "📎 파일을 보냈습니다.";
 
     // 서버에서 보낸 발신자 프로필 이미지를 사용 (없으면 기본값)
-    const senderImg = data.senderProfileImage || '/images/profile300.svg';
+    const senderImg = data.senderProfileImage || '/images/default-profile.svg';
 
     // 콤팩트한 카드 구조
     // toast.innerHTML = `
@@ -145,7 +145,7 @@ function showToastNotification(data) {
     toast.innerHTML = `
         <div class="toast-inner">
             <div class="toast-profile">
-                <img src="${senderImg}" onerror="this.src='/images/profile300.svg'">
+                <img src="${senderImg}" onerror="this.src='/images/default-profile.svg'">
             </div>
             <div class="toast-text-area">
                 <div class="toast-user-name">${data.senderName}</div>

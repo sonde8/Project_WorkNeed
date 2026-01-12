@@ -57,18 +57,19 @@
         ORDER BY a.admin_created_at DESC
     </select>
 
-    <select id="findAllActivityLogs"
-            resultType="com.Workneed.workneed.Members.dto.AdminUserDTO">
+    <select id="findAllActivityLogs" resultType="com.Workneed.workneed.Members.dto.AdminUserDTO">
         SELECT
-        l.log_id AS logId,
-        a.admin_name AS adminName,
-        r.role_name AS roleName,
-        l.log_action_type AS logActionType,
-        '' AS logDescription,
-        l.log_created_at AS logCreatedAt
+            l.log_id            AS logId,
+            a.admin_name        AS adminName,
+            r.role_name         AS roleName,
+            l.log_action_type   AS logActionType,
+            l.log_target_type   AS logTargetType,
+            l.log_target_id     AS logTargetId,
+            l.log_description   AS logDescription,
+            l.log_created_at    AS logCreatedAt
         FROM adminactivitylog l
-        JOIN adminuser a ON l.admin_id = a.admin_id
-        LEFT JOIN adminrole r ON a.role_id = r.role_id
+                 JOIN adminuser a ON l.admin_id = a.admin_id
+                 LEFT JOIN adminrole r ON a.role_id = r.role_id
         ORDER BY l.log_created_at DESC
     </select>
 
@@ -80,7 +81,7 @@
 
     <select id="findByAdminId" resultType="com.Workneed.workneed.Members.dto.AdminUserDTO">
         SELECT *
-        FROM adminUser
+        FROM adminuser
         WHERE admin_id = #{adminId}
     </select>
 
@@ -94,6 +95,12 @@
         )
     </insert>
 
+    <select id="existsByEmail" resultType="boolean">
+        SELECT COUNT(*)
+        FROM adminuser
+        WHERE admin_email = #{adminEmail}
+    </select>
+
     <insert id="insertActivityLog"
             parameterType="com.Workneed.workneed.Members.dto.AdminUserDTO">
         INSERT INTO adminactivitylog (
@@ -105,7 +112,7 @@
             log_created_at
         )
         VALUES (
-                   #{adminId},
+                    #{adminId},
                    #{logActionType},
                    #{logTargetType},
                    #{logTargetId},
