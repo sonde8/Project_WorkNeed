@@ -52,6 +52,7 @@
 }
 
 * {
+    font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
     box-sizing: border-box;
     margin: 0;
     padding: 0;
@@ -61,7 +62,6 @@ html {
     scroll-behavior: smooth;
 }
 body {
-    font-family: 'Noto Sans KR', sans-serif;
     color: var(--color-text-main);
     background-color: var(--color-bg);
     overflow-y: auto;

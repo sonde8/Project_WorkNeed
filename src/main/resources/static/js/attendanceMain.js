@@ -17,24 +17,59 @@ document.addEventListener('DOMContentLoaded', () => {   // html 다 만들어진
         return { year, month: month +1, week };
     }
 
+    const el = document.getElementById('yearMonth');
+    const prevDayBtn = document.getElementById('prevDay');
+    const nextDayBtn = document.getElementById('nextDay');
+
+    let curDate = new Date();
+
     function renderYearMonthWeek(){
-        const el = document.getElementById('yearMonth');
+
         if(!el) return;
 
-        const {year, month, week} = MonthWeek(new Date());
-        el.textContent = `<${year} -${month}>      ${week} 주차`;
+        const { year, month, week } = MonthWeek(curDate);
+
+        el.textContent = `${year}-${month}`;
+        const weekEl = document.getElementById('weekText');
+        if (weekEl) weekEl.textContent = `${week}주차`;
     }
 
     renderYearMonthWeek();
 
+    if (prevDayBtn) {
+        prevDayBtn.addEventListener('click', () => {
+            curDate.setDate(curDate.getDate() - 7);
+            renderYearMonthWeek();
+            loadSummary();
+        });
+    }
+    if (nextDayBtn) {
+        nextDayBtn.addEventListener('click', () => {
+            curDate.setDate(curDate.getDate() + 7);
+            renderYearMonthWeek();
+            loadSummary();
+        });
+    }
+
     // 자동 갱신
     (function UpdateMonthWeek(){
         const now = new Date();
-        const nextDay = new Date( now.getFullYear(), now.getMonth(), now.getDate() + 1,
-                                    0, 0, 1 );
+        const nextMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 1);
 
-        setTimeout(() => {  renderYearMonthWeek();
-                                        UpdateMonthWeek(); }, nextDay - now);
+        setTimeout(() => {
+
+            const isToday =
+                curDate.getFullYear() === now.getFullYear() &&
+                curDate.getMonth() === now.getMonth() &&
+                curDate.getDate() === now.getDate();
+
+            if (isToday) {
+                curDate = new Date();
+                renderYearMonthWeek();
+                loadSummary();
+            }
+            UpdateMonthWeek();
+        }, nextMidnight - now);
     })();
 
     function clamp(n, min, max){
@@ -42,6 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {   // html 다 만들어진
     }
 
     function applySummary(s){
+        console.log('[applySummary] called:', s);
         if(!s) return;
 
         const weekTotalEl = document.getElementById('weekTotal');
@@ -53,15 +89,19 @@ document.addEventListener('DOMContentLoaded', () => {   // html 다 만들어진
         const otEl = document.getElementById('weekFillOt');
         const holEl = document.getElementById('weekFillHoliday');
         const dotEl = document.getElementById('barDot');
-        const trackEl = document.getElementById('barTrack');
 
         if(weekTotalEl){ weekTotalEl.textContent = s.weekTotal ?? '0h 0m';}
         if(remainWorkEl) remainWorkEl.textContent = s.remainWork ?? '52h 0m';
         if(remainOtEl) remainOtEl.textContent = s.remainOt ?? '18h 0m';
         if(holidayEl) holidayEl.textContent = s.holidayTotal ?? '0h 0m';
 
-        const weekMin = Number(s.weekWorkMin ?? 0);
-        const holidayMin = Number(s.holidayWorkMin ?? 0);
+        const weekMin = Number(
+            s.weekWorkMin ?? s.weekMinutes ?? s.week_work_min ?? s.week_minutes ?? 0
+        ) || 0;
+
+        const holidayMin = Number(
+            s.holidayWorkMin ?? s.holidayMinutes ?? s.holiday_work_min ?? s.holiday_minutes ?? 0
+        ) || 0;
 
         const maxMin = 70 * 60;
         const base52 = 52 * 60;
@@ -75,7 +115,8 @@ document.addEventListener('DOMContentLoaded', () => {   // html 다 만들어진
 
         function pctToWidth(pct){
             if (pct <= 0) return '0';
-            return `max(6px, ${pct}%)`;
+            if (pct > 0 && pct < 1) return '6px';
+            return `${pct}%`;
         }
 
         // 휴일 근무
@@ -94,12 +135,44 @@ document.addEventListener('DOMContentLoaded', () => {   // html 다 만들어진
     });
 
 
-    (async function(){
-        const res = await fetch('/api/attendance/summary');
-        if(!res.ok) return;
-        const s = await res.json();
-        applySummary(s);
-    })();
+
+    async function loadSummary(){
+        try{
+            const y = curDate.getFullYear();
+            const m = curDate.getMonth() + 1;
+            const d = curDate.getDate();
+
+            const res = await fetch(`/api/attendance/summary?year=${y}&month=${m}&day=${d}`, {
+                headers: { Accept:'application/json' },
+                credentials: 'same-origin',
+            });
+
+            console.log('[summary] status =', res.status);
+
+            if(!res.ok){
+                console.warn('[summary] 응답 실패', res.status);
+                return;
+            }
+
+            const ct = res.headers.get('content-type') || '';
+            console.log('[summary] content-type =', ct);
+
+            if(!ct.includes('application/json')){
+                const text = await res.text();
+                console.warn('[summary] JSON이 아님(로그인/에러 HTML 가능)', text.slice(0, 300));
+                return;
+            }
+
+            const s = await res.json();
+            console.log('[summary] payload =', s);
+            applySummary(s);
+        } catch(e){
+            console.error('[summary] fetch/json 에러', e);
+        }
+    }
+
+    loadSummary();
+
 
     // 근태 현황, 잔여연차, 연간 근무
     (async function(){
