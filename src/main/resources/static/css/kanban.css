@@ -14,7 +14,7 @@
 .kanban-header{
     padding: 3rem 3rem 2rem 3rem;
     font-size: var(--font-size-18);
-    color: var(--color-secondary);
+    color: var(--color-primary);
     font-weight: 800;
 }
 .kanban-cards{
