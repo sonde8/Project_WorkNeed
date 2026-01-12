@@ -38,46 +38,58 @@
         <!-- 오른쪽 -->
         <section class="right">
 
-            <div class = "day" id = "yearMonth"> 날짜 </div>
+            <div class="dayChart">
+
+                <button type="button" id="prevDay"> &lt; </button>
+                <div class="day"><span id="yearMonth"></span></div>
+                <button type="button" id="nextDay"> &gt; </button>
+
+                <!-- 몇주차 -->
+                <div class="weekLabel"><span id="weekText"></span></div>
+
+            </div>
 
             <div class = "week-box">
-                <div class = "week-header">
-                    <span> 주 간 근 무 실 적 상 황 </span>
-                    <span class = "total"> 총 <b id = "weekTotal"> 0h 0m </b></span>
-                </div>
 
+                <div class="package">
 
-                <div class = "week-bar">
-
-                    <div class = "bar-chart" id = "barTrack">
-
-                        <div class = "bar-clip">
-                        <div class = "week-fill base" id="weekFillBase"></div>
-                        <div class = "week-fill ot" id="weekFillOt"></div>
-                        <div class = "week-fill holiday" id="weekFillHoliday"></div>
-                        </div>
-
-                        <div class = "mark" id="mark52"><span class="mark-text"> 52시간 </span></div>
-                        <div class = "mark" id="mark70"><span class="mark-text"> 70시간 </span></div>
-
+                    <div class = "week-header">
+                        <span> 주 간 근 무 실 적 상 황 </span>
+                        <span class = "total"> 총 <b id = "weekTotal"> 0h 0m </b></span>
                     </div>
 
-                    <div class = "week-bottom">
-                        <div class = "week-info">
-                            <div> 남은 근무 시간 : <b id = "remainWork"> 52h 0m</b> </div>
-                            <div> 남은 연장 시간 : <b id = "remainOt"> 18h 0m </b> </div>
-                            <div> 휴일 근무 시간 : <b id = "holidayWork"> 0h 0m </b></div>
+
+                    <div class = "week-bar">
+
+                        <div class = "bar-chart" id = "barTrack">
+
+                            <div class = "bar-clip">
+                            <div class = "week-fill base" id="weekFillBase"></div>
+                            <div class = "week-fill ot" id="weekFillOt"></div>
+                            <div class = "week-fill holiday" id="weekFillHoliday"></div>
+                            </div>
+
+                            <div class="bar-dot" id="barDot" aria-hidden="true"></div>
+
+                            <div class = "mark" id="mark52"><span class="mark-text"> 52시간 </span></div>
+                            <div class = "mark" id="mark70"><span class="mark-text"> 70시간 </span></div>
                         </div>
 
-                        <div class="week-legend">
-                            <div class="lg-item"><span class="lg-dot normal"></span><span>정상 근무</span></div>
-                            <div class="lg-item"><span class="lg-dot ot"></span><span>연장 근무</span></div>
-                            <div class="lg-item"><span class="lg-dot holiday"></span><span>휴일 근무</span></div>
+                        <div class = "week-bottom">
+                            <div class = "week-info">
+                                <div> 남은 근무 시간 : <b id = "remainWork"> 52h 0m</b> </div>
+                                <div> 남은 연장 시간 : <b id = "remainOt"> 18h 0m </b> </div>
+                                <div> 휴일 근무 시간 : <b id = "holidayWork"> 0h 0m </b></div>
+                            </div>
+
+                            <div class="week-legend">
+                                <div class="lg-item"><span class="lg-dot normal"></span><span>정상 근무</span></div>
+                                <div class="lg-item"><span class="lg-dot ot"></span><span>연장 근무</span></div>
+                                <div class="lg-item"><span class="lg-dot holiday"></span><span>휴일 근무</span></div>
+                            </div>
                         </div>
                     </div>
-
                 </div>
-
 
             </div>
 
