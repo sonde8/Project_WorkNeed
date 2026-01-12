@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+//사용자의 신분 확인과 아이디 비밀번호 복구를 담당
 @RestController
 @RequestMapping("/api/mail")
 @RequiredArgsConstructor
@@ -18,7 +19,6 @@ public class EmailApiController {
     private final MailService mailService;
     private final UserService userService;
 
-    // 중복된 @PostMapping("/send")가 있는지 확인하고 하나만 남기세요!
     @PostMapping("/send")
     public ResponseEntity<?> sendCode(@RequestParam("email") String email, @RequestParam("loginId") String loginId,
                                       HttpSession session) {
@@ -42,7 +42,7 @@ public class EmailApiController {
         return ResponseEntity.ok("인증번호가 발송되었습니다.");
     }
 
-    // 아이디 찾기 API 추가
+    // 아이디 찾기 
     @PostMapping("/find-id")
     public ResponseEntity<?> findId(@RequestParam("userName") String userName,
                                     @RequestParam("email") String email) {
@@ -57,43 +57,46 @@ public class EmailApiController {
         return ResponseEntity.ok(loginId);
     }
 
+    // 비밀번호 찾기
     @PostMapping("/find-pw")
     public ResponseEntity<?> findPw(@RequestParam("loginId") String loginId,
                                     @RequestParam("email") String email,
                                     HttpSession session) {
 
-        // 1. 서비스 호출 (내부에서 DB 업데이트 및 이쁜 템플릿 메일 발송 완료됨)
+        // 1. 임시 비밀번호 생성 및  내부에서 DB 업데이트, 메일 발송
         String tempPw = userService.createTempPassword(loginId, email);
 
         if (tempPw == null) {
             return ResponseEntity.badRequest().body("일치하는 회원 정보가 없습니다.");
         }
 
-        // 2. 컨트롤러에서의 추가 발송 코드는 삭제하고 세션 설정만 유지
+        // 2. 임시 비번으로 발급받은 사람임을 세션저장
         session.setAttribute("isTempLogin", true);
 
         return ResponseEntity.ok("입력하신 이메일로 임시 비밀번호를 발송했습니다.");
     }
 
+    // 인증번호 검증
     @PostMapping("/verify")
     public ResponseEntity<Boolean> verify(@RequestParam("code") String code,
                                           HttpSession session) {
 
+        // 세션에 저장해뒀던 인증번호 확인
         String savedCode = (String) session.getAttribute("authCode");
 
         if (savedCode == null) {
             return ResponseEntity.ok(false);
         }
 
+        // 사용자가 화면에 입력값과 서버(savecode)의 값 일치확인
         boolean result = savedCode.equals(code);
 
         if (result) {
-            session.removeAttribute("authCode"); // 성공 시 삭제
+            session.removeAttribute("authCode"); // 성공 시 코드 즉시 삭제
         }
 
         return ResponseEntity.ok(result);
     }
-
 
 
 }

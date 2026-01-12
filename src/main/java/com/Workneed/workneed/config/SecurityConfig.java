@@ -24,15 +24,18 @@ public class SecurityConfig {
     private final LoginFailureHandler loginFailureHandler;
 
 
+    //보안 접속통로 관리
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http
-                // CSRF / frame
+                // CSRF 추후 활성
+                //  frame:클릭재킹-다른 도메인이 아니면 위에 창을 못띄위게 막는 필터링-
                 .csrf(csrf -> csrf.disable())
-                .headers(headers -> headers.frameOptions(frame -> frame.disable()))
+                .headers(headers -> headers
+                        .frameOptions(frame -> frame.sameOrigin()))
 
-                // 접근 권한
+                // 누구나 접근 가능한 매핑
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/",
@@ -52,7 +55,7 @@ public class SecurityConfig {
                                 "/upload/**"
                         ).permitAll()
 
-                        // 🔽 여기부터 권한
+                        // 부서권한 있는 사람만 접근
                         .requestMatchers("/admin/dept/**")
                         .hasAnyAuthority(
                                 "DEPT_ASSIGN",
@@ -61,6 +64,7 @@ public class SecurityConfig {
                                 "DEPT_DELETE"
                         )
 
+                        //직급권한 있는 사람만 접근
                         .requestMatchers("/admin/rank/**")
                         .hasAnyAuthority(
                                 "RANK_ASSIGN",
@@ -69,26 +73,28 @@ public class SecurityConfig {
                                 "RANK_DELETE"
                         )
 
+                        //휴가권한 있는 사람만 접근
                         .requestMatchers("/admin/leave/**")
                         .hasAnyAuthority(
                                 "LEAVE_APPROVE",
                                 "LEAVE_REJECT"
                         )
 
+                        //근태권한 있는 사람만 접근
                         .requestMatchers("/admin/attend/**")
                         .hasAnyAuthority(
                                 "ATTEND_APPROVE",
                                 "ATTEND_REJECT"
                         )
 
-                        // ※ 관리자는 아직 세션 기반이므로 일단 permit
-                        .requestMatchers("/admin/**").authenticated()
-                        .requestMatchers("/main", "/main/**").authenticated()
+                        // 관리자만 들어올수있는 필터링 , 로그인한 사람만 메인 접근가능
+                        .requestMatchers("/admin/**", "/main/**").authenticated()
+                        // [핵심]명시적 허용 외에 전부 로그인 후 사용가능하게 하는 필터링
                         .anyRequest().authenticated()
                 )
 
 
-                // 일반 로그인 (HTML 구조에 맞춤)
+                // 일반 로그인
                 .formLogin(form -> form
                         .loginPage("/login")
                         .loginProcessingUrl("/login-user")
@@ -100,7 +106,7 @@ public class SecurityConfig {
                 )
 
 
-                // 자동 로그인 (remember-me) — 핵심 5줄
+                // 자동 로그인
                 .rememberMe(r -> r
                         .key("workneed-secret-key")
                         .tokenValiditySeconds(60 * 60 * 24 * 365)
@@ -108,6 +114,7 @@ public class SecurityConfig {
                         .userDetailsService(totalAuthService)
                 )
 
+                // 소셜 로그인
                 .oauth2Login(oauth2 -> oauth2
                         .loginPage("/login")
                         .userInfoEndpoint(userInfo -> userInfo

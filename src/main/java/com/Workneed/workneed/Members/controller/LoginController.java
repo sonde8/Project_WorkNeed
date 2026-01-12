@@ -2,33 +2,30 @@ package com.Workneed.workneed.Members.controller;
 
 
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import com.Workneed.workneed.Members.auth.principal.CustomUserDetails;
 import com.Workneed.workneed.Members.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
-
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 
+// 사용자의 로그인 상태를 감지하여 중복 로그인방지 , 접속 거부시 사유에 맞는 메시지 출력
 @Controller
 @RequiredArgsConstructor
 public class LoginController {
 
     private final UserService userService;
 
-
     //로그인 페이지 이동
     @GetMapping("/login")
     public String loginForm(HttpSession session, Authentication authentication,
                             @RequestParam(required = false) String reason,
                             Model model) {
-
-
+        
+        //스프링 시큐리티는 로그인 안 한 사용자도 '익명 사용자'로 보는데, 이를 제외한 진짜 로그인 유저만 저장
         if (authentication != null && authentication.isAuthenticated()
                 && !(authentication instanceof AnonymousAuthenticationToken)) {
             return "redirect:/main";
