@@ -2,7 +2,7 @@ let isDragging = false;
 
 document.addEventListener("DOMContentLoaded", () => {
 
-    /*  Elements */
+    /* Elements */
     const addTaskBtns = document.querySelectorAll(".kanban-addTask");
     const statusInput = document.getElementById("status");
 
@@ -25,6 +25,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const startInput = document.getElementById("startAt");
     const endInput   = document.getElementById("endAt");
+
+    /* ======================================================
+     * [추가] 조직도 관련 상태 변수
+     * ====================================================== */
+    let selectedUsers = new Set(); // 선택된 사용자 ID를 중복 없이 저장
+    let allUserData = [];          // 서버에서 가져온 전체 유저 데이터를 보관
 
     /* ======================================================
      * Helpers
@@ -95,9 +101,9 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-/* ======================================================
-* Flatpickr
-* ====================================================== */
+    /* ======================================================
+    * Flatpickr
+    * ====================================================== */
     let startPicker, endPicker;
 
     function initTaskPickersOnce() {
@@ -112,47 +118,32 @@ document.addEventListener("DOMContentLoaded", () => {
             enableTime: true,
             time_24hr: true,
             minuteIncrement: STEP_MIN,
-            // 서버로 보내는 값
             dateFormat: "Y-m-d\\TH:i",
-
-            // 화면에 보이는 값
             altInput: true,
             altFormat: "Y-m-d H:i",
-
             allowInput: false,
-
             onChange(selectedDates) {
                 if (!selectedDates.length) return;
-
                 const start = selectedDates[0];
-
                 endPicker.set("minDate", start);
-
                 const end = endPicker.selectedDates?.[0];
                 if (end && end < start) {endPicker.setDate(start, true);}
             }
         });
-
 
         endPicker = flatpickr(endInput, {
             disableMobile: true,
             enableTime: true,
             time_24hr: true,
             minuteIncrement: STEP_MIN,
-
             dateFormat: "Y-m-d\\TH:i",
-
             altInput: true,
             altFormat: "Y-m-d H:i",
-
             allowInput: false,
-
             onChange(selectedDates) {
                 if (!selectedDates.length) return;
-
                 const end = selectedDates[0];
                 const start = startPicker.selectedDates?.[0];
-
                 if (start && end < start) {endPicker.setDate(start, true); }
             }
         });
@@ -205,7 +196,6 @@ document.addEventListener("DOMContentLoaded", () => {
     taskForm?.addEventListener("submit", async (e) => {
         const type = typeInput?.value || "PERSONAL";
         if (type !== "TEAM") {
-            closeTaskModal();
             return;
         }
 
@@ -221,64 +211,216 @@ document.addEventListener("DOMContentLoaded", () => {
         closeTaskModal();
         openTeamModal();
 
-        const users = await fetch(`/schedule/active-users?scheduleId=${scheduleId}`).then(r => r.json());
-        renderUsers(users);
+        selectedUsers.clear();
+        loadOrganizationTree(scheduleId);
     });
 
     /* ======================================================
-     * TEAM Invite
+     * [수정] 조직도 기반 TEAM Invite 로직
      * ====================================================== */
-    function renderUsers(users) {
-        const box = document.getElementById("teamUserList");
-        const countEl = document.getElementById("inviteCount");
-        if (!box) return;
 
-        box.innerHTML = "";
+    async function loadOrganizationTree(scheduleId) {
+        try {
+            const users = await fetch(`/schedule/active-users?scheduleId=${scheduleId}`).then(r => r.json());
+            allUserData = users;
+            renderDeptTree(users);
+            updateSelectedUI();
+        } catch (err) {
+            console.error("조직도 로딩 실패:", err);
+        }
+    }
 
-        if (!users || users.length === 0) {
-            box.innerHTML = `<div style="padding:12px;">표시할 팀원이 없습니다.</div>`;
-            if (countEl) countEl.textContent = `[ 0명 ]`;
+    function renderDeptTree(users) {
+        const container = document.getElementById("deptTreeContainer");
+        if (!container) return;
+        container.innerHTML = "";
+
+        const deptMap = {};
+        users.forEach(u => {
+            if (!deptMap[u.deptName]) deptMap[u.deptName] = [];
+            deptMap[u.deptName].push(u);
+        });
+
+        const treeUl = document.createElement("ul");
+        treeUl.className = "dept-tree";
+
+        for (const deptName in deptMap) {
+            const deptLi = document.createElement("li");
+
+            deptLi.innerHTML = `
+                <div class="dept-header" style="display:flex; justify-content:space-between; align-items:center; cursor:pointer; padding:8px 0;">
+                    <div class="dept-title-area" style="font-weight:bold;">
+                        <span class="arrow">▶</span> ${deptName}
+                    </div>
+                    <button type="button" class="dept-select-all" data-dept="${deptName}" 
+                            style="font-size:11px; padding:2px 6px; cursor:pointer; background:#eee; border:1px solid #ccc; border-radius:3px;">
+                        전체 선택
+                    </button>
+                </div>
+            `;
+
+            const userUl = document.createElement("ul");
+            userUl.className = "user-list hidden";
+            userUl.style.paddingLeft = "20px";
+
+            deptMap[deptName].forEach(user => {
+                const userLi = document.createElement("li");
+                userLi.className = "user-item";
+                userLi.style.cursor = "pointer";
+                userLi.style.padding = "5px";
+                userLi.innerHTML = `<span>${user.userName} (${user.rankName || '사원'})</span>`;
+
+                userLi.onclick = (e) => {
+                    e.stopPropagation();
+                    toggleUserSelection(user);
+                };
+                userUl.appendChild(userLi);
+            });
+
+            const deptHeader = deptLi.querySelector(".dept-header");
+            deptHeader.onclick = (e) => {
+                if (e.target.classList.contains('dept-select-all')) return;
+
+                const arrow = deptLi.querySelector(".arrow");
+                const isHidden = userUl.classList.toggle("hidden");
+                arrow.textContent = isHidden ? "▶" : "▼";
+            };
+
+            const selectAllBtn = deptLi.querySelector(".dept-select-all");
+            selectAllBtn.onclick = (e) => {
+                e.stopPropagation();
+                const targetDept = selectAllBtn.getAttribute('data-dept');
+                const deptMembers = deptMap[targetDept];
+
+                const allSelected = deptMembers.every(m => selectedUsers.has(m.userId));
+
+                deptMembers.forEach(member => {
+                    if (allSelected) {
+                        selectedUsers.delete(member.userId);
+                    } else {
+                        selectedUsers.add(member.userId);
+                    }
+                });
+                updateSelectedUI();
+            };
+
+            deptLi.appendChild(userUl);
+            treeUl.appendChild(deptLi);
+        }
+        container.appendChild(treeUl);
+    }
+
+    /**
+     * [이식 및 수정] 이름 검색 필터링 및 부서 자동 열기
+     * [설명] 검색어가 포함된 유저가 한 명이라도 있는 부서를 자동으로 펼치고 표시합니다.
+     */
+    function filterUsers(keyword) {
+        const trimmedKeyword = keyword.trim().toLowerCase();
+        const userLists = document.querySelectorAll('.user-list');
+        const userItems = document.querySelectorAll('.user-item');
+
+        // 1. 검색어가 비어있는 경우: 모든 부서를 닫고 유저를 모두 표시
+        if (trimmedKeyword === "") {
+            userLists.forEach(list => {
+                list.classList.add('hidden');
+                const arrow = list.parentElement.querySelector('.arrow');
+                if (arrow) arrow.innerText = '▶';
+                list.parentElement.style.display = 'block';
+            });
+            userItems.forEach(item => {
+                item.style.display = 'flex';
+            });
             return;
         }
 
-        users.forEach(u => {
-            const label = document.createElement("label");
-            label.className = "invite-row";
-            label.innerHTML = `
-            <div class="meta">
-              <div class="name">${u.userName} <span class="sub">(${u.rankName || ""})</span></div>
-              <div class="sub">${u.deptName || ""} · ${u.userEmail || ""}</div>
-            </div>
-            <input type="checkbox" name="userIds" value="${u.userId}">
-            `;
-            box.appendChild(label);
-        });
+        // 2. 검색어가 있는 경우: 일치하는 유저 표시 및 부서 자동 열기
+        userLists.forEach(list => {
+            let hasVisibleUser = false;
+            const itemsInGroup = list.querySelectorAll('.user-item');
 
-        function updateInviteCount() {
-            if (!countEl) return;
-            const checkedCount = box.querySelectorAll('input[name="userIds"]:checked').length;
-            countEl.textContent = `[ ${checkedCount}명 ]`;
-        }
-        // 초기 0명
-        updateInviteCount();
+            itemsInGroup.forEach(item => {
+                const nameText = item.innerText.toLowerCase();
 
-        if (!box.dataset.inviteCountBound) {
-            box.addEventListener("change", (e) => {
-                if (e.target && e.target.matches('input[name="userIds"]')) {
-                    updateInviteCount();
+                if (nameText.includes(trimmedKeyword)) {
+                    item.style.display = 'flex';
+                    hasVisibleUser = true;
+                } else {
+                    item.style.display = 'none';
                 }
             });
-            box.dataset.inviteCountBound = "1";
+
+            const arrow = list.parentElement.querySelector('.arrow');
+
+            if (hasVisibleUser) {
+                list.classList.remove('hidden');
+                if (arrow) arrow.innerText = '▼';
+                list.parentElement.style.display = 'block';
+            } else {
+                list.classList.add('hidden');
+                if (arrow) arrow.innerText = '▶';
+                list.parentElement.style.display = 'none';
+            }
+        });
+    }
+
+    function toggleUserSelection(user) {
+        if (selectedUsers.has(user.userId)) {
+            selectedUsers.delete(user.userId);
+        } else {
+            selectedUsers.add(user.userId);
+        }
+        updateSelectedUI();
+    }
+
+    function updateSelectedUI() {
+        const listContainer = document.getElementById("selectedUserList");
+        const countEl = document.getElementById("selectedUsersCount");
+        if (!listContainer || !countEl) return;
+
+        listContainer.innerHTML = "";
+
+        const selectedList = allUserData.filter(u => selectedUsers.has(u.userId));
+        countEl.textContent = `선택된 대상 (${selectedList.length})`;
+
+        if (selectedList.length === 0) {
+            listContainer.innerHTML = '<p class="placeholder-text">대상을 선택해주세요.</p>';
+            return;
         }
 
+        selectedList.forEach(u => {
+            const item = document.createElement("div");
+            item.className = "selected-user-item";
+            item.style.cssText = "display:flex; justify-content:space-between; align-items:center; background:#fff; padding:8px; margin-bottom:5px; border:1px solid #ddd; border-radius:4px;";
+            item.innerHTML = `
+                <div class="selected-info">
+                    <strong>${u.userName}</strong> <span style="font-size:11px; color:#888; margin-left:5px;">${u.deptName}</span>
+                </div>
+                <button type="button" class="remove-btn" style="border:none; background:none; color:#ff5b5b; cursor:pointer; font-size:18px;">&times;</button>
+            `;
+            item.querySelector(".remove-btn").onclick = () => {
+                selectedUsers.delete(u.userId);
+                updateSelectedUI();
+            };
+            listContainer.appendChild(item);
+        });
     }
+
+    // [수정] 단순 리스트 필터링이 아닌 filterUsers 함수 호출로 변경
+    const userSearchInput = document.getElementById("userSearchInput");
+    userSearchInput?.addEventListener("input", (e) => {
+        filterUsers(e.target.value);
+    });
 
     teamInviteForm?.addEventListener("submit", async (e) => {
         e.preventDefault();
 
         const scheduleId = document.getElementById("teamScheduleId").value;
-        const userIds = [...document.querySelectorAll('input[name="userIds"]:checked')]
-            .map(el => el.value);
+        const userIds = Array.from(selectedUsers);
+
+        if (userIds.length === 0) {
+            alert("초대할 팀원을 한 명 이상 선택해주세요.");
+            return;
+        }
 
         const params = new URLSearchParams({ scheduleId });
         userIds.forEach(id => params.append("userIds", id));
@@ -325,7 +467,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // 초기 0
     updateDoneDeleteUI();
 
     document.addEventListener("click", async (e) => {
@@ -352,7 +493,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 throw new Error(data.message || "삭제 실패");
             }
 
-            // 성공한 id만 화면에서 제거
             (data.deletedIds || ids).forEach(id => {
                 document.querySelector(`.kanban-card[data-id="${id}"]`)?.remove();
             });
@@ -371,34 +511,24 @@ document.addEventListener("DOMContentLoaded", () => {
     function ensureDoneSelectCheckbox(cardEl, isDone) {
         if (!cardEl) return;
 
-        // DONE이면 체크박스 → 없으면 생성
         let label = cardEl.querySelector("label.done-check");
         if (isDone) {
             if (!label) {
                 label = document.createElement("label");
                 label.className = "done-check";
-
                 const chk = document.createElement("input");
                 chk.type = "checkbox";
                 chk.className = "done-select";
-
-                // 체크박스 클릭 상세페이지 이동에 먹히지 않게
                 label.addEventListener("click", (e) => e.stopPropagation());
                 chk.addEventListener("click", (e) => e.stopPropagation());
-
                 label.appendChild(chk);
-
-                // 카드 맨 앞에 DONE 체크박스 영역 삽입
                 cardEl.insertBefore(label, cardEl.firstChild);
             } else {
-                // 숨김 상태일 때 대비
                 const chk = label.querySelector("input.done-select");
                 if (chk) chk.checked = false;
             }
             return;
         }
-
-        // DONE이 아니면 체크박스 영역 제거
         if (label) label.remove();
     }
 
@@ -406,21 +536,17 @@ document.addEventListener("DOMContentLoaded", () => {
         new Sortable(list, {
             group: "kanban",
             animation: 300,
-
             onStart() {
                 isDragging = true;
             },
-
             onMove(evt) {
                 if (evt.from.dataset.status === "DONE" && evt.to.dataset.status !== "DONE") {
                     return false;
                 }
                 return true;
             },
-
             async onEnd(evt) {
                 setTimeout(() => isDragging = false, 0);
-
                 if (evt.from.dataset.status === evt.to.dataset.status) return;
 
                 const params = new URLSearchParams({
@@ -434,7 +560,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     body: params.toString()
                 });
 
-                // 실패 시
                 if (!res.ok) {
                     evt.from.insertBefore(evt.item, evt.from.children[evt.oldIndex] || null);
                     ensureDoneSelectCheckbox(evt.item, evt.from.dataset.status === "DONE");
@@ -442,10 +567,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     return;
                 }
 
-                // 성공 시
                 ensureDoneSelectCheckbox(evt.item, evt.to.dataset.status === "DONE");
                 updateDoneDeleteUI();
-
             }
         });
     });
