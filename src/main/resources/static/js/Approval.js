@@ -350,10 +350,13 @@ document.addEventListener("DOMContentLoaded", () => {
      * DETAIL PAGE (문서 상세) - 거절 토글 (기존 그대로)
      * ================================================== */
     const rejectForm = document.getElementById("rejectForm");
+
     if (rejectForm) {
+        // HTML에 작성된 id="btnToggleReject"와 똑같이 맞춰줍니다.
         const toggleBtn = document.getElementById("btnRejectToggle");
         const cancelBtn = document.getElementById("btnCancelReject");
 
+        // 1. 컨펌 메시지 로직 (기존 유지)
         document.querySelectorAll("[data-confirm]").forEach(btn => {
             btn.addEventListener("click", (e) => {
                 const msg = btn.dataset.confirm;
@@ -364,12 +367,15 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         });
 
+        // 2. 초기 상태 숨김
         rejectForm.style.display = "none";
 
+        // 3. 반려 버튼 토글 로직
         if (toggleBtn) {
             toggleBtn.addEventListener("click", () => {
-                const isHidden = rejectForm.style.display === "none";
+                const isHidden = (rejectForm.style.display === "none");
                 rejectForm.style.display = isHidden ? "block" : "none";
+
                 if (isHidden) {
                     const ta = rejectForm.querySelector("textarea[name='comment']");
                     if (ta) ta.focus();
@@ -377,6 +383,7 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         }
 
+        // 4. 취소 버튼 로직
         if (cancelBtn) {
             cancelBtn.addEventListener("click", () => {
                 rejectForm.style.display = "none";
@@ -385,7 +392,6 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         }
     }
-});
 const selectedUserIds = new Set();
 
 function renderPicked() {
