@@ -39,9 +39,16 @@ public class LocalUserDetailsService implements UserDetailsService {
         if (user != null) {
 
             if (!"ACTIVE".equals(user.getUserStatus())) {
-                // INACTIVE면 "pending"으로, 그외엔 변환(suspended, banned)
-                String reason = "INACTIVE".equals(user.getUserStatus()) ? "pending" : user.getUserStatus().toLowerCase();
-                // FailureHandler가 받아서 주소창에 ?reason=pending을 붙임
+
+
+                String reason = "pending";
+
+                if (user.getUserCreatedAt() != null) {
+                    long days = java.time.temporal.ChronoUnit.DAYS.between(user.getUserCreatedAt(), java.time.LocalDate.now());
+                    if (days >= 30) {
+                        reason = "inactive";
+                    }
+                }
                 throw new DisabledException(reason);
             }
             // ROLE_USER로 반환

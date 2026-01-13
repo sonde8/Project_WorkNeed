@@ -46,7 +46,7 @@ public class LoginController {
 
                 case "pending":
                     model.addAttribute("infoMessage",
-                            "가입 승인 대기 중입니다. 관리자가 승인한 후 서비스 이용이 가능합니다.");
+                            "승인 대기 중입니다. 관리자가 승인한 후 서비스 이용이 가능합니다.");
                     break;
 
                 case "suspended":
