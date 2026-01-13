@@ -106,6 +106,7 @@
     table-layout: fixed;
     border: 0;
     margin-bottom: 0;
+    font-weight: 550;
 }
 
 .bookTable thead th{
@@ -191,11 +192,13 @@
 
 /* 지각, 휴일근무 색깔 */
 .bookTable td.type-alert{
+    font-weight: 600;
     color: #e57373;
 }
 
 /* 연차일 때 회색 */
 .leave-row td{
+    font-weight: 600;
     background: #f9fafb;
 }
 
