@@ -37,7 +37,9 @@ public interface ScheduleMapper {
 
 //    메인 칸반
 
-    int countDoingSchedulesAll();
+    int countMainDoingSchedules();
+
+    int countDoingSchedulesAll(@Param("userId") Long userId);
 
 
     List<MainScheduleDTO> selectMainMyTaskCardsInDoingScheduleByStatus(

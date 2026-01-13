@@ -186,6 +186,7 @@ document.addEventListener("DOMContentLoaded", () => {
     taskPanel?.addEventListener("click", e => e.stopPropagation());
     teamPanel?.addEventListener("click", e => e.stopPropagation());
 
+
     /* EventType / Type 선택 */
     eventTypeGroup?.addEventListener("click", e => {
         const btn = e.target.closest(".eventBtn");
@@ -203,7 +204,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
     /* Task 생성 */
     taskForm?.addEventListener("submit", async (e) => {
+
+        if (!startInput.value) {
+            e.preventDefault();
+            alert("시작 시간을 입력해주세요.");
+            startInput.focus();
+            return;
+        }
+
+        if (!endInput.value) {
+            e.preventDefault();
+            alert("종료 시간을 입력해주세요.");
+            endInput.focus();
+            return;
+        }
+
         const type = typeInput?.value || "PERSONAL";
+        
         if (type !== "TEAM") {
             closeTaskModal();
             return;
