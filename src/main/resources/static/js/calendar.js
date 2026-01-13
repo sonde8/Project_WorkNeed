@@ -98,24 +98,24 @@
         // =========================================================
         if (source === "SCHEDULE") {
             if (type === "PERSONAL") {
-                return "rgba(11, 46, 79, 0.4)"; // 업무-개인 (기본 파랑)
+                return "rgba(11, 46, 79, 0.35)"; // 업무-개인
             }
             if (type === "TEAM") {
-                return "rgba(11, 46, 79, 0.7)"; // 업무-팀 (초록)
+                return "rgba(11, 46, 79, 0.7)"; // 업무-팀
             }
             if (type === "COMPANY") {
-                return "rgba(11, 46, 79, 0.95)"; // 업무-회사 (빨강)
+                return "rgba(11, 46, 79, 0.95)"; // 업무-회사
             }
-            // 예외(타입 없는 경우) 처리: 업무 기본색(여기선 파랑으로 둠)
-            return "#3b82f6";
+            // 예외(타입 없는 경우) 처리
+            return "rgba(11, 46, 79, 0.35)";
         }
 
         // =========================================================
-        // 2. [CALENDAR] 캘린더 일정 (내장 기능)
+        // 2. [CALENDAR] 캘린더 일정
         // =========================================================
-        // 2-1. 관리자가 등록한 회사 전체 일정 (보라색 고정)
+        // 2-1. 관리자가 등록한 회사 전체 일정
         if (type === "COMPANY") {
-            return "#8b5cf6";
+            return "rgb(49, 46, 129)";
         }
 
         // 2-2. 내 개인 일정
@@ -125,35 +125,34 @@
         }
 
         // 지정 안 했으면 기본 파랑
-        return "#3b82f6";
+        return "rgb(30, 64, 175)";
     }
 
     function getCategoryInfo(dto) {
         const type = (dto?.type || "").toUpperCase();
         const source = getSource(dto);
 
-        // 1. [SCHEDULE] 업무 연동 (타입별 색상 매칭)
+        // 1. [SCHEDULE] 업무 연동
         if (source === "SCHEDULE") {
             if (type === "COMPANY") {
-                // 업무-회사: 빨강 계열
-                return { text: "업무(회사)", bg: "#fee2e2", color: "#b91c1c" };
+                // 업무-회사: 가장 진한 무게감 (opacity 0.25)
+                return { text: "업무(회사)", bg: "rgba(11, 46, 79, 0.25)", color: "rgb(11, 46, 79)" };
             }
             if (type === "TEAM") {
-                // 업무-팀: 초록 계열
-                return { text: "업무(팀)", bg: "#dcfce7", color: "#15803d" };
+                // 업무-팀: 중간 무게감 (opacity 0.15)
+                return { text: "업무(팀)", bg: "rgba(11, 46, 79, 0.15)", color: "rgb(11, 46, 79)" };
             }
-            // 업무-개인: 파랑 계열 (텍스트로 '업무'임을 명시)
-            return { text: "업무(개인)", bg: "#dbeafe", color: "#1d4ed8" };
+            // 업무-개인: 가장 가벼운 무게감 (opacity 0.08)
+            return { text: "업무(개인)", bg: "rgba(11, 46, 79, 0.08)", color: "rgb(11, 46, 79)" };
         }
 
         // 2. [CALENDAR] 내장 캘린더
-        // 회사 (관리자 공지 등): 보라 계열
         if (type === "COMPANY") {
-            return { text: "사내공지", bg: "#f3e8ff", color: "#7e22ce" };
+            return { text: "사내공지", bg: "rgba(49, 46, 129, 0.15)", color: "rgb(49, 46, 129)" };
         }
 
-        // 개인 (기본): 파랑 계열
-        return { text: "개인", bg: "#eff6ff", color: "#1e40af" };
+        // 개인 (기본)
+        return { text: "개인", bg: "rgba(30, 64, 175, 0.1)", color: "rgb(30, 64, 175)" };
     }
 
     function getDtoId(dto) {
@@ -508,25 +507,22 @@
                 }
 
                 // 뱃지 설정
-                let badgeClass = 'personal';
-                let badgeText = '개인';
                 const cat = getCategoryInfo(e);
-
-                if (cat.text.includes('회사') || cat.text.includes('공지')) {
-                    badgeClass = 'company'; badgeText = '회사';
-                } else if (cat.text.includes('팀')) {
-                    badgeClass = 'team'; badgeText = '팀';
-                }
 
                 li.innerHTML = `
                     <div class="work-time-box"> 
                         ${dateHtml}
                     </div>
                     <div class="work-info-box">
-                        <span class="w-badge ${badgeClass}">${badgeText}</span>
+                        <span class="w-badge" style="background-color: ${cat.bg}; color: ${cat.color};">
+                            ${cat.text}
+                        </span>
                         <span class="w-title">${e.title || '(제목 없음)'}</span>
                     </div>
                 `;
+
+                li.onclick = () => safeOpenDetailModal(e);
+                ul.appendChild(li);
 
                 li.onclick = () => safeOpenDetailModal(e);
                 ul.appendChild(li);

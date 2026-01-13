@@ -507,6 +507,21 @@ body {
     text-decoration: none;
 }
 
+.fc-daygrid-event .fc-event-time {
+    display: none !important;
+}
+.fc-daygrid-event .fc-event-main {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+.fc-daygrid-event .fc-event-title {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
 /* =============================================================================
    6. Modals (Blur Backdrop)
    ============================================================================= */
