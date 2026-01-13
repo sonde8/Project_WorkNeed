@@ -9,12 +9,17 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import com.Workneed.workneed.Members.mapper.AdminUserMapper;
+import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 
 
 @ControllerAdvice
+@RequiredArgsConstructor
 public class GlobalUserModelAdviceService {
+
+    private final AdminUserMapper adminUserMapper;
 
     @ModelAttribute("user")
     public UserDTO user(HttpSession session, HttpServletResponse response) throws IOException { // throws 추가
@@ -52,19 +57,31 @@ public class GlobalUserModelAdviceService {
     }
 
     @ModelAttribute("admin")
-    public AdminUserDTO admin(HttpSession session) {
+    public AdminUserDTO admin(HttpSession session, HttpServletResponse response) throws IOException {
+
         AdminUserDTO admin = (AdminUserDTO) session.getAttribute("admin");
 
-        // 관리자 세션 복구 로직 추가
-        if (admin == null) {
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            if (auth != null && auth.getPrincipal() instanceof CustomUserDetails cud) {
-                admin = cud.getAdminDto();
-                if (admin != null) {
-                    session.setAttribute("admin", admin);
-                }
-            }
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !(auth.getPrincipal() instanceof CustomUserDetails cud)) {
+            return admin;
         }
-        return admin;
+
+        AdminUserDTO loginAdmin = cud.getAdminDto();
+        if (loginAdmin == null) return admin;
+
+        // DB 최신 상태 재조회
+        AdminUserDTO latest = adminUserMapper.findByAdminId(loginAdmin.getAdminId());
+
+        // ACTIVE 아니면 즉시 튕김
+        if (latest == null || !"ACTIVE".equals(latest.getAdminStatus())) {
+            SecurityContextHolder.clearContext();
+            session.invalidate();
+            response.sendRedirect("/login?reason=suspended");
+            return null;
+        }
+
+        // ACTIVE면 세션 최신화
+        session.setAttribute("admin", latest);
+        return latest;
     }
 }

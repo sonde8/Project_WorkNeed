@@ -260,6 +260,31 @@ function saveNewAdmin() {
        });
    }
 
+/* =========================
+모달 외부 클릭 및 ESC 닫기 추가
+========================= */
+
+// 1. 모달 바깥 배경 클릭 시 닫기
+window.addEventListener('click', function(event) {
+    // 클릭된 요소가 'modal' 클래스를 가진 배경 영역인지 확인
+    if (event.target.classList.contains('modal')) {
+        closeModal(event.target.id);
+    }
+});
+
+// 2. ESC 키 입력 시 열려있는 모달 닫기
+window.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        // 현재 display가 'block'인 모든 모달을 찾아 닫음
+        const modals = document.querySelectorAll('.modal');
+        modals.forEach(modal => {
+            if (modal.style.display === 'block') {
+                closeModal(modal.id);
+            }
+        });
+    }
+});
+
 
 
 

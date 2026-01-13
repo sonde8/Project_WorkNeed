@@ -1,10 +1,29 @@
 /* ==========================================
     1. 전체 레이아웃 (1340px 내에서 작동)
 ========================================== */
+
+/* 스크롤바 */
+.message-log::-webkit-scrollbar {
+    width: 4px;
+}
+
+.message-log::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+.room-list-scroll::-webkit-scrollbar {
+    width: 4px;
+}
+.room-list-scroll::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
 .chat-inner-layout {
     display: flex;
-    height: calc(100vh - 100px);
-    background-color: #F2F4F7; /* 캘린더 배경색(--color-bg)과 통일 */
+    height: 100%;
+    background-color: var(--color-bg); /* 캘린더 배경색(--color-bg)과 통일 */
     padding: 20px;            /* 캘린더와 동일한 여백 */
     gap: 20px;                /* 사이드바와 메인 사이 간격 */
     border: none;             /* 기존 테두리 제거 */
@@ -27,14 +46,14 @@
 .search-container {
     padding: 20px 15px;       /* 여백 확보 */
     background-color: #fff;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--color-border);
 }
 
 .search-box-wrapper {
     display: flex !important;       /* 가로 배치 */
     flex-direction: row !important; /* 세로 정렬 방지 */
     align-items: center;            /* 세로 중앙 정렬 */
-    background-color: #F8F9FA;      /* 캘린더 호버 배경색 */
+    background-color: var(--color-primary-light);      /* 캘린더 호버 배경색 */
     border: 1px solid #DEE2E6;      /* 캘린더 테두리 색상 */
     border-radius: 8px;             /* 둥근 모서리 */
     padding: 4px 10px;              /* 내부 여백 조정 */
@@ -77,12 +96,12 @@
 
 .room-card {
     padding: 15px;
-    border-bottom: 1px solid #eeeeee;
+    border-bottom: 1px solid var(--color-border);
     transition: background 0.2s;
 }
 
 .room-card:hover { background-color: #f0f0f0; }
-.room-card.active { background-color: #ffffff; border-left: 5px solid #333333; }
+.room-card.active { background-color: #ffffff; border-left: 5px solid var(--color-secondary); }
 
 .room-card a {
     display: flex;
@@ -215,6 +234,7 @@
     flex-direction: row;      /* 서랍 포함 */
     overflow: hidden;
     position: relative;
+    height: calc(100vh - 120px);
 }
 
 .chat-main-content {
@@ -238,7 +258,7 @@
 
     padding: 0 20px;
     background-color: #ffffff;
-    border-bottom: 1px solid #dddddd;
+    border-bottom: 1px solid var(--color-border);
 }
 
 .current-user { display: flex; align-items: center; gap: 10px; }
@@ -264,7 +284,7 @@
     flex-direction: column;
     gap: 15px;
     list-style: none;
-    background-color: #fcfcfc;
+    background-color: var(--color-surface);
 
     /* --- 튕김 방지 추가 --- */
     opacity: 0;
@@ -458,7 +478,7 @@ li.other-msg { justify-content: flex-start; display: flex; width: 100%; }
 .chat-footer {
     padding: 15px;
     background-color: #ffffff;
-    border-top: 1px solid #dddddd;
+    border-top: 1px solid var(--color-border);
 }
 
 .toolbar { margin-bottom: 8px; display: flex; gap: 10px; }
@@ -466,7 +486,7 @@ li.other-msg { justify-content: flex-start; display: flex; width: 100%; }
 
 .input-form textarea {
     width: 100%;
-    border: 1px solid #eeeeee;
+    border: 1px solid var(--color-border);
     padding: 10px;
     resize: none;
     font-size: 1.4rem;
@@ -503,8 +523,12 @@ li.other-msg { justify-content: flex-start; display: flex; width: 100%; }
     align-items: center;
     justify-content: center;
     height: 100%;
-    background-color: #f9f9f9;
+    background-color: var(--color-surface);
     color: #888;
+}
+
+.empty-chat-view p {
+    font-size: var(--font-size-13);
 }
 
 /* ==========================================
