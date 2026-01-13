@@ -55,21 +55,26 @@ public class TaskFileController {
             ScheduleFileDTO fileLog = fileLogService.getScheduleFileById(fileId);
             if (fileLog == null) return ResponseEntity.notFound().build();
 
-            // 2. S3 Key 추출 및 URL 디코딩 (한글/공백 문제 해결)
+            // 2. S3 Key 추출 (중요: S3의 Key는 폴더 경로를 포함해야 합니다)
             String storedName = fileLog.getStoredName();
-            String key = (storedName != null && storedName.contains("/"))
-                    ? storedName.substring(storedName.lastIndexOf("/") + 1)
-                    : storedName;
 
-            // S3 서버의 실제 Key와 매칭하기 위해 디코딩 수행
+            // DB에 저장된 storedName이 파일명만 가지고 있다면 폴더명을 붙여줘야 합니다.
+            // 로그상 파일들이 'task/' 폴더 안에 있으므로 경로를 맞춰줍니다.
+            String key = storedName;
+            if (key != null && !key.startsWith("task/")) {
+                key = "task/" + key;
+            }
+
+            // S3 서버의 실제 Key와 매칭하기 위해 디코딩 수행 (인코딩된 한글/특수문자 처리)
             key = URLDecoder.decode(key, StandardCharsets.UTF_8);
 
             // 3. S3에서 파일 객체 가져오기
+            // bucket 이름과 위에서 만든 key(task/uuid_파일명)를 사용하여 호출합니다.
             S3Object s3Object = amazonS3.getObject(bucket, key);
             S3ObjectInputStream inputStream = s3Object.getObjectContent();
             byte[] bytes = IOUtils.toByteArray(inputStream);
 
-            // 4. 원본 파일명 인코딩 (브라우저 다운로드 창 표시용)
+            // 4. 원본 파일명 인코딩 (브라우저 다운로드 창에서 원본 파일명을 보여주기 위함)
             String encodedFileName = URLEncoder.encode(fileLog.getOriginalName(), StandardCharsets.UTF_8)
                     .replaceAll("\\+", "%20");
 
@@ -83,8 +88,8 @@ public class TaskFileController {
             return new ResponseEntity<>(bytes, headers, HttpStatus.OK);
 
         } catch (AmazonS3Exception e) {
-            // S3에 파일이 없을 경우 (404)
-            e.printStackTrace();
+            // S3에 파일이 없을 경우 (NoSuchKey, 404)
+            System.err.println("S3에서 파일을 찾을 수 없습니다. 요청한 Key: " + e.getErrorCode());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         } catch (Exception e) {
             e.printStackTrace();

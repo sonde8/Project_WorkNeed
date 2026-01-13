@@ -234,6 +234,7 @@
     flex-direction: row;      /* 서랍 포함 */
     overflow: hidden;
     position: relative;
+    height: calc(100vh - 120px);
 }
 
 .chat-main-content {

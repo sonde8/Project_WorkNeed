@@ -57,12 +57,6 @@
         ORDER BY a.admin_created_at DESC
     </select>
 
-    <select id="existsByEmail" resultType="boolean">
-        SELECT COUNT(*)
-        FROM adminuser
-        WHERE admin_email = #{adminEmail}
-    </select>
-
     <select id="findAllActivityLogs" resultType="com.Workneed.workneed.Members.dto.AdminUserDTO">
         <![CDATA[
         SELECT
@@ -75,10 +69,11 @@
         l.log_description AS logDescription,
         l.log_created_at AS logCreatedAt
         FROM adminactivitylog l
-        JOIN adminuser a ON l.admin_id = a.admin_id
-        LEFT JOIN adminrole r ON a.role_id = r.role_id
+                 JOIN adminuser a ON l.admin_id = a.admin_id
+                 LEFT JOIN adminrole r ON a.role_id = r.role_id
         ORDER BY l.log_created_at DESC
-          ]]>
+        ]]>
+
     </select>
 
     <select id="findPermissionsByRoleId" resultType="string">
@@ -89,7 +84,7 @@
 
     <select id="findByAdminId" resultType="com.Workneed.workneed.Members.dto.AdminUserDTO">
         SELECT *
-        FROM adminUser
+        FROM adminuser
         WHERE admin_id = #{adminId}
     </select>
 
@@ -102,6 +97,12 @@
         #{roleId}, #{adminStatus}
         )
     </insert>
+
+    <select id="existsByEmail" resultType="boolean">
+        SELECT COUNT(*)
+        FROM adminuser
+        WHERE admin_email = #{adminEmail}
+    </select>
 
     <insert id="insertActivityLog"
             parameterType="com.Workneed.workneed.Members.dto.AdminUserDTO">
