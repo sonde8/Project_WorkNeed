@@ -174,25 +174,35 @@
 
 
     <div class="modal" id="teamModal" hidden>
-        <div class="modal-panel" id="teamModal-panel">
-
-            <header class="modal-header">Invite Team</header>
+        <div class="modal-panel" id="teamModal-panel" style="width: 750px;">
+            <header class="modal-header">팀원 초대 (조직도)</header>
             <button type="button" class="x-btn"> x </button>
 
             <form id="teamInviteForm">
                 <input type="hidden" id="teamScheduleId" name="scheduleId" />
 
-                <div id="teamUserList">
-                    <!-- JS로 ACTIVE 유저 체크박스 렌더링 -->
+                <div class="modal-body-main" style="display: flex; height: 450px; border: 1px solid #eee;">
+                    <div class="selection-panel" style="width: 50%; border-right: 1px solid #eee; overflow-y: auto; padding: 15px;">
+                        <div class="search-box" style="margin-bottom: 10px;">
+                            <input type="text" id="userSearchInput" placeholder="이름 검색" style="width: 100%; padding: 8px;">
+                        </div>
+                        <div id="deptTreeContainer" class="dept-list-container">
+                        </div>
+                    </div>
+
+                    <div class="selected-panel" style="width: 50%; padding: 15px; background: #fafafa; overflow-y: auto;">
+                        <div id="selectedUsersCount" style="font-weight: bold; margin-bottom: 10px;">선택된 대상 (0)</div>
+                        <div id="selectedUserList">
+                            <p class="placeholder-text">대상을 선택해주세요.</p>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="modal-btns">
-                    <span id="inviteCount" class="invite-count">[ 0명 ]</span>
-                    <button class="btn" type="submit">invite</button>
+                    <button class="btn" type="submit" id="submitInviteBtn">초대하기</button>
+                    <button class="btn" type="button" onclick="closeTeamModal()">취소</button>
                 </div>
             </form>
-
-
         </div>
     </div>
 

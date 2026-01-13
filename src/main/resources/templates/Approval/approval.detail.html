@@ -18,20 +18,6 @@
     <div class="approval-scope">
         <div class="wrap approval-detail">
 
-            <div class="page-head">
-                <h1 class="page-title">문서 상세</h1>
-                <div class="page-actions">
-                    <a class="btn" th:href="@{/approval}">결재함</a>
-                </div>
-            </div>
-            <form th:if="${canRecall}" method="post" th:action="@{/approval/recall}" style="display:inline;">
-                <input type="hidden" name="docId" th:value="${docId}">
-                <button type="submit" class="btn danger"
-                        onclick="return confirm('아직 1차 결재 전인 문서만 회수할 수 있습니다. 회수하시겠습니까?');">
-                    회수
-                </button>
-            </form>
-
             <!-- 문서 없음 -->
             <div th:if="${doc == null}" class="card">
                 <div class="card-head">
@@ -54,7 +40,25 @@
                 <div class="card">
                     <div class="card-head">
                         <h3>결재 라인</h3>
-                        <p class="meta">검토 / 합의 / 결재</p>
+
+                        <!-- 회수 버튼 -->
+                        <form th:if="${canRecall}"
+                              method="post"
+                              th:action="@{/approval/recall}"
+                              style="display:inline;">
+                            <input type="hidden" name="docId" th:value="${docId}">
+                            <button type="submit" class="btn danger"
+                                    onclick="return confirm('아직 1차 결재 전인 문서만 회수할 수 있습니다. 회수하시겠습니까?');">
+                                회수
+                            </button>
+                        </form>
+
+                        <!-- 임시저장 + 작성자만 수정 가능 -->
+                        <a th:if="${doc.status.name() == 'DRAFT' and doc.writerId == loginUserId}"
+                           th:href="@{/approval/edit/{docId}(docId=${doc.docId})}"
+                           class="btn btn-outline-primary">
+                            수정하기
+                        </a>
                     </div>
 
                     <ul class="line-list">
@@ -63,22 +67,22 @@
                             <!-- 차수 라벨 -->
                             <span class="ord"
                                   th:text="${l.orderNum == 1 ? '검토' : (l.orderNum == 2 ? '합의' : '최종 결재')}">
-        </span>
+                            </span>
 
                             <!-- 이름 + 부서/직급 -->
                             <span class="cand-name" th:text="${l.username}">이름</span>
                             <span class="cand-meta">
-            (<span th:text="${l.deptName}">부서</span>
-            <span th:if="${l.rankName != null}"
-                  th:text="' / ' + ${l.rankName}"> / 직급</span>)
-        </span>
+                                (<span th:text="${l.deptName}">부서</span>
+                                <span th:if="${l.rankName != null}"
+                                      th:text="' / ' + ${l.rankName}"> / 직급</span>)
+                            </span>
 
                             <!-- 상태 배지 -->
                             <span class="status badge"
                                   th:classappend="' st-' + ${#strings.toLowerCase(l.status.name())}"
                                   th:text="${l.status.label}">
-            상태
-        </span>
+                                상태
+                            </span>
 
                         </li>
 
@@ -86,8 +90,28 @@
                             결재 라인이 없습니다.
                         </li>
                     </ul>
-
                 </div>
+
+                <!-- =========================
+                     ✅ 반려 사유 (추가)
+                     - 문서가 REJECTED일 때만 표시
+                     - rejectComment 는 컨트롤러에서 model로 넣어둔 값
+                     ========================= -->
+                <div class="card" th:if="${doc.status.name() == 'REJECTED'}">
+                    <div class="card-head">
+                        <h3>반려 사유</h3>
+                        <p class="meta">반려 처리 시 입력된 사유입니다.</p>
+                    </div>
+
+                    <div class="rows">
+                        <div class="row-row-content">
+                            <span class="label">사유</span>
+                            <pre class="content-detail"
+                                 th:text="${rejectComment != null ? rejectComment : '반려 사유가 없습니다.'}">-</pre>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- =========================
                      참조자
                      ========================= -->
@@ -100,16 +124,16 @@
                     <ul class="line-list">
                         <li th:each="u : ${refUsers}" class="line-item"
                             th:attr="data-user-id=${u.userId},
-                 data-name=${u.username},
-                 data-dept=${u.deptName},
-                 data-rank=${u.rankName}">
+                                     data-name=${u.username},
+                                     data-dept=${u.deptName},
+                                     data-rank=${u.rankName}">
 
                             <span class="cand-name" th:text="${u.username}">이름</span>
                             <span class="cand-meta">
-            (<span th:text="${u.deptName}">부서</span>
-            <span th:if="${u.rankName != null}"
-                  th:text="' / ' + ${u.rankName}"> / 직급</span>)
-        </span>
+                                (<span th:text="${u.deptName}">부서</span>
+                                <span th:if="${u.rankName != null}"
+                                      th:text="' / ' + ${u.rankName}"> / 직급</span>)
+                            </span>
                         </li>
 
                         <li th:if="${refUsers == null or #lists.isEmpty(refUsers)}"
@@ -117,7 +141,6 @@
                             참조자가 없습니다.
                         </li>
                     </ul>
-
                 </div>
 
                 <!-- =========================
@@ -132,8 +155,8 @@
                     <div class="rows">
 
                         <div class="row">
-                            <span class="label">문서 ID</span>
-                            <span class="value" th:text="${doc.docId}"></span>
+                            <span class="label">제목</span>
+                            <span class="value" th:text="${doc.title}">-</span>
                         </div>
 
                         <div class="row">
@@ -147,23 +170,18 @@
 
                         <div class="row">
                             <span class="label">문서 종류</span>
-                            <span class="value" th:text="${doc.typeId}">-</span>
+                            <span class="value" th:text="${doc.typeName}">-</span>
                         </div>
 
                         <!-- ✅ 휴가 정보: 휴가 문서일 때만 표시 (leave가 모델에 있을 때만) -->
                         <div th:if="${leave != null}">
-
                             <div class="row">
                                 <span class="label">휴가 종류</span>
                                 <span class="value" th:text="${leave.leaveType}">-</span>
                             </div>
-
                         </div>
 
-                        <div class="row">
-                            <span class="label">제목</span>
-                            <span class="value" th:text="${doc.title}">-</span>
-                        </div>
+
 
                         <div class="row-row-content">
                             <span class="label">내용</span>
@@ -211,59 +229,59 @@
                 <!-- =========================
                      액션 버튼
                      ========================= -->
-                <div class="card">
-                    <div class="card-head">
-                        <h3>작업</h3>
-                        <p class="meta">현재 상태에 따라 가능한 작업만 표시됩니다.</p>
+                <div class="action-panel"
+                     th:if="${doc.status.name() == 'IN_PROGRESS' and isMyTurn and !isReference}">
+
+                    <!-- 왼쪽: 안내 -->
+                    <div class="action-head">
+                        <div class="action-title">결재 처리</div>
+                        <div class="action-desc">승인 또는 반려 중 하나를 선택하십시오.</div>
                     </div>
 
-                    <div class="btns">
+                    <!-- 오른쪽: 버튼 -->
+                    <div class="action-buttons">
 
-                        <!-- 승인: IN_PROGRESS + 내 차례 -->
+                        <!-- 승인 -->
                         <form class="inline"
-                              th:if="${doc.status.name() == 'IN_PROGRESS' and isMyTurn and !isReference}"
                               method="post" th:action="@{/approval/approve}">
                             <input type="hidden" name="docId" th:value="${doc.docId}">
-                            <button type="submit" class="btn primary"
+                            <button type="submit" class="btn action-btn approve"
                                     data-confirm="승인 처리하시겠습니까?">
                                 승인
                             </button>
                         </form>
 
-                        <!-- 반려: IN_PROGRESS + 내 차례 -->
-                        <div class="reject-wrap"
-                             th:if="${doc.status.name() == 'IN_PROGRESS' and isMyTurn and !isReference}">
-                            <button type="button" class="btn danger" id="btnToggleReject">
-                                반려 사유 입력
-                            </button>
+                        <!-- 반려 (토글) -->
+                        <button type="button" class="btn action-btn reject" id="btnToggleReject">
+                            반려
+                        </button>
+                    </div>
 
-                            <form id="rejectForm"
-                                  class="reject-form"
-                                  method="post" th:action="@{/approval/reject}">
-                                <input type="hidden" name="docId" th:value="${doc.docId}">
-                                <textarea name="comment" placeholder="반려 사유를 입력하십시오" required></textarea>
-                                <div class="btns tight">
-                                    <button type="submit" class="btn danger"
-                                            data-confirm="반려 처리하시겠습니까?">
-                                        반려
-                                    </button>
-                                    <button type="button" class="btn" id="btnCancelReject">
-                                        취소
-                                    </button>
-                                </div>
-                            </form>
+                    <!-- 반려 폼 -->
+                    <form id="rejectForm"
+                          class="action-reject-form"
+                          method="post" th:action="@{/approval/reject}">
+                        <input type="hidden" name="docId" th:value="${doc.docId}">
 
-
-                            <div style="padding:10px; border:1px solid #ddd; margin:10px 0;">
-                                <div>status = <span th:text="${doc.status}"></span></div>
-                                <div>isMyTurn = <span th:text="${isMyTurn}"></span></div>
-                                <div>isReference = <span th:text="${isReference}"></span></div>
-                                <div>isWriter = <span th:text="${isWriter}"></span></div>
-                            </div>
+                        <div class="reject-top">
+                            <div class="reject-title">반려 사유</div>
+                            <button type="button" class="btn action-btn ghost" id="btnCancelReject">닫기</button>
                         </div>
 
-                    </div>
+                        <textarea name="comment"
+                                  placeholder="반려 사유를 입력하십시오 (예: 첨부파일 누락, 내용 보완 필요 등)"
+                                  required></textarea>
+
+                        <div class="reject-actions">
+                            <button type="submit" class="btn action-btn reject solid"
+                                    data-confirm="반려 처리하시겠습니까?">
+                                반려 확정
+                            </button>
+                        </div>
+                    </form>
+
                 </div>
+
 
                 <!-- 서버에서 넣어둔 상태를 JS가 읽을 수 있게 -->
                 <input type="hidden" id="isMyTurn" th:value="${isMyTurn}">

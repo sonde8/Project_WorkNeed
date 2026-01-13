@@ -72,8 +72,8 @@ public class ScheduleService {
         scheduleMapper.deleteFileStorageUrl(scheduleId);
     }
 
-    public int getDoingScheduleCountAll() {
-        return scheduleMapper.countDoingSchedulesAll();
+    public int getDoingScheduleCountAll(Long userId) {
+        return scheduleMapper.countDoingSchedulesAll(userId);
     }
 
     public List<MainScheduleDTO> getMainTaskCardsByStatus(Long userId, String status) {
