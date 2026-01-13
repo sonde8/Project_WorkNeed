@@ -73,6 +73,7 @@
                  LEFT JOIN adminrole r ON a.role_id = r.role_id
         ORDER BY l.log_created_at DESC
         ]]>
+
     </select>
 
     <select id="findPermissionsByRoleId" resultType="string">
@@ -90,10 +91,10 @@
     <insert id="insertAdmin" parameterType="com.Workneed.workneed.Members.dto.AdminUserDTO"
             useGeneratedKeys="true" keyProperty="adminId">
         INSERT INTO adminuser (
-        admin_email,    admin_password, admin_name,     role_id,        admin_status    ) VALUES (
-        #{adminEmail},   #{adminPassword},
+        admin_email, admin_password, admin_name, role_id, admin_status ) VALUES (
+        #{adminEmail}, #{adminPassword},
         #{adminName},
-        #{roleId},      #{adminStatus}
+        #{roleId}, #{adminStatus}
         )
     </insert>
 
@@ -106,12 +107,12 @@
     <insert id="insertActivityLog"
             parameterType="com.Workneed.workneed.Members.dto.AdminUserDTO">
         INSERT INTO adminactivitylog (
-            admin_id,
-            log_action_type,
-            log_target_type,
-            log_target_id,
-            log_description,
-            log_created_at
+        admin_id,
+        log_action_type,
+        log_target_type,
+        log_target_id,
+        log_description,
+        log_created_at
         )
         VALUES (
         #{adminId},
@@ -123,7 +124,7 @@
         )
     </insert>
 
-    <update id="updateMemberStatus" >
+    <update id="updateMemberStatus">
         UPDATE user
         <set>
             rank_id = #{rankId},

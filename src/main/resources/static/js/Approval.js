@@ -25,7 +25,7 @@ function handleFileSelection(input) {
             fileItem.className = 'selected-file-item';
             fileItem.style = "display:flex; justify-content:space-between; align-items:center; background:#f8f9fa; padding:5px 10px; margin-bottom:5px; border-radius:4px; border:1px solid #eee;";
             fileItem.innerHTML = `
-                <span style="font-size:0.9rem;">${file.name}</span>
+                <span style="font-size:var(--font-size-13);">${file.name}</span>
                 <button type="button" onclick="removeFileFromList(this, '${file.name}')"
                         style="background:none; border:none; color:red; cursor:pointer; font-size:1.1rem;">&times;</button>
             `;

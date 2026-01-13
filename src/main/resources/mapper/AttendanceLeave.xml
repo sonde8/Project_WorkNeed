@@ -31,7 +31,7 @@
         FROM leave_usage
         WHERE user_id = #{userId}
           AND start_date &lt; #{end}
-          AND end_date   &gt;= #{start}
+          AND end_date   &gt; #{start}
         ORDER BY start_date ASC
     </select>
 
@@ -45,8 +45,8 @@
         SELECT COUNT(*)
         FROM leave_usage
         WHERE user_id = #{userId}
-          AND start_date &lt;= #{endDate}
-          AND end_date   &gt;= #{startDate}
+          AND start_date &lt; #{endDate}
+          AND end_date   &gt; #{startDate}
     </select>
 
 
@@ -80,7 +80,7 @@
         JOIN request req ON req.request_id = lu.request_id
         WHERE u.dept_id = #{deptId}
         AND lu.start_date &lt; #{end}
-        AND lu.end_date   &gt;= #{start}
+        AND lu.end_date   &gt; #{start}
         <if test="name != null and name != ''">
             AND u.user_name LIKE CONCAT('%', #{name}, '%')
         </if>

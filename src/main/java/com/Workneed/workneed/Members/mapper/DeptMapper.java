@@ -12,7 +12,5 @@ public interface DeptMapper {
     List<DeptDTO> findAll();
     DeptDTO findById(Long deptId);
     void insertDept(DeptDTO deptDto);
-
-
     void deleteDept(@Param("deptId") Long deptId);
 }
