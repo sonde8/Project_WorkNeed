@@ -373,4 +373,27 @@ public class ApprovalService {
         mapper.updateDocStatusToDraft(docId);
         mapper.resetLinesToPending(docId);
     }
+    public void assertEditableDraft(Long docId, Long loginUserId) {
+        DocDTO doc = mapper.findById(docId);
+
+        if (doc == null) throw new IllegalStateException("문서가 존재하지 않습니다.");
+        if (loginUserId == null || !loginUserId.equals(doc.getWriterId())) {
+            throw new IllegalStateException("작성자만 수정할 수 있습니다.");
+        }
+        if (doc.getStatus() != DocStatus.DRAFT) {
+            throw new IllegalStateException("임시저장(DRAFT) 상태만 수정할 수 있습니다.");
+        }
+    }
+
+    @Transactional
+    public void updateDraft(Long docId, Long loginUserId, DocDTO form) {
+        assertEditableDraft(docId, loginUserId);
+
+        int updated = mapper.updateDraft(docId, form.getTypeId(), form.getTitle(), form.getContent());
+
+        if (updated == 0) {
+            throw new IllegalStateException("수정에 실패했습니다. (상태가 DRAFT가 아니거나 문서가 없습니다)");
+        }
+    }
+
 }

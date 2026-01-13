@@ -1,13 +1,12 @@
 /* ==========================================================
-   APPROVE (Chat.css 기반 심플 버전)
-   - .approval-scope 내부만 적용
-   - chat.css 톤: 연한 회색 라인 + 심플 카드 + 과한 컴포넌트 없음
+   APPROVE (Chat.css 湲곕컲 �ы뵆 踰꾩쟾)
+   - .approval-scope �대�留� �곸슜
+   - chat.css ��: �고븳 �뚯깋 �쇱씤 + �ы뵆 移대뱶 + 怨쇳븳 而댄룷�뚰듃 �놁쓬
    ========================================================== */
 
 .approval-scope {
     color: #333333;
-    height: 70vh;
-
+ overflow: hidden; /* �� �ш린�� �몃� �ㅽ겕濡� 李⑤떒 */
 
 }
 
@@ -16,8 +15,9 @@
     width: 100%;
     /* max-width: 1340px; */
     margin: 0 auto;
-    padding: 20px 20px 40px;
+    padding: 20px ;
 }
+.approval-scope .wrap:-webkit-scrollbar { width: 4px; } :-webkit-scrollbar-thumb { background-color: rgba(0, 0, 0, 0.1); border-radius: 10px; }
 
 .approval-scope .page-head {
     display: flex;
@@ -64,6 +64,8 @@
     padding-bottom: 10px;
     border-bottom: 1px solid #eeeeee;
     margin-bottom: 12px;
+    justify-content: space-between;
+    padding-right: 6px;
 }
 
 .approval-scope .card-head h3 {
@@ -169,8 +171,8 @@
     display: grid;
     grid-template-columns: 420px 1fr;
     gap: 14px;
-    height: calc(100vh - 120px); /* 상단 header + padding 고려 */
-        min-height: 0;               /* ⭐ flex/grid 스크롤 필수 */
+    height: calc(100vh - 120px); /* �곷떒 header + padding 怨좊젮 */
+        min-height: 0;               /* 狩� flex/grid �ㅽ겕濡� �꾩닔 */
 }
 
 .approval-scope .inbox-side .side-card {
@@ -223,7 +225,7 @@
     font-weight: 700;
 }
 
-/* 뱃지(카운트) */
+/* 諭껋�(移댁슫��) */
 .approval-scope .count-badge {
     display: inline-flex;
     align-items: center;
@@ -238,7 +240,7 @@
     font-weight: 800;
 }
 
-/* 테이블 */
+/* �뚯씠釉� */
 .approval-scope .table-wrap {
     width: 100%;
     overflow-x: auto;
@@ -286,7 +288,7 @@
     text-decoration: underline;
 }
 
-/* 상태 뱃지(간단하게) */
+/* �곹깭 諭껋�(媛꾨떒�섍쾶) */
 .approval-scope .badge {
     display: inline-flex;
     align-items: center;
@@ -376,7 +378,7 @@
     color: #888888;
 }
 
-/* 결재선 구성 컨트롤 */
+/* 寃곗옱�� 援ъ꽦 而⑦듃濡� */
 .approval-scope .line-controls {
     padding: 10px 12px;
     display: flex;
@@ -396,7 +398,7 @@
     padding: 10px 0;
 }
 
-/* JS에서 만든 .item 대응 (현재 preview에 추가되는 구조) */
+/* JS�먯꽌 留뚮뱺 .item ���� (�꾩옱 preview�� 異붽��섎뒗 援ъ“) */
 .approval-scope .line-preview .item {
     display: flex;
     align-items: center;
@@ -414,7 +416,7 @@
     color: #888888;
 }
 
-/* ========== Create: Line Builder (검토/합의/최종결재/참조 4칸) ========== */
+/* ========== Create: Line Builder (寃���/�⑹쓽/理쒖쥌寃곗옱/李몄“ 4移�) ========== */
 .approval-scope .line-builder-actions{
     padding: 10px 12px;
     display: flex;
@@ -442,7 +444,7 @@
     transform: translateY(1px);
 }
 
-/* 4칸 레이아웃: 기본은 2x2, 넓으면 4열 */
+/* 4移� �덉씠�꾩썐: 湲곕낯�� 2x2, �볦쑝硫� 4�� */
 .approval-scope .line-builder-grid{
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -487,7 +489,7 @@
     border-radius: 10px;
 }
 
-/* JS에서 넣는 아이템(추천 클래스: .lane-item) */
+/* JS�먯꽌 �ｋ뒗 �꾩씠��(異붿쿇 �대옒��: .lane-item) */
 .approval-scope .lane-body .lane-item{
     display: flex;
     align-items: center;
@@ -546,8 +548,8 @@
     font-size: 13px;
 }
 .content-detail {
-    background: #f8f9fa;        /* 아주 연한 회색 */
-    border: 1px solid #e1e4e8;  /* 기본 보더 */
+    background: #f8f9fa;        /* �꾩＜ �고븳 �뚯깋 */
+    border: 1px solid #e1e4e8;  /* 湲곕낯 蹂대뜑 */
     border-radius: 6px;
 
     padding: 12px 14px;
@@ -556,8 +558,8 @@
     line-height: 1.6;
     color: #333;
 
-    white-space: pre-wrap;      /* 줄바꿈 유지 */
-    word-break: break-word;     /* 긴 문장 깨짐 방지 */
+    white-space: pre-wrap;      /* 以꾨컮轅� �좎� */
+    word-break: break-word;     /* 湲� 臾몄옣 源⑥쭚 諛⑹� */
     margin-top: 20px;
 }
 /*
@@ -578,7 +580,7 @@
 }
 
 .approval-scope .reject-form {
-    display: none; /* JS 토글 전제 */
+    display: none; /* JS �좉� �꾩젣 */
     padding: 10px;
     border: 1px solid #eeeeee;
     border-radius: 6px;
@@ -605,7 +607,7 @@
     }
 }
 
-/* 8) 결재 라인/참조자 리스트 깨짐 방지 */
+/* 8) 寃곗옱 �쇱씤/李몄“�� 由ъ뒪�� 源⑥쭚 諛⑹� */
 .approval-scope .line-list{
     list-style: none;
     margin: 0;
@@ -641,7 +643,7 @@
     color: #777;
 }
 
-/* 9) 파일 리스트 */
+/* 9) �뚯씪 由ъ뒪�� */
 .approval-scope .file-list{
     list-style: none;
     margin: 0;
@@ -657,7 +659,7 @@
     text-decoration: underline;
 }
 
-/* 10) 버튼 영역 깨짐 방지 */
+/* 10) 踰꾪듉 �곸뿭 源⑥쭚 諛⑹� */
 .approval-scope .btns{
     padding: 10px 5px;
     display: flex;
@@ -669,7 +671,7 @@
     display: inline-flex;
 }
 
-/* 11) 반려 폼 UI 정리 */
+/* 11) 諛섎젮 �� UI �뺣━ */
 .approval-scope .reject-wrap{
     display: flex;
     flex-direction: column;
@@ -678,7 +680,7 @@
     max-width: 520px;
 }
 .approval-scope .reject-form{
-    display: none; /* 기본 숨김(버튼 누르면 JS로 열도록) */
+    display: none; /* 湲곕낯 �④�(踰꾪듉 �꾨Ⅴ硫� JS濡� �대룄濡�) */
     flex-direction: column;
     gap: 10px;
     padding: 12px;
@@ -701,7 +703,7 @@
     gap: 8px;
 }
 
-/* 12) 모바일 대응 */
+/* 12) 紐⑤컮�� ���� */
 @media (max-width: 768px){
     .approval-scope .wrap.approval-detail{
         padding: 14px 10px;
@@ -739,29 +741,180 @@
 li.app-file-empty {
     list-style-type: none;
 }
-/* inbox-content : 내부 스크롤 */
+/* inbox-content : �대� �ㅽ겕濡� */
 .approval-scope .inbox-content {
-    min-height: 0;          /* grid 안에서 스크롤 필수 */
-    overflow-y: auto;       /* 스크롤은 됨 */
+    min-height: 0;          /* grid �덉뿉�� �ㅽ겕濡� �꾩닔 */
+    overflow-y: auto;       /* �ㅽ겕濡ㅼ� �� */
     overflow-x: hidden;
-     /* 스크롤바 숨김 */
+     /* �ㅽ겕濡ㅻ컮 �④� */
         scrollbar-width: none;      /* Firefox */
         -ms-overflow-style: none;   /* IE */
 }
-/* ===== 스크롤바 숨기기 ===== */
+/* ===== �ㅽ겕濡ㅻ컮 �④린湲� ===== */
 
 /* Chrome, Edge, Safari */
-.approval-scope .inbox-content::-webkit-scrollbar {
-    width: 0;
-    height: 0;
-}
+.approval-scope .inbox-content::-webkit-scrollbar { width: 4px; } :-webkit-scrollbar-thumb { background-color: rgba(0, 0, 0, 0.1); border-radius: 10px; }
 
 /* Firefox */
 .approval-scope .inbox-content {
     scrollbar-width: none;
 }
 
-/* IE (거의 안 쓰지만 안전) */
+/* IE (嫄곗쓽 �� �곗�留� �덉쟾) */
 .approval-scope .inbox-content {
     -ms-overflow-style: none;
+}
+/* ==========================================================
+   [ADD] Detail Action Panel (승인 + 반려 포함)
+   - 기존 CSS 건드리지 않고, action-panel 범위에서만 스타일링
+   ========================================================== */
+
+.approval-scope .action-panel{
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+    align-items: start;
+
+    padding: 14px 16px;
+    border: 1px solid #eeeeee;
+    border-radius: 12px;
+    background: #fafafa;
+}
+
+.approval-scope .action-head{
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.approval-scope .action-title{
+    font-size: 14px;
+    font-weight: 900;
+    color: #222222;
+}
+
+.approval-scope .action-desc{
+    font-size: 12px;
+    color: #888888;
+    line-height: 1.4;
+}
+
+.approval-scope .action-buttons{
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+}
+
+/* 버튼 공통(기존 .btn이 있어도 action-btn이 우선되게) */
+.approval-scope .action-btn{
+    height: 34px;
+    padding: 0 14px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 800;
+    border: 1px solid #cccccc;
+    background: #ffffff;
+    color: #333333;
+    cursor: pointer;
+    transition: transform .05s ease, background .15s ease, border-color .15s ease;
+}
+.approval-scope .action-btn:active{ transform: translateY(1px); }
+
+/* 승인 */
+.approval-scope .action-btn.approve{
+    background: #333333;
+    border-color: #333333;
+    color: #ffffff;
+}
+.approval-scope .action-btn.approve:hover{
+    background: #111111;
+    border-color: #111111;
+}
+
+/* 반려 */
+.approval-scope .action-btn.reject{
+    background: #ff4d4d;
+    border-color: #ff4d4d;
+    color: #ffffff;
+}
+.approval-scope .action-btn.reject:hover{
+    background: #e43c3c;
+    border-color: #e43c3c;
+}
+
+/* 회색(닫기) */
+.approval-scope .action-btn.ghost{
+    background: #ffffff;
+    border-color: #dddddd;
+    color: #333333;
+}
+.approval-scope .action-btn.ghost:hover{
+    background: #f0f0f0;
+}
+
+/* 반려 폼(기본 숨김: JS 토글) */
+.approval-scope .action-reject-form{
+    grid-column: 1 / -1; /* 전체 폭 */
+    display: none;       /* JS 토글 */
+    margin-top: 10px;
+
+    padding: 14px 16px;
+    border: 1px solid #f1c4c4;
+    border-radius: 12px;
+    background: #fff6f6;
+    box-shadow: 0 6px 14px rgba(0,0,0,0.05);
+}
+
+/* 상단 */
+.approval-scope .action-reject-form .reject-top{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.approval-scope .action-reject-form .reject-title{
+    font-size: 13px;
+    font-weight: 900;
+    color: #c0392b;
+}
+
+/* textarea */
+.approval-scope .action-reject-form textarea{
+    width: 100%;
+    min-height: 110px;
+    resize: vertical;
+
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid #e0b4b4;
+    background: #ffffff;
+
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333333;
+    outline: none;
+}
+.approval-scope .action-reject-form textarea:focus{
+    border-color: #ff4d4d;
+}
+
+/* 하단 확정 버튼 영역 */
+.approval-scope .action-reject-form .reject-actions{
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 10px;
+}
+
+/* 모바일 */
+@media (max-width: 768px){
+    .approval-scope .action-panel{
+        grid-template-columns: 1fr;
+    }
+    .approval-scope .action-buttons{
+        justify-content: flex-start;
+    }
 }

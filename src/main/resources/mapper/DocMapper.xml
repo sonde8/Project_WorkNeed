@@ -264,7 +264,7 @@
         WHERE approval_doc_id = #{docId}
           AND status = 'APPROVED'
     </select>
-
+        <!-- 반려 사유 저장 꺼내기-->
     <update id="rejectMyWaitingLine">
         UPDATE approval_line
         SET status = 'REJECTED',
@@ -274,6 +274,19 @@
           AND approver_id = #{userId}
           AND status = 'WAITING'
     </update>
+
+    <select id="findLatestRejectComment"
+            parameterType="long"
+            resultType="string">
+        SELECT comment
+        FROM approval_line
+        WHERE approval_doc_id = #{docId}
+        AND status = 'REJECTED'
+        AND comment IS NOT NULL
+        ORDER BY approved_at DESC
+        LIMIT 1
+    </select>
+
 
     <!-- 내 WAITING 라인의 orderNum -->
     <select id="findMyWaitingOrderNum" resultType="int">
@@ -617,5 +630,18 @@
     </update>
 
     <!-- 4) 회수 실행: 결재라인 상태 전부 PENDING으로 되돌림 -->
+
+    <!-- 문서 업데이트-->
+
+    <update id="updateDraft">
+        UPDATE approval_doc
+        SET type_id = #{typeId},
+        title = #{title},
+        content = #{content},
+        updated_at = NOW()
+        WHERE approval_doc_id = #{docId}
+        AND status = 'DRAFT'
+    </update>
+
 
 </mapper>

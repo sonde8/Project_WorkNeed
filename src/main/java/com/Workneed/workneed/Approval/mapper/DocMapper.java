@@ -202,4 +202,10 @@ public interface DocMapper {
 
     int resetLinesToPending(@Param("docId") long docId);
 
+    int updateDraft(@Param("docId") Long docId,
+                    @Param("typeId") Long typeId,
+                    @Param("title") String title,
+                    @Param("content") String content);
+    String findLatestRejectComment(Long docId);
+
 }
