@@ -155,8 +155,8 @@
                     <div class="rows">
 
                         <div class="row">
-                            <span class="label">문서 ID</span>
-                            <span class="value" th:text="${doc.docId}"></span>
+                            <span class="label">제목</span>
+                            <span class="value" th:text="${doc.title}">-</span>
                         </div>
 
                         <div class="row">
@@ -170,7 +170,7 @@
 
                         <div class="row">
                             <span class="label">문서 종류</span>
-                            <span class="value" th:text="${doc.typeId}">-</span>
+                            <span class="value" th:text="${doc.typeName}">-</span>
                         </div>
 
                         <!-- ✅ 휴가 정보: 휴가 문서일 때만 표시 (leave가 모델에 있을 때만) -->
@@ -181,10 +181,7 @@
                             </div>
                         </div>
 
-                        <div class="row">
-                            <span class="label">제목</span>
-                            <span class="value" th:text="${doc.title}">-</span>
-                        </div>
+
 
                         <div class="row-row-content">
                             <span class="label">내용</span>

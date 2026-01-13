@@ -166,9 +166,13 @@
 }
 
 .approval-scope .label {
-    font-size: 13px;
+    font-size: 16px;
     font-weight: 800;
     color: #333333;
+}
+
+span.value {
+    font-size: 15px;
 }
 
 .approval-scope .control {
@@ -227,7 +231,7 @@
     align-items: center;
     justify-content: space-between;
     gap: 10px;
-    padding : 5px 3px;
+    padding : 7px 3px;
     border-radius: 6px;
     text-decoration: none;
     color: #333333;
@@ -245,7 +249,7 @@
 }
 
 .approval-scope .side-link .txt {
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 700;
 }
 
@@ -281,14 +285,14 @@
     border-bottom: 1px solid #eeeeee;
     padding: 12px 10px;
     text-align: left;
-    font-size: 13px;
+    font-size: 14px;
     vertical-align: middle;
 }
 
 .approval-scope table.table thead th {
     background: #f7f7f7;
     color: #666666;
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 800;
 }
 
@@ -319,11 +323,12 @@
     height: 22px;
     padding: 0 10px;
     border-radius: 11px;
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 800;
     border: 1px solid #dddddd;
     background: #ffffff;
     color: #333333;
+    ustify-content: center;
 }
 .approval-scope .badge.strong {
     background: #333333;
@@ -578,7 +583,7 @@
 
     padding: 12px 14px;
 
-    font-size: 14px;
+    font-size: 15px;
     line-height: 1.6;
     color: #333;
 
@@ -644,6 +649,7 @@
 .approval-scope .line-item{
     display: grid;
     gap: 10px;
+    width: 134px; height: 134px;
     align-items: center;
     padding: 10px;
     border: 1px solid #eee;
@@ -679,7 +685,10 @@
 .app-file-list a{
     text-decoration: none;
     color: black;
+    font-size: 13px;
 }
+
+
 .app-file-list a:hover{
     text-decoration: underline;
 }
@@ -748,6 +757,9 @@
         justify-self: start;
     }
 
+}
+.side-group-head {
+    padding: 11px 0px;
 }
 .side-group {
     margin: 15px 0px;

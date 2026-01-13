@@ -31,18 +31,21 @@
             parameterType="long"
             resultType="com.Workneed.workneed.Approval.dto.DocDTO">
         SELECT
-            approval_doc_id AS docId,
-            title,
-            content,
-            writer_id AS writerId,
-            type_id AS typeId,
-            status,
-            /* leave_start_date, leave_end_date 컬럼 제거 (존재하지 않음) */
-            created_at,
-            updated_at
-        FROM approval_doc
-        WHERE approval_doc_id = #{docId}
+        d.approval_doc_id AS docId,
+        d.writer_id       AS writerId,
+        d.type_id         AS typeId,
+        t.type_name       AS typeName,
+        d.title,
+        d.content,
+        d.status,
+        d.created_at      AS createdAt,
+        d.updated_at      AS updatedAt
+        FROM approval_doc d
+        LEFT JOIN approval_type t
+        ON t.approval_type_id = d.type_id
+        WHERE d.approval_doc_id = #{docId}
     </select>
+
 
     <select id="findDocById"
             parameterType="long"
@@ -648,6 +651,21 @@
         WHERE approval_doc_id = #{docId}
         AND status = 'DRAFT'
     </update>
+    <!-- 유저 목록 -->
+    <select id="findAllUsersExceptMe"
+            parameterType="long"
+            resultType="com.Workneed.workneed.Members.dto.UserDTO">
 
+        SELECT
+        u.user_id        AS userId,
+        u.username       AS userName,
+        d.dept_name      AS deptName,
+        r.rank_name      AS rank
+        FROM users u
+        LEFT JOIN dept d  ON d.dept_id = u.dept_id
+        LEFT JOIN ranks r ON r.rank_id = u.rank_id
+        WHERE u.user_id != #{loginUserId}
+        ORDER BY d.dept_name, r.rank_order DESC, u.username
+    </select>
 
 </mapper>

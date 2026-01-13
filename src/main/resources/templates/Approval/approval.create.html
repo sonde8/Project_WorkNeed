@@ -108,11 +108,85 @@
 
                     <!-- 후보 리스트 -->
                     <div class="approver-box">
+
+
                         <div class="box-head">
                             <div class="box-title">사용자 후보</div>
                             <div class="box-meta">ACTIVE 사용자</div>
                         </div>
+                        <div class="left-user-picker">
 
+                            <!-- 팀 전체 선택 -->
+                            <div class="picker-actions">
+                                <button type="button" class="btn" id="btnSelectAll">팀 전체 선택</button>
+                            </div>
+
+                            <!-- 검색 -->
+                            <div class="picker-search">
+                                <input type="text" id="userSearchInput" placeholder="이름/부서/직급 검색">
+                                <button type="button" class="btn" id="btnSearch">검색</button>
+                            </div>
+
+                            <!-- 검색 결과 -->
+                            <div class="picker-section">
+                                <div class="section-title">검색 결과 <span id="searchCount">0</span></div>
+                                <div id="searchResultList" class="list"></div>
+                            </div>
+
+                            <!-- 부서별 토글 -->
+                            <div class="picker-section">
+                                <div class="section-title">부서별 팀원</div>
+
+                                <div class="dept-accordion" th:each="dept : ${departments}">
+                                    <button type="button" class="dept-head"
+                                            th:attr="data-dept-id=${dept.deptId}">
+                                        <span th:text="${dept.deptName}">부서명</span>
+                                        <span class="dept-count"
+                                              th:text="${#lists.size(usersByDept[dept.deptId])}">0</span>
+                                        <span class="dept-toggle-icon">▾</span>
+                                    </button>
+
+                                    <div class="dept-body" style="display:none;">
+                                        <!-- (선택) 부서 전체 선택 -->
+                                        <div class="dept-actions">
+                                            <button type="button" class="btn btn-small deptSelectAll"
+                                                    th:attr="data-dept-id=${dept.deptId}">부서 전체 선택</button>
+                                        </div>
+
+                                        <div class="list">
+                                            <div class="row"
+                                                 th:each="u : ${usersByDept[dept.deptId]}"
+                                                 th:attr="data-user-id=${u.userId},
+                        data-name=${u.username},
+                        data-dept=${dept.deptName},
+                        data-rank=${u.rankName}">
+                                                <div class="meta">
+                                                    <div class="name" th:text="${u.username}">홍길동</div>
+                                                    <div class="sub">
+                                                        <span th:text="${dept.deptName}">개발팀</span>
+                                                        <span> · </span>
+                                                        <span th:text="${u.rankName}">대리</span>
+                                                    </div>
+                                                </div>
+                                                <button type="button" class="btn btn-small btnPick">선택</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <!-- 선택된 목록(예: 오른쪽/아래) -->
+                        <div class="picked-users">
+                            <div class="section-title">선택된 목록</div>
+                            <div id="pickedList" class="list"></div>
+
+                            <!-- 서버 전송용 hidden inputs -->
+                            <div id="pickedHiddenInputs"></div>
+                        </div>
+<!--
                         <div class="candidate-list">
                             <label class="candidate" th:each="u : ${approvers}">
                                 <input type="checkbox" class="candCheck"
@@ -127,7 +201,7 @@
                                 </span>
                             </label>
                         </div>
-
+-->
                         <div class="hint">
 
                             최종결재는 1명만 가능합니다.
