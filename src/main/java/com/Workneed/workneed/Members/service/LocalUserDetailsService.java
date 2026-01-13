@@ -28,7 +28,7 @@ public class LocalUserDetailsService implements UserDetailsService {
     private final UserMapper userMapper;
     private final AdminUserMapper adminUserMapper;
 
-    //Spring Security가 ‘아이디 + 비밀번호 로그인’을 처리할 때
+    //Spring Security가 ‘아이디 + 비밀번호 로그인을 처리할 때
     //DB에서 사용자를 찾아 UserDetails로 변환
     // 일반 유저는 로그인id로 접근 ||  관리자는 이메일로 접근
     @Override
@@ -39,32 +39,38 @@ public class LocalUserDetailsService implements UserDetailsService {
         if (user != null) {
 
             if (!"ACTIVE".equals(user.getUserStatus())) {
-                // INACTIVE면 "pending"으로, 그외엔 소문자로 변환(suspended, banned 등)
+                // INACTIVE면 "pending"으로, 그외엔 변환(suspended, banned)
                 String reason = "INACTIVE".equals(user.getUserStatus()) ? "pending" : user.getUserStatus().toLowerCase();
-
-                // 이 메시지를 던지면 FailureHandler가 받아서 주소창에 ?reason=pending을 붙여줍니다.
+                // FailureHandler가 받아서 주소창에 ?reason=pending을 붙임
                 throw new DisabledException(reason);
             }
-
+            // ROLE_USER로 반환
             return new CustomUserDetails(user);
         }
 
         AdminUserDTO admin = adminUserMapper.findByAdminEmail(loginInput);
         if (admin != null) {
 
-            // 1️⃣ role_id로 permission 코드 조회
-            List<String> permissions =
-                    adminUserMapper.findPermissionsByRoleId(admin.getRoleId());
+            //  ACTIVE 아니면 무조건 차단
+            if (!"ACTIVE".equals(admin.getAdminStatus())) {
+                throw new DisabledException("suspended");
+            }
 
-            // 2️⃣ permission → GrantedAuthority 변환
+            // permission(권한) 코드 조회
+            List<String> permissions = adminUserMapper.findPermissionsByRoleId(admin.getRoleId());
+
+            // permission → GrantedAuthority 객체로 변환
+            // GrantedAuthority 인터페이스로 구현한 객체만 사용
+            // 리스트를 하나씩 꺼내서
             List<GrantedAuthority> authorities = permissions.stream()
+                    // 문자열 권한을 객체로 변환
                     .map(SimpleGrantedAuthority::new)
+                    // 다시 리스트로 모음
                     .collect(Collectors.toList());
 
-            // 3️⃣ CustomUserDetails에 권한까지 태워서 반환
+            // 고유 권한을 가진 관리자 반환
             return new CustomUserDetails(admin, authorities);
         }
-
         throw new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + loginInput);
     }
 }

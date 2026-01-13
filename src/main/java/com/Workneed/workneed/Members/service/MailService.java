@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.io.UnsupportedEncodingException;
 import java.util.Random;
 
+// 회원가입 인증메일, 축하메일 ,
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -27,6 +28,7 @@ public class MailService {
     // 인증번호 생성 (6자리)
     public String createCode() {
         Random random = new Random();
+        // 6자리 랜덤 111111~999999숫자
         return String.valueOf(random.nextInt(888888) + 111111);
     }
 
@@ -51,33 +53,6 @@ public class MailService {
 
         } catch (MessagingException | UnsupportedEncodingException e) {
             log.error("메일 발송 실패: {}", toEmail, e);
-        }
-    }
-
-    // 임시 비밀번호 발송 메서드 추가
-    public void sendTempPasswordEmail(String toEmail, String tempPassword) {
-        MimeMessage message = mailSender.createMimeMessage();
-        try {
-            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-
-            helper.setFrom(fromEmail, "Workneed");
-            helper.setTo(toEmail);
-            helper.setSubject("[Workneed] 임시 비밀번호가 발급되었습니다.");
-
-            String body = "<h3>Workneed 임시 비밀번호 안내</h3>" +
-                    "<p>안녕하세요, 요청하신 임시 비밀번호를 보내드립니다.</p>" +
-                    "<h2 style='color: #16a34a;'>" + tempPassword + "</h2>" +
-                    "<p>로그인 후 반드시 비밀번호를 변경해 주세요.</p>" +
-                    "<br>" +
-                    "<a href='http://localhost:8080/login'>로그인하러 가기</a>";
-
-            helper.setText(body, true);
-
-            mailSender.send(message);
-            log.info("임시 비밀번호 메일 발송 성공 → {}", toEmail);
-
-        } catch (MessagingException | UnsupportedEncodingException e) {
-            log.error("임시 비밀번호 메일 발송 실패: {}", toEmail, e);
         }
     }
 
@@ -107,5 +82,31 @@ public class MailService {
         }
     }
 
+    // 임시 비밀번호 발송 메서드 추가
+    public void sendTempPasswordEmail(String toEmail, String tempPassword) {
+        MimeMessage message = mailSender.createMimeMessage();
+        try {
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            helper.setFrom(fromEmail, "Workneed");
+            helper.setTo(toEmail);
+            helper.setSubject("[Workneed] 임시 비밀번호가 발급되었습니다.");
+
+            String body = "<h3>Workneed 임시 비밀번호 안내</h3>" +
+                    "<p>안녕하세요, 요청하신 임시 비밀번호를 보내드립니다.</p>" +
+                    "<h2 style='color: #16a34a;'>" + tempPassword + "</h2>" +
+                    "<p>로그인 후 반드시 비밀번호를 변경해 주세요.</p>" +
+                    "<br>" +
+                    "<a href='http://localhost:8080/login'>로그인하러 가기</a>";
+
+            helper.setText(body, true);
+
+            mailSender.send(message);
+            log.info("임시 비밀번호 메일 발송 성공 → {}", toEmail);
+
+        } catch (MessagingException | UnsupportedEncodingException e) {
+            log.error("임시 비밀번호 메일 발송 실패: {}", toEmail, e);
+        }
+    }
 
 }

@@ -37,6 +37,7 @@ body {
     width: 420px;
     flex-shrink: 0;
     height: 100%;
+    border: 1px solid var(--color-border);
     background-color: var(--color-surface);
     border-radius: var(--border-radius);
     box-shadow: var(--shadow-sm);
@@ -324,7 +325,7 @@ body {
 }
 
 .mini-kanban { grid-column: 1 / 2; grid-row: 1 / 2;}
-.mini-board { grid-column: 1 / 2; grid-row: 2 / 3; }
+.main-board { grid-column: 1 / 2; grid-row: 2 / 3; }
 .mini-meetingroom { grid-column: 2 / 3; grid-row: 1 / 3; }
 
 /* =========================================

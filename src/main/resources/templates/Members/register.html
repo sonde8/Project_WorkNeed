@@ -15,8 +15,6 @@
 
         <h2>회원가입</h2>
 
-        <div th:if="${errorMessage}" class="error-msg" th:text="${errorMessage}"></div>
-
         <form th:action="@{/register}" method="post" th:object="${user}" id="registerForm">
 
             <div class="input-group">
@@ -26,26 +24,20 @@
 
             <div class="input-group">
                 <img th:src="@{/images/lock300.svg}" class="input-icon" alt="비밀번호">
-                <input type="password" th:field="*{userPassword}" placeholder="비밀번호 (8자 이상 영문/숫자/특수문자)"
-                       autocomplete="off" oncopy="return false" onpaste="return false" oncut="return false"
-                       required>
+                <input type="password" th:field="*{userPassword}" placeholder="비밀번호 @제외(8자 이상 영문/숫자/특수문자)" required>
             </div>
 
-            <div class="input-group">
+            <div class="input-group no-margin">
                 <img th:src="@{/images/lock300.svg}" class="input-icon" alt="비밀번호 확인">
-                <input type="password" id="passwordConfirm" placeholder="비밀번호 확인"
-                       autocomplete="off" oncopy="return false" onpaste="return false" oncut="return false"
-                       required>
+                <input type="password" id="passwordConfirm" placeholder="비밀번호 확인" required>
             </div>
+            <p id="passwordMatchMsg" class="compact-msg"></p>
 
-            <p id="passwordMatchMsg" class="password-msg"></p>
-
-            <div class="input-group">
+            <div class="input-group no-margin">
                 <img th:src="@{/images/mail300.svg}" class="input-icon" alt="이메일">
                 <input type="email" th:field="*{userEmail}" id="userEmail" placeholder="이메일 (인증 필요)" required>
             </div>
-            <p class="email-guide">* 구글 연동하려면 Gmail로 가입해야 합니다.</p>
-
+            <p class="compact-msg email-color">* 구글 연동하려면 Gmail로 가입해야 합니다.</p>
 
             <div id="authCodeGroup" class="input-group" style="display: none;">
                 <img th:src="@{/images/lock300.svg}" class="input-icon" alt="인증번호">
@@ -64,13 +56,11 @@
 
             <div class="input-group">
                 <img th:src="@{/images/phone300.svg}" class="input-icon" alt="전화번호">
-                <input type="tel" id="userPhone" th:field="*{userPhone}" placeholder="010-1234-5678"
-                       maxlength="11" required>
+                <input type="tel" id="userPhone" th:field="*{userPhone}" placeholder="010-1234-5678" maxlength="11" required>
             </div>
+            <p id="phoneMsg" class="compact-msg"></p>
 
-            <p id="phoneMsg"></p>
-
-            <button type="button" id="mainBtn" class="btn-submit">인증번호 받기</button>
+            <button type="button" id="mainBtn" class="btn-submit">이메일 인증번호 받기</button>
         </form>
 
         <div class="footer-links">

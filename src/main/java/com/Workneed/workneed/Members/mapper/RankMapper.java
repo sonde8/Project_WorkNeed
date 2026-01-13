@@ -12,7 +12,5 @@ public interface RankMapper {
     List<RankDTO> findAll();
     RankDTO findById(Long rankId);
     void insertRank(RankDTO rankDto);
-
-
     void deleteRank(@Param("rankId") Long rankId);
 }

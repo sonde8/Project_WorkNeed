@@ -32,7 +32,7 @@ public interface AdminUserMapper {
 
     AdminUserDTO findByAdminId(@Param("adminId") Long adminId);
 
-    // 5 관리자로그
+    // 5 관리자로그 db에 추가하여 저장
     void insertActivityLog(AdminUserDTO logDto);
 
 

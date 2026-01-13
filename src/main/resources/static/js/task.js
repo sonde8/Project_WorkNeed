@@ -744,7 +744,7 @@ function renderTaskFileItem(fileLog) {
     fileItem.className = 'file-item';
 
     // 📎 아이콘과 span 사이 여백 없이 바짝 붙임
-    fileItem.innerHTML = `<a href="/api/task/files/download/${id}" class="file-link">📎<span>${name}</span></a>`;
+    fileItem.innerHTML = `<a href="/api/task/files/download/${id}" class="file-link"><span>${name}</span></a>`;
 
     // 최신 파일을 목록 맨 위로 추가
     container.prepend(fileItem);

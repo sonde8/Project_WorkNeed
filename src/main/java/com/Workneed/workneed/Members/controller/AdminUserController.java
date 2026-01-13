@@ -18,7 +18,6 @@ public class AdminUserController {
 
     private final AdminUserService adminUserService;
 
-    //세션100구조
     @GetMapping("/member/list")
     public String adminUserList(
             @RequestParam(required = false) String userName,
