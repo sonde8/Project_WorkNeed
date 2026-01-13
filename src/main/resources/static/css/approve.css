@@ -765,7 +765,11 @@ span.value {
     margin: 15px 0px;
 }
 
-
+.group-title {
+color: var(--color-primary);
+font-size: 12px;
+font-weight: 800;
+}
 .hint {
     padding-left: 20px;
 }
