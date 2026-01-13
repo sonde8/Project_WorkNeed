@@ -116,9 +116,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const tr = document.createElement('tr');
             tr.className = [rowClass, isLeave ? 'leave-row' : ''].join(' ').trim();
 
+            const isAlertType =
+                type.includes('지각') ||
+                type.replace(/\s+/g, '').includes('휴일근무');
+
             tr.innerHTML = `
                 <td>${d} (${dow})</td>
-                <td>${type}</td>
+                <td class="${isAlertType ? 'type-alert' : ''}">${type}</td>
                 <td>${rec.checkIn ?? ''}</td>
                 <td>${rec.checkOut ?? ''}</td>
                 <td>${otLabel}</td>
@@ -146,15 +150,18 @@ document.addEventListener('DOMContentLoaded', () => {
     /* ===============================
        모달 제어 (Leave 스타일 반영)
     =============================== */
-    openBtn.onclick = () => modal.hidden = false;
+    if(openBtn) openBtn.onclick = () => modal.hidden = false;
 
     const hideModal = () => { modal.hidden = true; };
     if (closeBtn) closeBtn.onclick = hideModal;
 
     // 배경 클릭 시 닫기
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal || e.target.id === 'closeModalBack') hideModal();
-    });
+    if(modal){
+
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal || e.target.id === 'closeModalBack') hideModal();
+        });
+    }
 
     /* ===============================
        근태 수정 요청 등록 (로직 강화)
@@ -219,4 +226,5 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     render();
+
 });

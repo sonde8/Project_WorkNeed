@@ -94,6 +94,18 @@ public interface AttendanceMapper {
     int overtimeMinutes(@Param("empId") Long empId,
                         @Param("startDate") LocalDate startDate,
                         @Param("endDate") LocalDate endDate);
+
+    // 근태 수정
+    int upsertCorrected(@Param("empId") Long empId,
+                        @Param("workDate") LocalDate workDate,
+                        @Param("checkInTime") LocalDateTime checkInTime,
+                        @Param("checkOutTime") LocalDateTime checkOutTime,
+                        @Param("workMinutes") Integer workMinutes,
+                        @Param("overtimeMinutes") Integer overtimeMinutes,
+                        @Param("isLate") String isLate,
+                        @Param("isEarlyLeave") String isEarlyLeave,
+                        @Param("statusCode") String statusCode);
+
 }
 
 

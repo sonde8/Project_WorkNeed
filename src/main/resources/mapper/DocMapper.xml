@@ -37,13 +37,13 @@
             writer_id AS writerId,
             type_id AS typeId,
             status,
-            leave_start_date AS leaveStartDate,
-            leave_end_date AS leaveEndDate,
+            /* leave_start_date, leave_end_date 컬럼 제거 (존재하지 않음) */
             created_at,
             updated_at
         FROM approval_doc
         WHERE approval_doc_id = #{docId}
     </select>
+
     <select id="findDocById"
             parameterType="long"
             resultType="com.Workneed.workneed.Approval.entity.ApprovalDoc">
@@ -374,6 +374,12 @@
     <delete id="deleteFileById">
         DELETE FROM approval_file
         WHERE file_id = #{fileId}
+    </delete>
+
+    <!-- 임시저장 삭제 시 결재선을 먼적 삭제하기 위함 -->
+    <delete id="deleteLinesByDocId">
+        DELETE FROM approval_line
+        WHERE approval_doc_id = #{docId}
     </delete>
 
     <delete id="deleteFilesByDocId">

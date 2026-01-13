@@ -9,6 +9,7 @@
     gap: 14px;
     margin: 0;
     padding: var(--gap-size2);
+    border: 1px solid #ddd;
     box-sizing: border-box;
     background: var(--color-surface);
     border-radius: var(--border-radius);
@@ -20,15 +21,15 @@
 .clock{
     width: 100%;
     background-color: #ffffff;
-    border: 1px solid #f0f0f0;
     border-radius: 15px;
-    font-size: 50px;
+    font-size: 55px;
     font-weight: 600;
     letter-spacing: 2px;
     text-align: center;
     color: #222;
     box-shadow: inset 0 1px 0 rgba(255,255,255,0.6);
     font-variant-numeric: tabular-nums;
+    margin-top: 15px;
 }
 
 /*--------------------- 메인 출퇴근 버튼----------------------*/
@@ -81,7 +82,9 @@
     width: 100px;
     height: 35px;
     font-size: 17px;
-    border-radius: 18px;
+    border-radius: 10px;
+    color: #fff;
+    background: var(--color-primary);
 }
 /*----------------------------------*/
 

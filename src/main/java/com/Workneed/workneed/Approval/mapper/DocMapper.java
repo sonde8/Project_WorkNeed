@@ -191,6 +191,9 @@ public interface DocMapper {
     int deleteMyDraft(@Param("docId") Long docId,
                       @Param("userId") Long userId);
 
+    // ✅ 임시저장 삭제 시 외래 키(FK) 오류 해결을 위해 결재선 데이터를 먼저 지우는 메서드 추가
+    int deleteLinesByDocId(@Param("docId") Long docId);
+
         /* =========================================================
         유저 검색 기능 (디벨롭) + 회수
        ========================================================== */

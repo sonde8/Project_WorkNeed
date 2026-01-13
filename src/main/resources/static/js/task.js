@@ -325,7 +325,7 @@ document.addEventListener("DOMContentLoaded", () => {
             data: {
                 datasets: [{
                     data: [value, 100 - value],
-                    backgroundColor: ["rgba(0,0,0,0.2)", "rgba(0,0,0,0.4)"],
+                    backgroundColor: ["#0B2E4F", "#6B7280"],
                     borderWidth: 0
                 }]
             },

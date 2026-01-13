@@ -57,27 +57,23 @@
         ORDER BY a.admin_created_at DESC
     </select>
 
-    <select id="existsByEmail" resultType="boolean">
-        SELECT COUNT(*)
-        FROM adminuser
-        WHERE admin_email = #{adminEmail}
-    </select>
-
-    <select id="findAllActivityLogs"
-            resultType="com.Workneed.workneed.Members.dto.AdminUserDTO">
+    <select id="findAllActivityLogs" resultType="com.Workneed.workneed.Members.dto.AdminUserDTO">
+        <![CDATA[
         SELECT
         l.log_id AS logId,
         a.admin_name AS adminName,
         r.role_name AS roleName,
         l.log_action_type AS logActionType,
-        l.log_target_type   AS logTargetType,
-        l.log_target_id     AS logTargetId,
+        l.log_target_type AS logTargetType,
+        l.log_target_id AS logTargetId,
         l.log_description AS logDescription,
         l.log_created_at AS logCreatedAt
         FROM adminactivitylog l
-        JOIN adminuser a ON l.admin_id = a.admin_id
-        LEFT JOIN adminrole r ON a.role_id = r.role_id
+                 JOIN adminuser a ON l.admin_id = a.admin_id
+                 LEFT JOIN adminrole r ON a.role_id = r.role_id
         ORDER BY l.log_created_at DESC
+        ]]>
+
     </select>
 
     <select id="findPermissionsByRoleId" resultType="string">
@@ -95,33 +91,40 @@
     <insert id="insertAdmin" parameterType="com.Workneed.workneed.Members.dto.AdminUserDTO"
             useGeneratedKeys="true" keyProperty="adminId">
         INSERT INTO adminuser (
-        admin_email,    admin_password, admin_name,     role_id,        admin_status    ) VALUES (
-        #{adminEmail},   #{adminPassword},
+        admin_email, admin_password, admin_name, role_id, admin_status ) VALUES (
+        #{adminEmail}, #{adminPassword},
         #{adminName},
-        #{roleId},      #{adminStatus}
+        #{roleId}, #{adminStatus}
         )
     </insert>
 
-    <insert id="insertActivityLog" parameterType="com.Workneed.workneed.Members.dto.AdminUserDTO">
+    <select id="existsByEmail" resultType="boolean">
+        SELECT COUNT(*)
+        FROM adminuser
+        WHERE admin_email = #{adminEmail}
+    </select>
+
+    <insert id="insertActivityLog"
+            parameterType="com.Workneed.workneed.Members.dto.AdminUserDTO">
         INSERT INTO adminactivitylog (
-            admin_id,
-            log_action_type,
-            log_target_type,
-            log_target_id,
-            log_description,
-            log_created_at
+        admin_id,
+        log_action_type,
+        log_target_type,
+        log_target_id,
+        log_description,
+        log_created_at
         )
         VALUES (
-                #{adminId},
-                #{logActionType},
-                #{logTargetType},
-                #{logTargetId},
-                #{logDescription},
-                NOW()
-            )
+        #{adminId},
+        #{logActionType},
+        #{logTargetType},
+        #{logTargetId},
+        #{logDescription},
+        NOW()
+        )
     </insert>
 
-    <update id="updateMemberStatus" >
+    <update id="updateMemberStatus">
         UPDATE user
         <set>
             rank_id = #{rankId},
