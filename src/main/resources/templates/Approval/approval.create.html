@@ -19,27 +19,19 @@
         <div class="wrap approval-create">
 
             <div class="page-head">
-                <h1 class="page-title"
-                    th:text="${mode} == 'edit' ? '임시저장 문서 수정' : '결재 문서 작성'">결재 문서 작성</h1>
+                <h1 class="page-title">결재 문서 작성</h1>
                 <div class="page-actions">
                     <a class="btn" th:href="@{/approval}">결재함</a>
                 </div>
             </div>
 
-            <!-- ✅ form은 1개만 사용 -->
             <form class="card form-card"
                   method="post"
-                  enctype="multipart/form-data"
-                  th:action="${mode} == 'edit'
-                                ? @{/approval/draft/{docId}(docId=${docId})}
-                                : @{/approval/save}">
-
-                <!-- edit 모드에서 docId 같이 전송 -->
-                <input type="hidden" name="docId" th:value="${docId}">
-                <input type="hidden" name="mode" th:value="${mode}">
+                  th:action="@{/approval/submit}"
+                  enctype="multipart/form-data">
 
                 <div class="card-head">
-                    <h3 th:text="${mode} == 'edit' ? '문서 수정' : '문서 작성'">문서 작성</h3>
+                    <h3>문서 작성</h3>
                     <p class="meta">문서 유형 / 제목 / 내용 / 첨부</p>
                 </div>
 
@@ -52,8 +44,8 @@
                             <option value="">문서 유형 선택</option>
                             <option th:each="t : ${types}"
                                     th:value="${t.typeId}"
-                                    th:text="${t.typeName}"
-                                    th:selected="${doc != null and doc.typeId != null} ? (${doc.typeId} == ${t.typeId}) : false">
+                                    th:text="${t.typeName}">
+                                유형
                             </option>
                         </select>
                     </div>
@@ -61,25 +53,14 @@
                     <!-- 제목 -->
                     <div class="row">
                         <label class="label">제목</label>
-                        <input class="control"
-                               type="text"
-                               name="title"
-                               placeholder="제목을 입력하십시오"
-                               th:value="${doc != null} ? ${doc.title} : ''"
-                               required>
+                        <input class="control" type="text" name="title" placeholder="제목을 입력하십시오" required>
                     </div>
 
                     <!-- 내용 -->
                     <div class="row row-content">
                         <label class="label">내용</label>
-                        <textarea class="control textarea"
-                                  name="content"
-                                  rows="10"
-                                  placeholder="내용을 입력하십시오"
-                                  th:text="${doc != null} ? ${doc.content} : ''"
-                                  required></textarea>
+                        <textarea class="control textarea" name="content" rows="10" placeholder="내용을 입력하십시오" required></textarea>
                     </div>
-
 
                     <!-- 첨부 -->
                     <div class="row">
@@ -101,92 +82,18 @@
 
                 <div class="card-head">
                     <h3>결재선 구성</h3>
-                    <p class="meta">결재선은 직급이 낮은 순서부터 높은 순서로 등록해 주세요.</p>
+                    <p class="meta">후보 체크 → 버튼(검토/합의/최종결재/참조)으로 배치</p>
                 </div>
 
                 <div class="approver-layout">
 
                     <!-- 후보 리스트 -->
                     <div class="approver-box">
-
-
                         <div class="box-head">
                             <div class="box-title">사용자 후보</div>
                             <div class="box-meta">ACTIVE 사용자</div>
                         </div>
-                        <div class="left-user-picker">
 
-                            <!-- 팀 전체 선택 -->
-                            <div class="picker-actions">
-                                <button type="button" class="btn" id="btnSelectAll">팀 전체 선택</button>
-                            </div>
-
-                            <!-- 검색 -->
-                            <div class="picker-search">
-                                <input type="text" id="userSearchInput" placeholder="이름/부서/직급 검색">
-                                <button type="button" class="btn" id="btnSearch">검색</button>
-                            </div>
-
-                            <!-- 검색 결과 -->
-                            <div class="picker-section">
-                                <div class="section-title">검색 결과 <span id="searchCount">0</span></div>
-                                <div id="searchResultList" class="list"></div>
-                            </div>
-
-                            <!-- 부서별 토글 -->
-                            <div class="picker-section">
-                                <div class="section-title">부서별 팀원</div>
-
-                                <div class="dept-accordion" th:each="dept : ${departments}">
-                                    <button type="button" class="dept-head"
-                                            th:attr="data-dept-id=${dept.deptId}">
-                                        <span th:text="${dept.deptName}">부서명</span>
-                                        <span class="dept-count"
-                                              th:text="${#lists.size(usersByDept[dept.deptId])}">0</span>
-                                        <span class="dept-toggle-icon">▾</span>
-                                    </button>
-
-                                    <div class="dept-body" style="display:none;">
-                                        <!-- (선택) 부서 전체 선택 -->
-                                        <div class="dept-actions">
-                                            <button type="button" class="btn btn-small deptSelectAll"
-                                                    th:attr="data-dept-id=${dept.deptId}">부서 전체 선택</button>
-                                        </div>
-
-                                        <div class="list">
-                                            <div class="row"
-                                                 th:each="u : ${usersByDept[dept.deptId]}"
-                                                 th:attr="data-user-id=${u.userId},
-                        data-name=${u.username},
-                        data-dept=${dept.deptName},
-                        data-rank=${u.rankName}">
-                                                <div class="meta">
-                                                    <div class="name" th:text="${u.username}">홍길동</div>
-                                                    <div class="sub">
-                                                        <span th:text="${dept.deptName}">개발팀</span>
-                                                        <span> · </span>
-                                                        <span th:text="${u.rankName}">대리</span>
-                                                    </div>
-                                                </div>
-                                                <button type="button" class="btn btn-small btnPick">선택</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                        <!-- 선택된 목록(예: 오른쪽/아래) -->
-                        <div class="picked-users">
-                            <div class="section-title">선택된 목록</div>
-                            <div id="pickedList" class="list"></div>
-
-                            <!-- 서버 전송용 hidden inputs -->
-                            <div id="pickedHiddenInputs"></div>
-                        </div>
-<!--
                         <div class="candidate-list">
                             <label class="candidate" th:each="u : ${approvers}">
                                 <input type="checkbox" class="candCheck"
@@ -201,7 +108,7 @@
                                 </span>
                             </label>
                         </div>
--->
+
                         <div class="hint">
 
                             최종결재는 1명만 가능합니다.
