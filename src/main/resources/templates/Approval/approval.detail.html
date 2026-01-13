@@ -232,16 +232,13 @@
                 <div class="action-panel"
                      th:if="${doc.status.name() == 'IN_PROGRESS' and isMyTurn and !isReference}">
 
-                    <!-- 왼쪽: 안내 -->
                     <div class="action-head">
                         <div class="action-title">결재 처리</div>
                         <div class="action-desc">승인 또는 반려 중 하나를 선택하십시오.</div>
                     </div>
 
-                    <!-- 오른쪽: 버튼 -->
                     <div class="action-buttons">
 
-                        <!-- 승인 -->
                         <form class="inline"
                               method="post" th:action="@{/approval/approve}">
                             <input type="hidden" name="docId" th:value="${doc.docId}">
@@ -251,13 +248,11 @@
                             </button>
                         </form>
 
-                        <!-- 반려 (토글) -->
-                        <button type="button" class="btn action-btn reject" id="btnToggleReject">
+                        <button type="button" class="btn action-btn reject" id="btnRejectToggle">
                             반려
                         </button>
                     </div>
 
-                    <!-- 반려 폼 -->
                     <form id="rejectForm"
                           class="action-reject-form"
                           method="post" th:action="@{/approval/reject}">
