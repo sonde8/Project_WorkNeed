@@ -141,7 +141,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const daysNum = Number(r.days ?? 0);
             const minutes = minutesBType(code, daysNum);
 
-            const statusText = statusLabel(r.status);
+            const statusCode = r.status ?? '';
+            const statusText = statusLabel(statusCode);
 
             function statusLabel(code){
 
@@ -165,7 +166,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td>${t.start}</td>
                 <td>${t.end}</td>
                 <td class="reasonCell">${reasonText}</td>
-                <td>${statusText}</td>
+                <td class="status ${statusCode.toLowerCase()}">${statusText}</td>
             `;
 
             tbody.appendChild(tr);
