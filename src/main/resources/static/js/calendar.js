@@ -507,25 +507,22 @@
                 }
 
                 // 뱃지 설정
-                let badgeClass = 'personal';
-                let badgeText = '개인';
                 const cat = getCategoryInfo(e);
-
-                if (cat.text.includes('회사') || cat.text.includes('공지')) {
-                    badgeClass = 'company'; badgeText = '회사';
-                } else if (cat.text.includes('팀')) {
-                    badgeClass = 'team'; badgeText = '팀';
-                }
 
                 li.innerHTML = `
                     <div class="work-time-box"> 
                         ${dateHtml}
                     </div>
                     <div class="work-info-box">
-                        <span class="w-badge ${badgeClass}">${badgeText}</span>
+                        <span class="w-badge" style="background-color: ${cat.bg}; color: ${cat.color};">
+                            ${cat.text}
+                        </span>
                         <span class="w-title">${e.title || '(제목 없음)'}</span>
                     </div>
                 `;
+
+                li.onclick = () => safeOpenDetailModal(e);
+                ul.appendChild(li);
 
                 li.onclick = () => safeOpenDetailModal(e);
                 ul.appendChild(li);
