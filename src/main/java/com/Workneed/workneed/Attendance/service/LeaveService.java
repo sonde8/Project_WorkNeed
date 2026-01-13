@@ -100,8 +100,6 @@ public class LeaveService {
         leaveMapper.insertRequest(r);
 
         // ====== 사용 내역 ======
-        double days = calcDays(req.getLeaveType(), req.getStartDate(), req.getEndDate());
-
         LeaveUsageInsertDTO u = new LeaveUsageInsertDTO();
         u.setRequestId(r.getRequestId());
         u.setUserId(userId);

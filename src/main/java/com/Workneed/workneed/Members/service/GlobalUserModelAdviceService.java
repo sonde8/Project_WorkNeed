@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import java.io.IOException;
 
 
+// 로그인 후에도 실시간으로 유저의 상태를 확인 후 처리
 @ControllerAdvice
 @RequiredArgsConstructor
 public class GlobalUserModelAdviceService {

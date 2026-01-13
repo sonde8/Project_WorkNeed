@@ -150,7 +150,7 @@
     </update>
 
 <!--main page mini kanban-->
-    <select id="countDoingSchedulesAll" resultType="int">
+    <select id="countMainDoingSchedules" parameterType="long" resultType="int">
         SELECT COUNT(*)
         FROM schedule
         WHERE status = 'DOING'
