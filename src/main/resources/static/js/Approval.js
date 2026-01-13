@@ -351,7 +351,7 @@ document.addEventListener("DOMContentLoaded", () => {
      * ================================================== */
     const rejectForm = document.getElementById("rejectForm");
     if (rejectForm) {
-        const toggleBtn = document.getElementById("btnToggleReject");
+        const toggleBtn = document.getElementById("btnRejectToggle");
         const cancelBtn = document.getElementById("btnCancelReject");
 
         document.querySelectorAll("[data-confirm]").forEach(btn => {
