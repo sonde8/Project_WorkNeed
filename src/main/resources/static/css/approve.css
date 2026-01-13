@@ -18,7 +18,7 @@
     margin: 0 auto;
     padding: 20px ;
 }
-.approval-scope .wrap:-webkit-scrollbar { width: 4px; } :-webkit-scrollbar-thumb { background-color: rgba(0, 0, 0, 0.1); border-radius: 10px; }
+.approval-scope .wrap::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-thumb { background-color: rgba(0, 0, 0, 0.1); border-radius: 10px; }
 
 .approval-scope .page-head {
     display: flex;
