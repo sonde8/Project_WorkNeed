@@ -6,10 +6,10 @@
     display: flex;
     flex: none;
     flex-direction: column;
-    gap: 14px;
-    margin: 0;
+    gap: 16px;
+
     padding: var(--gap-size2);
-    border: 1px solid #ddd;
+    border: 1px solid var(--color-border);
     box-sizing: border-box;
     background: var(--color-surface);
     border-radius: var(--border-radius);
@@ -18,18 +18,21 @@
 
 
 /* 현재 시간 */
-.clock{
+.att-left .clock{
     width: 100%;
-    background-color: #ffffff;
-    border-radius: 15px;
-    font-size: 55px;
-    font-weight: 600;
+    padding: 18px 10px;
+
+    background: rgba(0, 0, 0, .04);
+
+    border-radius: 18px;
+
+    font-size: 45px;
+    font-weight: 700;
     letter-spacing: 2px;
     text-align: center;
-    color: #222;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.6);
+    color:  var(--color-primary);
     font-variant-numeric: tabular-nums;
-    margin-top: 15px;
+
 }
 
 /*--------------------- 메인 출퇴근 버튼----------------------*/
@@ -86,43 +89,95 @@
 }
 /*----------------------------------*/
 
-.att-left .rows{
-    border: 1px solid #f0f0f0;
-    border-radius: var(--border-radius);
-    margin: 0;
-}
-
 .att-left .row{
-    padding: 0;
-}
-
-.rowMonth{
     margin: 0;
+    padding: 0;
+    font-size: 16px;
+}
 
+.att-left .leftAttend{
     background: #fff;
+    border: 1px solid var(--color-border);
+    border-radius: 18px;
+    padding: 14px 14px;
 }
 
-/* 출퇴근 버튼 */
+.att-left .rows{
+    margin: 0;
+    background: transparent;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
 
-.btn {
-    width: 172px;
-    height: 45px;
-    font-size: 20px;
-    font-weight: 600;
+.att-left .rows > .row{
+    display: grid;
+    grid-template-columns: 1fr auto 110px;
+    align-items: center;
+    column-gap: 14px;
+
+    padding: 8px 4px;
+}
+
+.att-left .rows > .row > span:first-child{
+    font-weight: 700;
     color: #111;
-    border: 1px solid #cfcfcf;
-    border-radius: 14px;
-    cursor: pointer;
+    letter-spacing: -0.2px;
 }
 
-.btn:hover{
-    background: #fafafa;
+.att-left .rows > .row .muted{
+    font-weight: 700;
+    color: #111;
+    justify-self: end;
+    white-space: nowrap;
 }
 
-.btn:disabled{
+.att-left .rows > .row .btn{
+    width: 110px;
+    height: 36px;
+    border-radius: 18px;
+    font-size: 16px;
+    font-weight: 700;
+
+    border: 1px solid #d7dbe1;
+    background: #f6f8fb;
+    color: #111;
+}
+
+.att-left .rows > .row .btn:hover{
+    background: #eef3f8;
+}
+
+.att-left .rows > .row .btn:disabled{
     opacity: .45;
     cursor: not-allowed;
 }
+
+.att-left .rowMonth{
+    background: var(--color-bg);
+    border-radius: 18px;
+    padding: 12px 14px;
+}
+
+.att-left .rowMonth .row-month{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.att-left .rowMonth .row-month > span:first-child{
+    font-weight: 800;
+    color: #111;
+}
+
+.att-left .rowMonth .row-month .muted{
+    font-weight: 800;
+    color: #111;
+    white-space: nowrap;
+}
+
+
 
 /* 업무 상태 변경 */
 .state-wrap{
@@ -151,88 +206,102 @@
 .click{
     display: grid;
     grid-template-columns: 1fr;
-    gap: 20px;
-    margin-top: 18px;
-    justify-content: center;
-    cursor : pointer;
+    gap: 18px;
+    margin-top: 6px;
+    cursor:pointer;
 }
 
-.menuGroup{
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
-
+.menuGroup,
 .menuGroupTeam{
     display: flex;
     flex-direction: column;
-    gap: 20px;
-
+    gap: 18px;
 }
 
-.cli {
-    width: 100%;
+.cli.card{
+    position: relative;
+    height: 45px;
+
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
 
-    height: 56px;
-    padding: 0 18px;
+    padding: 0 18px 0 22px;
+    border-radius: 18px;
+
+    background: #fff;
+    border: 1px solid var(--color-border);
 
     font-size: 18px;
     font-weight: 700;
-    color: var(--color-primary);
+    color: #111;
     letter-spacing: -0.2px;
-
     text-decoration: none;
 
-    background: #ffffff;
-    border: 1px solid var(--color-border);
-    border-radius: 14px;
-
-    transition: all 0.18s ease;
+    transition: transform .15s ease, box-shadow .15s ease, background .15s ease, border-color .15s ease;
 }
 
-.cli:hover {
-    background: var(--color-primary-light);
-    border-color: var(--color-primary);
+.cli.card::before{
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 10px;
+    bottom: 10px;
+    width: 6px;
+    border-radius: 10px;
+    background: #8ec5ff;
+}
 
-    box-shadow: 0 8px 18px rgba(0,0,0,0.08);
+.cli.card:hover{
+    background: #f6f9fd;
+    border-color: #d8e2f2;
+    box-shadow: 0 10px 24px rgba(0,0,0,0.06);
     transform: translateY(-1px);
 }
+.cli.card:hover::after{
+    color: #7f8a99;
+}
+
+.cli.card.team::before{
+    background: #84d8cf;
+}
+
+.cli.card::after{
+    content: "›";
+    font-size: 28px;
+    font-weight: 700;
+    color: #aab3bf;
+    line-height: 1;
+}
+
 
 .menuGroupTeam .cli {
-    height: 56px;
+    background: #f7f9fc;
     font-size: 17px;
-    background: #f9fafb;
-    border-radius: 14px;
-    font-weight: 700;
 }
 
 .menuGroupTeam .cli:hover {
     background: #eef3f8;
 }
 
-.cli.active {
-    background: var(--color-primary);
-    color: #ffffff;
-    border-color: var(--color-primary);
-}
-
 @media (max-width: 520px){
-    .click{
-        grid-template-columns: 1fr;
+    .cli.card{
+        height: 64px;
+        font-size: 18px;
+        padding-left: 18px;
     }
-    .menuGroupTeam{
-        padding-top: 0;
-        width: 100%;
+    .cli.card::before{
+        width: 8px;
+        top: 8px;
+        bottom: 8px;
+    }
+    .cli.card::after{
+        font-size: 24px;
     }
 }
-
 .click:has(.menuGroupTeam){
     grid-template-columns: 1fr 1fr;
-    justify-items: stretch;
-    align-items: start;
+    gap: 14px;
 }
 
 .click:has(.menuGroupTeam) .menuGroup,
@@ -240,70 +309,58 @@
     width: 100%;
 }
 
+.att-left .work-state{
+    width: fit-content;
+    margin-left: auto;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
 
+    gap: 10px;
 
-/* 업무 변경 모달 */
-.state-modal[hidden]{
-    display: none;
-}
-
-.state-modal{
-    position: fixed;
-    inset: 0;
-    z-index: 999999;
-    display: block;
-}
-
-.state-modal_back{
-    position: absolute;
-    inset: 0;
-    background: rgba(0,0,0,0.45);
-}
-
-
-.state-modal_panel{
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-
-    width: 320px;
-    padding: 16px;
-    border: 1px solid #111;
-    border-radius: 14px;
-
-    background: #fff;
-    color: #111;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.35);
-}
-
-.state-modal_title{
-    font-size: 18px;
-    font-weight: 600;
-    margin-bottom: 12px;
-    text-align: center;
-}
-
-.state-modal_list{
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.state-item{
-    padding: 10px 12px;
-    border: 1px solid black;
-    border-radius: 10px;
-    margin-bottom: 8px;
-    cursor: pointer;
-    text-align: center;
-}
-
-.state-modal_close{
-    width: 100%;
     margin-top: 10px;
-    padding: 10px 0;
-    border-radius: 10px;
-    border: 1px solid black;
-    cursor: pointer;
+    padding: 8px 12px;
+    background-color: #f3f4f6;
+
+    border-radius: 14px;
 }
+
+.att-left .work-state .labelState{
+    font-size: 14px;
+    font-weight: 650;
+    letter-spacing: -0.5px;
+    color: #111;
+}
+
+.att-left .work-state .dotState{
+    width: 14px;
+    height: 14px;
+    border-radius: 999px;
+    border: 2px solid #111;
+    background: transparent;
+    cursor: pointer;
+    transition: transform .12s ease, background .15s ease, border-color .15s ease;
+}
+
+.att-left .work-state .dotState:hover{
+    transform: translateY(-1px);
+}
+
+/* 출근(파랑) */
+.att-left .work-state[data-state="IN"] .dotState{
+    border-color: var(--color-secondary);
+    background: var(--color-secondary);
+}
+
+/* 퇴근(검정) */
+.att-left .work-state[data-state="OUT"] .dotState{
+    border-color:  #333;
+    background:  #333;
+}
+
+/* 자리비움(주황) */
+.att-left .work-state[data-state="AWAY"] .dotState{
+    border-color: #f59e0b;
+    background: #f59e0b;
+}
+

@@ -287,6 +287,7 @@
                 try {
                     const res = await fetch('/api/leave/apply', {
                         method: 'POST',
+                        credentials: 'same-origin',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(payload)
                     });
