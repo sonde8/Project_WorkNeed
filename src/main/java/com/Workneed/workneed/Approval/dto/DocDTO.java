@@ -13,6 +13,7 @@ public class DocDTO {
     private Long writerId; // FK (USER.user_id)
     private Long typeId;  // FK (APPROVAL_TYPE.type_id)
     private String refUserIds; //참조자
+    private String typeName;
 
     private String title;
     private String content;
