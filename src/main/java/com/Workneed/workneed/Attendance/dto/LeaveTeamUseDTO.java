@@ -18,7 +18,6 @@ public class LeaveTeamUseDTO {
     private String leaveType;
     private LocalDate startDate;
     private LocalDate endDate;
-    private Double days;
     private String reason;
 
     private String status;

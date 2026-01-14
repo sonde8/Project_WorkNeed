@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+// 관리자 페이지에서 다루는 권한기능 모음
 @Controller
 @RequestMapping("/admin")
 @RequiredArgsConstructor
@@ -18,9 +19,11 @@ public class AdminUserController {
 
     private final AdminUserService adminUserService;
 
-    //세션100구조
+    // 권한이 없으면 자동로드, 권한을 key값에 저장
     @GetMapping("/member/list")
     public String adminUserList(
+            // 하나의 페이지에서 전체 보기 , 검색 결과 보기를 모두 처리하는 필터
+            // false로 처리하여 검색 시 조건에 없어도 오류 x
             @RequestParam(required = false) String userName,
             @RequestParam(required = false) String userLoginId,
             @RequestParam(required = false) Long deptId,
@@ -29,17 +32,19 @@ public class AdminUserController {
             HttpSession session,
             Model model) {
 
+        // 관리자 아니면 로그인화면
         AdminUserDTO admin = (AdminUserDTO) session.getAttribute("admin");
         if (admin == null) return "redirect:/login";
 
         if (session.getAttribute("permissions") == null) {
             List<String> permissions = adminUserService.getPermissionsByRoleId(admin.getRoleId());
             session.setAttribute("permissions", permissions);
-            System.out.println("로그인 관리자 [" + admin.getAdminName() + "] 권한 로드: " + permissions);
         }
 
+        // 한 유저의 모든정보 가져와서 리스트에담음
         List<UserDTO> memberList = adminUserService.getAllMembers(userName, userLoginId, deptId, rankId, userStatus);
 
+        // html넘겨주기위해 key value로 이름간소화, 이름 구체화
         model.addAttribute("admin", admin);
         model.addAttribute("user", memberList);
         model.addAttribute("dept", adminUserService.getAllDepts());
@@ -54,13 +59,14 @@ public class AdminUserController {
         return "Members/admin_user_list";
     }
 
-    // 1. 정보 수정
+    // 1. 정보 변경(직급,부서) 및 변경자로그남김
     @PostMapping("/member/edit/save")
     @ResponseBody
     public String adminUserEditSave(@RequestBody UserDTO userDto, HttpSession session) {
         AdminUserDTO admin = (AdminUserDTO) session.getAttribute("admin");
         if (admin == null) return "fail";
 
+        // 에러가 나더라도 프로그램이 터지지 않고, 관리자에게  신호를 보내서 작업 실패 안내
         try {
             // 서비스에서 개별 로그를 남기도록 adminId 전달
             adminUserService.updateMemberStatusWithLog(
@@ -72,7 +78,6 @@ public class AdminUserController {
             );
             return "success";
         } catch (Exception e) {
-            e.printStackTrace();
             return "fail";
         }
     }
@@ -100,17 +105,17 @@ public class AdminUserController {
     @ResponseBody
     public String addAdminAccount(@RequestBody AdminUserDTO adminDto, HttpSession session) {
         AdminUserDTO admin = (AdminUserDTO) session.getAttribute("admin");
-        if (admin == null) return "로그인이 필요합니다.";
+        if (admin == null) return "fail";
 
         try {
             adminUserService.createAdmin(adminDto, admin);
             return "success";
         } catch (IllegalStateException e) {
-            return e.getMessage();   // 이메일 중복 등
+            return e.getMessage();   // 이메일 중복
         } catch (SecurityException e) {
             return "권한이 없습니다.";
         } catch (IllegalArgumentException e) {
-            return e.getMessage();
+            return e.getMessage();  // 비어있는 값 처리
         } catch (Exception e) {
             return "서버 오류";
         }
@@ -134,7 +139,7 @@ public class AdminUserController {
     }
 
 
-    // 3. 부서 추가 (adminId 전달)
+    // 3. 부서 추가
     @PostMapping("/dept/add")
     @ResponseBody
     public String addDept(@RequestParam("deptName") String deptName, HttpSession session) {
@@ -148,7 +153,7 @@ public class AdminUserController {
         }
     }
 
-    // 4. 직급 추가 (adminId 전달)
+    // 4. 직급 추가
     @PostMapping("/rank/add")
     @ResponseBody
     public String addRank(@RequestParam("rankName") String rankName, HttpSession session) {
@@ -162,7 +167,7 @@ public class AdminUserController {
         }
     }
 
-    // 5. 부서 삭제 (adminId 전달)
+    // 5. 부서 삭제
     @PostMapping("/dept/delete")
     @ResponseBody
     public String deleteDept(@RequestParam("deptId") Long deptId, HttpSession session) {
@@ -172,7 +177,7 @@ public class AdminUserController {
         return "success";
     }
 
-    // 6. 직급 삭제 (adminId 전달)
+    // 6. 직급 삭제 
     @PostMapping("/rank/delete")
     @ResponseBody
     public String deleteRank(@RequestParam("rankId") Long rankId, HttpSession session) {
@@ -189,9 +194,9 @@ public class AdminUserController {
         AdminUserDTO admin = (AdminUserDTO) session.getAttribute("admin");
         if (admin == null) return "redirect:/login";
 
-        model.addAttribute("admin", admin); // 헤더용
+        model.addAttribute("admin", admin);
         model.addAttribute("admins", adminUserService.getAllAdmins()); // 관리자 리스트
-        return "Members/admin_manage_list"; // 새로 만들 HTML 파일명
+        return "Members/admin_manage_list";
     }
 
 
@@ -201,9 +206,9 @@ public class AdminUserController {
         AdminUserDTO admin = (AdminUserDTO) session.getAttribute("admin");
         if (admin == null) return "redirect:/login";
 
-        model.addAttribute("admin", admin); // 헤더용
+        model.addAttribute("admin", admin);
         model.addAttribute("logs", adminUserService.getAllLogs()); // 로그 리스트
-        return "Members/admin_activity_log"; // 새로 만들 HTML 파일명
+        return "Members/admin_activity_log";
     }
 
 
@@ -217,7 +222,7 @@ public class AdminUserController {
         if (admin == null) return "fail";
 
         try {
-            // targetId가 본인인 경우 정지 못하게 하는 방어 로직 (선택사항)
+            // targetId가 본인인 경우 정지 못하게 하는 방어 로직
             if (targetId.equals(admin.getAdminId()) && "SUSPENDED".equals(status)) {
                 return "self_error";
             }

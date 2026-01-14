@@ -67,11 +67,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function minTDH(min) {
 
-        const n = Number(min || 0);
-        const d = Math.floor(n / DAY_MN);
-        const h = Math.floor((n % DAY_MN) / 60);
+        const n = Math.max(0, Number(min || 0));
+        const h = Math.floor(n / 60);
+        const m = n % 60;
 
-        return `${d}d ${h}h`;
+        return `${h}시간 ${m}분`;
     }
 
     // 연차 조회
@@ -141,7 +141,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const daysNum = Number(r.days ?? 0);
             const minutes = minutesBType(code, daysNum);
 
-            const statusText = statusLabel(r.status);
+            const statusCode = r.status ?? '';
+            const statusText = statusLabel(statusCode);
 
             function statusLabel(code){
 
@@ -156,6 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const reasonText = r.reason ?? '';
 
+
             const tr = document.createElement('tr');
 
             tr.innerHTML = `
@@ -165,7 +167,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td>${t.start}</td>
                 <td>${t.end}</td>
                 <td class="reasonCell">${reasonText}</td>
-                <td>${statusText}</td>
+                <td class="status ${String(statusCode).toLowerCase()}">${statusText}</td>
+               
             `;
 
             tbody.appendChild(tr);

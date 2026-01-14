@@ -1,6 +1,7 @@
 package com.Workneed.workneed.Attendance.job;
 
 import com.Workneed.workneed.Attendance.service.AttendanceService;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -10,6 +11,11 @@ import org.springframework.stereotype.Component;
 public class AttendanceJob {
 
     private final AttendanceService attendanceService;
+
+    @PostConstruct
+    public void runOnStartup() {
+        attendanceService.autoYesterday();
+    }
 
     @Scheduled(cron = "0 1 0 * * *", zone = "Asia/Seoul")
     public void autoMidnight(){

@@ -5,7 +5,6 @@ import com.Workneed.workneed.Approval.LineStatus;
 import com.Workneed.workneed.Approval.dto.*;
 import com.Workneed.workneed.Approval.entity.ApprovalDoc;
 import com.Workneed.workneed.Approval.entity.User;
-import com.Workneed.workneed.Members.dto.UserDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -191,6 +190,9 @@ public interface DocMapper {
     int deleteMyDraft(@Param("docId") Long docId,
                       @Param("userId") Long userId);
 
+    // ✅ 임시저장 삭제 시 외래 키(FK) 오류 해결을 위해 결재선 데이터를 먼저 지우는 메서드 추가
+    int deleteLinesByDocId(@Param("docId") Long docId);
+
         /* =========================================================
         유저 검색 기능 (디벨롭) + 회수
        ========================================================== */
@@ -201,5 +203,18 @@ public interface DocMapper {
     int updateDocStatusToDraft(@Param("docId") long docId);
 
     int resetLinesToPending(@Param("docId") long docId);
+
+    int updateDraft(@Param("docId") Long docId,
+                    @Param("typeId") Long typeId,
+                    @Param("title") String title,
+                    @Param("content") String content);
+    String findLatestRejectComment(Long docId);
+
+    /*=================================================================
+    smtp 메일송부
+    ================================================================= */
+    List<ApprovalLineMailDTO> findLinesForMail(@Param("docId") Long docId);
+    List<String> findEmailsByUserIds(@Param("ids") List<Long> ids);
+
 
 }

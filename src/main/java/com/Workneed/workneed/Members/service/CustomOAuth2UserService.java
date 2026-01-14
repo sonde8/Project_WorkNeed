@@ -100,12 +100,25 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             log.info("새로운 소셜 연동 성공: {}", email);
         }
 
-        // 2. 계정 상태 체크 (차단 검문소)
+        // 2. 계정 상태 체크
         if (!"ACTIVE".equals(userDto.getUserStatus())) {
-            String reason = "inactive";
-            if ("INACTIVE".equals(userDto.getUserStatus())) reason = "pending";
-            else if ("SUSPENDED".equals(userDto.getUserStatus())) reason = "suspended";
-            else if ("BANNED".equals(userDto.getUserStatus())) reason = "banned";
+            String reason = "pending"; // 기본값은 승인 대기
+
+            // INACTIVE 상태일 때만 날짜를 계산해서 '휴직(inactive)'으로 바꿀지 결정
+            if ("INACTIVE".equals(userDto.getUserStatus())) {
+                if (userDto.getUserCreatedAt() != null) {
+                    java.time.LocalDate signupDate = userDto.getUserCreatedAt().toLocalDate();
+                    java.time.LocalDate today = java.time.LocalDate.now();
+                    long days = java.time.temporal.ChronoUnit.DAYS.between(signupDate, today);
+                    if (days >= 30) {
+                        reason = "inactive";
+                    }
+                }
+            } else if ("SUSPENDED".equals(userDto.getUserStatus())) {
+                reason = "suspended";
+            } else if ("BANNED".equals(userDto.getUserStatus())) {
+                reason = "banned";
+            }
 
             throw new OAuth2AuthenticationException(new OAuth2Error("login_failed", reason, null));
         }

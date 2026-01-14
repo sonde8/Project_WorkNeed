@@ -20,7 +20,18 @@ function initMiniCalendar(calendarEl, tooltipEl) {
         initialView: 'dayGridMonth',
         height: '100%',
         expandRows: true,
-        fixedWeekCount: true,
+        views: {
+            dayGridTwoWeek: {
+                type: 'dayGrid',
+                duration: { weeks: 2 }, // 2주 기간 설정
+                dayMaxEvents: false     // 모든 이벤트 표시 (필요시 true로 변경)
+            }
+        },
+        windowResize: function(arg) {
+            adjustCalendarView(miniCalendarInstance, calendarEl);
+        },
+
+        fixedWeekCount: false,
         showNonCurrentDates: true,
         handleWindowResize: true,
 
@@ -173,7 +184,31 @@ function initMiniCalendar(calendarEl, tooltipEl) {
     });
 
     miniCalendarInstance.render();
+    adjustCalendarView(miniCalendarInstance, calendarEl);
     loadMiniCalendarEvents(miniCalendarInstance);
+}
+// 높이에 따라 2주 뷰를 전환하는 함수
+function adjustCalendarView(calendar, element) {
+    // 달력 컨테이너의 현재 높이 가져오기
+    const height = element.clientHeight;
+
+    // 기준 높이 설정 (예: 300px보다 작으면 2주 보기로 전환)
+    // 이 값은 실제 화면 보시면서 조정하시면 됩니다.
+    const THRESHOLD_HEIGHT = 380;
+
+    const currentView = calendar.view.type;
+
+    if (height < THRESHOLD_HEIGHT) {
+        if (currentView !== 'dayGridTwoWeek') {
+            calendar.changeView('dayGridTwoWeek');
+            // 2주 보기일 때는 오늘 날짜가 포함된 주가 나오도록 이동
+            calendar.today();
+        }
+    } else {
+        if (currentView !== 'dayGridMonth') {
+            calendar.changeView('dayGridMonth');
+        }
+    }
 }
 
 // --- 데이터 로드 ---
@@ -280,13 +315,23 @@ function toDateString(date) {
 
 function getMiniEventColor(dto, source) {
     const type = (dto.type || "").toString().toUpperCase();
+
+    // 이 부분을 사진의 로직과 동일하게 변경
     if (source === "SCHEDULE") {
-        if (type === "PERSONAL") return "#3b82f6";
-        if (type === "TEAM") return "#22c55e";
-        if (type === "COMPANY") return "#ef4444";
-        return "#3b82f6";
+        if (type === "PERSONAL") {
+            return "rgba(11, 46, 79, 0.35)"; // 업무-개인
+        }
+        if (type === "TEAM") {
+            return "rgba(11, 46, 79, 0.7)";  // 업무-팀
+        }
+        if (type === "COMPANY") {
+            return "rgba(11, 46, 79, 0.95)"; // 업무-회사
+        }
+        // 예외 처리
+        return "rgba(11, 46, 79, 0.35)";
     }
-    if (type === "COMPANY") return "#8b5cf6";
+
+    if (type === "COMPANY") return "rgb(49, 46, 129)";
     if (dto.color) return dto.color;
-    return "#3b82f6";
+    return "rgb(30, 64, 175)";
 }

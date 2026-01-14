@@ -23,12 +23,15 @@
         SELECT
         u.user_id AS userId,
         u.user_login_id AS userLoginId,
-        u.user_email AS userEmail,  u.user_password AS userPassword,
+        u.user_email AS userEmail,
+        u.user_password AS userPassword,
         u.user_status AS userStatus,
         u.user_name AS userName,
         u.user_profile_image AS userProfileImage,
         u.dept_id AS deptId,
         u.rank_id AS rankId,
+        u.user_created_at AS userCreatedAt,
+        u.user_updated_at AS userUpdatedAt,
         d.dept_name AS deptName,
         r.rank_name AS rankName
         FROM user u

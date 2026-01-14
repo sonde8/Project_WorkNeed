@@ -652,7 +652,7 @@ function loadRoomSelect(targetRoomId) {
 }
 
 /* ======================
-   업무 목록 로드 (예약 불가능한 업무 원천 봉쇄)
+   업무 목록 로드
 ====================== */
 function loadScheduleSelect() {
     fetch("/api/calendar/schedules")
@@ -661,10 +661,10 @@ function loadScheduleSelect() {
             const select = document.getElementById("scheduleSelect");
             select.innerHTML = '<option value="">업무 선택 안 함</option>';
 
-            // 예약 가능한 '기준 시작일'을 가져옵니다.
-            // 17:30이 지났으면 이 값은 '내일 00시'가 됩니다.
+            // 1. 현재 예약 가능한 가장 빠른 시간 (기준점)
             const initData = getInitialDateTime();
-            const sysMinDate = initData.dateObj; // 시/분/초가 00:00:00인 날짜 객체
+            const minReservableStr = `${initData.dateStr}T${initData.timeStr}:00`;
+            const minReservableDate = new Date(minReservableStr);
 
             schedules.forEach(sch => {
                 const opt = document.createElement("option");
@@ -672,25 +672,38 @@ function loadScheduleSelect() {
 
                 const isDone = (sch.status === 'DONE');
                 let isExpired = false;
+                let isZeroDuration = false;
 
+                // 시작 시간과 종료 시간이 같은지 체크 (0분 업무)
+                if (sch.start && sch.end) {
+                    const sTime = new Date(sch.start).getTime();
+                    const eTime = new Date(sch.end).getTime();
+
+                    if (sTime === eTime) {
+                        isZeroDuration = true;
+                    }
+                }
+
+                // 기간 만료 체크
                 if (sch.end) {
                     const endAt = new Date(sch.end);
-                    // 단순히 현재 시간이 아니라, '시스템상 예약 가능한 날짜'보다 이전에 끝나면 만료 처리
-                    // 예: 지금 밤 11시라 내일부터 예약 가능한데, 업무가 오늘 끝나면 -> 선택 불가
-                    if (endAt < sysMinDate) {
+                    if (endAt < minReservableDate) {
                         isExpired = true;
                     }
                 } else {
-                    // 종료일이 없는 업무라면 일단 만료 처리
                     isExpired = true;
                 }
 
-                if (isDone || isExpired) {
+                // 비활성화 조건 통합 (완료됨 OR 만료됨 OR 0분 업무)
+                if (isDone || isExpired || isZeroDuration) {
                     opt.disabled = true;
                     opt.style.color = "#bbb";
 
-                    // 업무 선택 불가 사유를 명확히 표시
-                    let reason = isDone ? "완료됨" : "기간 만료";
+                    let reason = "";
+                    if (isDone) reason = "완료됨";
+                    else if (isZeroDuration) reason = "시간 없음";
+                    else reason = "기간 만료";
+
                     opt.textContent = `[선택불가] ${sch.title} (${reason})`;
                 } else {
                     opt.textContent = `[${sch.eventType || '업무'}] ${sch.title}`;

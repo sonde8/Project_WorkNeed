@@ -13,9 +13,8 @@
         const checkInBtn   = root.querySelector('[data-action="checkin"]');
         const checkOutBtn  = root.querySelector('[data-action="checkout"]');
 
-        const stateBtn     = root.querySelector('[data-action="toggle-menu"]');
-        const stateTextEl  = root.querySelector('[data-state-text]');
-        const stateModal   = root.querySelector('[data-state-modal]');
+        const workStateEl = root.querySelector('[data-workstate]');
+        const awayBtn     = root.querySelector('[data-action="toggle-away"]');
 
         if (!checkInBtn || !checkOutBtn || !checkInEl || !checkOutEl) return;
 
@@ -38,6 +37,20 @@
             setInterval(updateClock, 1000);
         }
 
+        function setWorkState(state){
+            if(!workStateEl) return;
+            workStateEl.dataset.state = state;
+        }
+        function getWorkState(){
+            return workStateEl?.dataset?.state || 'OUT';
+        }
+
+        window.addEventListener('attendance:state', (e) => {
+            const state = e?.detail?.state;
+            if (!state) return;
+            setWorkState(state);
+        });
+
         function setButtons(summary){
             const hasIn = !!summary.todayCheckIn;
             const hasOut = !!summary.todayCheckOut;
@@ -57,21 +70,24 @@
             }
         }
 
-        async function loadSummary() {
-            const res = await fetch('/api/attendance/summary');
+        async function loadSummary(date = new Date()) {
+            const y = date.getFullYear();
+            const m = date.getMonth() + 1;
+            const d = date.getDate();
+
+            const res = await fetch(`/api/attendance/summary?year=${y}&month=${m}&day=${d}`);
             if (!res.ok) return;
             const s = await res.json();
 
             checkInEl.textContent = s.todayCheckIn ?? '미등록';
             checkOutEl.textContent = s.todayCheckOut ?? '미등록';
 
-            if(monthTotalEl) monthTotalEl.textContent = s.monthTotal ?? '0h 0m';
-            if(stateTextEl)  stateTextEl.textContent  = s.todayStatusText ?? '업무 상태 변경하기';
+            if (monthTotalEl) monthTotalEl.textContent = s.monthTotal ?? '-';
 
             setButtons(s);
-
             window.dispatchEvent(new CustomEvent('attendance:summary', { detail: s }));
         }
+
 
         loadSummary().catch(console.error);
 
@@ -96,6 +112,44 @@
             }
         }
 
+        function formatHM(v){
+            let totalMin = 0;
+
+            if (typeof v === 'number' && Number.isFinite(v)) {
+                totalMin = Math.max(0, Math.floor(v));
+            } else {
+                const s = String(v ?? '').trim();
+
+                const h = Number(s.match(/(\d+)\s*h/i)?.[1] ?? 0);
+                const m = Number(s.match(/(\d+)\s*m/i)?.[1] ?? 0);
+
+                if (h || m) {
+                    totalMin = h * 60 + m;
+                }
+
+                else if (/^\d{1,2}:\d{2}$/.test(s)) {
+                    const [hh, mm] = s.split(':').map(Number);
+                    totalMin = (hh || 0) * 60 + (mm || 0);
+                }
+
+                else if (/^\d+$/.test(s)) {
+                    totalMin = Number(s);
+                }
+            }
+
+            if (totalMin === 0) return '-';
+
+            if (totalMin < 60) return `${totalMin}분`;
+
+            const h = Math.floor(totalMin / 60);
+            const m = totalMin % 60;
+
+            if (m === 0) return `${h}시간`;
+
+            return `${h}시간 ${m}분`;
+        }
+
+
         // 출근
         checkInBtn.addEventListener('click', async () => {
 
@@ -112,6 +166,8 @@
                 return;
             }
 
+            setWorkState('IN');
+
             await autoChekNotice();
 
             await loadSummary();
@@ -121,43 +177,27 @@
         checkOutBtn.addEventListener('click', async () => {
             const res = await fetch('/api/attendance/checkout', { method:'POST' });
             if(!res.ok){ alert('퇴근 저장 실패'); return; }
+
+            setWorkState('OUT');
+
             await loadSummary();
         });
 
-        // 모달
-        function openModal(){ stateModal.hidden = false; }
-        function closeModal(){ stateModal.hidden = true; }
+        if (awayBtn) {
+            awayBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
 
-        stateBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            stateModal.hidden ? openModal() : closeModal();
-        });
+                const cur = getWorkState();
 
-        root.addEventListener('click', (e) => {
-            const act = e.target?.dataset?.action;
+                if (cur === 'OUT') return;
 
-            if(act === 'set-state'){
-                stateTextEl.textContent = e.target.dataset.state;
-                closeModal();
-                return;
-            }
+                if (cur === 'IN') setWorkState('AWAY');
+                else if (cur === 'AWAY') setWorkState('IN');
 
-            if(act === 'close-state-modal'){
-                if (!stateModal.hidden) closeModal();
-                return;
-            }
-        });
-
-        if (!window.__atdLeftKeyBound) {
-            window.__atdLeftKeyBound = true;
-
-            document.addEventListener('keydown', (e) => {
-                if (e.key !== 'Escape') return;
-                const modal = document.querySelector('.att-left [data-state-modal]');
-                if (modal) modal.hidden = true;
             });
         }
+
     }
 
     //

@@ -19,5 +19,6 @@ public interface RequestMapper {
                 @Param("adminId") Long adminId,
                 @Param("payload") String payload);
 
+    // 대기중인 근태요청을 가져온다
     List<RequestDTO> findPendingAttendanceRequests();
 }

@@ -6,7 +6,6 @@
 
 .approval-scope {
     color: #333333;
-    height: 70vh;
 
 
 }
@@ -16,8 +15,11 @@
     width: 100%;
     /* max-width: 1340px; */
     margin: 0 auto;
-    padding: 20px 20px 40px;
+    padding: 20px ;
+    overflow-y: auto;
+    height: 90vh;
 }
+.approval-scope .wrap::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-thumb { background-color: rgba(0, 0, 0, 0.1); border-radius: 10px; }
 
 .approval-scope .page-head {
     display: flex;
@@ -51,8 +53,15 @@
     border: 1px solid #dddddd;
     border-radius: 8px;
     padding: 25px;
-}
 
+}
+.card2 {
+    background: #ffffff;
+    border: 1px solid #dddddd;
+    border-radius: 8px;
+    padding: 25px;
+    min-height: 85vh;
+}
 .approval-scope .card + .card {
     margin-top: 12px;
 }
@@ -64,6 +73,8 @@
     padding-bottom: 10px;
     border-bottom: 1px solid #eeeeee;
     margin-bottom: 12px;
+    justify-content: space-between;
+    padding-right: 6px;
 }
 
 .approval-scope .card-head h3 {
@@ -71,7 +82,9 @@
     font-weight: 800;
     margin: 0;
 }
-
+.approval-scope .card::-webkit-scrollbar{
+width: 4px;
+}
 .approval-scope .meta {
     font-size: 12px;
     color: #888888;
@@ -121,6 +134,29 @@
     border-color: #e43c3c;
 }
 
+
+/*삭제할지말지 확인 필요*/
+.app-btn-delete {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 27px;
+    padding: 0 12px;
+    border: 1px solid #cccccc;
+    background: #ffffff;
+    color: #333333;
+    font-size: 12px;
+    font-weight: 700;
+    border-radius: 6px;
+    cursor: pointer;
+    text-decoration: none;
+    background: #ff4d4d;
+    border-color: #ff4d4d;
+    color: #ffffff;
+}
+
+
+
 /* ========== Form ========== */
 .approval-scope .form {
     display: flex;
@@ -140,9 +176,13 @@
 }
 
 .approval-scope .label {
-    font-size: 13px;
+    font-size: 16px;
     font-weight: 800;
     color: #333333;
+}
+
+span.value {
+    font-size: 15px;
 }
 
 .approval-scope .control {
@@ -180,6 +220,7 @@
     padding: 25px;
     position: sticky;
     top: 12px;
+    min-height: 85vh;
 }
 
 .approval-scope .side-title {
@@ -201,7 +242,7 @@
     align-items: center;
     justify-content: space-between;
     gap: 10px;
-    padding : 5px 3px;
+    padding : 7px 3px;
     border-radius: 6px;
     text-decoration: none;
     color: #333333;
@@ -219,7 +260,7 @@
 }
 
 .approval-scope .side-link .txt {
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 700;
 }
 
@@ -255,14 +296,14 @@
     border-bottom: 1px solid #eeeeee;
     padding: 12px 10px;
     text-align: left;
-    font-size: 13px;
+    font-size: 14px;
     vertical-align: middle;
 }
 
 .approval-scope table.table thead th {
     background: #f7f7f7;
     color: #666666;
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 800;
 }
 
@@ -293,11 +334,12 @@
     height: 22px;
     padding: 0 10px;
     border-radius: 11px;
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 800;
     border: 1px solid #dddddd;
     background: #ffffff;
     color: #333333;
+    ustify-content: center;
 }
 .approval-scope .badge.strong {
     background: #333333;
@@ -552,7 +594,7 @@
 
     padding: 12px 14px;
 
-    font-size: 14px;
+    font-size: 15px;
     line-height: 1.6;
     color: #333;
 
@@ -577,7 +619,7 @@
     gap: 10px;
 }
 
-.approval-scope .reject-form {
+.approval-scope .action-reject-form {
     display: none; /* JS 토글 전제 */
     padding: 10px;
     border: 1px solid #eeeeee;
@@ -618,6 +660,7 @@
 .approval-scope .line-item{
     display: grid;
     gap: 10px;
+    width: 134px; height: 134px;
     align-items: center;
     padding: 10px;
     border: 1px solid #eee;
@@ -642,7 +685,7 @@
 }
 
 /* 9) 파일 리스트 */
-.approval-scope .file-list{
+.app-file-list{
     list-style: none;
     margin: 0;
     padding: 14px 16px;
@@ -650,10 +693,14 @@
     flex-direction: column;
     gap: 8px;
 }
-.approval-scope .file-list a{
+.app-file-list a{
     text-decoration: none;
+    color: black;
+    font-size: 13px;
 }
-.approval-scope .file-list a:hover{
+
+
+.app-file-list a:hover{
     text-decoration: underline;
 }
 
@@ -677,7 +724,7 @@
     width: 100%;
     max-width: 520px;
 }
-.approval-scope .reject-form{
+.approval-scope .action-reject-form{
     display: none; /* 기본 숨김(버튼 누르면 JS로 열도록) */
     flex-direction: column;
     gap: 10px;
@@ -686,7 +733,7 @@
     border-radius: 12px;
     background: #fafafa;
 }
-.approval-scope .reject-form textarea{
+.approval-scope .action-reject-form textarea{
     width: 100%;
     min-height: 100px;
     resize: vertical;
@@ -722,11 +769,18 @@
     }
 
 }
+.side-group-head {
+    padding: 11px 0px;
+}
 .side-group {
     margin: 15px 0px;
 }
 
-
+.group-title {
+color: var(--color-primary);
+font-size: 12px;
+font-weight: 800;
+}
 .hint {
     padding-left: 20px;
 }
@@ -764,4 +818,158 @@ li.app-file-empty {
 /* IE (거의 안 쓰지만 안전) */
 .approval-scope .inbox-content {
     -ms-overflow-style: none;
+}
+/* ==========================================================
+   [ADD] Detail Action Panel (승인 + 반려 포함)
+   - 기존 CSS 건드리지 않고, action-panel 범위에서만 스타일링
+   ========================================================== */
+
+.approval-scope .action-panel{
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+    align-items: start;
+
+    padding: 14px 16px;
+    border: 1px solid #eeeeee;
+    border-radius: 12px;
+    background: #fafafa;
+}
+
+.approval-scope .action-head{
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.approval-scope .action-title{
+    font-size: 14px;
+    font-weight: 900;
+    color: #222222;
+}
+
+.approval-scope .action-desc{
+    font-size: 12px;
+    color: #888888;
+    line-height: 1.4;
+}
+
+.approval-scope .action-buttons{
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+}
+
+/* 버튼 공통(기존 .btn이 있어도 action-btn이 우선되게) */
+.approval-scope .action-btn{
+    height: 34px;
+    padding: 0 14px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 800;
+    border: 1px solid #cccccc;
+    background: #ffffff;
+    color: #333333;
+    cursor: pointer;
+    transition: transform .05s ease, background .15s ease, border-color .15s ease;
+}
+.approval-scope .action-btn:active{ transform: translateY(1px); }
+
+/* 승인 */
+.approval-scope .action-btn.approve{
+    background: #333333;
+    border-color: #333333;
+    color: #ffffff;
+}
+.approval-scope .action-btn.approve:hover{
+    background: #111111;
+    border-color: #111111;
+}
+
+/* 반려 */
+.approval-scope .action-btn.reject{
+    background: #ff4d4d;
+    border-color: #ff4d4d;
+    color: #ffffff;
+}
+.approval-scope .action-btn.reject:hover{
+    background: #e43c3c;
+    border-color: #e43c3c;
+}
+
+/* 회색(닫기) */
+.approval-scope .action-btn.ghost{
+    background: #ffffff;
+    border-color: #dddddd;
+    color: #333333;
+}
+.approval-scope .action-btn.ghost:hover{
+    background: #f0f0f0;
+}
+
+/* 반려 폼(기본 숨김: JS 토글) */
+.approval-scope .action-reject-form{
+    grid-column: 1 / -1; /* 전체 폭 */
+    display: none;       /* JS 토글 */
+    margin-top: 10px;
+
+    padding: 14px 16px;
+    border: 1px solid #f1c4c4;
+    border-radius: 12px;
+    background: #fff6f6;
+    box-shadow: 0 6px 14px rgba(0,0,0,0.05);
+}
+
+/* 상단 */
+.approval-scope .action-reject-form .reject-top{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.approval-scope .action-reject-form .reject-title{
+    font-size: 13px;
+    font-weight: 900;
+    color: #c0392b;
+}
+
+/* textarea */
+.approval-scope .action-reject-form textarea{
+    width: 100%;
+    min-height: 110px;
+    resize: vertical;
+
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid #e0b4b4;
+    background: #ffffff;
+
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333333;
+    outline: none;
+}
+.approval-scope .action-reject-form textarea:focus{
+    border-color: #ff4d4d;
+}
+
+/* 하단 확정 버튼 영역 */
+.approval-scope .action-reject-form .reject-actions{
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 10px;
+}
+
+/* 모바일 */
+@media (max-width: 768px){
+    .approval-scope .action-panel{
+        grid-template-columns: 1fr;
+    }
+    .approval-scope .action-buttons{
+        justify-content: flex-start;
+    }
 }

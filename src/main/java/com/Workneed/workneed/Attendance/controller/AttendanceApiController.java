@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -41,9 +42,17 @@ public class AttendanceApiController {
 
     // 누적
     @GetMapping("/summary")
-    public AttendanceResponseDTO summary(HttpSession session) {
-        return attendanceService.summary(getEmpId(session));
+    public AttendanceResponseDTO summary(
+            HttpSession session,
+            @RequestParam int year,
+            @RequestParam int month,
+            @RequestParam int day
+    ) {
+        Long empId = getEmpId(session);
+        LocalDate baseDate = LocalDate.of(year, month, day);
+        return attendanceService.summary(empId, baseDate);
     }
+
 
     // 출근부
     @GetMapping("/book")
@@ -105,11 +114,10 @@ public class AttendanceApiController {
     @PostMapping("/request")
     public void createAttendanceRequest(HttpSession session,
                                         @RequestBody AttendanceRequestCreateDTO dto) {
-        // 세션에서 로그인한 사용자 ID(userId)를 꺼내 DTO에 세팅합니다.
+
         Long userId = getEmpId(session);
         dto.setUserId(userId);
 
-        // 서비스 호출 (DB 저장 로직)
         attendanceService.createRequest(dto);
     }
 

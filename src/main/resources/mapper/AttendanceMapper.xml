@@ -34,7 +34,7 @@
     <!--근태 요청-->
     <insert id="insertAttendanceRequest"
             parameterType="com.Workneed.workneed.Members.dto.AttendanceRequestCreateDTO">
-        INSERT INTO Request (
+        INSERT INTO request (
         user_id,
         request_type,
         request_payload,
