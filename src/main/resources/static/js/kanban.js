@@ -72,10 +72,26 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function closeTeamModal() {
+        const teamModal = document.getElementById("teamModal");
+        if (!teamModal) return;
+
         teamModal.hidden = true;
-        closeBackdropIfNoModal();
-        if (!isAnyModalOpen()) lockScroll(false);
+
+        // submit 상태 복구
+        const form = document.getElementById("teamInviteForm");
+        if (form) delete form.dataset.submitting;
+
+        const btn = document.getElementById("submitInviteBtn");
+        if (btn) {
+            btn.disabled = false;
+            btn.textContent = "초대하기";
+        }
+
+        // 기존 로직
+        try { closeBackdropIfNoModal(); } catch (e) { console.error(e); }
+        try { if (!isAnyModalOpen()) lockScroll(false); } catch (e) { console.error(e); }
     }
+    window.closeTeamModal = closeTeamModal;
 
     function closeAllModals() {
         closeTaskModal();
@@ -431,25 +447,58 @@ document.addEventListener("DOMContentLoaded", () => {
     teamInviteForm?.addEventListener("submit", async (e) => {
         e.preventDefault();
 
-        const scheduleId = document.getElementById("teamScheduleId").value;
-        const userIds = Array.from(selectedUsers);
+        // 중복 제출 방지
+        if (teamInviteForm.dataset.submitting === "true") return;
+        teamInviteForm.dataset.submitting = "true";
 
-        if (userIds.length === 0) {
-            alert("초대할 팀원을 한 명 이상 선택해주세요.");
-            return;
+        const submitBtn = document.getElementById("submitInviteBtn");
+        const originalText = submitBtn?.textContent || "초대하기";
+
+        // 버튼 잠금  문구 변경
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.textContent = "메일 발송중...";
         }
 
-        const params = new URLSearchParams({ scheduleId });
-        userIds.forEach(id => params.append("userIds", id));
 
-        await fetch("/schedule/inviteAjax", {
-            method: "POST",
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: params.toString()
-        });
+        try {
+            const scheduleId = document.getElementById("teamScheduleId").value;
+            const userIds = Array.from(selectedUsers);
 
-        closeTeamModal();
-        location.href = "/schedule/kanban";
+            if (userIds.length === 0) {
+                alert("초대할 팀원을 한 명 이상 선택해주세요.");
+                throw new Error("NO_USERS");
+            }
+
+            const params = new URLSearchParams({ scheduleId });
+            userIds.forEach(id => params.append("userIds", id));
+
+            const res = await fetch("/schedule/inviteAjax", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: params.toString()
+            });
+
+            const text = await res.text();
+            if (!res.ok || text !== "OK") {
+                throw new Error(text || "INVITE_FAILED");
+            }
+
+            // 성공 시 닫고 이동
+            closeTeamModal();
+            location.href = "/schedule/kanban";
+
+        } catch (err) {
+            console.error(err);
+            alert("초대 처리 중 문제가 발생했습니다. 다시 시도해주세요.");
+
+            // 실패 시 복구
+            delete teamInviteForm.dataset.submitting;
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
+            }
+        }
     });
 
     /* ======================================================
