@@ -110,7 +110,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                     java.time.LocalDate signupDate = userDto.getUserCreatedAt().toLocalDate();
                     java.time.LocalDate today = java.time.LocalDate.now();
                     long days = java.time.temporal.ChronoUnit.DAYS.between(signupDate, today);
-                    if (days >= 30) {
+                    if (days >= 1) {
                         reason = "inactive";
                     }
                 }

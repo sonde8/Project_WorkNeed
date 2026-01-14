@@ -18,6 +18,7 @@ public class AttendanceRequestService {
     private final RequestMapper requestMapper;
     private final ObjectMapper objectMapper;
 
+    // 화면에서 폼에 제출하면 json으로 request에 pending 저장
     public void create(Long userId, AttendanceRequestCreateDTO dto) {
 
         Map<String, Object> payload = new HashMap<>();

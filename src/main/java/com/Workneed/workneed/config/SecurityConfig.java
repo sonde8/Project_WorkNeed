@@ -29,12 +29,12 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http
-                // CSRF 추후 활성
+                // CSRF 
                 //  frame:클릭재킹-다른 도메인이 아니면 위에 창을 못띄위게 막는 필터링-
                 .csrf(csrf -> csrf.disable())
                 .headers(headers -> headers
                         .frameOptions(frame -> frame.sameOrigin()))
-
+                
                 // 누구나 접근 가능한 매핑
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(

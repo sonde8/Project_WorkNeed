@@ -45,7 +45,7 @@ public class LocalUserDetailsService implements UserDetailsService {
 
                 if (user.getUserCreatedAt() != null) {
                     long days = java.time.temporal.ChronoUnit.DAYS.between(user.getUserCreatedAt(), java.time.LocalDate.now());
-                    if (days >= 30) {
+                    if (days >= 1) {
                         reason = "inactive";
                     }
                 }
