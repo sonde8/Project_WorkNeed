@@ -45,6 +45,12 @@
             return workStateEl?.dataset?.state || 'OUT';
         }
 
+        window.addEventListener('attendance:state', (e) => {
+            const state = e?.detail?.state;
+            if (!state) return;
+            setWorkState(state);
+        });
+
         function setButtons(summary){
             const hasIn = !!summary.todayCheckIn;
             const hasOut = !!summary.todayCheckOut;
@@ -76,7 +82,7 @@
             checkInEl.textContent = s.todayCheckIn ?? '미등록';
             checkOutEl.textContent = s.todayCheckOut ?? '미등록';
 
-            if (monthTotalEl) monthTotalEl.textContent = s.monthTotal ?? '-'; // ✅ 여기 포인트
+            if (monthTotalEl) monthTotalEl.textContent = s.monthTotal ?? '-';
 
             setButtons(s);
             window.dispatchEvent(new CustomEvent('attendance:summary', { detail: s }));

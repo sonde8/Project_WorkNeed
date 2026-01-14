@@ -125,9 +125,20 @@ document.addEventListener('DOMContentLoaded', () => {   // html 다 만들어진
         if(baseEl) baseEl.style.width = pctToWidth(totalPct);
         if(otEl) otEl.style.width = `${otPct}%`;
         if(holEl) holEl.style.width = `${holPct}%`;
-
         if(dotEl) dotEl.style.left = `${totalPct}%`;
 
+        const hasIn  = !!s.todayCheckIn;
+        const hasOut = !!s.todayCheckOut;
+
+        let state = 'OUT';
+        if (hasOut) state = 'OUT';
+        else if (hasIn) {
+            const t = (s.todayStatusText || '').replace(/\s/g,'');
+            if (t.includes('자리') || t.includes('비움')) state = 'AWAY';
+            else state = 'IN';
+        }
+
+        window.dispatchEvent(new CustomEvent('attendance:state', { detail: { state } }));
     }
 
     window.addEventListener('attendance:summary', (e) => {
