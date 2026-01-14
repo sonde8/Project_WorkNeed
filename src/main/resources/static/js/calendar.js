@@ -98,24 +98,24 @@
         // =========================================================
         if (source === "SCHEDULE") {
             if (type === "PERSONAL") {
-                return "#3b82f6"; // 업무-개인 (기본 파랑)
+                return "rgba(11, 46, 79, 0.35)"; // 업무-개인
             }
             if (type === "TEAM") {
-                return "#22c55e"; // 업무-팀 (초록)
+                return "rgba(11, 46, 79, 0.7)"; // 업무-팀
             }
             if (type === "COMPANY") {
-                return "#ef4444"; // 업무-회사 (빨강)
+                return "rgba(11, 46, 79, 0.95)"; // 업무-회사
             }
-            // 예외(타입 없는 경우) 처리: 업무 기본색(여기선 파랑으로 둠)
-            return "#3b82f6";
+            // 예외(타입 없는 경우) 처리
+            return "rgba(11, 46, 79, 0.35)";
         }
 
         // =========================================================
-        // 2. [CALENDAR] 캘린더 일정 (내장 기능)
+        // 2. [CALENDAR] 캘린더 일정
         // =========================================================
-        // 2-1. 관리자가 등록한 회사 전체 일정 (보라색 고정)
+        // 2-1. 관리자가 등록한 회사 전체 일정
         if (type === "COMPANY") {
-            return "#8b5cf6";
+            return "rgb(49, 46, 129)";
         }
 
         // 2-2. 내 개인 일정
@@ -125,35 +125,34 @@
         }
 
         // 지정 안 했으면 기본 파랑
-        return "#3b82f6";
+        return "rgb(30, 64, 175)";
     }
 
     function getCategoryInfo(dto) {
         const type = (dto?.type || "").toUpperCase();
         const source = getSource(dto);
 
-        // 1. [SCHEDULE] 업무 연동 (타입별 색상 매칭)
+        // 1. [SCHEDULE] 업무 연동
         if (source === "SCHEDULE") {
             if (type === "COMPANY") {
-                // 업무-회사: 빨강 계열
-                return { text: "업무(회사)", bg: "#fee2e2", color: "#b91c1c" };
+                // 업무-회사: 가장 진한 무게감 (opacity 0.25)
+                return { text: "업무(회사)", bg: "rgba(11, 46, 79, 0.25)", color: "rgb(11, 46, 79)" };
             }
             if (type === "TEAM") {
-                // 업무-팀: 초록 계열
-                return { text: "업무(팀)", bg: "#dcfce7", color: "#15803d" };
+                // 업무-팀: 중간 무게감 (opacity 0.15)
+                return { text: "업무(팀)", bg: "rgba(11, 46, 79, 0.15)", color: "rgb(11, 46, 79)" };
             }
-            // 업무-개인: 파랑 계열 (텍스트로 '업무'임을 명시)
-            return { text: "업무(개인)", bg: "#dbeafe", color: "#1d4ed8" };
+            // 업무-개인: 가장 가벼운 무게감 (opacity 0.08)
+            return { text: "업무(개인)", bg: "rgba(11, 46, 79, 0.08)", color: "rgb(11, 46, 79)" };
         }
 
         // 2. [CALENDAR] 내장 캘린더
-        // 회사 (관리자 공지 등): 보라 계열
         if (type === "COMPANY") {
-            return { text: "사내공지", bg: "#f3e8ff", color: "#7e22ce" };
+            return { text: "사내공지", bg: "rgba(49, 46, 129, 0.15)", color: "rgb(49, 46, 129)" };
         }
 
-        // 개인 (기본): 파랑 계열
-        return { text: "개인", bg: "#eff6ff", color: "#1e40af" };
+        // 개인 (기본)
+        return { text: "개인", bg: "rgba(30, 64, 175, 0.1)", color: "rgb(30, 64, 175)" };
     }
 
     function getDtoId(dto) {
@@ -203,7 +202,7 @@
         if (!id) return null;
 
         let forceAllDay = (type === "COMPANY" && !isSchedule);
-        if (end && start.getDate() !== end.getDate()) {
+        if (end && start.toDateString() !== end.toDateString()) {
             forceAllDay = true;
         }
 
@@ -211,21 +210,29 @@
 
         /* ================= 종일 일정 (상단 바) ================= */
         if (forceAllDay) {
-            const s = new Date(start); s.setHours(0,0,0,0);
+            const s = new Date(start);
+            s.setHours(0,0,0,0);
+
             let e = end ? new Date(end) : new Date(s);
 
-            if (end) {
-                e = new Date(e.getFullYear(), e.getMonth(), e.getDate() + 1, 0, 0, 0);
-            } else {
+            if (e.getHours() > 0 || e.getMinutes() > 0) {
                 e.setDate(e.getDate() + 1);
+                e.setHours(0,0,0,0);
+            } else {
+                // 00:00 딱 떨어지는 종료라면 날짜 조정 로직에 맡김
+                if (s.getTime() === e.getTime()) {
+                    e.setDate(e.getDate() + 1);
+                }
             }
 
+            // FullCalendar는 end 날짜가 'exclusive(미포함)'이므로
+            // 23일 00:00으로 설정해야 22일까지 색칠됩니다.
             return {
                 id: String(id),
                 title: dto.title || "(제목 없음)",
                 start: s,
                 end: e,
-                allDay: true,
+                allDay: true, // 강제 상단 고정
                 backgroundColor: color,
                 borderColor: "transparent",
                 textColor: "#ffffff",
@@ -235,6 +242,7 @@
         }
 
         /* ================= 시간 일정 (Time Grid) ================= */
+        // 당일 시간 일정만 여기로 옴
         const fixedEnd = end ? new Date(end) : addMinutes(start, 30);
         const editable = !isSchedule;
 
@@ -251,6 +259,7 @@
             extendedProps: { raw: dto },
         };
     }
+
     /* ================= Daily List Modal Logic ================= */
     function openDailyListModal(targetDate) {
         const overlay = document.getElementById("calendarDailyListModalOverlay");
@@ -498,32 +507,28 @@
                 }
 
                 // 뱃지 설정
-                let badgeClass = 'personal';
-                let badgeText = '개인';
                 const cat = getCategoryInfo(e);
-
-                if (cat.text.includes('회사') || cat.text.includes('공지')) {
-                    badgeClass = 'company'; badgeText = '회사';
-                } else if (cat.text.includes('팀')) {
-                    badgeClass = 'team'; badgeText = '팀';
-                }
 
                 li.innerHTML = `
                     <div class="work-time-box"> 
                         ${dateHtml}
                     </div>
                     <div class="work-info-box">
-                        <span class="w-badge ${badgeClass}">${badgeText}</span>
+                        <span class="w-badge" style="background-color: ${cat.bg}; color: ${cat.color};">
+                            ${cat.text}
+                        </span>
                         <span class="w-title">${e.title || '(제목 없음)'}</span>
                     </div>
                 `;
 
                 li.onclick = () => safeOpenDetailModal(e);
                 ul.appendChild(li);
+
+                li.onclick = () => safeOpenDetailModal(e);
+                ul.appendChild(li);
             });
         }
     }
-    /* ================= Calendar Init (Modified) ================= */
     function initCalendar() {
         const el = document.getElementById("calendar");
         if (!el) {
@@ -571,16 +576,12 @@
 
             // [뷰 변경 감지]
             datesSet: function(info) {
-                // 1. 현재 뷰 정보 저장
                 currentViewType = info.view.type;
                 currentViewStart = info.start;
                 currentViewEnd = info.end;
 
-                // 2. 레이아웃 전환 (Month vs Split)
                 toggleSplitView(currentViewType);
 
-                // 3. 데이터 재렌더링
-                // (loadCalendarEvents 내부에서 currentViewType을 보고 캘린더/리스트에 분배함)
                 if (allEventsCache.length > 0) {
                     renderCalendarEventsOnly();
                     renderWorkScheduleList();
@@ -609,27 +610,36 @@
             },
 
             select(info) {
+
+                const startStr = toDtoDateTime(info.start);
+                const endStr = info.end
+                    ? toDtoDateTime(info.end)
+                    : toDtoDateTime(addMinutes(info.start, 30));
+
+                // 1. 월간 뷰(Month)일 때
                 if (calendar.view.type === "dayGridMonth") {
                     const diffTime = info.end.getTime() - info.start.getTime();
                     const diffDays = diffTime / (1000 * 60 * 60 * 24);
+
+                    // 1일 초과 드래그 (다일 일정) -> 등록 모달 띄우기
                     if (diffDays > 1) {
-                        const endDateInclusive = new Date(info.end);
-                        endDateInclusive.setDate(endDateInclusive.getDate() - 1);
                         safeOpenCreateModal({
-                            start: toDtoDateTime(info.start),
-                            end: toDtoDateTime(info.end),
+                            start: startStr,
+                            end: endStr,
                         });
                     } else {
+                        // 1일 클릭 (단일 일정) -> 상세 리스트 모달 띄우기
                         openDailyListModal(info.start);
                     }
                     calendar.unselect();
                     return;
                 }
-                // 주간/일간 뷰
-                const start = info.start;
-                let end = info.end ? new Date(info.end) : null;
-                if (!end) end = addMinutes(start, 30);
-                safeOpenCreateModal({ start: toDtoDateTime(start), end: toDtoDateTime(end) });
+
+                // 2. 주간/일간 뷰(Week/Day)일 때 -> 바로 등록 모달
+                safeOpenCreateModal({
+                    start: startStr,
+                    end: endStr
+                });
                 calendar.unselect();
             },
 
@@ -649,6 +659,7 @@
                 if (checkReadOnly(raw)) { info.revert(); return; }
                 syncEvent(info.event);
             },
+
             eventResize(info) {
                 const raw = info.event.extendedProps?.raw;
                 if (checkReadOnly(raw)) { info.revert(); return; }
@@ -672,20 +683,15 @@
         return false;
     }
 
-    /* ================= Sync (drag/resize) ================= */
     async function syncEvent(fcEvent) {
         const raw = fcEvent?.extendedProps?.raw;
-
-        // 업무 스케줄은 sync 대상 아님
         if (raw && isScheduleSource(raw)) return;
-
         if (!raw?.calendarId) return;
 
         const start = fcEvent.start;
         const end = fcEvent.end ? fcEvent.end : addMinutes(start, 30);
 
         const payload = {
-            // calendarId는 컨트롤러에서 path로 세팅하지만, 서버 구현에 따라 body도 같이 받는 경우가 있어 넣어도 무해
             calendarId: raw.calendarId,
             createdBy: raw.createdBy ?? DEFAULT_CREATED_BY,
             title: fcEvent.title ?? raw.title ?? "",
@@ -706,7 +712,6 @@
             raw.color = payload.color;
             raw.createdBy = payload.createdBy;
         }
-
         await loadCalendarEvents();
     }
 

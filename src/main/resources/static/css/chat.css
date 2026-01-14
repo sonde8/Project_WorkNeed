@@ -618,7 +618,12 @@ li.other-msg { justify-content: flex-start; display: flex; width: 100%; }
 .hidden { display: none; }
 
 /* 오른쪽 판넬 */
-.selected-panel { width: 50%; padding: 15px; background: #fafafa; overflow-y: auto; }
+.selected-panel {
+    background-color: var(--color-primary-light);
+    width: 50%;
+    padding: 15px;
+    overflow-y: auto;
+}
 .placeholder-text { color: #aaa; text-align: center; margin-top: 150px; }
 
 .modal-footer { padding: 15px; display: flex; justify-content: center; gap: 10px; border-top: 1px solid #eee; }
@@ -635,7 +640,19 @@ li.other-msg { justify-content: flex-start; display: flex; width: 100%; }
     background: #fff; padding: 8px 12px; margin-bottom: 8px;
     border: 1px solid #ddd; border-radius: 6px;
 }
-.remove-btn { background: none; border: none; font-size: 18px; color: #ff5b5b; cursor: pointer; }
+.remove-btn {
+    border: none;
+    background: none;
+    color: #ff4d4f;
+    font-size: 1.2rem;
+    cursor: pointer;
+    line-height: 1;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+}
+.remove-btn:hover{
+    opacity: 1;
+}
 
 /* ==========================================
     8. 사이드바 모달창 css

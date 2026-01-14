@@ -32,7 +32,7 @@
             <th>권한(Role)</th>
             <th>권한 설명</th>
             <th>이메일(아이디)</th>
-            <th>마지막 접속 시간</th>
+
             <th>상태</th>
             <th>계정 제어</th>
         </tr>
@@ -50,7 +50,7 @@
             </td>
 
             <td th:text="${a.adminEmail}">admin@workneed.com</td>
-            <td th:text="${a.adminLastLoginAt != null ? #temporals.format(a.adminLastLoginAt, 'yyyy-MM-dd HH:mm:ss') : '미접속'}"></td>
+
             <td>
                 <span th:text="${a.adminStatus}"
                       th:class="${a.adminStatus == 'ACTIVE' ? 'status-active' : 'status-suspended'}">
