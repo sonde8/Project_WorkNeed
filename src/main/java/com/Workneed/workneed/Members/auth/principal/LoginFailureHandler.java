@@ -4,12 +4,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.oauth2.core.OAuth2AuthenticationException; // 🚨 필수 추가
+import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
+// 로그인 실패 시 원인분석해서 reason 반환
 @Component
 public class LoginFailureHandler implements AuthenticationFailureHandler {
 
@@ -29,14 +30,13 @@ public class LoginFailureHandler implements AuthenticationFailureHandler {
             if (reason == null) {
                 reason = oauthEx.getError().getErrorCode();
             }
+            // 실패 원인이 비활성계정 때문인지 확인
         } else if (exception instanceof DisabledException) {
             reason = exception.getMessage();
+            // 마지막으로 무엇이 원인인지 한번 더 확인
         } else if (exception.getCause() instanceof DisabledException) {
             reason = exception.getCause().getMessage();
         }
-
-        // 이제 "로그인 실패 사유 리다이렉트: suspended" 가 정상적으로 출력될 것입니다.
-        System.out.println("로그인 실패 사유 리다이렉트: " + reason);
 
         response.sendRedirect("/login?reason=" + reason);
     }

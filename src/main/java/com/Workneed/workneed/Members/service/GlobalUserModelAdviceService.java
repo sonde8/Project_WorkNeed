@@ -39,12 +39,16 @@ public class GlobalUserModelAdviceService {
                         session.invalidate();
 
                         String status = user.getUserStatus();
-                        String reason = "inactive";
+                        String reason = "pending";
 
-                        if ("INACTIVE".equals(status)) {
-                            reason = "pending";
-                        } else {
-                            reason = status.toLowerCase();
+                        // 가입일이 30일 넘었을 때만 inactive로 바꿈
+                        if (user.getUserCreatedAt() != null) {
+                            long days = java.time.temporal.ChronoUnit.DAYS.between(
+                                    user.getUserCreatedAt().toLocalDate(),
+                                    java.time.LocalDate.now());
+                            if (days >= 30) {
+                                reason = "inactive";
+                            }
                         }
 
                         response.sendRedirect("/login?reason=" + reason);

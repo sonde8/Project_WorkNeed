@@ -29,9 +29,9 @@ public class AttendanceApproveService {
     private final ObjectMapper objectMapper;
     private final AttendanceMapper attendanceMapper;
 
-    /* =========================
-       ✅ 승인
-    ========================= */
+    
+      
+    // 승인
     @Transactional
     public void approve(Long requestId, Long adminId) {
 
@@ -39,7 +39,7 @@ public class AttendanceApproveService {
             RequestDTO req = requestMapper.findById(requestId);
             if (req == null || !"PENDING".equals(req.getStatus())) return;
 
-            // 🔑 payload 파싱 (방어적으로)
+            //  payload 파싱 
             AttendancePayloadDTO payload = parsePayload(req.getRequestPayload());
 
             LocalDate workDate = payload.getWorkDate();
@@ -51,7 +51,7 @@ public class AttendanceApproveService {
                     memberAttendanceMapper.findByUserAndDate(
                             req.getUserId(), workDate);
 
-            // ⏱ 시간 정보가 있을 때만 계산
+            // 시간 정보가 있을 때만 계산
             if (payload.getFromTime() != null && payload.getToTime() != null) {
 
                 LocalTime from = payload.getFromTime();
@@ -105,9 +105,8 @@ public class AttendanceApproveService {
         }
     }
 
-    /* =========================
-       ❌ 반려
-    ========================= */
+   
+    // 반려
     @Transactional
     public void reject(Long requestId, Long adminId, String reason) {
 
@@ -142,7 +141,7 @@ public class AttendanceApproveService {
     }
 
 
-    //🔑 payload 파싱- 근태 worktime 못받아옴
+    // payload 파싱- 근태 worktime 못받아옴
     private AttendancePayloadDTO parsePayload(String json) throws Exception {
 
         AttendancePayloadDTO payload =

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+// 회원이 근태기록 수정요청에 대한 신청 창구
 @RestController
 @RequiredArgsConstructor
 public class UserAttendanceController {
