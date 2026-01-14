@@ -174,25 +174,35 @@
 
 
     <div class="modal" id="teamModal" hidden>
-        <div class="modal-panel" id="teamModal-panel">
-
-            <header class="modal-header">Invite Team</header>
+        <div class="modal-panel" id="teamModal-panel" >
+            <header class="modal-header">팀원 초대 (조직도)</header>
             <button type="button" class="x-btn"> x </button>
 
             <form id="teamInviteForm">
                 <input type="hidden" id="teamScheduleId" name="scheduleId" />
 
-                <div id="teamUserList">
-                    <!-- JS로 ACTIVE 유저 체크박스 렌더링 -->
+                <div class="modal-body-main">
+                    <div class="selection-panel">
+                        <div class="search-box">
+                            <input type="text" id="userSearchInput" placeholder="이름 검색" style="width: 100%; padding: 8px;">
+                        </div>
+                        <div id="deptTreeContainer" class="dept-list-container">
+                        </div>
+                    </div>
+
+                    <div class="selected-panel" >
+                        <div id="selectedUsersCount">선택된 대상 (0)</div>
+                        <div id="selectedUserList">
+                            <p class="placeholder-text">대상을 선택해주세요.</p>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="modal-btns">
-                    <span id="inviteCount" class="invite-count">[ 0명 ]</span>
-                    <button class="btn" type="submit">invite</button>
+                    <button class="btn" type="submit" id="submitInviteBtn">초대하기</button>
+                    <button class="btn" type="button" onclick="closeTeamModal()">취소</button>
                 </div>
             </form>
-
-
         </div>
     </div>
 

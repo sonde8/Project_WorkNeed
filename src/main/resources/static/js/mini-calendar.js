@@ -315,13 +315,23 @@ function toDateString(date) {
 
 function getMiniEventColor(dto, source) {
     const type = (dto.type || "").toString().toUpperCase();
+
+    // 이 부분을 사진의 로직과 동일하게 변경
     if (source === "SCHEDULE") {
-        if (type === "PERSONAL") return "#3b82f6";
-        if (type === "TEAM") return "#22c55e";
-        if (type === "COMPANY") return "#ef4444";
-        return "#3b82f6";
+        if (type === "PERSONAL") {
+            return "rgba(11, 46, 79, 0.35)"; // 업무-개인
+        }
+        if (type === "TEAM") {
+            return "rgba(11, 46, 79, 0.7)";  // 업무-팀
+        }
+        if (type === "COMPANY") {
+            return "rgba(11, 46, 79, 0.95)"; // 업무-회사
+        }
+        // 예외 처리
+        return "rgba(11, 46, 79, 0.35)";
     }
-    if (type === "COMPANY") return "#8b5cf6";
+
+    if (type === "COMPANY") return "rgb(49, 46, 129)";
     if (dto.color) return dto.color;
-    return "#3b82f6";
+    return "rgb(30, 64, 175)";
 }

@@ -13,5 +13,4 @@ public class LeaveApplyDTO {
     private LocalDate startDate;
     private LocalDate endDate;
     private String reason;
-    private Double days;
 }

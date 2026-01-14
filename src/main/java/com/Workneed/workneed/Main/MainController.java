@@ -46,7 +46,7 @@ public class MainController {
 
         model.addAttribute("counts", approvalService.getCounts(userId));
 
-        model.addAttribute("doingScheduleCount", scheduleMapper.countDoingSchedulesAll());
+        model.addAttribute("doingScheduleCount", scheduleMapper.countMainDoingSchedules());
 
         model.addAttribute("mainTodo",
                 scheduleMapper.selectMainMyTaskCardsInDoingScheduleByStatus(userId, "TODO"));

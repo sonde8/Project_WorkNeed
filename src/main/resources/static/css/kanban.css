@@ -174,7 +174,7 @@
 
 /* ===== Panel ===== */
 .modal-panel{
-    width: 70rem;
+    width: 75rem;
     height: auto;
     padding: 2rem;
     background: #ffffff;
@@ -332,7 +332,26 @@
     font-weight: 600;
 }
 
+
+
 /*invite team modal*/
+#teamModal-panel{
+    width: 75rem;
+}
+.modal-body-main{
+    display: flex;
+    height: 45rem;
+    border: 1px solid #eee;
+}
+.selection-panel{
+    width: 50%;
+    border-right: 1px solid #eee;
+    overflow-y: auto;
+    padding: 1.5rem;
+}
+.search-box{
+    margin-bottom: 10px;
+}
 #teamUserList{
     padding: 3rem;
 }
@@ -360,4 +379,122 @@
 .drag-ghost{opacity: .4;}
 .drag-chosen{transform: scale(1.1);}
 
+
+/* 팀원 초대 모달 css */
+/* kanban.css 하단에 추가 */
+
+/* 부서 목록 트리 스타일 */
+.dept-tree {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* 부서 헤더 (클릭 영역) */
+.dept-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 5px;
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+
+.dept-header:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.dept-title-area {
+    font-size: 1.4rem;
+    font-weight: 700;
+}
+
+.arrow {
+    display: inline-block;
+    width: 1.5rem;
+    margin-right: 5px;
+    transition: transform 0.2s;
+}
+
+/* 유저 리스트 (접히는 부분) */
+.user-list {
+    list-style: none;
+    margin: 0;
+    padding-left: 20px;
+}
+
+/* [중요] 접기/펴기 기능의 핵심 */
+.user-list.hidden {
+    display: none !important;
+}
+
+.user-item {
+    padding: 5px 0;
+    font-size: 1.3rem;
+    color: #555;
+    transition: color 0.2s;
+}
+
+.user-item:hover {
+    color: var(--color-primary);
+    text-decoration: underline;
+}
+
+/* 전체 선택 버튼 스타일 */
+.dept-select-all {
+    border: 1px solid var(--color-primary-light);
+    font-size: 1.1rem;
+    padding: 2px 6px;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.dept-select-all:hover {
+    background: #f0f0f0;
+}
+
+/* 선택된 유저 아이템 스타일 */
+.selected-panel{
+    background-color: var(--color-primary-light);
+    width: 50%;
+    padding: 15px;
+    overflow-y: auto;
+}
+#selectedUsersCount{
+    font-weight: bold;
+    margin-bottom: 2rem;
+    font-size: 12px;
+}
+.placeholder-text{
+    font-weight: 400;
+    padding: 2rem;
+    display: flex;
+    font-size: 11px;
+    justify-content: center;
+}
+.selected-user-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #fff;
+    padding: 8px;
+    margin-bottom: 5px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1.3rem;
+}
+
+.remove-btn {
+    border: none;
+    background: none;
+    color: #ff4d4f;
+    font-size: 1.2rem;
+    cursor: pointer;
+    line-height: 1;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+    }
+.remove-btn:hover{
+    opacity: 1;
+}
 

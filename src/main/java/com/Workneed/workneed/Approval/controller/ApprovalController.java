@@ -96,10 +96,11 @@ public class ApprovalController {
         Long userId = getLoginUserId(session);
         if (userId == null) return redirectLogin();
 
-        // 문서 유형 리스트
-        List<ApprovalTypeDTO> types = service.getTypes();
-        model.addAttribute("types", types);
+        model.addAttribute("mode", "create");      // ✅ 추가
+        model.addAttribute("docId", null);         // ✅ 추가
+        model.addAttribute("doc", new DocDTO());   // ✅ 추가 (또는 new ApprovalDoc()도 가능)
 
+        model.addAttribute("types", service.getTypes());
         model.addAttribute("approvers", service.getApproverCandidates());
 
         return "Approval/approval.create";
@@ -137,6 +138,8 @@ public class ApprovalController {
             model.addAttribute("files", List.of());
             return "Approval/approval.detail";
         }
+        String rejectComment = docMapper.findLatestRejectComment(docId);
+        model.addAttribute("rejectComment", rejectComment);
 
         model.addAttribute("doc", doc);
         model.addAttribute("lines", service.findLinesByDocId(docId));
@@ -409,6 +412,41 @@ public class ApprovalController {
         if (userId == null) return redirectLogin();
 
         service.recall(docId, userId);
+
+        return "redirect:/approval/detail/" + docId;
+
+    }@GetMapping("/edit/{docId}")
+    public String editDraft(@PathVariable Long docId, Model model, HttpSession session) {
+
+        Long loginUserId = getLoginUserId(session);
+        if (loginUserId == null) return redirectLogin();
+
+        DocDTO doc = service.findById(docId);
+        if (doc == null) return "redirect:/approval";
+
+        service.assertEditableDraft(docId, loginUserId);
+
+        model.addAttribute("mode", "edit");
+        model.addAttribute("docId", docId);
+        model.addAttribute("doc", doc);
+
+        model.addAttribute("types", service.getTypes());
+        model.addAttribute("approvers", service.getApproverCandidates());
+
+        return "Approval/approval.create";
+    }
+
+    @PostMapping("/draft/{docId}")
+    public String updateDraft(@PathVariable Long docId,
+                              @ModelAttribute DocDTO form,
+                              Model model,
+                              HttpSession session) {
+
+        Long loginUserId = getLoginUserId(session);
+        model.addAttribute("loginUserId", loginUserId);
+        if (loginUserId == null) return redirectLogin();
+
+        service.updateDraft(docId, loginUserId, form);
 
         return "redirect:/approval/detail/" + docId;
     }
