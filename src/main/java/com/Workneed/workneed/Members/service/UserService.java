@@ -25,8 +25,8 @@ public class UserService {
     private final SocialAccountMapper socialAccountMapper;
     private final MailService mailService;
 
-    private static final Long DEFAULT_DEPT_ID = 6L; // 부서 미지정
-    private static final Long DEFAULT_RANK_ID = 6L; // 직급 신입
+    private static final Long DEFAULT_DEPT_ID = 0L; // 부서 미지정
+    private static final Long DEFAULT_RANK_ID = 0L; // 직급 신입
 
     @Transactional
     public void updateProfileImage(Long userId, String profileImage) {
