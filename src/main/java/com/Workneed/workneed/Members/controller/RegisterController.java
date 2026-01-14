@@ -8,12 +8,14 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
+// 신규 회원의 정보를 수집, 데이터 유효성을 검증하여 시스템에 등록
 @Controller
 @RequiredArgsConstructor
 public class RegisterController {
 
     private final UserService userService;
 
+    // 가입가능한 뷰 띄우기
     @GetMapping("/register")
     public String registerForm(Model model) {
         model.addAttribute("user", new UserDTO());
@@ -24,20 +26,20 @@ public class RegisterController {
     @PostMapping("/register")
     public String register(UserDTO user, Model model) {
 
-        // 필수값 검증 (Controller 책임)
+        // 필수값 검증
         if (user.getUserLoginId() == null || user.getUserLoginId().isBlank()
                 || user.getUserPassword() == null || user.getUserPassword().isBlank()
                 || user.getUserName() == null || user.getUserName().isBlank()
                 || user.getUserBirthday() == null) {
 
             model.addAttribute("errorMessage", "정보를 입력해주세요.");
-            model.addAttribute("user", user);
+            model.addAttribute("user", user); //폼에 입력했던 값 유지
             return "Members/register";
         }
 
         try {
             userService.register(user);
-            // 성공만 redirect
+            // 성공 redirect
             return "redirect:/login?needApproval=true";
 
         } catch (IllegalStateException e) {

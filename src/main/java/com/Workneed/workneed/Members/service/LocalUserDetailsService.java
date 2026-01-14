@@ -15,6 +15,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -39,9 +41,22 @@ public class LocalUserDetailsService implements UserDetailsService {
         if (user != null) {
 
             if (!"ACTIVE".equals(user.getUserStatus())) {
-                // INACTIVE면 "pending"으로, 그외엔 변환(suspended, banned)
-                String reason = "INACTIVE".equals(user.getUserStatus()) ? "pending" : user.getUserStatus().toLowerCase();
-                // FailureHandler가 받아서 주소창에 ?reason=pending을 붙임
+
+                String status = user.getUserStatus();
+                String reason = "pending";
+
+                if ("INACTIVE".equals(status)) {
+                    if (user.getUserCreatedAt() != null) {
+                        LocalDate signupDate = user.getUserCreatedAt().toLocalDate();
+                        LocalDate today = LocalDate.now();
+                        long days = ChronoUnit.DAYS.between(signupDate, today);
+                        if (days >= 30) reason = "inactive";
+                    }
+                } else if ("SUSPENDED".equals(status)) {
+                    reason = "suspended";
+                } else if ("BANNED".equals(status)) {
+                    reason = "banned";
+                }
                 throw new DisabledException(reason);
             }
             // ROLE_USER로 반환
