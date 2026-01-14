@@ -17,7 +17,7 @@ public class AttendanceController {
 
         Long rankId = user.getRankId();
 
-        return rankId != null && rankId.equals(4L);
+        return rankId != null && rankId >= 4;
     }
 
     // 근태관리 메인
