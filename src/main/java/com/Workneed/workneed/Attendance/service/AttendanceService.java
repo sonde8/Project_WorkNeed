@@ -149,22 +149,24 @@ public class AttendanceService {
         attendanceMapper.markCheck(empId, yesterday);
     }
 
-    public AttendanceResponseDTO summary(Long empId) {
-        LocalDate today = LocalDate.now();
-        LocalDate weekStart = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+    public AttendanceResponseDTO summary(Long empId, LocalDate baseDate) {
+
+        LocalDate weekStart = baseDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
         LocalDate weekEnd = weekStart.plusDays(7);
-        LocalDate monthStart = today.withDayOfMonth(1);
+
+        LocalDate monthStart = baseDate.withDayOfMonth(1);
         LocalDate monthEnd = monthStart.plusMonths(1);
 
-        AttendanceDTO todayRow = attendanceMapper.findByEmpAndDate(empId, today);
-        String todayCheckIn = (todayRow != null && todayRow.getCheckInTime() != null) ? todayRow.getCheckInTime().format(HHMM) : null;
-        String todayCheckOut = (todayRow != null && todayRow.getCheckOutTime() != null) ? todayRow.getCheckOutTime().format(HHMM) : null;
 
-        String todayStatusText = "업무 상태 변경하기";
-        if (todayRow != null && todayRow.getStatusCode() != null) {
-            if ("CHECKED_IN".equals(todayRow.getStatusCode())) todayStatusText = "출근";
-            else if ("CHECKED_OUT".equals(todayRow.getStatusCode())) todayStatusText = "퇴근";
-            else if ("AUTO_CHECKED_OUT".equals(todayRow.getStatusCode())) todayStatusText = "퇴근";
+        AttendanceDTO baseRow = attendanceMapper.findByEmpAndDate(empId, baseDate);
+        String checkIn = (baseRow != null && baseRow.getCheckInTime() != null) ? baseRow.getCheckInTime().format(HHMM) : null;
+        String checkOut = (baseRow != null && baseRow.getCheckOutTime() != null) ? baseRow.getCheckOutTime().format(HHMM) : null;
+
+        String statusText = "업무 상태 변경하기";
+        if (baseRow != null && baseRow.getStatusCode() != null) {
+            if ("CHECKED_IN".equals(baseRow.getStatusCode())) statusText = "출근";
+            else if ("CHECKED_OUT".equals(baseRow.getStatusCode())) statusText = "퇴근";
+            else if ("AUTO_CHECKED_OUT".equals(baseRow.getStatusCode())) statusText = "퇴근";
         }
 
         int weekWorkMin = attendanceMapper.workMinutes(empId, weekStart, weekEnd);
@@ -182,12 +184,13 @@ public class AttendanceService {
         int weekPercent = (int) Math.round(Math.min(100.0, (weekWorkMin * 100.0) / maxBarMin));
 
         return AttendanceResponseDTO.builder()
-                .todayCheckIn(todayCheckIn).todayCheckOut(todayCheckOut).todayStatusText(todayStatusText)
+                .todayCheckIn(checkIn).todayCheckOut(checkOut).todayStatusText(statusText)
                 .weekWorkMin(weekWorkMin).monthWorkMin(monthWorkMin).holidayWorkMin(holidayWorkMin)
                 .weekTotal(toHM(weekWorkMin)).monthTotal(toHM(monthWorkMin)).holidayTotal(toHM(holidayWorkMin))
                 .remainWork(toHM(remainWorkMin)).remainOt(toHM(remainOtMin)).over52(over52)
                 .weekPercent(weekPercent).progressText("52h / " + toHM(weekWorkMin)).build();
     }
+
 
     private String toHM(int minutes) {
         int h = minutes / 60;
