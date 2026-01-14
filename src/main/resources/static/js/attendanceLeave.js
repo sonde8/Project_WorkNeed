@@ -22,11 +22,43 @@
         let curYear = new Date().getFullYear();
         const DAY_MIN = 8 * 60;
 
-        function minToDH(min) {
-            const d = Math.floor(min / DAY_MIN);
-            const h = Math.floor((min % DAY_MIN) / 60);
-            return `${d}d ${h}h`;
+        function toISO(d){
+            const yyyy = d.getFullYear();
+            const mm = String(d.getMonth() + 1).padStart(2, '0');
+            const dd = String(d.getDate()).padStart(2, '0');
+            return `${yyyy}-${mm}-${dd}`;
         }
+
+        function todayISO(){
+            const t = new Date();
+            t.setHours(0,0,0,0);
+            return toISO(t);
+        }
+
+        function tomorrowISO(){
+            const t = new Date();
+            t.setHours(0,0,0,0);
+            t.setDate(t.getDate() + 1);
+            return toISO(t);
+        }
+
+        function minToDH(min){
+            min = Number(min ?? 0);
+            if (!Number.isFinite(min) || min < 0) min = 0;
+
+            const totalHours = Math.floor(min / 60);
+            if (totalHours <= 0) return '-';
+
+            const d = Math.floor(totalHours / 8);
+            const h = totalHours % 8;
+
+            if (d === 0) return `${totalHours}시간`;
+
+            if (h === 0) return `${d}일`;
+
+            return `${d}일 ${h}시간`;
+        }
+
 
         function typeLabel(code){
             if (code === 'ANNUAL') return '연차';
@@ -113,8 +145,12 @@
 
                         const t = timeByType(code);
 
-                        const daysNum = Number(r.days ?? 0);
+                        let daysNum = Number(r.days);
+                        if (code === 'ANNUAL' && (!Number.isFinite(daysNum) || daysNum <= 0)) {
+                            daysNum = 1; // 1일 = 8시간
+                        }
                         const minutes = minutesByType(code, daysNum);
+
 
                         const statusText = r.status ?? r.requestStatus ?? '승인 완료';
 
@@ -163,23 +199,54 @@
             document.querySelectorAll('.rowCheck').forEach(chk => chk.checked = checked);
         });
 
+        function applyType(){
+            const type = document.getElementById('lvType')?.value;
+            const s = document.getElementById('lvStart');
+            const e = document.getElementById('lvEnd');
+            if (!s || !e) return;
+
+            const min = (type === 'HALF_PM') ? todayISO() : tomorrowISO();
+
+            s.min = min;
+            e.min = min;
+
+            if (!s.value || s.value < min) s.value = min;
+            if (!e.value || e.value < s.value) e.value = s.value;
+
+            if (type === 'HALF_AM' || type === 'HALF_PM') {
+                e.value = s.value;
+            }
+        }
+
 
         // 모달 열기
         function openModal() {
             if (!modal) return;
             modal.hidden = false;
 
+            applyType();
+
+            const sel = document.getElementById('lvType');
             const s = document.getElementById('lvStart');
             const e = document.getElementById('lvEnd');
 
-            const today = new Date();
-            const yyyy = today.getFullYear();
-            const mm = String(today.getMonth() + 1).padStart(2, '0');
-            const dd = String(today.getDate()).padStart(2, '0');
-            const iso = `${yyyy}-${mm}-${dd}`;
+            if (sel && !sel.dataset.bound) {
+                sel.addEventListener('change', applyType);
+                sel.dataset.bound = '1';
+            }
 
-            if (s && !s.value) s.value = iso;
-            if (e && !e.value) e.value = iso;
+            if (s && e && !s.dataset.bound) {
+                s.addEventListener('change', () => {
+                    e.min = s.value;
+                    if (e.value < s.value) e.value = s.value;
+
+                    const type = sel?.value;
+                    if (type === 'HALF_AM' || type === 'HALF_PM') {
+                        e.value = s.value;
+                    }
+                });
+                s.dataset.bound = '1';
+            }
         }
 
         function closeModal() {
@@ -228,10 +295,13 @@
                 }
 
                 payload.reason = payload.reason.trim();
-
                 if (!payload.reason) {
                     alert('사유를 꼭 적어주세요');
                     return;
+                }
+
+                if (payload.leaveType === 'HALF_AM' || payload.leaveType === 'HALF_PM') {
+                    payload.endDate = payload.startDate;
                 }
 
                 if (payload.startDate > payload.endDate) {
@@ -239,7 +309,19 @@
                     return;
                 }
 
-                if(hasWeekend(payload.startDate, payload.endDate)){
+                const today = todayISO();
+                if (payload.startDate < today) {
+                    alert('이전날짜는 연차를 신청할 수 없습니다');
+                    return;
+                }
+                if (payload.startDate === today || payload.endDate === today) {
+                    if (payload.leaveType !== 'HALF_PM') {
+                        alert('당일은 오후반차만 신청 가능합니다');
+                        return;
+                    }
+                }
+
+                if (hasWeekend(payload.startDate, payload.endDate)) {
                     alert('주말에는 연차를 사용할 수 없습니다');
                     return;
                 }
@@ -247,38 +329,28 @@
                 const y = Number(payload.startDate.slice(0, 4)) || curYear;
 
                 let sum;
-
                 try {
                     sum = await fetchSummary(y);
-                } catch (e) {
-                    console.error(e);
+                } catch (err) {
+                    console.error(err);
                     alert('연차 정보를 불러오지 못했습니다');
                     return;
                 }
 
                 const remainMin = Number(sum.remainMin ?? 0);
 
-                // 신청 분 계산
-                const code = payload.leaveType;
-
-                let daysNum = 1;
-
                 const startD = new Date(payload.startDate);
                 const endD = new Date(payload.endDate);
-                daysNum = Math.floor((endD - startD) / (1000 * 60 * 60 * 24)) + 1;
+
+                let daysNum = Math.floor((endD - startD) / (1000 * 60 * 60 * 24)) + 1;
                 if (!Number.isFinite(daysNum) || daysNum < 1) daysNum = 1;
 
+                const reqMin = minutesByType(payload.leaveType, daysNum);
 
-                const reqMin = minutesByType(code, daysNum);
-
-                // 잔여 0 일때
                 if (remainMin <= 0) {
                     alert('사용할 수 있는 연차가 없습니다');
                     return;
                 }
-
-
-                // 잔여보다 더 많은 날 신청할 때
                 if (reqMin > remainMin) {
                     alert('잔여 연차가 적습니다');
                     return;
@@ -308,6 +380,7 @@
                 }
             });
         }
+
 
         render();
     });
