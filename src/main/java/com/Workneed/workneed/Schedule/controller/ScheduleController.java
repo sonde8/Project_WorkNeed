@@ -197,9 +197,17 @@ public class ScheduleController {
 
         // 본인(OWNER) 체크  방지
         userIds.remove(loginUserId);
+//
+//        // MEMBER 등록
+//        scheduleParticipantMapper.inviteTeam(scheduleId, userIds);
 
-        // MEMBER 등록
-        scheduleParticipantMapper.inviteTeam(scheduleId, userIds);
+        // 초대자 이름(메일에 표시)
+        UserDTO user = (UserDTO) session.getAttribute("user");
+        String inviterName = (user != null && user.getUserName() != null) ? user.getUserName() : "Workneed";
+
+        // 팀원 초대 + 메일 발송 (서비스로 위임)
+        scheduleService.inviteTeamAndSendMail(scheduleId, loginUserId, inviterName, userIds);
+
 
         return "redirect:/schedule/kanban";
     }
@@ -219,9 +227,16 @@ public class ScheduleController {
 
         // OWNER은 MEMBER로 방지
         userIds.remove(loginUserId);
+//
+//        // TEAM 멤버
+//        scheduleParticipantMapper.inviteTeam(scheduleId, userIds);
 
-        // TEAM 멤버
-        scheduleParticipantMapper.inviteTeam(scheduleId, userIds);
+        UserDTO user = (UserDTO) session.getAttribute("user");
+        String inviterName = (user != null && user.getUserName() != null) ? user.getUserName() : "Workneed";
+
+        // 팀원 초대 + 메일 발송
+        scheduleService.inviteTeamAndSendMail(scheduleId, loginUserId, inviterName, userIds);
+
         return "OK";
     }
     ////create Ajax
