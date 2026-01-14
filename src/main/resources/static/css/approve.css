@@ -6,7 +6,6 @@
 
 .approval-scope {
     color: #333333;
-    height: 70vh;
 
 
 }
@@ -17,6 +16,8 @@
     /* max-width: 1340px; */
     margin: 0 auto;
     padding: 20px ;
+    overflow-y: auto;
+    height: 90vh;
 }
 .approval-scope .wrap::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-thumb { background-color: rgba(0, 0, 0, 0.1); border-radius: 10px; }
 
@@ -52,8 +53,15 @@
     border: 1px solid #dddddd;
     border-radius: 8px;
     padding: 25px;
-}
 
+}
+.card2 {
+    background: #ffffff;
+    border: 1px solid #dddddd;
+    border-radius: 8px;
+    padding: 25px;
+    min-height: 85vh;
+}
 .approval-scope .card + .card {
     margin-top: 12px;
 }
@@ -74,7 +82,9 @@
     font-weight: 800;
     margin: 0;
 }
-
+.approval-scope .card::-webkit-scrollbar{
+width: 4px;
+}
 .approval-scope .meta {
     font-size: 12px;
     color: #888888;
@@ -210,6 +220,7 @@ span.value {
     padding: 25px;
     position: sticky;
     top: 12px;
+    min-height: 85vh;
 }
 
 .approval-scope .side-title {
@@ -765,7 +776,11 @@ span.value {
     margin: 15px 0px;
 }
 
-
+.group-title {
+color: var(--color-primary);
+font-size: 12px;
+font-weight: 800;
+}
 .hint {
     padding-left: 20px;
 }
