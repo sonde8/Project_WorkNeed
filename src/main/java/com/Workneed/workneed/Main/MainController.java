@@ -25,16 +25,18 @@ public class MainController {
     @GetMapping("/main")
     public String main(HttpSession session, Model model) {
 
-
+        // 관리자라면 관리자 멤버리스트로 반환
         if (session.getAttribute("admin") != null) {
             return "redirect:/admin/member/list";
         }
 
+        // 2. 로그인 안 했으면 로그인 페이지로
         UserDTO user = (UserDTO) session.getAttribute("user");
         if (user == null) {
             return "redirect:/login";
         }
 
+        // 공통 모델 데이터 추가
         model.addAttribute("user", user);
         model.addAttribute("pageTitle", "메인");
 

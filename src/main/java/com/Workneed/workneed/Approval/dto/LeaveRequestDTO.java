@@ -15,6 +15,7 @@ public class LeaveRequestDTO {
     private Long userId;
     private LocalDate startDate;
     private LocalDate endDate;
+    private Double days;
     private String reason;
 
 

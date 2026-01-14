@@ -43,7 +43,7 @@ public class AdminUserService {
     }
 
 
-    // 관리자 생성 (SUPER만)
+    // 관리자 생성
     @Transactional
     public void createAdmin(AdminUserDTO newAdmin, AdminUserDTO actor) {
 
@@ -95,14 +95,14 @@ public class AdminUserService {
         adminUserMapper.updateLastLogin(adminId);
     }
 
-    //관리자 상태변경
+    // 관리자 상태변경
     @Transactional
     public void changeAdminStatus(
             Long targetAdminId,
             String status,
             AdminUserDTO actor
     ) {
-        // 1️⃣ 수행자 권한 체크
+        // 수행자 권한 체크
         if (!(isSuper(actor) || isManager(actor))) {
             throw new SecurityException("관리자 상태 변경 권한 없음");
         }
@@ -111,28 +111,28 @@ public class AdminUserService {
             throw new IllegalArgumentException("대상 관리자 ID 없음");
         }
 
-        // 2️⃣ 대상 관리자 조회
+        // 대상 관리자 조회
         AdminUserDTO target = adminUserMapper.findByAdminId(targetAdminId);
         if (target == null) {
             throw new IllegalArgumentException("대상 관리자가 존재하지 않음");
         }
 
-        // 3️⃣ 자기 자신 정지 방어
+        // 자기 자신 정지 방어
         if (actor.getAdminId().equals(targetAdminId)
                 && "SUSPENDED".equals(status)) {
             throw new IllegalStateException("본인 계정은 정지할 수 없음");
         }
 
-        // 4️⃣ 상위 관리자 보호 로직
+        // 상위 관리자 보호 로직
         // roleId 숫자 작을수록 상위
         if (actor.getRoleId() > target.getRoleId()) {
             throw new SecurityException("상위 관리자 상태는 변경할 수 없음");
         }
 
-        // 5️⃣ 상태 변경
+        // 상태 변경
         adminUserMapper.updateAdminStatus(targetAdminId, status);
 
-        // 6️⃣ 로그 기록
+        // 로그 기록
         String desc = String.format(
                 "관리자(ID:%d) 상태를 [%s]로 변경",
                 targetAdminId, status
@@ -181,9 +181,9 @@ public class AdminUserService {
                 dto.getRankId(), "직급 생성");
     }
 
-    /* =========================
-        부서 삭제 (SUPER만)
-    ========================= */
+
+
+    // 부서 삭제
     @Transactional
     public void deleteDept(Long deptId, AdminUserDTO actor) {
         if (!isSuper(actor)) {
@@ -199,9 +199,8 @@ public class AdminUserService {
         saveLog(actor.getAdminId(), "DELETE", "DEPT", deptId, "부서 삭제");
     }
 
-    /* =========================
-        직급 삭제 (SUPER만)
-    ========================= */
+
+    // 직급 삭제
     @Transactional
     public void deleteRank(Long rankId, AdminUserDTO actor) {
         if (!isSuper(actor)) {
@@ -217,9 +216,8 @@ public class AdminUserService {
         saveLog(actor.getAdminId(), "DELETE", "RANK", rankId, "직급 삭제");
     }
 
-    /* =========================
-        직원 상태/조직 변경
-    ========================= */
+
+    // 직원 상태/조직 변경
     @Transactional
     public void updateMemberStatusWithLog(
             Long userId,
@@ -273,7 +271,7 @@ public class AdminUserService {
             // 실제 DB 업데이트
             adminUserMapper.updateMemberStatus(update);
 
-            // 조립된 상세 메시지로 로그 저장
+            // 로그 저장
             saveLog(actor.getAdminId(), "UPDATE_STATUS", "USER", userId, logDesc.toString());
 
         }
@@ -286,9 +284,8 @@ public class AdminUserService {
     }
 
 
-    /* =========================
-        일괄 상태 변경
-    ========================= */
+
+    // 일괄 상태 변경
     @Transactional
     public void batchUpdateUserStatus(
             List<Long> userIds,
@@ -310,9 +307,8 @@ public class AdminUserService {
     }
 
 
-    /* =========================
-        조회
-    ========================= */
+
+    // 조회
     public List<UserDTO> getAllMembers(String userName, String userLoginId,
                                        Long deptId, Long rankId, String userStatus) {
         return adminUserMapper.findAllMembersForAdmin(
@@ -335,9 +331,8 @@ public class AdminUserService {
         return adminUserMapper.findAllActivityLogs();
     }
 
-    /* =========================
-       🧾 로그 저장
-    ========================= */
+
+    // 로그 저장
     private void saveLog(Long adminId, String action,
                          String targetType, Long targetId, String desc) {
         AdminUserDTO log = new AdminUserDTO();

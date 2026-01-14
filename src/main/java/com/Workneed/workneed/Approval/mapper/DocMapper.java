@@ -5,7 +5,6 @@ import com.Workneed.workneed.Approval.LineStatus;
 import com.Workneed.workneed.Approval.dto.*;
 import com.Workneed.workneed.Approval.entity.ApprovalDoc;
 import com.Workneed.workneed.Approval.entity.User;
-import com.Workneed.workneed.Members.dto.UserDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -210,5 +209,12 @@ public interface DocMapper {
                     @Param("title") String title,
                     @Param("content") String content);
     String findLatestRejectComment(Long docId);
+
+    /*=================================================================
+    smtp 메일송부
+    ================================================================= */
+    List<ApprovalLineMailDTO> findLinesForMail(@Param("docId") Long docId);
+    List<String> findEmailsByUserIds(@Param("ids") List<Long> ids);
+
 
 }

@@ -12,8 +12,8 @@
 
     <insert id="insertLeaveUsage"
             parameterType="com.Workneed.workneed.Attendance.dto.LeaveUsageInsertDTO">
-        INSERT INTO leave_usage (request_id, user_id, leave_type, start_date, end_date,  reason)
-        VALUES (#{requestId}, #{userId}, #{leaveType}, #{startDate}, #{endDate}, #{reason})
+        INSERT INTO leave_usage (request_id, user_id, leave_type, start_date, end_date, days,  reason)
+        VALUES (#{requestId}, #{userId}, #{leaveType}, #{startDate}, #{endDate}, #{days}, #{reason})
     </insert>
 
     <select id="selectLeaveUsage"

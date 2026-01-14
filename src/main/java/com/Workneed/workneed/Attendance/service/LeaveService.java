@@ -5,6 +5,7 @@ import com.Workneed.workneed.Approval.dto.LeaveRequestDTO;
 import com.Workneed.workneed.Approval.service.ApprovalLeaveService;
 import com.Workneed.workneed.Attendance.dto.*;
 import com.Workneed.workneed.Attendance.mapper.LeaveMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,7 +13,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.LocalDate;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -88,18 +91,28 @@ public class LeaveService {
         r.setStatus("APPROVED");
 
         // payload에는 코드값(name) 저장을 권장합니다
-        String payload = String.format(
-                "{\"leaveType\":\"%s\",\"start\":\"%s\",\"end\":\"%s\",\"reason\":\"%s\"}",
-                req.getLeaveType().name(),
-                req.getStartDate(),
-                req.getEndDate(),
-                req.getReason().replace("\"", "\\\"")
-        );
+        ObjectMapper om = new ObjectMapper();
+
+        Map<String, Object> payloadObj = new LinkedHashMap<>();
+        payloadObj.put("leaveType", req.getLeaveType().name());
+        payloadObj.put("start", req.getStartDate().toString());
+        payloadObj.put("end", req.getEndDate().toString());
+        payloadObj.put("reason", req.getReason());
+
+        String payload;
+        try {
+            payload = om.writeValueAsString(payloadObj);
+        } catch (Exception e) {
+
+            throw new IllegalStateException("요청 payload 생성 실패", e);
+        }
 
         r.setRequestPayload(payload);
         leaveMapper.insertRequest(r);
 
         // ====== 사용 내역 ======
+        double days = calcDays(req.getLeaveType(), req.getStartDate(), req.getEndDate());
+
         LeaveUsageInsertDTO u = new LeaveUsageInsertDTO();
         u.setRequestId(r.getRequestId());
         u.setUserId(userId);
@@ -111,6 +124,7 @@ public class LeaveService {
 
         u.setStartDate(req.getStartDate());
         u.setEndDate(req.getEndDate());
+        u.setDays(days);
         u.setReason(req.getReason());
 
         leaveMapper.insertLeaveUsage(u);
@@ -120,6 +134,7 @@ public class LeaveService {
         dto.setLeaveType(req.getLeaveType()); // enum 그대로 전달
         dto.setStartDate(req.getStartDate());
         dto.setEndDate(req.getEndDate());
+        dto.setDays(days);
         dto.setReason(req.getReason());
 
         approvalLeaveService.submitLeave(dto, userId);

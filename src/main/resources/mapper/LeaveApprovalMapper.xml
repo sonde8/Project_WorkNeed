@@ -10,9 +10,9 @@
     <insert id="insertLeaveRequest"
             parameterType="com.Workneed.workneed.Approval.dto.LeaveRequestDTO">
         INSERT INTO leave_request
-        (approval_doc_id, user_id, leave_type, start_date, end_date, reason, created_at)
+        (approval_doc_id, user_id, leave_type, start_date, end_date, days, reason, created_at)
         VALUES
-        (#{docId}, #{userId}, #{leaveType}, #{startDate}, #{endDate}, #{reason}, NOW())
+        (#{docId}, #{userId}, #{leaveType}, #{startDate}, #{endDate}, #{days}, #{reason}, NOW())
     </insert>
 
     <!-- 1) 작성자 부서 -->

@@ -6,6 +6,7 @@ import com.Workneed.workneed.Approval.dto.DocDTO;
 import com.Workneed.workneed.Approval.dto.DocFileDTO;
 import com.Workneed.workneed.Approval.entity.ApprovalDoc;
 import com.Workneed.workneed.Approval.mapper.DocMapper;
+import com.Workneed.workneed.Approval.service.ApprovalMailService;
 import com.Workneed.workneed.Approval.service.ApprovalService;
 import com.Workneed.workneed.Chat.service.StorageService;
 import com.Workneed.workneed.Members.dto.UserDTO;
@@ -37,6 +38,7 @@ public class ApprovalController {
     private final DocMapper docMapper;
     private final StorageService storageService;
     private final AmazonS3 amazonS3; // S3 직접 접근을 위해 주입
+    private final ApprovalMailService approvalMailService;
 
     @Value("${cloud.aws.s3.bucket}") // S3 버킷명 주입
     private String bucket;
@@ -193,7 +195,7 @@ public class ApprovalController {
             docId = service.save(doc);
         }
 
-        // ✅ 파일 저장(업로드) - 기존 로직 유지
+        //  파일 저장(업로드) - 기존 로직 유지
         if (files != null && !files.isEmpty()) {
             service.saveFile(docId, files);
         }
@@ -201,11 +203,17 @@ public class ApprovalController {
         // 결재 흐름 시작
         service.submit(docId, approverIds, orderNums, referenceIds);
 
+        try {
+            approvalMailService.sendApprovalLineTableToApprovers(docId, approverIds);
+        } catch (Exception e) {
+            System.err.println("SMTP 메일 발송 실패: " + e.getMessage());
+        }
+
         return "redirect:/approval/detail/" + docId;
     }
 
     /* ==========================================================
-       ✅ [수정됨] 파일 다운로드 및 삭제 (S3 연동형)
+        [수정됨] 파일 다운로드 및 삭제 (S3 연동형)
        - 로컬 경로(FileSystemResource) 대신 S3 객체 직접 반환 로직 적용
        ========================================================== */
 

@@ -178,5 +178,14 @@
           t.task_id DESC
     </select>
 
+    <select id="selectEmailsByUserIds" resultType="string">
+        SELECT DISTINCT u.user_email
+        FROM user u
+        WHERE u.user_id IN
+        <foreach collection="userIds" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
 
 </mapper>

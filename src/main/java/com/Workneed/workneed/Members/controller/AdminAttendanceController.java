@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
 
+// 관리자가 유저의 근태요청 심사하는 컨트롤러
 @Controller
 @RequiredArgsConstructor
 public class AdminAttendanceController {
@@ -26,23 +27,27 @@ public class AdminAttendanceController {
     @GetMapping("/admin/attendance/list")
     public String pendingAttendanceList(Model model) {
 
+        // 대기 요청만 db에서 가져옴
         List<RequestDTO> requests =
                 attendanceAdminQueryService.getPendingRequests();
 
+        // 모델에 담고 화면 반환
         model.addAttribute("requests", requests);
         return "Members/admin_attendance_list";
     }
 
-    // 🔹 승인
+    // ResponseBody 화면처리 비동기 방식 -승인처리-
     @PostMapping("/admin/attendance/approve")
     @ResponseBody
     public String approve(
             @RequestParam Long requestId,
             HttpSession session) {
 
+        // 관리자 세션을 담아서 어떤 형식으로도 관리자만 처리
         AdminUserDTO admin = (AdminUserDTO) session.getAttribute("admin");
         if (admin == null) return "fail";
 
+        // requestIdd(요청의 id) ,adminId(승인자)
         attendanceApproveService.approve(requestId, admin.getAdminId());
         return "success";
     }
@@ -57,6 +62,7 @@ public class AdminAttendanceController {
         AdminUserDTO admin = (AdminUserDTO) session.getAttribute("admin");
         if (admin == null) return "fail";
 
+        // 반려는 reason 반려사유 필수
         attendanceApproveService.reject(
                 requestId,
                 admin.getAdminId(),

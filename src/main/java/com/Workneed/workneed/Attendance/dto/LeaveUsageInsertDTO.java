@@ -12,5 +12,6 @@ public class LeaveUsageInsertDTO {
     private String leaveType;
     private LocalDate startDate;
     private LocalDate endDate;
+    private Double days;
     private String reason;
 }

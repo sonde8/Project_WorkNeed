@@ -45,6 +45,12 @@
             return workStateEl?.dataset?.state || 'OUT';
         }
 
+        window.addEventListener('attendance:state', (e) => {
+            const state = e?.detail?.state;
+            if (!state) return;
+            setWorkState(state);
+        });
+
         function setButtons(summary){
             const hasIn = !!summary.todayCheckIn;
             const hasOut = !!summary.todayCheckOut;
@@ -64,32 +70,24 @@
             }
         }
 
-        async function loadSummary() {
-            const res = await fetch('/api/attendance/summary');
+        async function loadSummary(date = new Date()) {
+            const y = date.getFullYear();
+            const m = date.getMonth() + 1;
+            const d = date.getDate();
+
+            const res = await fetch(`/api/attendance/summary?year=${y}&month=${m}&day=${d}`);
             if (!res.ok) return;
             const s = await res.json();
 
             checkInEl.textContent = s.todayCheckIn ?? '미등록';
             checkOutEl.textContent = s.todayCheckOut ?? '미등록';
 
-            if(monthTotalEl) monthTotalEl.textContent = s.monthTotal ?? '0h 0m';
-
-            const hasIn  = !!s.todayCheckIn;
-            const hasOut = !!s.todayCheckOut;
-
-            let state = 'OUT';
-            if (hasOut) state = 'OUT';
-            else if (hasIn) {
-                const t = (s.todayStatusText || '').replace(/\s/g,'');
-                if (t.includes('자리') || t.includes('비움')) state = 'AWAY';
-                else state = 'IN';
-            }
-            setWorkState(state);
+            if (monthTotalEl) monthTotalEl.textContent = s.monthTotal ?? '-';
 
             setButtons(s);
-
             window.dispatchEvent(new CustomEvent('attendance:summary', { detail: s }));
         }
+
 
         loadSummary().catch(console.error);
 
@@ -113,6 +111,44 @@
                 await fetch('/api/attendance/auto/notice', { method: 'POST' });
             }
         }
+
+        function formatHM(v){
+            let totalMin = 0;
+
+            if (typeof v === 'number' && Number.isFinite(v)) {
+                totalMin = Math.max(0, Math.floor(v));
+            } else {
+                const s = String(v ?? '').trim();
+
+                const h = Number(s.match(/(\d+)\s*h/i)?.[1] ?? 0);
+                const m = Number(s.match(/(\d+)\s*m/i)?.[1] ?? 0);
+
+                if (h || m) {
+                    totalMin = h * 60 + m;
+                }
+
+                else if (/^\d{1,2}:\d{2}$/.test(s)) {
+                    const [hh, mm] = s.split(':').map(Number);
+                    totalMin = (hh || 0) * 60 + (mm || 0);
+                }
+
+                else if (/^\d+$/.test(s)) {
+                    totalMin = Number(s);
+                }
+            }
+
+            if (totalMin === 0) return '-';
+
+            if (totalMin < 60) return `${totalMin}분`;
+
+            const h = Math.floor(totalMin / 60);
+            const m = totalMin % 60;
+
+            if (m === 0) return `${h}시간`;
+
+            return `${h}시간 ${m}분`;
+        }
+
 
         // 출근
         checkInBtn.addEventListener('click', async () => {
