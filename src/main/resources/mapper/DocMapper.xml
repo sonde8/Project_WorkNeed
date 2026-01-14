@@ -144,13 +144,11 @@
     <!-- ===============================
          결재 라인 저장
          =============================== -->
-    <insert id="insertApprovalLine"
-            parameterType="com.Workneed.workneed.Approval.entity.ApprovalLine">
-        INSERT INTO approval_line
-            (approval_doc_id, approver_id, order_num, status)
-        VALUES
-            (#{docId}, #{approverId}, #{orderNum}, #{status})
+    <insert id="insertApprovalLine">
+        INSERT INTO approval_line (approval_doc_id, approver_id, order_num, status)
+        VALUES (#{docId}, #{approverId}, #{orderNum}, #{status})
     </insert>
+
 
     <!-- ===============================
          결재 라인 전체 PENDING 처리
@@ -667,5 +665,35 @@
         WHERE u.user_id != #{loginUserId}
         ORDER BY d.dept_name, r.rank_order DESC, u.username
     </select>
+
+    <select id="findLinesForMail"
+            parameterType="long"
+            resultType="com.Workneed.workneed.Approval.dto.ApprovalLineMailDTO">
+        SELECT
+        l.order_num AS orderNum,
+        d.dept_name AS deptName,
+        r.rank_name AS rankName,
+        u.user_name AS username,
+        l.status    AS status,
+        DATE_FORMAT(l.approved_at, '%Y-%m-%d %H:%i') AS approvedAt
+        FROM approval_line l
+        JOIN user u ON u.user_id = l.approver_id
+        LEFT JOIN dept d  ON d.dept_id = u.dept_id
+        LEFT JOIN ranks r ON r.rank_id = u.rank_id
+        WHERE l.approval_doc_id = #{docId}
+        ORDER BY l.order_num ASC, l.approval_line_id ASC
+    </select>
+
+
+    <select id="findEmailsByUserIds" resultType="string">
+        SELECT user_email
+        FROM user
+        WHERE user_id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
+
 
 </mapper>
