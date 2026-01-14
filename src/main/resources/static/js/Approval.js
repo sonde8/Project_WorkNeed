@@ -70,9 +70,9 @@ document.addEventListener("DOMContentLoaded", () => {
     /* ==================================================
      * CREATE PAGE (결재선 구성: 4칸 고정)
      * 필요한 DOM:
-     *  - buttons: btnAddReview / btnAddAgreement / btnAddFinal / btnAddReference / btnReset
-     *  - boxes  : reviewBox / agreementBox / finalBox / referenceBox
-     *  - hidden : hiddenContainer
+     * - buttons: btnAddReview / btnAddAgreement / btnAddFinal / btnAddReference / btnReset
+     * - boxes  : reviewBox / agreementBox / finalBox / referenceBox
+     * - hidden : hiddenContainer
      * 체크박스(.candCheck)는 value=userId, data-name/dept/rank 를 갖습니다.
      * ================================================== */
     const hiddenContainer = document.getElementById("hiddenContainer");
@@ -310,9 +310,9 @@ document.addEventListener("DOMContentLoaded", () => {
         /**
          * [전체 렌더]
          * 현재 상태(lineItems/refItems)를 기준으로
-         *  - 4칸(검토/합의/최종결재/참조) 화면 갱신
-         *  - hidden input 갱신
-         *  - 삭제 이벤트 재연결
+         * - 4칸(검토/합의/최종결재/참조) 화면 갱신
+         * - hidden input 갱신
+         * - 삭제 이벤트 재연결
          */
         function render() {
             const reviewItems = lineItems.filter(item => item.orderNum === 1);
@@ -350,10 +350,13 @@ document.addEventListener("DOMContentLoaded", () => {
      * DETAIL PAGE (문서 상세) - 거절 토글 (기존 그대로)
      * ================================================== */
     const rejectForm = document.getElementById("rejectForm");
+
     if (rejectForm) {
-        const toggleBtn = document.getElementById("btnToggleReject");
+        // HTML에 작성된 id="btnToggleReject"와 똑같이 맞춰줍니다.
+        const toggleBtn = document.getElementById("btnRejectToggle");
         const cancelBtn = document.getElementById("btnCancelReject");
 
+        // 1. 컨펌 메시지 로직 (기존 유지)
         document.querySelectorAll("[data-confirm]").forEach(btn => {
             btn.addEventListener("click", (e) => {
                 const msg = btn.dataset.confirm;
@@ -364,12 +367,15 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         });
 
+        // 2. 초기 상태 숨김
         rejectForm.style.display = "none";
 
+        // 3. 반려 버튼 토글 로직
         if (toggleBtn) {
             toggleBtn.addEventListener("click", () => {
-                const isHidden = rejectForm.style.display === "none";
+                const isHidden = (rejectForm.style.display === "none");
                 rejectForm.style.display = isHidden ? "block" : "none";
+
                 if (isHidden) {
                     const ta = rejectForm.querySelector("textarea[name='comment']");
                     if (ta) ta.focus();
@@ -377,6 +383,7 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         }
 
+        // 4. 취소 버튼 로직
         if (cancelBtn) {
             cancelBtn.addEventListener("click", () => {
                 rejectForm.style.display = "none";
@@ -385,134 +392,150 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         }
     }
-});
+}); // <-- 여기서 DOMContentLoaded 이벤트를 정상적으로 닫았습니다.
+
+/* ==================================================
+ * 멤버 선택/검사 관련 로직 (DOMContentLoaded 외부)
+ * ================================================== */
 const selectedUserIds = new Set();
 
 function renderPicked() {
-  const pickedList = document.getElementById('pickedList');
-  const hiddenWrap = document.getElementById('pickedHiddenInputs');
+    const pickedList = document.getElementById('pickedList');
+    const hiddenWrap = document.getElementById('pickedHiddenInputs');
 
-  pickedList.innerHTML = '';
-  hiddenWrap.innerHTML = '';
+    if(!pickedList || !hiddenWrap) return;
 
-  selectedUserIds.forEach(id => {
-    const u = ALL_USERS.find(x => String(x.userId) === String(id));
-    if (!u) return;
+    pickedList.innerHTML = '';
+    hiddenWrap.innerHTML = '';
 
-    const row = document.createElement('div');
-    row.className = 'row';
-    row.innerHTML = `
+    selectedUserIds.forEach(id => {
+        const u = ALL_USERS.find(x => String(x.userId) === String(id));
+        if (!u) return;
+
+        const row = document.createElement('div');
+        row.className = 'row';
+        row.innerHTML = `
       <div class="meta">
         <div class="name">${u.username}</div>
         <div class="sub">${u.deptName} · ${u.rankName}</div>
       </div>
       <button type="button" class="btn btn-small btnRemove" data-user-id="${u.userId}">삭제</button>
     `;
-    pickedList.appendChild(row);
+        pickedList.appendChild(row);
 
-    const input = document.createElement('input');
-    input.type = 'hidden';
-    input.name = 'selectedUserIds';
-    input.value = u.userId;
-    hiddenWrap.appendChild(input);
-  });
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'selectedUserIds';
+        input.value = u.userId;
+        hiddenWrap.appendChild(input);
+    });
 
-  syncPickButtons();
+    syncPickButtons();
 }
 
 function syncPickButtons() {
-  document.querySelectorAll('[data-user-id]').forEach(row => {
-    const userId = row.getAttribute('data-user-id');
-    const btn = row.querySelector('.btnPick');
-    if (!btn) return;
+    document.querySelectorAll('[data-user-id]').forEach(row => {
+        const userId = row.getAttribute('data-user-id');
+        const btn = row.querySelector('.btnPick');
+        if (!btn) return;
 
-    const picked = selectedUserIds.has(String(userId));
-    btn.disabled = picked;
-    btn.textContent = picked ? '선택됨' : '선택';
-  });
+        const picked = selectedUserIds.has(String(userId));
+        btn.disabled = picked;
+        btn.textContent = picked ? '선택됨' : '선택';
+    });
 }
 
 function pickUser(userId) {
-  selectedUserIds.add(String(userId));
-  renderPicked();
+    selectedUserIds.add(String(userId));
+    renderPicked();
 }
 
 function removeUser(userId) {
-  selectedUserIds.delete(String(userId));
-  renderPicked();
+    selectedUserIds.delete(String(userId));
+    renderPicked();
 }
 
 /* 부서 토글 */
 document.addEventListener('click', (e) => {
-  const head = e.target.closest('.dept-head');
-  if (head) {
-    const body = head.parentElement.querySelector('.dept-body');
-    const isOpen = body.style.display !== 'none';
-    body.style.display = isOpen ? 'none' : 'block';
-  }
-
-  const pickBtn = e.target.closest('.btnPick');
-  if (pickBtn) {
-    const row = pickBtn.closest('[data-user-id]');
-    pickUser(row.getAttribute('data-user-id'));
-  }
-
-  const removeBtn = e.target.closest('.btnRemove');
-  if (removeBtn) {
-    removeUser(removeBtn.getAttribute('data-user-id'));
-  }
-
-  const deptAll = e.target.closest('.deptSelectAll');
-  if (deptAll) {
-    const deptId = deptAll.getAttribute('data-dept-id');
-    const rows = document.querySelectorAll(`.dept-head[data-dept-id="${deptId}"]`)
-    if (rows.length) {
-      const body = rows[0].parentElement.querySelector('.dept-body');
-      body.querySelectorAll('[data-user-id]').forEach(r => {
-        pickUser(r.getAttribute('data-user-id'));
-      });
+    const head = e.target.closest('.dept-head');
+    if (head) {
+        const body = head.parentElement.querySelector('.dept-body');
+        const isOpen = body.style.display !== 'none';
+        body.style.display = isOpen ? 'none' : 'block';
     }
-  }
+
+    const pickBtn = e.target.closest('.btnPick');
+    if (pickBtn) {
+        const row = pickBtn.closest('[data-user-id]');
+        pickUser(row.getAttribute('data-user-id'));
+    }
+
+    const removeBtn = e.target.closest('.btnRemove');
+    if (removeBtn) {
+        removeUser(removeBtn.getAttribute('data-user-id'));
+    }
+
+    const deptAll = e.target.closest('.deptSelectAll');
+    if (deptAll) {
+        const deptId = deptAll.getAttribute('data-dept-id');
+        const rows = document.querySelectorAll(`.dept-head[data-dept-id="${deptId}"]`)
+        if (rows.length) {
+            const body = rows[0].parentElement.querySelector('.dept-body');
+            body.querySelectorAll('[data-user-id]').forEach(r => {
+                pickUser(r.getAttribute('data-user-id'));
+            });
+        }
+    }
 });
 
 /* 팀 전체 선택 */
-document.getElementById('btnSelectAll').addEventListener('click', () => {
-  ALL_USERS.forEach(u => selectedUserIds.add(String(u.userId)));
-  renderPicked();
-});
+const btnSelectAll = document.getElementById('btnSelectAll');
+if (btnSelectAll) {
+    btnSelectAll.addEventListener('click', () => {
+        ALL_USERS.forEach(u => selectedUserIds.add(String(u.userId)));
+        renderPicked();
+    });
+}
 
 /* 검색 */
 function renderSearchResults(list) {
-  const wrap = document.getElementById('searchResultList');
-  document.getElementById('searchCount').textContent = list.length;
+    const wrap = document.getElementById('searchResultList');
+    const countSpan = document.getElementById('searchCount');
+    if (countSpan) countSpan.textContent = list.length;
+    if (!wrap) return;
 
-  wrap.innerHTML = '';
-  list.forEach(u => {
-    const row = document.createElement('div');
-    row.className = 'row';
-    row.setAttribute('data-user-id', u.userId);
-    row.innerHTML = `
+    wrap.innerHTML = '';
+    list.forEach(u => {
+        const row = document.createElement('div');
+        row.className = 'row';
+        row.setAttribute('data-user-id', u.userId);
+        row.innerHTML = `
       <div class="meta">
         <div class="name">${u.username}</div>
         <div class="sub">${u.deptName} · ${u.rankName}</div>
       </div>
       <button type="button" class="btn btn-small btnPick">선택</button>
     `;
-    wrap.appendChild(row);
-  });
+        wrap.appendChild(row);
+    });
 
-  syncPickButtons();
+    syncPickButtons();
 }
 
-document.getElementById('btnSearch').addEventListener('click', () => {
-  const q = document.getElementById('userSearchInput').value.trim().toLowerCase();
-  if (!q) { renderSearchResults([]); return; }
+const btnSearch = document.getElementById('btnSearch');
+if (btnSearch) {
+    btnSearch.addEventListener('click', () => {
+        const qInput = document.getElementById('userSearchInput');
+        if(!qInput) return;
+        const q = qInput.value.trim().toLowerCase();
+        if (!q) { renderSearchResults([]); return; }
 
-  const filtered = ALL_USERS.filter(u =>
-    String(u.username).toLowerCase().includes(q) ||
-    String(u.deptName).toLowerCase().includes(q) ||
-    String(u.rankName).toLowerCase().includes(q)
-  );
+        const filtered = ALL_USERS.filter(u =>
+            String(u.username).toLowerCase().includes(q) ||
+            String(u.deptName).toLowerCase().includes(q) ||
+            String(u.rankName).toLowerCase().includes(q)
+        );
 
-  renderSearchResults(filtered);
-});
+        renderSearchResults(filtered);
+    });
+}

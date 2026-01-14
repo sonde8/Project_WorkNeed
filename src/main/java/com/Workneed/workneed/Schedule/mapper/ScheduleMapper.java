@@ -47,5 +47,8 @@ public interface ScheduleMapper {
             @Param("status") String status
     );
 
+    //이메일 발송
+    List<String> selectEmailsByUserIds(@Param("userIds") List<Long> userIds);
+
 
 }

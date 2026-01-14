@@ -619,7 +619,7 @@ span.value {
     gap: 10px;
 }
 
-.approval-scope .reject-form {
+.approval-scope .action-reject-form {
     display: none; /* JS 토글 전제 */
     padding: 10px;
     border: 1px solid #eeeeee;
@@ -724,7 +724,7 @@ span.value {
     width: 100%;
     max-width: 520px;
 }
-.approval-scope .reject-form{
+.approval-scope .action-reject-form{
     display: none; /* 기본 숨김(버튼 누르면 JS로 열도록) */
     flex-direction: column;
     gap: 10px;
@@ -733,7 +733,7 @@ span.value {
     border-radius: 12px;
     background: #fafafa;
 }
-.approval-scope .reject-form textarea{
+.approval-scope .action-reject-form textarea{
     width: 100%;
     min-height: 100px;
     resize: vertical;
