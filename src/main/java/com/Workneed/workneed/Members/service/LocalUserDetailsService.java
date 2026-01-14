@@ -15,6 +15,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -40,14 +42,20 @@ public class LocalUserDetailsService implements UserDetailsService {
 
             if (!"ACTIVE".equals(user.getUserStatus())) {
 
-
+                String status = user.getUserStatus();
                 String reason = "pending";
 
-                if (user.getUserCreatedAt() != null) {
-                    long days = java.time.temporal.ChronoUnit.DAYS.between(user.getUserCreatedAt(), java.time.LocalDate.now());
-                    if (days >= 1) {
-                        reason = "inactive";
+                if ("INACTIVE".equals(status)) {
+                    if (user.getUserCreatedAt() != null) {
+                        LocalDate signupDate = user.getUserCreatedAt().toLocalDate();
+                        LocalDate today = LocalDate.now();
+                        long days = ChronoUnit.DAYS.between(signupDate, today);
+                        if (days >= 30) reason = "inactive";
                     }
+                } else if ("SUSPENDED".equals(status)) {
+                    reason = "suspended";
+                } else if ("BANNED".equals(status)) {
+                    reason = "banned";
                 }
                 throw new DisabledException(reason);
             }
