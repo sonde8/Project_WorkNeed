@@ -180,34 +180,91 @@
 <br>
 
 ## 회원가입
+![회원가입2](https://github.com/user-attachments/assets/a413e6f7-f6fe-4b45-b799-c9bae94461c7)
 
-![로그인](https://github.com/user-attachments/assets/5922004c-931d-4fbd-b301-8e032803a535)
 
+
+- 비밀번호란과 비밀번호 확인란이 일치 하지 않을 경우 안내 문구 출력
+- 중복된 아이디와 이메일로 회원가입 불가능
+- 이메일에 발송된 인증번호를 입력해야 회원가입이 가능
+
+<br>
 
 ## 채팅
+![채팅2](https://github.com/user-attachments/assets/68b794ff-77a4-4d74-9865-75bf93e6f6b0)
 
-![채팅](https://github.com/user-attachments/assets/eddf9186-a2b8-4092-8228-e680dafa5eae)
+
+- 채팅방 생성 모달에서 사용자 검색 가능
+- 개인, 단체 채팅방 개설 가능
+- 부서별 트리 구조로 사용자 구분
+- 파일, 이미지 전송 및 다운로드 가능
+- 파일 보관함 기능 구현
+- 전역적 알림 시스템 구현
+
+<br>
 
 ## 캘린더
 
-![캘린더](https://github.com/user-attachments/assets/9930cdd7-c093-4ae1-a861-e9a69dd80bec)
+![캘린더](https://github.com/user-attachments/assets/3321e700-0a53-465c-904d-bec75d2c0a9e)
+- 개인 일정 등록, 수정, 삭제 가능 (색깔 커스텀 가능)
+- 드래그 앤 드롭으로 개인 일정 일정 변경 가능
+- 업무와 연동하여 업무 일정 캘린더에 표시 (업무는 수정, 삭제 불가능)
+- 월/주/일 별로 확인 가능
+- 전체/업무/개인 별로 확인 가능
+
+
+<br>
 
 ## 칸반보드
 
-![칸반보드](https://github.com/user-attachments/assets/91f52b58-db95-4e2f-8f56-51e2ae6308ae)
+![칸반보드](https://github.com/user-attachments/assets/46578101-5d3a-410d-b0a4-25e996b93003)
+- 개인, 팀, 회사별로 업무 생성 가능
+- 팀 업무 생성 시 부서별 트리 구조로 사용자 구분, 전체 선택 기능
+- 드래그 앤 드롭 기능으로 이동 가능 (Done 상태 업무는 이동 불가능)
 
-![칸반보드2](https://github.com/user-attachments/assets/0b727e42-f09f-4e7c-853e-cc07800ab202)
+<br>
 
+## 칸반보드 상세 페이지
+![칸반보드상세](https://github.com/user-attachments/assets/7acf086f-4d54-435d-b697-53542a947958)
+
+- 개인 업무 추가 가능
+- 드래그 앤 드롭으로 이동 가능
+- 진행사항을 계산하여 원형 그래프로 진행도 시각화
+- 파일 업로드 및 다운로드, 깃허브 주소 등록 가능
+- 댓글 작성 가능
+- 채팅 기능과 연동하여 채팅하러 가기 버튼 클릭 시 해당 프로젝트 인원 정보를 가지고 채팅 페이지로 이동
+
+<br>
 
 ## 근태관리
-![근태관리](https://github.com/user-attachments/assets/e05b4dc0-8767-4298-b4a7-bac5f2f1c4ed)
+
+![근태](https://github.com/user-attachments/assets/6eaba3ad-1e5b-46ae-9bc3-a57158c51dc2)
+
+- 근태 메인페이지에서 주간 근무 실적 막대 그래프로 시각화, 근태 현황, 잔여 연차, 연간 근무 확인 가능
+- 출퇴근 버튼 클릭 시 출퇴근 시간 화면에 출력
+- 출근시 업무 상태 버튼을 클릭하여 색상 변경 가능
+- 출근부에서 사용자의 근태 기록 확인 가능
+- 연차관리에서 연차 신청 가능
+
+<br>
 
 ## 전자결재
-![결재](https://github.com/user-attachments/assets/67e22b9c-ed2a-491a-a479-741669bcea7d)
+![전자결재](https://github.com/user-attachments/assets/d80ec29f-0263-4c8b-bc41-5f913712b75b)
+
+- 결재 문서 작성 시 문서 유형 선택 가능
+- 첨부 파일 첨부 가능
+- 검토, 합의, 최종결재, 참조별로 인원 추가 가능
+
+<br>
 
 ## 관리자
+![관리](https://github.com/user-attachments/assets/ab7400ac-3a77-469c-964a-94d32aa14c58)
 
-![관리자](https://github.com/user-attachments/assets/66301cfe-f88d-4e20-b6d2-23ca12998f86)
+- 직원 상태 변경 가능 (부서, 직급, 계정 살태)
+- 직급, 부서 생성 가능
+- 관리자 생성 가능
+
+
 
 
 
