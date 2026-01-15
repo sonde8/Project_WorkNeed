@@ -177,4 +177,42 @@
 - 출퇴근 및 연차 관리 등 기본적인 근태관리
 - 그래프로 주 근무 상황 확인 가능
 
+<br>
+
+## 회원가입
+
+![로그인](https://github.com/user-attachments/assets/5922004c-931d-4fbd-b301-8e032803a535)
+
+
+## 채팅
+
+![채팅](https://github.com/user-attachments/assets/eddf9186-a2b8-4092-8228-e680dafa5eae)
+
+## 캘린더
+
+![캘린더](https://github.com/user-attachments/assets/9930cdd7-c093-4ae1-a861-e9a69dd80bec)
+
+## 칸반보드
+
+![칸반보드](https://github.com/user-attachments/assets/91f52b58-db95-4e2f-8f56-51e2ae6308ae)
+
+![칸반보드2](https://github.com/user-attachments/assets/0b727e42-f09f-4e7c-853e-cc07800ab202)
+
+
+## 근태관리
+![근태관리](https://github.com/user-attachments/assets/e05b4dc0-8767-4298-b4a7-bac5f2f1c4ed)
+
+## 전자결재
+![결재](https://github.com/user-attachments/assets/67e22b9c-ed2a-491a-a479-741669bcea7d)
+
+## 관리자
+
+![관리자](https://github.com/user-attachments/assets/66301cfe-f88d-4e20-b6d2-23ca12998f86)
+
+
+
+
+
+
+
 
