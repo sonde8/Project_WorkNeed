@@ -179,7 +179,9 @@
 
 <br>
 
-## 회원가입
+## 7. 구현
+
+### 회원가입
 ![회원가입2](https://github.com/user-attachments/assets/a413e6f7-f6fe-4b45-b799-c9bae94461c7)
 
 
@@ -190,7 +192,7 @@
 
 <br>
 
-## 채팅
+### 채팅
 ![채팅2](https://github.com/user-attachments/assets/68b794ff-77a4-4d74-9865-75bf93e6f6b0)
 
 
@@ -203,7 +205,7 @@
 
 <br>
 
-## 캘린더
+### 캘린더
 
 ![캘린더](https://github.com/user-attachments/assets/3321e700-0a53-465c-904d-bec75d2c0a9e)
 - 개인 일정 등록, 수정, 삭제 가능 (색깔 커스텀 가능)
@@ -215,7 +217,7 @@
 
 <br>
 
-## 칸반보드
+### 칸반보드
 
 ![칸반보드](https://github.com/user-attachments/assets/46578101-5d3a-410d-b0a4-25e996b93003)
 - 개인, 팀, 회사별로 업무 생성 가능
@@ -224,7 +226,7 @@
 
 <br>
 
-## 칸반보드 상세 페이지
+### 칸반보드 상세 페이지
 ![칸반보드상세](https://github.com/user-attachments/assets/7acf086f-4d54-435d-b697-53542a947958)
 
 - 개인 업무 추가 가능
@@ -236,7 +238,7 @@
 
 <br>
 
-## 근태관리
+### 근태관리
 
 ![근태](https://github.com/user-attachments/assets/6eaba3ad-1e5b-46ae-9bc3-a57158c51dc2)
 
@@ -248,7 +250,7 @@
 
 <br>
 
-## 전자결재
+### 전자결재
 ![전자결재](https://github.com/user-attachments/assets/d80ec29f-0263-4c8b-bc41-5f913712b75b)
 
 - 결재 문서 작성 시 문서 유형 선택 가능
@@ -257,7 +259,7 @@
 
 <br>
 
-## 관리자
+### 관리자
 ![관리](https://github.com/user-attachments/assets/ab7400ac-3a77-469c-964a-94d32aa14c58)
 
 - 직원 상태 변경 가능 (부서, 직급, 계정 살태)
