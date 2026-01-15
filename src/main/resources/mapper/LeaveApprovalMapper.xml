@@ -25,10 +25,11 @@
     <select id="findTeamLeaderId" resultType="long">
         SELECT u.user_id
         FROM user u
-        JOIN ranks r ON r.rank_id = u.rank_id
+                 JOIN ranks r ON r.rank_id = u.rank_id
         WHERE u.dept_id = #{deptId}
-        AND r.rank_name = '차장'
-        LIMIT 1
+          AND r.rank_level >= 4
+        ORDER BY r.rank_level ASC
+            LIMIT 1
     </select>
 
     <insert id="insertApprovedLine">
